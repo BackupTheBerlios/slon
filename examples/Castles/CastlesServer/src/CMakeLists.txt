@@ -1,0 +1,35 @@
+# list headers
+SET ( HEADER_PATH ${EXAMPLE_SOURCE_DIR}/include)
+SET ( SHARED_HEADER_PATH ${EXAMPLE_SOURCE_DIR}/../include)
+SET ( EXAMPLE_HEADERS
+	${HEADER_PATH}/Game.h
+	${HEADER_PATH}/Scene.h
+	${SHARED_HEADER_PATH}/Network.h
+)
+
+# list sources
+SET ( SHARED_SORCE_PATH ${EXAMPLE_SOURCE_DIR}/../src)
+SET ( EXAMPLE_SOURCES
+	main.cpp
+	Game.cpp
+	Scene.cpp
+	${SHARED_SORCE_PATH}/Network.cpp
+)
+
+# target
+ADD_EXECUTABLE ( ${EXAMPLE_NAME} ${EXAMPLE_HEADERS} ${EXAMPLE_SOURCES} )
+
+# libraries
+TARGET_LINK_LIBRARIES ( ${EXAMPLE_NAME} 
+	${TARGET_NAME}
+	${Boost_LIBRARIES}
+	${BULLET_LIBRARIES}
+)
+
+# includes
+INCLUDE_DIRECTORIES ( 
+	${BULLET_INCLUDE_DIR}
+)
+
+
+

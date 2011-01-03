@@ -1,0 +1,261 @@
+#ifndef __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
+#define __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
+
+#include "../Config.h"
+#include "../Utility/Algorithm/algorithm.hpp"
+#include "../Utility/referenced.hpp"
+#include <boost/intrusive_ptr.hpp>
+#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Plane.hpp>
+#include <vector>
+
+namespace slon {
+namespace physics {
+
+/** Collision shape class */
+class CollisionShape :
+	public Referenced
+{
+public:
+	enum SHAPE_TYPE
+	{
+		PLANE,
+		SPHERE,
+		BOX,
+		CONE,
+		CAPSULE,
+		HEIGHTFIELD,
+		CONVEX_MESH,
+		TRIANGLE_MESH,
+		COMPOUND
+	};
+
+    /** Clone the shape */
+    virtual CollisionShape* clone() const = 0;
+
+	/** Get type of the collision shape. */
+	virtual SHAPE_TYPE getShapeType() const = 0;
+
+    /** Scale shape. Some shapes unable to handle arbitrary scaling.
+     * For example, sphere.
+     */
+    virtual void applyScaling(const math::Vector3f& scaling) = 0;
+
+	virtual ~CollisionShape() {}
+};
+
+typedef boost::intrusive_ptr<CollisionShape>        collision_shape_ptr;
+typedef boost::intrusive_ptr<const CollisionShape>  const_collision_shape_ptr;
+
+/** Planar collision shape */
+class PlaneShape :
+	public CollisionShape
+{
+public:
+    PlaneShape(const math::Planef& plane_) :
+        plane(plane_)
+    {}
+
+    // Override shape
+    CollisionShape* clone() const        { return new PlaneShape(plane); }
+	SHAPE_TYPE      getShapeType() const { return PLANE; }
+    void            applyScaling(const math::Vector3f& /*scaling*/) { /*nothing*/ }
+
+public:
+	math::Planef plane;
+};
+
+/** Sphere collision shape */
+class SphereShape :
+	public CollisionShape
+{
+public:
+    SphereShape(float _radius = 1.0f) :
+        radius(_radius)
+    {}
+
+    CollisionShape* clone() const { return new SphereShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return SPHERE; }
+    void            applyScaling(const math::Vector3f& scaling) { radius *= fabs(scaling.x + scaling.y + scaling.z) / 3.0f; }
+
+public:
+	float radius;
+};
+
+/** Box collision shape */
+class BoxShape :
+	public CollisionShape
+{
+public:
+	BoxShape() :
+	    halfExtents(0.0f, 0.0f, 0.0f)
+	{}
+
+	BoxShape(const math::Vector3f& _halfExtents) :
+	    halfExtents(_halfExtents)
+	{}
+
+    CollisionShape* clone() const { return new BoxShape(*this); }
+    SHAPE_TYPE      getShapeType() const { return BOX; }
+    void            applyScaling(const math::Vector3f& scaling)
+    {
+        halfExtents *= math::Vector3f( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
+    }
+
+public:
+	math::Vector3f halfExtents;
+};
+
+/** Cone collision shape */
+class ConeShape :
+	public CollisionShape
+{
+public:
+	ConeShape() :
+	    radius(0),
+	    height(0)
+	{}
+
+	ConeShape(float _radius, float _height) :
+	    radius(_radius),
+	    height(_height)
+	{}
+
+    CollisionShape* clone() const { return new ConeShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CONE; }
+    void applyScaling(const math::Vector3f& scaling)
+    {
+        height *= fabs(scaling.z);
+        radius *= fabs(scaling.x + scaling.y) / 2.0f;
+    }
+public:
+	float radius;
+	float height;
+};
+
+/** Capsule collision shape */
+class CapsuleShape :
+	public CollisionShape
+{
+public:
+    CollisionShape* clone() const { return new CapsuleShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CAPSULE; }
+    void applyScaling(const math::Vector3f& scaling)
+    {
+        height *= fabs(scaling.y);
+        radius *= fabs(scaling.x + scaling.z) / 2.0f;
+    }
+
+public:
+	float height;	/// height of the cylinder
+	float radius;	/// thickness of the cylinder
+};
+
+/** Convex hull collision shape. Collision detection behaviour
+ * is undefined if convex shape is not convex). Use buildConvexHull
+ * in cases you don't know definetely that the point cloud represents
+ * convex hull.
+ */
+class ConvexShape :
+	public CollisionShape
+{
+public:
+	// Override CollisionShape
+    CollisionShape* clone() const { return new ConvexShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CONVEX_MESH; }
+    void applyScaling(const math::Vector3f& scaling)
+    {
+        math::Matrix3f matScaling = math::make_matrix( scaling.x,  0.0f,       0.0f,
+                                                       0.0f,       scaling.y,  0.0f,
+                                                       0.0f,       0.0f,       scaling.z );
+        transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
+    }
+
+	/** Build convex hull of the point cloud and store it as shape.
+	 * @tparam Iterator - iterator type referencing 3-component floating tuple.
+	 * @param beginIter - begin iterator.
+	 * @param beginIter - end iterator.
+	 * @see build_convex_hull
+	 */
+	template<typename Iterator>
+	void buildConvexHull(const Iterator& beginIter, const Iterator& enditer)
+	{
+	    vertices.clear();
+        // TODO: Build convex hull
+        std::copy( beginIter, enditer, std::back_inserter(vertices) );
+	    //build_convex_hull( beginIter, endIter, vertices.begin() );
+	}
+
+public:
+	std::vector<math::Vector3f>	vertices;
+};
+
+/** Arbitrary triangle mesh collision shape */
+class TriangleMeshShape :
+	public CollisionShape
+{
+public:
+    CollisionShape* clone() const { return new TriangleMeshShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return TRIANGLE_MESH; }
+    void applyScaling(const math::Vector3f& scaling)
+    {
+        math::Matrix3f matScaling = math::make_matrix( scaling.x,  0.0f,       0.0f,
+                                                       0.0f,       scaling.y,  0.0f,
+                                                       0.0f,       0.0f,       scaling.z );
+        transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
+    }
+
+public:
+	std::vector<math::Vector3f>	vertices;
+	std::vector<unsigned>		indices;
+};
+
+/** Compound collision shape*/
+class CompoundShape :
+    public CollisionShape
+{
+public:
+    typedef boost::intrusive_ptr<CollisionShape>    collision_shape_ptr;
+
+    struct shape_transform
+    {
+        math::Matrix4f      transform;
+        collision_shape_ptr shape;
+    };
+
+    typedef sgl::vector< shape_transform, sgl::aligned_allocator<shape_transform> > shape_transform_vector;
+    typedef shape_transform_vector::iterator                                        shape_transform_iterator;
+    typedef shape_transform_vector::const_iterator                                  const_shape_trasnform_iterator;
+
+public:
+    // Override CollisionShape
+    CollisionShape* clone() const { return new CompoundShape(*this); }
+    SHAPE_TYPE      getShapeType() const { return COMPOUND; }
+    void applyScaling(const math::Vector3f& scaling)
+    {
+        for (size_t i = 0; i<shapes.size(); ++i) {
+            shapes[i].shape->applyScaling(scaling);
+        }
+    }
+
+    /** Add shape with transform
+     * @param transform - transform of the shape. Scaling doesn't applied.
+     * @param collisionShape - collision shape. Do not allocate on stack.
+     */
+    void addShape( const math::Matrix4f& transform,
+                   CollisionShape&       collisionShape )
+    {
+        shape_transform shapeTransform;
+        shapeTransform.transform = transform;
+        shapeTransform.shape.reset(&collisionShape);
+        shapes.push_back(shapeTransform);
+    }
+
+public:
+    shape_transform_vector shapes;
+};
+
+} // namespace physics
+} // namespace slon
+
+#endif // __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
