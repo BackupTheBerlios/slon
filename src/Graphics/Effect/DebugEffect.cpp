@@ -20,45 +20,42 @@ namespace slon {
 namespace graphics {
 
 // Debug effect
-DebugEffect::DebugEffect() :
-    modelMatrix( math::make_identity<float, 4>() ),
-    color( math::Vector4f(1.0f, 1.0f, 0.0f, 1.0f) ),
-    useCameraProjection(true),
-    depthTest(true)
+DebugEffect::DebugEffect(const DESC& desc_)
+:   desc(desc_)
 {
     // create binders
-    colorBinder.reset( new parameter_binding<math::Vector4f>(&color, 1, false) );
-    ownProjectionMatrixBinder.reset( new parameter_binding<math::Matrix4f>(&projectionMatrix, 1, false) );
+    colorBinder.reset( new parameter_binding<math::Vector4f>(&desc.color, 1, false) );
+    ownProjectionMatrixBinder.reset( new parameter_binding<math::Matrix4f>(&desc.projectionMatrix, 1, false) );
 
     // create pass
     switch ( currentRenderer()->getRenderTechnique() )
     {
         case Renderer::FIXED_PIPELINE:
         {
-            detail::FFPPass::DESC desc;
+            detail::FFPPass::DESC pdesc;
 
-            desc.projectionMatrixBinding.parameter  = ownProjectionMatrixBinder.get();
-            desc.worldViewMatrixBinding.parameter   = worldViewMatrixBinder.get();
-            desc.diffuseSpecularBinding.parameter   = colorBinder.get();
+            pdesc.projectionMatrixBinding.parameter  = ownProjectionMatrixBinder.get();
+            pdesc.worldViewMatrixBinding.parameter   = worldViewMatrixBinder.get();
+            pdesc.diffuseSpecularBinding.parameter   = colorBinder.get();
 
             {
                 sgl::DepthStencilState::DESC dsDesc;
-                dsDesc.depthEnable   = depthTest;
+                dsDesc.depthEnable   = desc.depthTest;
                 dsDesc.stencilEnable = false;
 
-                desc.depthStencilState = currentDevice()->CreateDepthStencilState(dsDesc);
+                pdesc.depthStencilState = currentDevice()->CreateDepthStencilState(dsDesc);
             }
 
             {
                 sgl::RasterizerState::DESC rsDesc;
-                rsDesc.fillMode  = wireframe ? sgl::RasterizerState::WIREFRAME : sgl::RasterizerState::SOLID;
-                rsDesc.cullMode  = sgl::RasterizerState::BACK;
+                rsDesc.fillMode  = desc.wireframe ? sgl::RasterizerState::WIREFRAME : sgl::RasterizerState::SOLID;
+                rsDesc.cullMode  = sgl::RasterizerState::NONE;
                 rsDesc.colorMask = sgl::RasterizerState::RGBA;
 
-                desc.rasterizerState = currentDevice()->CreateRasterizerState(rsDesc);
+                pdesc.rasterizerState = currentDevice()->CreateRasterizerState(rsDesc);
             }
 
-            pass.reset( new detail::FFPPass(desc) );
+            pass.reset( new detail::FFPPass(pdesc) );
             break;
         }
 
@@ -70,36 +67,36 @@ DebugEffect::DebugEffect() :
             program.addShader("Data/Shaders/debug.vert");
             program.addShader("Data/Shaders/debug.frag");
 
-            detail::Pass::DESC desc;
-            desc.program = program.getProgram();
-            desc.priority = ForwardRenderer::makePriority(ForwardRenderer::OPAQUE_BIN, desc.program);
+            detail::Pass::DESC pdesc;
+            pdesc.program = program.getProgram();
+            pdesc.priority = ForwardRenderer::makePriority(ForwardRenderer::OPAQUE_BIN, pdesc.program);
 
             {
                 sgl::DepthStencilState::DESC dsDesc;
-                dsDesc.depthEnable   = depthTest;
+                dsDesc.depthEnable   = desc.depthTest;
                 dsDesc.stencilEnable = false;
 
-                desc.depthStencilState = currentDevice()->CreateDepthStencilState(dsDesc);
+                pdesc.depthStencilState = currentDevice()->CreateDepthStencilState(dsDesc);
             }
 
             {
                 sgl::RasterizerState::DESC rsDesc;
-                rsDesc.fillMode  = wireframe ? sgl::RasterizerState::WIREFRAME : sgl::RasterizerState::SOLID;
-                rsDesc.cullMode  = sgl::RasterizerState::BACK;
+                rsDesc.fillMode  = desc.wireframe ? sgl::RasterizerState::WIREFRAME : sgl::RasterizerState::SOLID;
+                rsDesc.cullMode  = sgl::RasterizerState::NONE;
                 rsDesc.colorMask = sgl::RasterizerState::RGBA;
 
-                desc.rasterizerState = currentDevice()->CreateRasterizerState(rsDesc);
+                pdesc.rasterizerState = currentDevice()->CreateRasterizerState(rsDesc);
             }
 
             detail::Pass::UNIFORM_DESC uniformDesc;
             uniformDesc.uniformName = "worldViewProjMatrix";
             uniformDesc.parameter   = worldViewProjMatrixBinder.get();
-            desc.uniforms.push_back(uniformDesc);
+            pdesc.uniforms.push_back(uniformDesc);
             uniformDesc.uniformName = "color";
             uniformDesc.parameter   = colorBinder.get();
-            desc.uniforms.push_back(uniformDesc);
+            pdesc.uniforms.push_back(uniformDesc);
 
-            pass.reset( new detail::Pass(desc) );
+            pass.reset( new detail::Pass(pdesc) );
             break;
         }
 
@@ -108,59 +105,33 @@ DebugEffect::DebugEffect() :
     }
 }
 
-void DebugEffect::setModelMatrix(const math::Matrix4f& _modelMatrix)
-{
-    modelMatrix = _modelMatrix;
-}
-
-void DebugEffect::setProjectionMatrix(bool useCameraProjection_, const math::Matrix4f& projectionMatrix_)
-{
-    useCameraProjection = useCameraProjection_;
-    projectionMatrix    = projectionMatrix_;
-}
-
-void DebugEffect::setColor(const math::Vector4f& color)
-{
-    colorBinder->write_value(color);
-}
-
-void DebugEffect::toggleDepthTest(bool _depthTest)
-{
-    depthTest = _depthTest;
-}
-
-void DebugEffect::toggleWireframe(bool _wireframe)
-{
-    wireframe = _wireframe;
-}
-
 int DebugEffect::present(render_group_handle /*renderGroup*/, render_pass_handle renderPass, Pass** passes)
 {
     if (renderPass == DebugPass)
     {
-        if (useCameraProjection)
+        if (desc.useCameraProjection)
         {
             worldViewMatrixBinder->write_value( viewMatrixBinder->value() *
                                                 worldMatrixBinder->value()
-                                                * modelMatrix );
+                                                * desc.modelMatrix );
 
             worldViewProjMatrixBinder->write_value( projectionMatrixBinder->value() 
                                                     * viewMatrixBinder->value()
                                                     * worldMatrixBinder->value()
-                                                    * modelMatrix );
+                                                    * desc.modelMatrix );
 
             ownProjectionMatrixBinder->write_value( projectionMatrixBinder->value() );
         }
         else
         {
             worldViewMatrixBinder->write_value( worldMatrixBinder->value()
-                                                * modelMatrix );
+                                                * desc.modelMatrix );
 
-            worldViewProjMatrixBinder->write_value( projectionMatrix 
+            worldViewProjMatrixBinder->write_value( desc.projectionMatrix 
                                                     * worldMatrixBinder->value()
-                                                    * modelMatrix );
+                                                    * desc.modelMatrix );
 
-            ownProjectionMatrixBinder->write_value( projectionMatrix );
+            ownProjectionMatrixBinder->write_value( desc.projectionMatrix );
         }
 
         passes[0] = pass.get();

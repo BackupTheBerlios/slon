@@ -120,12 +120,16 @@ void DebugMesh::pushPrimitive( sgl::PRIMITIVE_TYPE primType,
     {
         // add new subset
         subset s;
-        s.debugEffect.reset( new DebugEffect() );
-        s.debugEffect->setColor(color);
-        s.debugEffect->toggleDepthTest(depthTest);
-        s.debugEffect->toggleWireframe(wireframe);
-        s.debugEffect->setModelMatrix(transform);
-        s.debugEffect->setProjectionMatrix(useCameraProjection, projection);
+        {
+            DebugEffect::DESC desc;
+            desc.color               = color;
+            desc.depthTest           = depthTest;
+            desc.wireframe           = wireframe;
+            desc.modelMatrix         = transform;
+            desc.projectionMatrix    = projection;
+            desc.useCameraProjection = useCameraProjection;
+            s.debugEffect.reset( new DebugEffect(desc) );
+        }
         s.debugEffect->bindParameter( unique_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&baseTransform, 1) );
         s.debugMesh     = this;
         s.transform     = transform;

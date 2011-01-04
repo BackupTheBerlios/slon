@@ -118,29 +118,30 @@ DebugMesh& operator << (DebugMesh& mesh, const debug::line& l)
 
 DebugMesh& operator << (DebugMesh& mesh, const sector& s)
 {
-    assert(s.loLimit <= s.hiLimit && s.splits > 0);
- 
+    assert(s.splits > 0);
+
     // tip
+    size_t base = mesh.vertices.size();
     mesh.vertices.push_back( math::Vector3f(0.0f, 0.0f, 0.0f) );
-    mesh.indices.push_back(0);
+    mesh.indices.push_back(base);
     
     // arc
-    math::Vector3f pointer = math::make_rotation(s.loLimit, s.cross) * s.up;
-    float          step    = (s.hiLimit - s.loLimit) / s.splits;
-    for (unsigned i = 0; i < s.splits; ++i)
+    for (unsigned i = 0; i < s.splits + 1; ++i)
     {
+        float          angle   = s.loLimit + i * (s.hiLimit - s.loLimit) / s.splits;
+        math::Vector3f pointer = math::make_rotation(angle, s.cross) * s.up;
         mesh.vertices.push_back(pointer);
-        mesh.indices.push_back(i + 1);
-        pointer = math::make_rotation(step, s.cross) * pointer;
+        mesh.indices.push_back(base + i + 1);
     }
     
+    mesh.wireframe = !s.filled;
     if (s.filled) {
-        mesh.pushPrimitive(sgl::TRIANGLE_FAN, s.splits + 1);
+        mesh.pushPrimitive(sgl::TRIANGLE_FAN, s.splits + 2);
     }
     else {
-        mesh.pushPrimitive(sgl::LINE_LOOP, s.splits + 1);
+        mesh.pushPrimitive(sgl::LINE_LOOP, s.splits + 2);
     }
-
+    mesh.geometryDirty = true;
 
     return mesh;
 }
