@@ -30,6 +30,9 @@ MESSAGE ("Use SSE: " ${SLON_ENGINE_USE_SSE})
 OPTION_DEPENDENT_ON_PACKAGE ( SLON_ENGINE_USE_BULLET "Set ON to enable bullet physics support" BULLET_FOUND )
 MESSAGE ( "Using bullet physics: " ${SLON_ENGINE_USE_BULLET} )
 
+OPTION_DEPENDENT_ON_PACKAGE ( SLON_ENGINE_USE_GNUPLOT "Set ON to enable gnuplot for drawing graphics" GNUPLOT_FOUND )
+MESSAGE ( "Use gnuplot: " ${SLON_ENGINE_USE_GNUPLOT} )
+
 OPTION_DEPENDENT_ON_PACKAGE ( BUILD_DOCUMENTATION "Set ON to build doxygen reference documentation" DOXYGEN_FOUND )
 MESSAGE ( "Build documentation: " ${BUILD_DOCUMENTATION} )
 

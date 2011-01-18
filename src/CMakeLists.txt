@@ -306,6 +306,7 @@ SET ( TARGET_UTILITY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/math.hpp
     ${TARGET_HEADER_PATH}/Utility/referenced.hpp
     ${TARGET_HEADER_PATH}/Utility/singleton.hpp
+    ${TARGET_HEADER_PATH}/Utility/tmp_file.hpp
     ${TARGET_HEADER_PATH}/Utility/unique_string.hpp
 )
 
@@ -326,6 +327,10 @@ SET ( TARGET_UTILITY_MEMORY_HEADERS
 SET ( TARGET_UTILITY_URI_HEADERS
     ${TARGET_HEADER_PATH}/Utility/URI/uri.hpp
     ${TARGET_HEADER_PATH}/Utility/URI/file_uri.hpp
+)
+
+SET ( TARGET_UTILITY_PLOT_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/Plot/gnuplot.h
 )
 
 # group headers
@@ -373,6 +378,7 @@ SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAI
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
 SOURCE_GROUP( headers\\Utility\\Algorithm FILES            ${TARGET_UTILITY_ALGORITHM_HEADERS} )
 SOURCE_GROUP( headers\\Utility\\Memory FILES               ${TARGET_UTILITY_MEMORY_HEADERS} )
+SOURCE_GROUP( headers\\Utility\\Plot FILES                 ${TARGET_UTILITY_PLOT_HEADERS} )
 SOURCE_GROUP( headers\\Utility\\URI FILES                  ${TARGET_UTILITY_URI_HEADERS} )
 
 SET ( TARGET_HEADERS
@@ -427,6 +433,12 @@ IF (SLON_ENGINE_USE_BULLET)
         ${TARGET_SCENE_VISITORS_PHYSICS_HEADERS} 
     )
 ENDIF (SLON_ENGINE_USE_BULLET)
+
+IF (SLON_ENGINE_USE_GNUPLOT)
+    LIST ( APPEND TARGET_HEADERS
+        ${TARGET_UTILITY_PLOT_HEADERS} 
+    )
+ENDIF (SLON_ENGINE_USE_GNUPLOT)
 
 # list sources
 SET ( TARGET_SOURCES
@@ -679,6 +691,10 @@ SET ( TARGET_UTILITY_SOURCES
 	Utility/error.cpp
 )
 
+SET ( TARGET_UTILITY_PLOT_SOURCES
+	Utility/Plot/gnuplot.cpp
+)
+
 # group sources
 SOURCE_GROUP( sources FILES                                ${TARGET_SOURCES} )
 SOURCE_GROUP( sources\\Animation FILES                     ${TARGET_ANIMATION_SOURCES} )
@@ -721,6 +737,7 @@ SOURCE_GROUP( sources\\Scene\\Visitors\\Physics FILES      ${TARGET_SCENE_VISITO
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
+SOURCE_GROUP( sources\\Utility\\Plot FILES                 ${TARGET_UTILITY_PLOT_SOURCES} )
 
 SET ( TARGET_SOURCES
     ${TARGET_SOURCES}
@@ -771,6 +788,12 @@ IF (SLON_ENGINE_USE_BULLET)
         ${TARGET_SCENE_VISITORS_PHYSICS_SOURCES}
     )
 ENDIF (SLON_ENGINE_USE_BULLET)
+
+IF (SLON_ENGINE_USE_GNUPLOT)
+    LIST ( APPEND TARGET_SOURCES
+        ${TARGET_UTILITY_PLOT_SOURCES}
+    )
+ENDIF (SLON_ENGINE_USE_GNUPLOT)
 
 # library target
 ADD_LIBRARY ( ${TARGET_UNIX_NAME} STATIC ${TARGET_HEADERS} ${TARGET_SOURCES} ${TARGET_OPTIONS} )
@@ -975,6 +998,13 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 		FILES       ${TARGET_UTILITY_URI_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Utility/URI
 	)
+    
+    IF (SLON_ENGINE_USE_GNUPLOT)
+        INSTALL (
+            FILES       ${TARGET_UTILITY_PLOT_HEADERS}
+            DESTINATION ${INSTALL_INCDIR}/slon/Utility/Plot
+        )
+    ENDIF (SLON_ENGINE_USE_GNUPLOT)
 
 	IF (SLON_ENGINE_USE_PHYSICS)
 		INSTALL (
