@@ -9,10 +9,16 @@ namespace slon {
 namespace physics {
 
 class BulletRotationalServoMotor :
-    public BulletRotationalMotor<ServoMotor>
+    public BulletRotationalMotor<ServoMotor>,
+    public BulletSolver
 {
+typedef BulletRotationalMotor<ServoMotor> motor_base;
 public:
     BulletRotationalServoMotor(BulletConstraint* constraint, int axis);
+
+    // Override BulletSolver
+    void solve(btScalar dt);
+    void accept(BulletSolverCollector& collector);
 
     // Override BulletRotationalMotor
     void reset(BulletConstraint* constraint, int axis);
@@ -24,6 +30,7 @@ public:
 
 private:
     btScalar targetForce;
+    bool     enableMotor;
 };
 
 } // namespace physics

@@ -71,7 +71,6 @@ void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
 void BulletDynamicsWorld::stepSimulation(float dt)
 {
     // simulate
-    solverCollector.clear();
     accept(solverCollector);
     {
         float t = 0;
@@ -82,6 +81,7 @@ void BulletDynamicsWorld::stepSimulation(float dt)
             dynamicsWorld->stepSimulation(timeStep, 1, desc.fixedTimeStep);
         }
     }
+    solverCollector.clear();
 
     // enumerate contacts
     contact_vector              currentContacts;
