@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_PARAMETER_BINDING_H__
 
 #include "../Utility/referenced.hpp"
+#include "../Utility/Memory/object_in_pool.hpp"
 #include "Forward.h"
 #include <boost/intrusive_ptr.hpp>
 #include <sgl/Math/Matrix.hpp>
@@ -21,7 +22,7 @@ typedef boost::intrusive_ptr<const abstract_parameter_binding>  const_binding_pt
 
 template<typename T>
 struct parameter_binding :
-    public abstract_parameter_binding
+    public object_in_pool<parameter_binding<T>, abstract_parameter_binding>
 {
 public:
     parameter_binding(T*        valuesPtr_   = 0,
@@ -50,8 +51,7 @@ public:
 
     void write_value(const T& value, unsigned offset = 0)
     {
-        valuesPtr[offset] = 
-            value;
+        valuesPtr[offset] = value;
         ++useCount;
     }
 

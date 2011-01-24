@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __SLON_ENGINE_BLOCK_ALLOCATOR_H__
+#define __SLON_ENGINE_BLOCK_ALLOCATOR_H__
+
 #include <boost/pool/pool.hpp>
 
 // Fuck WinAPI
@@ -15,7 +17,8 @@ namespace slon {
  * @tparam UserAllocator - allocator for allocating bytes, must support allocate(size_t nbytes, void* hint), deallocate(void* ptr, size_t size) functions
  */
 template<typename UserAllocator = boost::default_user_allocator_new_delete>
-class block_allocator
+class block_allocator :
+	protected UserAllocator
 {
 public:
     typedef UserAllocator								user_allocator;
@@ -28,9 +31,14 @@ private:
     typedef char*										byte_pointer;
 
 private:
-	pointer& get_node_ptr(pointer ptr)
+	pointer& next_of(pointer ptr)
 	{
-		return *reinterpret_cast<pointer*>(ptr);
+		return *static_cast<pointer*>(ptr);
+	}
+
+	size_type& size_of(pointer ptr)
+	{
+		return *static_cast<size_type*>(ptr);
 	}
 
 	void link_nodes(byte_pointer begin, byte_pointer end)
@@ -41,25 +49,34 @@ private:
 			endNode_ = begin;
 			while (begin != end)
 			{
-				get_node_ptr(begin) = begin + blockSize_;
+				next_of(begin) = begin + blockSize_;
 				begin += blockSize_;
 			}
-			get_node_ptr(end - blockSize_) = 0;
+			next_of(end - blockSize_) = 0;
 		}
 	}
 
     void extend(size_type size)
     {
-		byte_pointer chunk  = user_allocator::malloc( size * blockSize_ + sizeof(pointer) );
-		capacity_		   += size;
-		get_node_ptr(chunk) = endChunk_;
-        endChunk_           = chunk;
-		chunk              += sizeof(pointer);
+		if (size > nextSize_) {
+			nextSize_ = size;
+		}
+
+		size_type    msize  = nextSize_ * blockSize_;
+		byte_pointer chunk  = user_allocator::malloc( msize + sizeof(pointer) + sizeof(size_type) );
+		capacity_		   += nextSize_;
+		nextSize_		  <<= 1;
 		
 		if (endNode_) {
-			get_node_ptr(endNode_) = chunk;
+			next_of(endNode_) = chunk;
 		}
-        link_nodes(chunk, chunk + size * blockSize_);
+        link_nodes(chunk, chunk + msize);
+
+        chunk         += msize;
+		next_of(chunk) = endChunk_;
+        endChunk_      = chunk;
+        chunk         += sizeof(pointer);
+		size_of(chunk) = msize;
     }
 
 	// noncopyable
@@ -68,10 +85,10 @@ private:
 public:
     block_allocator(size_type blockSize, 
 					size_type capacity = 0,
-					size_type blocksPerPage = 4094)
+					size_type nextSize = 32)
     :   blockSize_(blockSize)
-	,	capacity_(0)
-	,	blocksPerPage_(blocksPerPage)
+	,	capacity_(capacity)
+	,	nextSize_(nextSize)
 	,	endChunk_(0)
     ,   endNode_(0)
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
@@ -80,7 +97,7 @@ public:
 	,	maxNumActiveAllocations_(0)
 #endif
     {
-		assert( blockSize_ >= sizeof(pointer) && blockSize_ % sizeof(pointer) == 0 && blocksPerPage_ > 0 );
+		assert( blockSize_ >= sizeof(pointer) && blockSize_ % sizeof(pointer) == 0 && nextSize > 0 );
 		if (capacity > 0) {
 			extend(capacity);
 		}
@@ -89,7 +106,7 @@ public:
 	block_allocator(const block_allocator& other)
     :   blockSize_(other.blockSize_)
 	,	capacity_(0)
-	,	blocksPerPage_(other.blocksPerPage_)
+	,	nextSize_(other.nextSize_)
 	,	endChunk_(0)
     ,   endNode_(0)
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
@@ -103,7 +120,7 @@ public:
 	~block_allocator()
 	{
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
-		assert(numDeallocations_ == numDeallocations_); // memory is free
+		assert(numAllocations_ == numDeallocations_); // memory is free
 #endif
 		clear();
 	}
@@ -113,7 +130,8 @@ public:
         while (endChunk_) 
 		{
 			byte_pointer chunk = (byte_pointer)endChunk_;
-			endChunk_ = get_node_ptr(endChunk_);
+			endChunk_ = next_of(chunk);
+            chunk -= size_of(chunk + sizeof(pointer)); // get pointer to the beginning of the chunk
 			user_allocator::free(chunk);
 		}
     }
@@ -123,7 +141,7 @@ public:
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
 		++numDeallocations_;
 #endif
-		get_node_ptr(node) = endNode_;
+		next_of(node) = endNode_;
 		endNode_ = node;
     }
 
@@ -134,24 +152,24 @@ public:
 		maxNumActiveAllocations_ = std::max(numAllocations_ - numDeallocations_, maxNumActiveAllocations_);
 #endif
 		if (!endNode_) {
-			extend(blocksPerPage_);
+			extend(1);
 		}
 
 		pointer allocated = endNode_;
-		endNode_ = get_node_ptr(endNode_); 
+		endNode_ = next_of(endNode_); 
 		return allocated;
 	}
 
     bool		empty() const			{ return endNode_ == 0; }
 	size_type	block_size() const		{ return blockSize_; }
-	size_type	blocks_per_page() const	{ return blocksPerPage_; }
+	size_type	next_size() const		{ return nextSize_; }
 	size_type	page_size() const		{ return blocksPerPage_ + sizeof(pointer); }
     size_type	capacity() const		{ return capacity_; }
 
-	void set_blocks_per_page(size_type blocksPerPage)
+	void set_next_size(size_type nextSize)
 	{
-		assert(blocksPerPage > 0);
-		blocksPerPage_ = blocksPerPage;
+		assert(nextSize > 0);
+		nextSize_ = nextSize;
 	}
 	
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
@@ -167,7 +185,7 @@ public:
 private:
 	size_type	blockSize_;
     size_type	capacity_;
-    size_type	blocksPerPage_;
+    size_type	nextSize_;
     pointer		endChunk_;
 	pointer		endNode_;
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
@@ -181,3 +199,5 @@ private:
 
 #pragma pop_macro("min")
 #pragma pop_macro("max")
+
+#endif // __SLON_ENGINE_BLOCK_ALLOCATOR_H__

@@ -14,7 +14,7 @@ namespace detail {
 
 /* Technique performing object lighting using shaders */
 class Pass :
-    public graphics::Pass
+    public object_in_pool<Pass, graphics::Pass>
 {
 public:
     typedef std::vector<uniform_binder_ptr>         uniform_binder_vector;

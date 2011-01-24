@@ -18,8 +18,8 @@ namespace {
     {
         assert(desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies");
 
-        btRigidBody& rigidBodyA = *static_cast<BulletRigidBody*>(desc.rigidBodies[0])->getBulletRigidBody();
-        btRigidBody& rigidBodyB = *static_cast<BulletRigidBody*>(desc.rigidBodies[1])->getBulletRigidBody();
+        btRigidBody& rigidBodyA = *static_cast<BulletRigidBody*>(desc.rigidBodies[0])->getBtRigidBody();
+        btRigidBody& rigidBodyB = *static_cast<BulletRigidBody*>(desc.rigidBodies[1])->getBtRigidBody();
 
         btGeneric6DofConstraint* constraint = new btGeneric6DofConstraint( rigidBodyA,
                                                                            rigidBodyB,

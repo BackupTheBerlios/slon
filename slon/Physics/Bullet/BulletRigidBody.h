@@ -78,8 +78,8 @@ public:
     /** Connect event handler that will be called on destroy. */
     connection_type connectDestroyHandler(rigid_body_signal::slot_type handler);
 
-    /** Get rigid body used for bullet. */
-    rigid_body_ptr getBulletRigidBody() const { return rigidBody; }
+    /** Get internal bullet rigid body. */
+    const rigid_body_ptr& getBtRigidBody() const { return rigidBody; }
 
     ~BulletRigidBody();
 

@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_BINDER_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_BINDER_H__
 
+#include "../../../Utility/Memory/object_in_pool.hpp"
 #include "../../Detail/UniformTable.h"
 #include <vector>
 
@@ -25,7 +26,7 @@ typedef boost::intrusive_ptr<const AbstractUniformBinder>     const_uniform_bind
 /** Binds values to the uniform. */
 template<typename T>
 class UniformBinder :
-    public AbstractUniformBinder
+    public object_in_pool<UniformBinder<T>, AbstractUniformBinder>
 {
 private:
     typedef boost::intrusive_ptr< uniform_binding<T> >                  uniform_binding_ptr;
@@ -79,7 +80,7 @@ typedef boost::intrusive_ptr<const AbstractSamplerBinder>     const_sampler_bind
 /** Binds values to the uniform. */
 template<typename T>
 class SamplerUniformBinder :
-    public AbstractSamplerBinder
+    public object_in_pool<SamplerUniformBinder<T>, AbstractSamplerBinder>
 {
 private:
     typedef boost::intrusive_ptr< sampler_uniform_binding<T> >          uniform_binding_ptr;

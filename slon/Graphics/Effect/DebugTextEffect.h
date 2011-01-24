@@ -1,6 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_TEXT_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_TEXT_EFFECT_H__
 
+#include "../../Utility/Memory/aligned_allocator.hpp"
+#include "../../Utility/Memory/object_in_pool.hpp"
 #include "../Effect.h"
 #include "Pass.h"
 #include <sgl/Font.h>
@@ -10,7 +12,7 @@ namespace graphics {
 
 /** Effect for rendering debug information */
 class DebugTextEffect :
-    public Effect
+    public object_in_pool<DebugTextEffect, Effect, aligned_allocator<0x10> >
 {
 public:
     DebugTextEffect( const sgl::Font*      font  = 0, 

@@ -19,15 +19,18 @@ class ParameterTable :
 private:
     template<typename T>
     class parameter_binding :
-        public graphics::parameter_binding<T>
+        public object_in_pool<parameter_binding<T>, graphics::parameter_binding<T> >
     {
+    public:
+        typedef object_in_pool<parameter_binding<T>, graphics::parameter_binding<T> > base_type;
+
     public:
         parameter_binding(unique_string     name_,
                           ParameterTable*   parameterTable_,
                           T*                values          = 0,
                           unsigned          count           = 0,
                           bool              dynamic         = true) :
-            graphics::parameter_binding<T>(values, count, dynamic),
+            base_type(values, count, dynamic),
             name(name_),
             parameterTable(parameterTable_)
         {

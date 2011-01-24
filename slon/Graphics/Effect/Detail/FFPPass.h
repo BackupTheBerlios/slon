@@ -13,7 +13,7 @@ namespace detail {
 
 /* Technique performing object lighting using shaders */
 class FFPPass :
-    public graphics::Pass
+    public object_in_pool<FFPPass, graphics::Pass>
 {
 public:
     template<typename T>

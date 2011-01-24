@@ -1,6 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_EFFECT_H__
 
+#include "../../Utility/Memory/aligned_allocator.hpp"
+#include "../../Utility/Memory/object_in_pool.hpp"
 #include "TransformEffect.h"
 
 namespace slon {
@@ -8,7 +10,7 @@ namespace graphics {
 
 /** Effect for rendering debug information */
 class DebugEffect :
-    public TransformEffect
+    public object_in_pool<DebugEffect, TransformEffect, aligned_allocator<0x10> >
 {
 public:
     struct DESC

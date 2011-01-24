@@ -318,9 +318,11 @@ SET ( TARGET_UTILITY_ALGORITHM_HEADERS
 )
 
 SET ( TARGET_UTILITY_MEMORY_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/Memory/aligned_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/block_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/if_then_else.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/small_object_allocator.hpp
+    ${TARGET_HEADER_PATH}/Utility/Memory/object_in_pool.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/object_pool.hpp
 )
 
