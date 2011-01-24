@@ -16,6 +16,7 @@ namespace {
         if (desc.collisionShape)
 		{
 		    collisionShape = createBtCollisionShape(*desc.collisionShape);
+			collisionShape->setMargin(0.01f);
             
             if (desc.mass > 0.0f) {
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);

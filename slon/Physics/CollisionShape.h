@@ -128,6 +128,7 @@ public:
         height *= fabs(scaling.z);
         radius *= fabs(scaling.x + scaling.y) / 2.0f;
     }
+
 public:
 	float radius;
 	float height;
