@@ -897,8 +897,8 @@ namespace {
                                 throw collada_error(logger, "Unable to build collision shape using 2-dimensional vertices");
                             }
 
-                            collisionShape->buildConvexHull( vector3f_composer( colladaSource.floatArray.begin(), colladaSource.stride ),
-                                                             vector3f_composer( colladaSource.floatArray.end(), colladaSource.stride ) );
+                            collisionShape->buildConvexHull( vector_composer<physics::real, 3>( colladaSource.floatArray.begin(), colladaSource.stride ),
+                                                             vector_composer<physics::real, 3>( colladaSource.floatArray.end(), colladaSource.stride ) );
                             break;
                         }
                     }
@@ -928,8 +928,8 @@ namespace {
                                 throw collada_error(logger, "Unable to build collision shape using 2-dimensional vertices");
                             }
 
-                            std::copy( vector3f_composer( colladaSource.floatArray.begin(), colladaSource.stride ),
-                                       vector3f_composer( colladaSource.floatArray.end(), colladaSource.stride ),
+                            std::copy( vector_composer<physics::real, 3>( colladaSource.floatArray.begin(), colladaSource.stride ),
+                                       vector_composer<physics::real, 3>( colladaSource.floatArray.end(), colladaSource.stride ),
                                        std::back_inserter(collisionShape->vertices) );
 
                             vertexInput = i;
@@ -980,9 +980,8 @@ namespace {
                 case collada_shape_geometry::BOX:
                 {
                     const collada_box_shape& colladaBoxShape = static_cast<const collada_box_shape&>(*colladaShape.geometry);
-                    return new physics::BoxShape(colladaBoxShape.halfExtents);
+                    return new physics::BoxShape(math::Vector3r(colladaBoxShape.halfExtents));
                 }
-
 
                 case collada_shape_geometry::TAPPERED_CYLINDER:
                 {
@@ -1013,14 +1012,14 @@ namespace {
             // create constraint
             physics::Constraint::state_desc desc(colladaConstraint.sid);
 
-            desc.frames[0] = colladaConstraint.refAttachment.transform;
-            desc.frames[1] = colladaConstraint.attachment.transform;
+            desc.frames[0] = math::Matrix4r(colladaConstraint.refAttachment.transform);
+            desc.frames[1] = math::Matrix4r(colladaConstraint.attachment.transform);
 
             desc.rigidBodies[0] = sceneModel.findRigidBody(colladaConstraint.refAttachment.rigidBody->sid)->get();
             desc.rigidBodies[1] = sceneModel.findRigidBody(colladaConstraint.attachment.rigidBody->sid)->get();
 
-            desc.linearLimits[0] = colladaConstraint.limits.linear[0];
-            desc.linearLimits[1] = colladaConstraint.limits.linear[1];
+            desc.linearLimits[0] = math::Vector3r(colladaConstraint.limits.linear[0]);
+            desc.linearLimits[1] = math::Vector3r(colladaConstraint.limits.linear[1]);
 
             for (int i = 0; i<3; ++i)
             {
@@ -1053,7 +1052,7 @@ namespace {
                 physics::CompoundShape* compoundShape = new physics::CompoundShape();
                 for (size_t i = 0; i<colladaRigidBody.shapes.size(); ++i)
                 {
-                    compoundShape->addShape( colladaRigidBody.shapes[i]->transform,
+                    compoundShape->addShape( math::Matrix4r(colladaRigidBody.shapes[i]->transform),
                                              *createCollisionShape(*colladaRigidBody.shapes[i]) );
                 }
 

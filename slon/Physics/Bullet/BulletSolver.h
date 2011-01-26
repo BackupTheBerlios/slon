@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_PHYSICS_BULLET_SOLVER_H__
 #define __SLON_ENGINE_PHYSICS_BULLET_SOLVER_H__
 
+#include "../Forward.h"
 #include <boost/intrusive/slist.hpp>
-#include <LinearMath/btScalar.h>
 
 namespace slon {
 namespace physics {
@@ -14,7 +14,7 @@ class BulletSolver
 friend class BulletSolverCollector;
 public:
     /** Resolve some physics */
-    virtual void solve(btScalar dt) = 0;
+    virtual void solve(real dt) = 0;
 
     /** Accept collector */
     virtual void accept(BulletSolverCollector& collector) = 0;

@@ -44,18 +44,18 @@ public:
                     DynamicsWorld*               dynamicsWorld);
 
     // implement RigidBody
-    void applyForce(const math::Vector3f& force, const math::Vector3f& pos);
-    void applyTorque(const math::Vector3f& torque);
-    void applyImpulse(const math::Vector3f& impulse, const math::Vector3f& pos);
-    void applyTorqueImpulse(const math::Vector3f& torqueImpulse);
+    void applyForce(const math::Vector3r& force, const math::Vector3r& pos);
+    void applyTorque(const math::Vector3r& torque);
+    void applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos);
+    void applyTorqueImpulse(const math::Vector3r& torqueImpulse);
 
-    math::Vector3f      getTotalForce() const;
-    math::Vector3f      getTotalTorque() const;
-    math::Matrix4f      getTransform() const;
-    float 		        getMass() const;
+    math::Vector3r      getTotalForce() const;
+    math::Vector3r      getTotalTorque() const;
+    math::Matrix4r      getTransform() const;
+    real 		        getMass() const;
     ACTIVATION_STATE    getActivationState() const;
-    math::Vector3f      getLinearVelocity() const;
-    math::Vector3f      getAngularVelocity() const;
+    math::Vector3r      getLinearVelocity() const;
+    math::Vector3r      getAngularVelocity() const;
 
     COLLISION_TYPE                  getCollisionType() const    { return CT_RIGID_BODY; }
     const CollisionShape* 	        getCollisionShape() const   { return desc.collisionShape.get(); }
@@ -66,7 +66,7 @@ public:
     const RigidBody::state_desc&    getStateDesc() const        { return desc; }
 
     void    reset(const RigidBody::state_desc& desc);
-    void    setTransform(const math::Matrix4f& worldTransform);
+    void    setTransform(const math::Matrix4r& worldTransform);
     void    setActivationState(ACTIVATION_STATE state);
 
     RigidBody::constraint_iterator firstConstraint()    { return constraints.begin(); }

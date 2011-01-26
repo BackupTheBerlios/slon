@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_PHYSICS_COLLISION_OBJECT_H__
 
 #include "../Utility/referenced.hpp"
+#include "Forward.h"
 #include <boost/signals.hpp>
 #include <sgl/Math/Matrix.hpp>
 
@@ -17,7 +18,7 @@ class DynamicsWorld;
 struct Contact
 {
     CollisionObject*    collisionObjects[2];
-    math::Vector3f*     contacts;
+    math::Vector3r*     contacts;
     size_t              numContacts;
 
     Contact() :
@@ -65,10 +66,10 @@ public:
     virtual const std::string& getName() const = 0;
 
     /** Get local to world transform matrix of the object. */
-    virtual math::Matrix4f getTransform() const = 0;
+    virtual math::Matrix4r getTransform() const = 0;
 
     /** Set world transform for the object. Works only for ghost objects and kinematic rigid bodies */
-    virtual void setTransform(const math::Matrix4f& transform) = 0;
+    virtual void setTransform(const math::Matrix4r& transform) = 0;
 
     /** Connect callback for handling contact occuring. Callback is called for
      * every appearing contact pair.

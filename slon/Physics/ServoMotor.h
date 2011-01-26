@@ -15,10 +15,10 @@ public:
     virtual bool enabled() const = 0;
 
     /** Set force(torque) the motor want to apply. */
-    virtual float getTargetForce() const = 0;
+    virtual real getTargetForce() const = 0;
 
     /** Set force(torque) the motor want to apply. */
-    virtual void setTargetForce(float force) = 0;
+    virtual void setTargetForce(real force) = 0;
 
     virtual ~ServoMotor() {} 
 };

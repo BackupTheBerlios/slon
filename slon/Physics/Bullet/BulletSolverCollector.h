@@ -26,7 +26,7 @@ public:
         solvers.push_front(solver);
     }
 
-    void solve(btScalar dt);
+    void solve(real dt);
 
 private:
     solver_list solvers;

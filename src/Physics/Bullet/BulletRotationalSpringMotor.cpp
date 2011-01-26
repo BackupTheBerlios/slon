@@ -10,9 +10,9 @@ BulletRotationalSpringMotor::BulletRotationalSpringMotor(BulletConstraint* const
 {
 }
 
-void BulletRotationalSpringMotor::solve(float /*dt*/)
+void BulletRotationalSpringMotor::solve(real /*dt*/)
 {
-    float force             = stiffness * (equilibrium - motor->m_currentPosition) - velocityDamping * velocity;
+    real force             = stiffness * (equilibrium - motor->m_currentPosition) - velocityDamping * velocity;
     motor->m_maxMotorForce  = fabs(force);
     motor->m_targetVelocity = force / motor->m_maxMotorForce * btScalar(BT_LARGE_FLOAT);
 }

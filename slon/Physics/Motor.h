@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_PHYSICS_MOTOR_H__
 #define __SLON_ENGINE_PHYSICS_MOTOR_H__
 
+#include "Forward.h"
 #include <sgl/Math/Vector.hpp>
 
 namespace slon {
@@ -32,22 +33,22 @@ public:
     /** Get working axis of the motor. For rotational motor it axis along which the rotation is performed,
      * for translational motor it is axis where motor is translating.
      */
-    virtual math::Vector3f getAxis() const = 0;
+    virtual math::Vector3r getAxis() const = 0;
 
     /** Get lower limit of the motor. */
-    virtual float getLoLimit() const = 0;
+    virtual real getLoLimit() const = 0;
 
     /** Get high limit of the motor. */
-    virtual float getHiLimit() const = 0;
+    virtual real getHiLimit() const = 0;
 
     /** Get position(rotation) of the motor. */
-    virtual float getPosition() const = 0;
+    virtual real getPosition() const = 0;
 
     /** Get velocity(angular velocity) of the motor. */
-    virtual float getVelocity() const = 0;
+    virtual real getVelocity() const = 0;
 
     /** Get applied motor force(torque) */
-    virtual float getForce() const = 0;
+    virtual real getForce() const = 0;
 
     virtual ~Motor() {} 
 };

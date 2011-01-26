@@ -38,11 +38,11 @@ public:
        : public sgl::Aligned16
 #endif
     {
-        math::Matrix4f  initialTransform;
+        math::Matrix4r  initialTransform;
         DYNAMICS_TYPE   type;
-        float           mass;
-        math::Vector3f  linearVelocity;
-        math::Vector3f  angularVelocity;
+        real            mass;
+        math::Vector3r  linearVelocity;
+        math::Vector3r  angularVelocity;
         std::string     name;
         std::string     target;
 
@@ -51,34 +51,34 @@ public:
 
         state_desc(const std::string& _name = "") :
             initialTransform( math::make_identity<float, 4>() ),
-            mass(0.0f),
-            linearVelocity(0.0f, 0.0f, 0.0f),
-            angularVelocity(0.0f, 0.0f, 0.0f),
+            mass(0),
+            linearVelocity(0, 0, 0),
+            angularVelocity(0, 0, 0),
             name(_name)
         {}
     };
 
 public:
     /** Apply force to rigid body at the specified position. */
-    virtual void applyForce(const math::Vector3f& force, const math::Vector3f& pos) = 0;
+    virtual void applyForce(const math::Vector3r& force, const math::Vector3r& pos) = 0;
 
     /** Apply torque to rigid body. */
-    virtual void applyTorque(const math::Vector3f& torque) = 0;
+    virtual void applyTorque(const math::Vector3r& torque) = 0;
 
     /** Apply impulse to rigid body. */
-    virtual void applyImpulse(const math::Vector3f& impulse, const math::Vector3f& pos) = 0;
+    virtual void applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos) = 0;
 
     /** Apply toque impulse to rigid body. */
-    virtual void applyTorqueImpulse(const math::Vector3f& torqueImpulse) = 0;
+    virtual void applyTorqueImpulse(const math::Vector3r& torqueImpulse) = 0;
 
     /** Get sum of all forces applied to the body. */
-    virtual math::Vector3f getTotalForce() const = 0;
+    virtual math::Vector3r getTotalForce() const = 0;
 
     /** Get sum of all torques applied to the body. */
-    virtual math::Vector3f getTotalTorque() const = 0;
+    virtual math::Vector3r getTotalTorque() const = 0;
 
     /** Get mass of the rigid body */
-    virtual float getMass() const = 0;
+    virtual real getMass() const = 0;
 
     /** Get activation/deactivation state/policy of the object */
     virtual ACTIVATION_STATE getActivationState() const = 0;
@@ -87,13 +87,13 @@ public:
     virtual void setActivationState(ACTIVATION_STATE state) = 0;
 
     /** Get linear velocity of the body */
-    virtual math::Vector3f getLinearVelocity() const = 0;
+    virtual math::Vector3r getLinearVelocity() const = 0;
 
     /** Get angular velocity of the body. 
      * @return angular velocity in axis angle representation: direction of the vector is
      * the rotation axis, length of the vector is angular velocity.
      */
-    virtual math::Vector3f getAngularVelocity() const = 0;
+    virtual math::Vector3r getAngularVelocity() const = 0;
 
     /** Get rigid body graphics target */
     virtual const std::string& getTarget() const = 0;

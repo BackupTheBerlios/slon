@@ -8,24 +8,24 @@
 namespace slon {
 namespace physics {
 
-inline btVector3 to_bt_vec(const math::Vector3f& vec)
+inline btVector3 to_bt_vec(const math::Vector3r& vec)
 {
     return btVector3(vec.x, vec.y, vec.z);
 }
 
-inline btVector4 to_bt_vec(const math::Vector4f& vec)
+inline btVector4 to_bt_vec(const math::Vector4r& vec)
 {
     return btVector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-inline btMatrix3x3 to_bt_mat(const math::Matrix3f& mat)
+inline btMatrix3x3 to_bt_mat(const math::Matrix3r& mat)
 {
 	return btMatrix3x3( mat[0][0], mat[0][1], mat[0][2],
                         mat[1][0], mat[1][1], mat[1][2],
                         mat[2][0], mat[2][1], mat[2][2] );
 }
 
-inline btTransform to_bt_mat(const math::Matrix4f& mat)
+inline btTransform to_bt_mat(const math::Matrix4r& mat)
 {
 	btMatrix3x3 basis( mat[0][0], mat[0][1], mat[0][2],
                        mat[1][0], mat[1][1], mat[1][2],
@@ -34,17 +34,17 @@ inline btTransform to_bt_mat(const math::Matrix4f& mat)
 	return btTransform( basis, btVector3(mat[0][3], mat[1][3], mat[2][3]) );
 }
 
-inline math::Vector3f to_vec(const btVector3& vec)
+inline math::Vector3r to_vec(const btVector3& vec)
 {
-    return math::Vector3f( vec.x(), vec.y(), vec.z() );
+    return math::Vector3r( vec.x(), vec.y(), vec.z() );
 }
 
-inline math::Vector4f to_vec(const btVector4& vec)
+inline math::Vector4r to_vec(const btVector4& vec)
 {
-    return math::Vector4f( vec.x(), vec.y(), vec.z(), vec.w() );
+    return math::Vector4r( vec.x(), vec.y(), vec.z(), vec.w() );
 }
 
-inline math::Matrix4f to_mat(const btTransform& transform)
+inline math::Matrix4r to_mat(const btTransform& transform)
 {
 	const btMatrix3x3& basis  = transform.getBasis();
 	const btVector3&   origin = transform.getOrigin();
@@ -52,7 +52,7 @@ inline math::Matrix4f to_mat(const btTransform& transform)
 	return math::make_matrix( basis[0].x(), basis[0].y(), basis[0].z(), origin.x(),
 						      basis[1].x(), basis[1].y(), basis[1].z(), origin.y(),
 					          basis[2].x(), basis[2].y(), basis[2].z(), origin.z(),
-						      0.0f,         0.0f,         0.0f,         1.0f );
+						      (real)0.0,    (real)0.0,    (real)0.0,    (real)1.0 );
 }
 
 // create bullet collision shape from slon collision shape
@@ -97,7 +97,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const ConvexShape& convexShape = static_cast<const ConvexShape&>(collisionShape);
 			btConvexHullShape* bulletCollisionShape = new btConvexHullShape( &convexShape.vertices[0].x,
                                                                              convexShape.vertices.size(),
-                                                                             sizeof(math::Vector3f) );
+                                                                             sizeof(math::Vector3r) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
             return bulletCollisionShape;
 		}
@@ -111,9 +111,9 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
                                                                                            3 * sizeof(unsigned),
                                                                                            triangleMeshShape.vertices.size(),
                                                                                            (btScalar*)&triangleMeshShape.vertices[0].x,
-                                                                                           sizeof(math::Vector3f) );
-		    math::AABBf aabb = compute_aabb( triangleMeshShape.vertices.begin(),
-                                             triangleMeshShape.vertices.end() );
+                                                                                           sizeof(math::Vector3r) );
+		    math::AABBr aabb = compute_aabb<real>( triangleMeshShape.vertices.begin(),
+												   triangleMeshShape.vertices.end() );
 
 		    btBvhTriangleMeshShape* bulletCollisionShape = new btBvhTriangleMeshShape( indexVertexArray, true, to_bt_vec( xyz(aabb.minVec) ), to_bt_vec( xyz(aabb.maxVec) ) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
@@ -151,7 +151,7 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
 {
 	if ( const btStaticPlaneShape* btShape = dynamic_cast<const btStaticPlaneShape*>(&collisionShape) )
     {
-        return new PlaneShape( math::Planef( to_vec(btShape->getPlaneNormal()), btShape->getPlaneConstant() ) );
+        return new PlaneShape( math::Planer( to_vec(btShape->getPlaneNormal()), btShape->getPlaneConstant() ) );
     }
     else if ( const btSphereShape* btShape = dynamic_cast<const btSphereShape*>(&collisionShape) )
     {

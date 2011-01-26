@@ -52,7 +52,7 @@ void RigidBodyTransform::setRigidBody(physics::RigidBody* rigidBody_)
     rigidBody.reset(rigidBody_);
     if (rigidBody) 
     {
-        localToWorld = rigidBody->getTransform();
+        localToWorld = math::Matrix4f(rigidBody->getTransform());
         scale_axises(localToWorld, scaling);
     }
 }
@@ -67,14 +67,14 @@ void RigidBodyTransform::accept(TraverseVisitor& visitor)
         {
         case RigidBody::DT_STATIC:
         case RigidBody::DT_DYNAMIC:
-            localToWorld = rigidBody->getTransform();
+            localToWorld = math::Matrix4f(rigidBody->getTransform());
             //scale_axises(localToWorld, scaling);
             localToWorld *= math::make_scaling(scaling.x, scaling.y, scaling.z);
             break;
 
         case RigidBody::DT_KINEMATIC:
             localToWorld = visitor.getLocalToWorldTransform();
-            rigidBody->setTransform(localToWorld);
+            rigidBody->setTransform(math::Matrix4r(localToWorld));
             localToWorld *= math::make_scaling(scaling.x, scaling.y, scaling.z);
             //scale_axises(localToWorld, scaling);
             break;

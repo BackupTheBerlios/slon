@@ -22,28 +22,28 @@ public:
     virtual void toggle(bool toggle) = 0;
 
     /** Get velocity damping */
-    virtual float getVelocityDamping() const = 0;
+    virtual real getVelocityDamping() const = 0;
 
     /** Get velocity damping. */
-    virtual void setVelocityDamping(float damping) = 0;
+    virtual void setVelocityDamping(real damping) = 0;
 
     /** Get spring stiffness. */
-    virtual float getStiffness() const = 0;
+    virtual real getStiffness() const = 0;
 
     /** Set spring stiffness. */
-    virtual void setStiffness(float stiffness) = 0;
+    virtual void setStiffness(real stiffness) = 0;
     
     /** Get equilibrium point of the spring. */
-    virtual float getEquilibriumPoint() const = 0;
+    virtual real getEquilibriumPoint() const = 0;
 
     /** Set equilibrium point for the spring. */
-    virtual void setEquilibriumPoint(float equilibrium) = 0;
+    virtual void setEquilibriumPoint(real equilibrium) = 0;
 
     /** Get maximum force(torque) the motor can apply. Must be non negative. */
-    virtual float getMaxForce() const = 0;
+    virtual real getMaxForce() const = 0;
 
     /** Set maximum force(torque) the motor can apply. Must be non negative. */
-    virtual void setMaxForce(float force) = 0;
+    virtual void setMaxForce(real force) = 0;
 
     virtual ~SpringMotor() {} 
 };

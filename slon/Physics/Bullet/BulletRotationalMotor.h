@@ -57,14 +57,14 @@ public:
     void accept(BulletSolverCollector& collector);
 
     // override Base
-    const Constraint*   getConstraint() const;
-    math::Vector3f      getAxis() const;
-    Motor::TYPE         getType() const       { return Motor::TYPE(Motor::MOTOR_X_ROT + axis); }
-    float               getLoLimit() const    { return motor->m_loLimit; }
-    float               getHiLimit() const    { return motor->m_hiLimit; }
-    float               getPosition() const   { return motor->m_currentPosition; }
-    float               getVelocity() const   { return velocity; }
-    float               getForce() const      { return force; }
+    const Constraint*  getConstraint() const;
+    math::Vector3r     getAxis() const;
+    Motor::TYPE        getType() const       { return Motor::TYPE(Motor::MOTOR_X_ROT + axis); }
+    real               getLoLimit() const    { return motor->m_loLimit; }
+    real               getHiLimit() const    { return motor->m_hiLimit; }
+    real               getPosition() const   { return motor->m_currentPosition; }
+    real               getVelocity() const   { return velocity; }
+    real               getForce() const      { return force; }
 
 protected:
     btScalar    velocity;

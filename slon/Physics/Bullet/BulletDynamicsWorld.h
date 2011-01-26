@@ -72,10 +72,10 @@ public:
     void                accept(BulletSolverCollector& collector);
 
     // Override dynamics world
-    void                setGravity(const math::Vector3f& gravity);
-    math::Vector3f      getGravity() const;
+    void                setGravity(const math::Vector3r& gravity);
+    math::Vector3r      getGravity() const;
     const state_desc&   getStateDesc() const;
-    void                stepSimulation(float dt);
+    void                stepSimulation(real dt);
     void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
     unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
 
@@ -111,7 +111,7 @@ private:
 
     // for handling contact callbacks
     contact_vector              contacts;
-    math::vector_of_vector3f    contactPoints;
+    std::vector<math::Vector3r> contactPoints;
 
     // mutex locks any camera modification
     mutable boost::shared_mutex accessMutex;

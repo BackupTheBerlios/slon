@@ -45,13 +45,13 @@ BulletDynamicsWorld::BulletDynamicsWorld(const state_desc& _desc) :
     dynamicsWorld->setGravity( to_bt_vec(desc.gravity) );
 }
 
-void BulletDynamicsWorld::setGravity(const math::Vector3f& gravity)
+void BulletDynamicsWorld::setGravity(const math::Vector3r& gravity)
 {
 	desc.gravity = gravity;
 	dynamicsWorld->setGravity( to_bt_vec(gravity) );
 }
 
-math::Vector3f BulletDynamicsWorld::getGravity() const
+math::Vector3r BulletDynamicsWorld::getGravity() const
 {
 	return desc.gravity;
 }
@@ -68,15 +68,15 @@ void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
                    boost::bind(&BulletConstraint::accept, _1, boost::ref(collector)) );
 }
 
-void BulletDynamicsWorld::stepSimulation(float dt)
+void BulletDynamicsWorld::stepSimulation(real dt)
 {
     // simulate
     accept(solverCollector);
     {
-        float t = 0;
+        real t = 0;
         for (unsigned i = 0; i<maxSubSteps && t < dt; ++i, t += desc.fixedTimeStep)
         {
-            float timeStep = std::min(desc.fixedTimeStep, dt - t);
+            real timeStep = std::min(desc.fixedTimeStep, dt - t);
             solverCollector.solve(timeStep); // run proprietary solvers
             dynamicsWorld->stepSimulation(timeStep, 1, desc.fixedTimeStep);
         }
@@ -85,7 +85,7 @@ void BulletDynamicsWorld::stepSimulation(float dt)
 
     // enumerate contacts
     contact_vector              currentContacts;
-    math::vector_of_vector3f    currentContactPoints;
+    std::vector<math::Vector3r> currentContactPoints;
     for (int i = 0; i<collisionDispatcher->getNumManifolds(); ++i)
     {
         btPersistentManifold*   contactManifold = collisionDispatcher->getManifoldByIndexInternal(i);
@@ -104,7 +104,7 @@ void BulletDynamicsWorld::stepSimulation(float dt)
     // fill pointers
     if ( !currentContactPoints.empty() )
     {
-        math::Vector3f* contacts = &currentContactPoints[0];
+        math::Vector3r* contacts = &currentContactPoints[0];
         for (size_t i = 0; i<currentContacts.size(); ++i) 
         {
             currentContacts[i].contacts = contacts;

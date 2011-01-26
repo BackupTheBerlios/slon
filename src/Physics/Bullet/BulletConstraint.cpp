@@ -70,11 +70,11 @@ BulletConstraint::BulletConstraint(const bullet_constraint_ptr& constraint_,
         desc.linearLimits[0] = to_vec( genericConstraint->getTranslationalLimitMotor()->m_lowerLimit );
         desc.linearLimits[1] = to_vec( genericConstraint->getTranslationalLimitMotor()->m_upperLimit );
 
-        desc.angularLimits[0] = math::Vector3f( genericConstraint->getRotationalLimitMotor(0)->m_loLimit,
+        desc.angularLimits[0] = math::Vector3r( genericConstraint->getRotationalLimitMotor(0)->m_loLimit,
                                                 genericConstraint->getRotationalLimitMotor(1)->m_loLimit,
                                                 genericConstraint->getRotationalLimitMotor(2)->m_loLimit );
 
-        desc.angularLimits[1] = math::Vector3f( genericConstraint->getRotationalLimitMotor(0)->m_hiLimit,
+        desc.angularLimits[1] = math::Vector3r( genericConstraint->getRotationalLimitMotor(0)->m_hiLimit,
                                                 genericConstraint->getRotationalLimitMotor(1)->m_hiLimit,
                                                 genericConstraint->getRotationalLimitMotor(2)->m_hiLimit );
     }
@@ -276,13 +276,13 @@ SpringMotor* BulletConstraint::createSpringMotor(Motor::TYPE motor)
     return 0;
 }
 
-math::Vector3f BulletConstraint::getAxis(unsigned int axis) const
+math::Vector3r BulletConstraint::getAxis(unsigned int axis) const
 {
     assert(axis < 3);
     return to_vec( constraint->getAxis(axis) );
 }
 
-float BulletConstraint::getRotationAngle(unsigned int axis) const
+real BulletConstraint::getRotationAngle(unsigned int axis) const
 {
     return constraint->getRotationalLimitMotor(axis)->m_currentPosition;
 }

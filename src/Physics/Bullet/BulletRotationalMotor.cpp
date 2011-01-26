@@ -63,7 +63,7 @@ const Constraint* BulletRotationalMotor<Base>::getConstraint() const
 }
 
 template<typename Base>
-math::Vector3f BulletRotationalMotor<Base>::getAxis() const       
+math::Vector3r BulletRotationalMotor<Base>::getAxis() const       
 { 
     return to_vec(constraint->getBtConstraint()->getAxis(axis)); 
 }

@@ -30,16 +30,16 @@ public:
        : public sgl::Aligned16
 #endif
     {
-        math::AABBf     worldSize;
+        math::AABBr     worldSize;
         COLLISION_TYPE  collisionType;
-        math::Vector3f  gravity;
-        float           fixedTimeStep;
+        math::Vector3r  gravity;
+        real            fixedTimeStep;
 
         state_desc() :
-            worldSize( math::Vector3f(0.0f, 0.0f, 0.0f), math::Vector3f(0.0f, 0.0f, 0.0f) ),
+            worldSize( math::Vector3r(0), math::Vector3r(0) ),
             collisionType(CT_DISCRETE),
-            gravity( math::Vector3f(0.0f, -9.8f, 0.0f) ),
-            fixedTimeStep( 1.0f / 60.0f )
+            gravity(0, real(-9.8), 0),
+            fixedTimeStep( real(1.0 / 60.0) )
         {}
     };
 
@@ -49,16 +49,16 @@ public:
 
 public:
     /** Setup world's gravity and its direction. */
-    virtual void setGravity(const math::Vector3f& gravity) = 0;
+    virtual void setGravity(const math::Vector3r& gravity) = 0;
 
     /** Get gravity of our toy world. */
-    virtual math::Vector3f getGravity() const = 0;
+    virtual math::Vector3r getGravity() const = 0;
 
     /** Get description of the world. */
     virtual const state_desc& getStateDesc() const = 0;
 
     /** Step simulation. */
-    virtual void stepSimulation(float dt) = 0;
+    virtual void stepSimulation(real dt) = 0;
 
     /** Set maximum number of substeps in the simulation step. */
     virtual void setMaxNumSubSteps(unsigned maxSubSteps) = 0;

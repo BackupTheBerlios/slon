@@ -55,12 +55,12 @@ private:
     mutable vertex_type    vertex;
 };
 
-template<typename FloatIteratorType>
-vertex_compose_iterator<math::Vector3f, FloatIteratorType, 3>
-vector3f_composer(const FloatIteratorType& floatIterator, size_t stride = 3)
+template<typename T, int n, typename IteratorType>
+vertex_compose_iterator<math::Matrix<T, n, 1>, IteratorType, 3>
+vector_composer(const IteratorType& iterator, size_t stride = 3)
 {
-    typedef vertex_compose_iterator<math::Vector3f, FloatIteratorType, 3> iterator_type;
-    return iterator_type(floatIterator, stride);
+    typedef vertex_compose_iterator<math::Matrix<T, n, 1>, IteratorType, n> iterator_type;
+    return iterator_type(iterator, stride);
 }
 
 /** Convert floating point tuple to vector. Tuple must overload operator [] */
@@ -82,13 +82,13 @@ const math::Matrix<RealType, 1, n>& to_vec(const math::Matrix<RealType, 1, n>& v
  * @param beginIter - point cloud begin iterator.
  * @param endIter - point cloud end iterator.
  */
-template<typename Iterator>
-math::AABBf compute_aabb( const Iterator& beginIter,
-                          const Iterator& endIter )
+template<typename T, typename Iterator>
+math::AABB<T, 3> compute_aabb( const Iterator& beginIter,
+							   const Iterator& endIter )
 {
     assert(beginIter != endIter && "Point cloud must have at least one point.");
 
-    math::AABBf aabb( to_vec(*beginIter), to_vec(*beginIter) );
+    math::AABB<T, 3> aabb( to_vec(*beginIter), to_vec(*beginIter) );
     for (Iterator i = beginIter; i != endIter; ++i)
     {
         aabb.extend( to_vec(*i) );

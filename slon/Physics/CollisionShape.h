@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
 #define __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
 
-#include "../Config.h"
 #include "../Utility/Algorithm/algorithm.hpp"
 #include "../Utility/referenced.hpp"
+#include "Forward.h"
 #include <boost/intrusive_ptr.hpp>
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Plane.hpp>
@@ -39,7 +39,7 @@ public:
     /** Scale shape. Some shapes unable to handle arbitrary scaling.
      * For example, sphere.
      */
-    virtual void applyScaling(const math::Vector3f& scaling) = 0;
+    virtual void applyScaling(const math::Vector3r& scaling) = 0;
 
 	virtual ~CollisionShape() {}
 };
@@ -52,17 +52,17 @@ class PlaneShape :
 	public CollisionShape
 {
 public:
-    PlaneShape(const math::Planef& plane_) :
+    PlaneShape(const math::Planer& plane_) :
         plane(plane_)
     {}
 
     // Override shape
     CollisionShape* clone() const        { return new PlaneShape(plane); }
 	SHAPE_TYPE      getShapeType() const { return PLANE; }
-    void            applyScaling(const math::Vector3f& /*scaling*/) { /*nothing*/ }
+    void            applyScaling(const math::Vector3r& /*scaling*/) { /*nothing*/ }
 
 public:
-	math::Planef plane;
+	math::Planer plane;
 };
 
 /** Sphere collision shape */
@@ -70,16 +70,16 @@ class SphereShape :
 	public CollisionShape
 {
 public:
-    SphereShape(float _radius = 1.0f) :
+    SphereShape(real _radius = 1.0f) :
         radius(_radius)
     {}
 
     CollisionShape* clone() const { return new SphereShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return SPHERE; }
-    void            applyScaling(const math::Vector3f& scaling) { radius *= fabs(scaling.x + scaling.y + scaling.z) / 3.0f; }
+    void            applyScaling(const math::Vector3r& scaling) { radius *= fabs(scaling.x + scaling.y + scaling.z) / 3; }
 
 public:
-	float radius;
+	real radius;
 };
 
 /** Box collision shape */
@@ -88,22 +88,22 @@ class BoxShape :
 {
 public:
 	BoxShape() :
-	    halfExtents(0.0f, 0.0f, 0.0f)
+	    halfExtents(0)
 	{}
 
-	BoxShape(const math::Vector3f& _halfExtents) :
+	BoxShape(const math::Vector3r& _halfExtents) :
 	    halfExtents(_halfExtents)
 	{}
 
     CollisionShape* clone() const { return new BoxShape(*this); }
     SHAPE_TYPE      getShapeType() const { return BOX; }
-    void            applyScaling(const math::Vector3f& scaling)
+    void            applyScaling(const math::Vector3r& scaling)
     {
-        halfExtents *= math::Vector3f( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
+        halfExtents *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
     }
 
 public:
-	math::Vector3f halfExtents;
+	math::Vector3r halfExtents;
 };
 
 /** Cone collision shape */
@@ -116,22 +116,22 @@ public:
 	    height(0)
 	{}
 
-	ConeShape(float _radius, float _height) :
+	ConeShape(real _radius, real _height) :
 	    radius(_radius),
 	    height(_height)
 	{}
 
     CollisionShape* clone() const { return new ConeShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONE; }
-    void applyScaling(const math::Vector3f& scaling)
+    void applyScaling(const math::Vector3r& scaling)
     {
         height *= fabs(scaling.z);
-        radius *= fabs(scaling.x + scaling.y) / 2.0f;
+        radius *= fabs(scaling.x + scaling.y) / 2;
     }
 
 public:
-	float radius;
-	float height;
+	real radius;
+	real height;
 };
 
 /** Capsule collision shape */
@@ -141,15 +141,15 @@ class CapsuleShape :
 public:
     CollisionShape* clone() const { return new CapsuleShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CAPSULE; }
-    void applyScaling(const math::Vector3f& scaling)
+    void applyScaling(const math::Vector3r& scaling)
     {
         height *= fabs(scaling.y);
-        radius *= fabs(scaling.x + scaling.z) / 2.0f;
+        radius *= fabs(scaling.x + scaling.z) / 2;
     }
 
 public:
-	float height;	/// height of the cylinder
-	float radius;	/// thickness of the cylinder
+	real height;	/// height of the cylinder
+	real radius;	/// thickness of the cylinder
 };
 
 /** Convex hull collision shape. Collision detection behaviour
@@ -164,11 +164,11 @@ public:
 	// Override CollisionShape
     CollisionShape* clone() const { return new ConvexShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONVEX_MESH; }
-    void applyScaling(const math::Vector3f& scaling)
+    void applyScaling(const math::Vector3r& scaling)
     {
-        math::Matrix3f matScaling = math::make_matrix( scaling.x,  0.0f,       0.0f,
-                                                       0.0f,       scaling.y,  0.0f,
-                                                       0.0f,       0.0f,       scaling.z );
+        math::Matrix3r matScaling = math::make_matrix( scaling.x,  (real)0.0,  (real)0.0,
+                                                       (real)0.0,  scaling.y,  (real)0.0,
+                                                       (real)0.0,  (real)0.0,  scaling.z );
         transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
     }
 
@@ -188,7 +188,7 @@ public:
 	}
 
 public:
-	std::vector<math::Vector3f>	vertices;
+	std::vector<math::Vector3r>	vertices;
 };
 
 /** Arbitrary triangle mesh collision shape */
@@ -198,16 +198,16 @@ class TriangleMeshShape :
 public:
     CollisionShape* clone() const { return new TriangleMeshShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return TRIANGLE_MESH; }
-    void applyScaling(const math::Vector3f& scaling)
+    void applyScaling(const math::Vector3r& scaling)
     {
-        math::Matrix3f matScaling = math::make_matrix( scaling.x,  0.0f,       0.0f,
-                                                       0.0f,       scaling.y,  0.0f,
-                                                       0.0f,       0.0f,       scaling.z );
+        math::Matrix3r matScaling = math::make_matrix( scaling.x,  (real)0.0,  (real)0.0,
+                                                       (real)0.0,  scaling.y,  (real)0.0,
+                                                       (real)0.0,  (real)0.0,  scaling.z );
         transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
     }
 
 public:
-	std::vector<math::Vector3f>	vertices;
+	std::vector<math::Vector3r>	vertices;
 	std::vector<unsigned>		indices;
 };
 
@@ -220,7 +220,7 @@ public:
 
     struct shape_transform
     {
-        math::Matrix4f      transform;
+        math::Matrix4r      transform;
         collision_shape_ptr shape;
     };
 
@@ -232,7 +232,7 @@ public:
     // Override CollisionShape
     CollisionShape* clone() const { return new CompoundShape(*this); }
     SHAPE_TYPE      getShapeType() const { return COMPOUND; }
-    void applyScaling(const math::Vector3f& scaling)
+    void applyScaling(const math::Vector3r& scaling)
     {
         for (size_t i = 0; i<shapes.size(); ++i) {
             shapes[i].shape->applyScaling(scaling);
@@ -243,7 +243,7 @@ public:
      * @param transform - transform of the shape. Scaling doesn't applied.
      * @param collisionShape - collision shape. Do not allocate on stack.
      */
-    void addShape( const math::Matrix4f& transform,
+    void addShape( const math::Matrix4r& transform,
                    CollisionShape&       collisionShape )
     {
         shape_transform shapeTransform;

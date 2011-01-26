@@ -18,11 +18,11 @@ namespace {
         if ( transform != math::make_identity<float, 4>() && collisionShape )
         {
             CollisionShape* newShape = collisionShape->clone();
-            newShape->applyScaling(scaling);
+            newShape->applyScaling(math::Vector3r(scaling));
 
             // reset rigid body
             RigidBody::state_desc rigidBodyDesc = rigidBody.getStateDesc();
-            rigidBodyDesc.initialTransform = rigidBody.getTransform() * transform;
+            rigidBodyDesc.initialTransform = rigidBody.getTransform() * math::Matrix4r(transform);
             rigidBodyDesc.collisionShape.reset(newShape);
             rigidBody.reset(rigidBodyDesc);
 

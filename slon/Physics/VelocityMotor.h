@@ -21,16 +21,16 @@ public:
     virtual void toggle(bool toggle) = 0;
 
     /** Get velocity(angular velocity) which motor is trying to reach. */
-    virtual float getTargetVelocity() const = 0;
+    virtual real getTargetVelocity() const = 0;
 
     /** Set velocity(angular velocity) which motor will try to reach. */
-    virtual void setTargetVelocity(float velocity) = 0;
+    virtual void setTargetVelocity(real velocity) = 0;
 
     /** Get maximum force(torque) the motor can apply. Must be non negative. */
-    virtual float getMaxForce() const = 0;
+    virtual real getMaxForce() const = 0;
 
     /** Set maximum force(torque) the motor can apply. Must be non negative. */
-    virtual void setMaxForce(float force) = 0;
+    virtual void setMaxForce(real force) = 0;
 
     virtual ~VelocityMotor() {} 
 };

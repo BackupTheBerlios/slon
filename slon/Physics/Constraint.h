@@ -26,18 +26,18 @@ public:
 #endif
     {
         RigidBody*      rigidBodies[2];
-        math::Matrix4f  frames[2];
-        math::Vector3f  linearLimits[2];
-        math::Vector3f  angularLimits[2];
+        math::Matrix4r  frames[2];
+        math::Vector3r  linearLimits[2];
+        math::Vector3r  angularLimits[2];
         std::string     name;
 
         state_desc(const std::string& _name = "") :
             name(_name)
         {
             rigidBodies[0]   = rigidBodies[1]   = 0;
-            frames[0]        = frames[1]        = math::make_identity<float, 4>();
-            linearLimits[0]  = linearLimits[1]  = math::Vector3f(0.0f, 0.0f, 0.0f);
-            angularLimits[0] = angularLimits[1] = math::Vector3f(0.0f, 0.0f, 0.0f);
+            frames[0]        = frames[1]        = math::make_identity<real, 4>();
+            linearLimits[0]  = linearLimits[1]  = math::Vector3r(0);
+            angularLimits[0] = angularLimits[1] = math::Vector3r(0);
         }
     };
 
@@ -88,12 +88,12 @@ public:
     /** Get axis in parent coordinate frame.
      * @param axis - 0 - X, 1 - Y, 2 - Z.
      */
-    virtual math::Vector3f getAxis(unsigned int axis) const = 0;
+    virtual math::Vector3r getAxis(unsigned int axis) const = 0;
 
     /** Get current angle of the rotational axis. 
      * @param axis - 0 - X, 1 - Y, 2 - Z.
      */
-    virtual float getRotationAngle(unsigned int axis) const = 0;
+    virtual real getRotationAngle(unsigned int axis) const = 0;
 
     /** Check wether specified axis is locked.
      * @param axis - 0 - X, 1 - Y, 2 - Z.

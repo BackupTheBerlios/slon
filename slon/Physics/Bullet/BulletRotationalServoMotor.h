@@ -17,16 +17,16 @@ public:
     BulletRotationalServoMotor(BulletConstraint* constraint, int axis);
 
     // Override BulletSolver
-    void solve(btScalar dt);
+    void solve(real dt);
     void accept(BulletSolverCollector& collector);
 
     // Override BulletRotationalMotor
     void reset(BulletConstraint* constraint, int axis);
 
     // Override ServoMotor
-    bool  enabled() const                   { return motor->m_enableMotor; }
-    float getTargetForce() const            { return targetForce; }
-    void  setTargetForce(float targetForce);
+    bool enabled() const                   { return motor->m_enableMotor; }
+    real getTargetForce() const            { return targetForce; }
+    void setTargetForce(real targetForce);
 
 private:
     btScalar targetForce;

@@ -18,7 +18,7 @@ void BulletRotationalServoMotor::reset(BulletConstraint* constraint, int axis)
     setTargetForce(targetForce);
 }
 
-void BulletRotationalServoMotor::solve(btScalar dt)
+void BulletRotationalServoMotor::solve(real dt)
 {
     btVector3 torque = constraint->getBtConstraint()->getAxis(axis) * targetForce;
     motor_base::constraint->getBtConstraint()->getRigidBodyA().applyTorque( torque);
@@ -33,10 +33,10 @@ void BulletRotationalServoMotor::accept(BulletSolverCollector& collector)
     BulletRotationalMotor<ServoMotor>::accept(collector);
 }
 
-void BulletRotationalServoMotor::setTargetForce(float targetForce_) 
+void BulletRotationalServoMotor::setTargetForce(real targetForce_) 
 { 
     targetForce = targetForce_;
-    enableMotor = fabs(targetForce) > 0.01f;
+    enableMotor = fabs(targetForce) > real(0.01);
 }
 
 } // namespace physics

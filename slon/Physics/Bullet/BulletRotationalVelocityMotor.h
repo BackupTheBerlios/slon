@@ -21,11 +21,11 @@ public:
     bool enabled() const     { return motor->m_enableMotor; }
     void toggle(bool toggle) { motor->m_enableMotor = toggle; }
 
-    float getTargetVelocity() const         { return motor->m_targetVelocity; }
-    void  setTargetVelocity(float velocity) { motor->m_targetVelocity = velocity; }
+    real getTargetVelocity() const        { return motor->m_targetVelocity; }
+    void setTargetVelocity(real velocity) { motor->m_targetVelocity = velocity; }
 
-    float getMaxForce() const       { return motor->m_maxMotorForce; }
-    void  setMaxForce(float force)  { motor->m_maxMotorForce = force; }
+    real getMaxForce() const     { return motor->m_maxMotorForce; }
+    void setMaxForce(real force) { motor->m_maxMotorForce = force; }
 };
 
 } // namespace physics

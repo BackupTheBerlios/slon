@@ -12,13 +12,13 @@ namespace {
 	inline btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState)
 	{
 		btCollisionShape* collisionShape = 0;
-        btVector3         localInertia   = btVector3(0.0f, 0.0f, 0.0f);
+        btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
         if (desc.collisionShape)
 		{
 		    collisionShape = createBtCollisionShape(*desc.collisionShape);
-			collisionShape->setMargin(0.01f);
+			collisionShape->setMargin(0.01);
             
-            if (desc.mass > 0.0f) {
+            if ( desc.mass > real(0.0) ) {
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
             }
 		}
@@ -54,7 +54,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     else {
         desc.type = RigidBody::DT_DYNAMIC;
     }
-    desc.mass            = 1.0f / rigidBody->getInvMass();
+    desc.mass            = real(1.0) / rigidBody->getInvMass();
     desc.linearVelocity  = to_vec( rigidBody->getLinearVelocity() );
     desc.angularVelocity = to_vec( rigidBody->getAngularVelocity() );
     desc.name            = name_;
@@ -77,46 +77,46 @@ BulletRigidBody::~BulletRigidBody()
     destroy();
 }
 
-void BulletRigidBody::applyForce(const math::Vector3f& force, const math::Vector3f& pos)
+void BulletRigidBody::applyForce(const math::Vector3r& force, const math::Vector3r& pos)
 {
 	rigidBody->applyForce( to_bt_vec(force), to_bt_vec(pos) );
 }
 
-void BulletRigidBody::applyTorque(const math::Vector3f& torque)
+void BulletRigidBody::applyTorque(const math::Vector3r& torque)
 {
 	rigidBody->applyTorque( to_bt_vec(torque) );
 }
 
-void BulletRigidBody::applyImpulse(const math::Vector3f& impulse, const math::Vector3f& pos)
+void BulletRigidBody::applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos)
 {
 	rigidBody->applyImpulse( to_bt_vec(impulse), to_bt_vec(pos) );
 }
 
-void BulletRigidBody::applyTorqueImpulse(const math::Vector3f& torqueImpulse)
+void BulletRigidBody::applyTorqueImpulse(const math::Vector3r& torqueImpulse)
 {
 	rigidBody->applyTorqueImpulse( to_bt_vec(torqueImpulse) );
 }
 
-math::Vector3f BulletRigidBody::getTotalForce() const
+math::Vector3r BulletRigidBody::getTotalForce() const
 {
 	// I wonder getTotalForce function is not const
 	return to_vec( const_cast<btRigidBody&>(*rigidBody).getTotalForce() );
 }
 
-math::Vector3f BulletRigidBody::getTotalTorque() const
+math::Vector3r BulletRigidBody::getTotalTorque() const
 {
 	// I wonder getTotalTorque function is not const
     return to_vec( const_cast<btRigidBody&>(*rigidBody).getTotalTorque() );
 }
 
-math::Matrix4f BulletRigidBody::getTransform() const
+math::Matrix4r BulletRigidBody::getTransform() const
 {
 	btTransform worldTrans;
 	motionState->getWorldTransform(worldTrans);
 	return to_mat(worldTrans);
 }
 
-float BulletRigidBody::getMass() const
+real BulletRigidBody::getMass() const
 {
 	return 1.0f / rigidBody->getInvMass();
 }
@@ -169,12 +169,12 @@ void BulletRigidBody::setActivationState(ACTIVATION_STATE state)
     }
 }
 
-math::Vector3f BulletRigidBody::getLinearVelocity() const
+math::Vector3r BulletRigidBody::getLinearVelocity() const
 {
 	return to_vec( rigidBody->getLinearVelocity() );
 }
 
-math::Vector3f BulletRigidBody::getAngularVelocity() const
+math::Vector3r BulletRigidBody::getAngularVelocity() const
 {
 	return to_vec( rigidBody->getAngularVelocity() );
 }
@@ -257,7 +257,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     onResetSignal(*this);
 }
 
-void BulletRigidBody::setTransform(const math::Matrix4f& worldTransform)
+void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)
 {
     //rigidBody->setWorldTransform( to_bt_mat(worldTransform) );
     motionState->setWorldTransform( to_bt_mat(worldTransform) );

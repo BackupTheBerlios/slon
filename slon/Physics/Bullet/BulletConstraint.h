@@ -64,8 +64,8 @@ public:
     VelocityMotor*   createVelocityMotor(Motor::TYPE motor);
     SpringMotor*     createSpringMotor(Motor::TYPE motor);
 
-    math::Vector3f   getAxis(unsigned int axis) const;
-    float            getRotationAngle(unsigned int axis) const;
+    math::Vector3r   getAxis(unsigned int axis) const;
+    real             getRotationAngle(unsigned int axis) const;
     AXIS_RESTRICTION getAxisRestriction(unsigned int axis) const;
 
     const std::string&  getName() const      { return desc.name; }
