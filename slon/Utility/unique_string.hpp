@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_ALGORITHM_UNIQUE_STRING_H__
 #define __SLON_ENGINE_ALGORITHM_UNIQUE_STRING_H__
 
-#include "Algorithm/prefix_tree.hpp"
 #include "singleton.hpp"
 #include "referenced.hpp"
 #include <boost/intrusive_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <cstring>
 #include <string>
 
@@ -16,8 +16,8 @@ class unique_string
 private:
     struct string_holder;
 
-    typedef prefix_tree<char, string_holder*>   string_prefix_tree;
-    typedef singleton<string_prefix_tree>       prefix_tree_singleton;
+    typedef boost::unordered_map<std::string, string_holder*>   string_prefix_tree;
+    typedef singleton<string_prefix_tree>						prefix_tree_singleton;
 
     struct string_holder :
         public referenced
@@ -70,10 +70,8 @@ private:
         }
         else
         {
-			string_prefix_tree::value_type value( str, new string_holder( str, prefix_tree_singleton::shared_instance() ) );
-            std::pair<string_prefix_tree::iterator, bool> insPair = prefixTree->insert(value);
-			assert(insPair.second);
-            stringHolder.reset(insPair.first->second);
+            stringHolder.reset( new string_holder(str, prefix_tree_singleton::shared_instance()) );
+			(*prefixTree)[str] = stringHolder.get();
         }
     }
 

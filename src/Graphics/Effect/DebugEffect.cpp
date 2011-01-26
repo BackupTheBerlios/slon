@@ -63,12 +63,17 @@ DebugEffect::DebugEffect(const DESC& desc_)
         {
             using detail::ForwardRenderer;
 
-            EffectShaderProgram program(logger);
-            program.addShader("Data/Shaders/debug.vert");
-            program.addShader("Data/Shaders/debug.frag");
+			static const sgl::Program* shaderProgram = 0;
+			if (!shaderProgram)
+			{
+				EffectShaderProgram program(logger);
+				program.addShader("Data/Shaders/debug.vert");
+				program.addShader("Data/Shaders/debug.frag");
+				shaderProgram = program.getProgram();
+			}
 
             detail::Pass::DESC pdesc;
-            pdesc.program = program.getProgram();
+            pdesc.program  = shaderProgram;
             pdesc.priority = ForwardRenderer::makePriority(ForwardRenderer::OPAQUE_BIN, pdesc.program);
 
             {

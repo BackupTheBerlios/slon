@@ -126,9 +126,14 @@ DebugMesh& operator << (DebugMesh& mesh, const sector& s)
     mesh.indices.push_back(base);
     
     // arc
-    for (unsigned i = 0; i < s.splits + 1; ++i)
+	unsigned splits = unsigned(s.fullCircleSplits * fabs(fmodf(s.hiLimit - s.loLimit, math::PI2)) / math::PI2);
+	if (splits == 0) {
+		splits = 1;
+	}
+
+    for (unsigned i = 0; i < splits + 1; ++i)
     {
-        float          angle   = s.loLimit + i * (s.hiLimit - s.loLimit) / s.splits;
+        float          angle   = s.loLimit + i * (s.hiLimit - s.loLimit) / splits;
         math::Vector3f pointer = math::make_rotation(angle, s.cross) * s.up;
         mesh.vertices.push_back(pointer);
         mesh.indices.push_back(base + i + 1);
@@ -136,10 +141,10 @@ DebugMesh& operator << (DebugMesh& mesh, const sector& s)
     
     mesh.wireframe = !s.filled;
     if (s.filled) {
-        mesh.pushPrimitive(sgl::TRIANGLE_FAN, s.splits + 2);
+        mesh.pushPrimitive(sgl::TRIANGLE_FAN, splits + 2);
     }
     else {
-        mesh.pushPrimitive(sgl::LINE_LOOP, s.splits + 2);
+        mesh.pushPrimitive(sgl::LINE_LOOP, splits + 2);
     }
     mesh.geometryDirty = true;
 

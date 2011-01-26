@@ -161,19 +161,19 @@ struct sector
            float    loLimit_, 
            float    hiLimit_,
            bool     filled_ = false,
-           unsigned splits_ = 20)
+           unsigned fullCircleSplits_ = 60)
     :   up(up_)
     ,   cross(cross_)
     ,   loLimit(loLimit_)
     ,   hiLimit(hiLimit_)
-    ,   splits(splits_)
+    ,   fullCircleSplits(fullCircleSplits_)
     ,   filled(filled_)
     {}
 
     math::Vector3f  up, cross;
     float           loLimit, hiLimit;
     bool            filled;
-    unsigned        splits;
+    unsigned        fullCircleSplits;
 };
 
 /** Setup debug mesh draw color. */

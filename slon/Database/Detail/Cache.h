@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_DATABASE_DETAIL_CACHE_H__
 
 #include "../../Utility/Algorithm/algorithm.hpp"
+#include "../../Utility/Algorithm/prefix_tree.hpp"
 #include "../Cache.h"
 #include <boost/bind.hpp>
 #include <boost/xpressive/xpressive.hpp>
