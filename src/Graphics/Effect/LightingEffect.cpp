@@ -198,62 +198,51 @@ void LightingEffect::dirty(const LightingMaterial* material_)
                 using detail::ForwardRenderer;
 
                 detail::Pass::DESC         desc;
-                detail::Pass::UNIFORM_DESC uniformDesc;
+                detail::Pass::UNIFORM_DESC uniformDesc[14];
                 {
-                    uniformDesc.uniformName   = "projectionMatrix";
-                    uniformDesc.parameterName = "projectionMatrix";
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "lightColorIntensity";
-                    uniformDesc.parameterName = "lightColorIntensity";
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "lightDirectionAmbient";
-                    uniformDesc.parameterName = "lightViewDirectionAmbient";
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "lightPositionRadius";
-                    uniformDesc.parameterName = "lightViewPositionRadius";
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "materialDiffuseSpecular";
-                    uniformDesc.parameter     = material->diffuseSpecularBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "materialShininess";
-                    uniformDesc.parameter     = material->shininessBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "normalMatrix";
-                    uniformDesc.parameter     = normalMatrixBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "worldViewMatrix";
-                    uniformDesc.parameter     = worldViewMatrixBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "worldViewProjMatrix";
-                    uniformDesc.parameter     = worldViewProjMatrixBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "diffuseSpecularMap";
-                    uniformDesc.parameter     = material->diffuseSpecularMapBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
-                    uniformDesc.uniformName   = "opacity";
-                    uniformDesc.parameter     = opacityBinder ? opacityBinder.get() : opacityOneBinder.get();
-                    desc.uniforms.push_back(uniformDesc);
+                    uniformDesc[0].uniformName   = "projectionMatrix";
+                    uniformDesc[0].parameterName = "projectionMatrix";
+                    uniformDesc[1].uniformName   = "lightColorIntensity";
+                    uniformDesc[1].parameterName = "lightColorIntensity";
+                    uniformDesc[2].uniformName   = "lightDirectionAmbient";
+                    uniformDesc[2].parameterName = "lightViewDirectionAmbient";
+                    uniformDesc[3].uniformName   = "lightPositionRadius";
+                    uniformDesc[3].parameterName = "lightViewPositionRadius";
+                    uniformDesc[4].uniformName   = "materialDiffuseSpecular";
+                    uniformDesc[4].parameter     = material->diffuseSpecularBinder.get();
+                    uniformDesc[5].uniformName   = "materialShininess";
+                    uniformDesc[5].parameter     = material->shininessBinder.get();
+                    uniformDesc[6].uniformName   = "normalMatrix";
+                    uniformDesc[6].parameter     = normalMatrixBinder.get();
+                    uniformDesc[7].uniformName   = "worldViewMatrix";
+                    uniformDesc[7].parameter     = worldViewMatrixBinder.get();
+                    uniformDesc[8].uniformName   = "worldViewProjMatrix";
+                    uniformDesc[8].parameter     = worldViewProjMatrixBinder.get();
+                    uniformDesc[9].uniformName   = "diffuseSpecularMap";
+                    uniformDesc[9].parameter     = material->diffuseSpecularMapBinder.get();
+                    uniformDesc[10].uniformName  = "opacity";
+                    uniformDesc[10].parameter    = opacityBinder ? opacityBinder.get() : opacityOneBinder.get();
 
 					if (boneMatricesBinder) 
 					{
-						uniformDesc.uniformName = "boneMatrices";
-						uniformDesc.parameter   = boneMatricesBinder.get();
-						desc.uniforms.push_back(uniformDesc);
+						uniformDesc[11].uniformName = "boneMatrices";
+						uniformDesc[11].parameter   = boneMatricesBinder.get();
 					}
 
                     if (boneRotationsBinder)
                     {
-				        uniformDesc.uniformName = "boneRotations";
-				        uniformDesc.parameter   = boneRotationsBinder.get();
-				        desc.uniforms.push_back(uniformDesc);
+				        uniformDesc[12].uniformName = "boneRotations";
+				        uniformDesc[12].parameter   = boneRotationsBinder.get();
                     }
 
                     if (boneTranslationsBinder)
                     {
-				        uniformDesc.uniformName = "boneTranslations";
-				        uniformDesc.parameter   = boneTranslationsBinder.get();
-				        desc.uniforms.push_back(uniformDesc);
+				        uniformDesc[13].uniformName = "boneTranslations";
+				        uniformDesc[13].parameter   = boneTranslationsBinder.get();
                     }
+
+					desc.uniforms    = uniformDesc;
+					desc.numUniforms = 14;
                 }
 
                 // create passes

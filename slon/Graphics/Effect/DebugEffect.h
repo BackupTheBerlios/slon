@@ -25,8 +25,12 @@ public:
 
 public:
     DebugEffect(const DESC& desc);
+    DebugEffect(const DebugEffect& effect);
 
-    // Override Effectint
+	/** Recreate debug effect with provided desc */
+	void	reset(const DESC& desc);
+
+    // Override Effect
     int     present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
     int     queryAttribute(unique_string /*name*/) { return -1; }
 

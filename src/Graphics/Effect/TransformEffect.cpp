@@ -42,32 +42,31 @@ void TransformEffect::dirty()
         detail::Pass::DESC desc;
         desc.program = program.getProgram();
 
-        detail::Pass::UNIFORM_DESC uniformDesc;
+        detail::Pass::UNIFORM_DESC uniformDesc[4];
 		{
-			uniformDesc.uniformName = "worldViewProjMatrix";
-			uniformDesc.parameter   = worldViewProjMatrixBinder.get();
-			desc.uniforms.push_back(uniformDesc);
+			uniformDesc[0].uniformName = "worldViewProjMatrix";
+			uniformDesc[0].parameter   = worldViewProjMatrixBinder.get();
 
 			if (boneMatricesBinder) 
 			{
-				uniformDesc.uniformName = "boneMatrices";
-				uniformDesc.parameter   = boneMatricesBinder.get();
-				desc.uniforms.push_back(uniformDesc);
+				uniformDesc[1].uniformName = "boneMatrices";
+				uniformDesc[1].parameter   = boneMatricesBinder.get();
 			}
 
             if (boneRotationsBinder)
             {
-				uniformDesc.uniformName = "boneRotations";
-				uniformDesc.parameter   = boneRotationsBinder.get();
-				desc.uniforms.push_back(uniformDesc);
+				uniformDesc[2].uniformName = "boneRotations";
+				uniformDesc[2].parameter   = boneRotationsBinder.get();
             }
 
             if (boneTranslationsBinder)
             {
-				uniformDesc.uniformName = "boneTranslations";
-				uniformDesc.parameter   = boneTranslationsBinder.get();
-				desc.uniforms.push_back(uniformDesc);
+				uniformDesc[3].uniformName = "boneTranslations";
+				uniformDesc[3].parameter   = boneTranslationsBinder.get();
             }
+
+			desc.uniforms    = uniformDesc;
+			desc.numUniforms = 4;
 		}
         
         sgl::DepthStencilState::DESC dsDesc;

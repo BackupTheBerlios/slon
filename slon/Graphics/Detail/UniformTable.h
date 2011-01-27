@@ -12,6 +12,10 @@ class abstract_uniform_binding :
     public referenced
 {
 public:
+	virtual sgl::AbstractUniform* get_uniform_base() = 0;
+
+	virtual const sgl::AbstractUniform* get_uniform_base() const = 0;
+
     virtual ~abstract_uniform_binding() {}
 };
 
@@ -40,6 +44,16 @@ public:
             count = uniform->Size();
         }
     }
+	
+	sgl::AbstractUniform* get_uniform_base()
+	{
+		return uniform;
+	}
+
+	const sgl::AbstractUniform* get_uniform_base() const
+	{
+		return uniform;
+	}
 
     sgl::Uniform<T>* get_uniform() 
     { 
@@ -90,8 +104,25 @@ public:
     {
     }
     
-    void set_uniform(sgl::Uniform<T>* uniform_) { uniform = uniform_; }
-    sgl::Uniform<T>* get_uniform() { return uniform; }
+    void set_uniform(sgl::Uniform<T>* uniform_) 
+	{ 
+		uniform = uniform_; 
+	}
+    
+	sgl::Uniform<T>* get_uniform() 
+	{ 
+		return uniform; 
+	}
+	
+	sgl::AbstractUniform* get_uniform_base()
+	{
+		return uniform;
+	}
+
+	const sgl::AbstractUniform* get_uniform_base() const
+	{
+		return uniform;
+	}
 
     void bind(const parameter_binding<T>* valuesBinder_, unsigned stage)
     {

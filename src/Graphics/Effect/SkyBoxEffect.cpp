@@ -47,12 +47,16 @@ void SkyBoxEffect::dirtyShaderTechniques()
                 desc.program  = program.getProgram();
                 desc.priority = ForwardRenderer::makePriority(ForwardRenderer::OPAQUE_BIN, desc.program);
 
-                detail::Pass::UNIFORM_DESC uniformDesc;
-                uniformDesc.uniformName = "environmentMap";
-                uniformDesc.parameter   = environmentMapBinder.get();
-                uniformDesc.uniformName = "viewProjectionMatrix";
-                uniformDesc.parameter   = viewProjectionMatrixBinder.get();
-                desc.uniforms.push_back(uniformDesc);
+                detail::Pass::UNIFORM_DESC uniformDesc[2];
+				{
+					uniformDesc[0].uniformName = "environmentMap";
+					uniformDesc[0].parameter   = environmentMapBinder.get();
+					uniformDesc[1].uniformName = "viewProjectionMatrix";
+					uniformDesc[1].parameter   = viewProjectionMatrixBinder.get();
+
+					desc.uniforms    = uniformDesc;
+					desc.numUniforms = 2;
+				}
 
                 pass.reset( new detail::Pass(desc) );
 

@@ -128,7 +128,16 @@ void DebugMesh::pushPrimitive( sgl::PRIMITIVE_TYPE primType,
             desc.modelMatrix         = transform;
             desc.projectionMatrix    = projection;
             desc.useCameraProjection = useCameraProjection;
-            s.debugEffect.reset( new DebugEffect(desc) );
+			
+			if ( !subsets.empty() ) 
+			{
+				// this is just optimization
+				s.debugEffect.reset( new DebugEffect(*subsets.back().debugEffect) );
+				s.debugEffect->reset(desc);
+			}
+			else {
+				s.debugEffect.reset( new DebugEffect(desc) );
+			}
         }
         s.debugEffect->bindParameter( unique_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&baseTransform, 1) );
         s.debugMesh     = this;

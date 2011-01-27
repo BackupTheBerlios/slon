@@ -90,6 +90,35 @@ FFPPass::FFPPass(const DESC& desc) :
                desc.textureParameters + 8, 
                textureParameters.begin() );
 }
+	
+void FFPPass::setBlendState(const sgl::BlendState* blendState_)
+{
+	blendState.reset(blendState_);
+}
+
+void FFPPass::setDepthStencilState(const sgl::DepthStencilState* depthStencilState_)
+{
+	depthStencilState.reset(depthStencilState_);
+}
+
+void FFPPass::setRasterizerState(const sgl::RasterizerState* rasterizerState_)
+{
+	rasterizerState.reset(rasterizerState_);
+}
+
+void FFPPass::setProjectionMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& binding)
+{
+    projectionMatrixParameter.reset( binding.parameter ?
+                                     binding.parameter :
+                                     currentParameterTable().getParameterBinding<math::Matrix4f>( unique_string(binding.parameterName) ).get() );
+}
+
+void FFPPass::setWorldViewMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& binding)
+{
+    worldViewMatrixParameter.reset( binding.parameter ?
+                                    binding.parameter :
+                                    currentParameterTable().getParameterBinding<math::Matrix4f>( unique_string(binding.parameterName) ).get() );
+}
 
 void FFPPass::begin() const
 {

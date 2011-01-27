@@ -123,7 +123,6 @@ SET ( TARGET_GRAPHICS_EFFECT_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/EffectShaderProgram.h
     ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/FFPPass.h
     ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/Pass.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/UniformBinder.h
 )
 
 SET ( TARGET_GRAPHICS_MATERIAL_HEADERS
@@ -535,7 +534,6 @@ SET ( TARGET_GRAPHICS_EFFECT_DETAIL_SOURCES
     Graphics/Effect/Detail/EffectShaderProgram.cpp
     Graphics/Effect/Detail/FFPPass.cpp
     Graphics/Effect/Detail/Pass.cpp
-    Graphics/Effect/Detail/UniformBinder.cpp
 )
 
 SET ( TARGET_GRAPHICS_MATERIAL_SOURCES

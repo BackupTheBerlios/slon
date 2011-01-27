@@ -22,9 +22,14 @@ public:
         const char*                 parameterName;
         const parameter_binding<T>* parameter;
 
-        PARAMETER_DESC() :
+        PARAMETER_DESC(const char* parameterName_ = 0) :
+            parameterName(parameterName_),
+			parameter(0)
+        {}
+
+        PARAMETER_DESC(const parameter_binding<T>* parameter_) :
             parameterName(0),
-            parameter(0)
+			parameter(parameter_)
         {}
     };
 
@@ -59,6 +64,12 @@ public:
 
     /** Setup rasterizer state to the pass. */
     void setRasterizerState(const sgl::RasterizerState* rasterizerState);
+	
+	/** Setup binder for projection matrix. */
+	void setProjectionMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& binding);
+
+	/** Setup binder for world view matrix matrix. */
+	void setWorldViewMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& binding);
 
     /** Get pass blend state. */
     const sgl::BlendState* getBlendState() const { return blendState.get(); }
@@ -68,6 +79,12 @@ public:
 
     /** Get pass blend state. */
     const sgl::RasterizerState* getRasterizerState() const { return rasterizerState.get(); }
+	
+	/** Get binder for projection matrix. */
+	const binding_mat4x4f* getProjectionMatrixBinder() const { return projectionMatrixParameter.get(); }
+	
+	/** Get binder for world view matrix matrix. */
+	const binding_mat4x4f* getWorldViewMatrixBinder() const { return worldViewMatrixParameter.get(); }
 
     // Override Pass
     long long   getPriority() const { return 0; }

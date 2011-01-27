@@ -118,7 +118,7 @@ DebugMesh& operator << (DebugMesh& mesh, const debug::line& l)
 
 DebugMesh& operator << (DebugMesh& mesh, const sector& s)
 {
-    assert(s.splits > 0);
+    assert(s.fullCircleSplits > 0);
 
     // tip
     size_t base = mesh.vertices.size();

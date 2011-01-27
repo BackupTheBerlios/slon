@@ -72,13 +72,21 @@ Pass::Pass(const DESC& desc)
     depthStencilState.reset(desc.depthStencilState ? desc.depthStencilState : createDefaultDepthStencilState());
     rasterizerState.reset(desc.rasterizerState ? desc.rasterizerState : createDefaultRasterizerState());
 
-    for (size_t i = 0; i<desc.uniforms.size(); ++i)
+    for (size_t i = 0; i<desc.numUniforms; ++i)
     {
-        sgl::AbstractUniform*               uniform    = program->GetUniform(desc.uniforms[i].uniformName);
-        const abstract_parameter_binding*   parameter  = desc.uniforms[i].parameter ?
-                                                         desc.uniforms[i].parameter :
-                                                         currentParameterTable().getParameterBinding( unique_string(desc.uniforms[i].parameterName) ).get();
-        bool                                compatible = false;
+		// Not very good situation, notify may be
+		if (!desc.uniforms[i].uniformName && !desc.uniforms[i].uniform) {
+			continue;
+		}
+
+		// find corresponding uniform <-> parameter pairs, check their types
+        sgl::AbstractUniform*             uniform    = desc.uniforms[i].uniform ? 
+                                                       desc.uniforms[i].uniform :
+                                                       program->GetUniform(desc.uniforms[i].uniformName);
+        const abstract_parameter_binding* parameter  = desc.uniforms[i].parameter ?
+                                                       desc.uniforms[i].parameter :
+                                                       currentParameterTable().getParameterBinding( unique_string(desc.uniforms[i].parameterName) ).get();
+        bool                              compatible = false;
         if (uniform && parameter)
         {
             switch ( uniform->Type() )
@@ -175,7 +183,7 @@ Pass::Pass(const DESC& desc)
                 {
                     const binding_tex_2d* typedParameter = dynamic_cast<const binding_tex_2d*>(parameter);
                     if ( (compatible = (typedParameter != 0)) ) {
-                        linkUniform( static_cast<sgl::SamplerUniform2D*>(uniform), typedParameter );
+                        linkSamplerUniform( static_cast<sgl::SamplerUniform2D*>(uniform), typedParameter );
                     }
                     break;
                 }
@@ -183,7 +191,7 @@ Pass::Pass(const DESC& desc)
                 {
                     const binding_tex_3d* typedParameter = dynamic_cast<const binding_tex_3d*>(parameter);
                     if ( (compatible = (typedParameter != 0)) ) {
-                        linkUniform( static_cast<sgl::SamplerUniform3D*>(uniform), typedParameter );
+                        linkSamplerUniform( static_cast<sgl::SamplerUniform3D*>(uniform), typedParameter );
                     }
                     break;
                 }
@@ -191,24 +199,39 @@ Pass::Pass(const DESC& desc)
                 {
                     const binding_tex_cube* typedParameter = dynamic_cast<const binding_tex_cube*>(parameter);
                     if ( (compatible = (typedParameter != 0)) ) {
-                        linkUniform( static_cast<sgl::SamplerUniformCube*>(uniform), typedParameter );
+                        linkSamplerUniform( static_cast<sgl::SamplerUniformCube*>(uniform), typedParameter );
                     }
                     break;
                 }
                 default:
-                    logger << log::WL_WARNING << "Uniform '" << desc.uniforms[i].uniformName << "' have unsupported type.\n";
+                    logger << log::WL_WARNING 
+						   << "Uniform '" 
+						   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
+						   << "' have unsupported type.\n";
                     break;
             }
         }
 
-        if (!uniform) {
-            logger << log::WL_WARNING << "Uniform '" << desc.uniforms[i].uniformName << "' was not loaded.\n";
+        if (!uniform) 
+		{
+            logger << log::WL_WARNING 
+				   << "Uniform '" 
+				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
+				   << "' was not loaded.\n";
         }
-        else if (!parameter) {
-            logger << log::WL_WARNING << "Parameter for uniform '" << desc.uniforms[i].uniformName << "' not specified.\n";
+        else if (!parameter) 
+		{
+            logger << log::WL_WARNING 
+				   << "Parameter for uniform '" 
+				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
+				   << "' not specified.\n";
         }
-        else if (!compatible) {
-            logger << log::WL_WARNING << "Parameter and uniform '" << desc.uniforms[i].uniformName << "' have incompatible types.\n";
+        else if (!compatible) 
+		{
+            logger << log::WL_WARNING 
+				   << "Parameter and uniform '" 
+				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
+				   << "' have incompatible types.\n";
         }
     }
 }
@@ -237,12 +260,12 @@ void Pass::begin() const
                    boost::mem_fn(&AbstractUniformBinder::bind) );
 
     // bind samplers
-    unsigned stageOffset = 0;
+    unsigned stage = 0;
     for (sampler_binder_const_iterator iter  = samplerBinders.begin();
                                        iter != samplerBinders.end();
                                        ++iter)
     {
-        stageOffset += (*iter)->bind(stageOffset);
+        (*iter)->bind(stage++);
     }
 
     // bind states
@@ -263,6 +286,21 @@ void Pass::end() const
 {
 }
 
+void Pass::setBlendState(const sgl::BlendState* blendState_)
+{
+	blendState.reset(blendState_);
+}
+
+void Pass::setDepthStencilState(const sgl::DepthStencilState* depthStencilState_)
+{
+	depthStencilState.reset(depthStencilState_);
+}
+
+void Pass::setRasterizerState(const sgl::RasterizerState* rasterizerState_)
+{
+	rasterizerState.reset(rasterizerState_);
+}
+
 template<typename T>
 bool Pass::linkUniform(sgl::Uniform<T>*               uniform,
                        const parameter_binding<T>*    parameter)
@@ -280,24 +318,41 @@ bool Pass::linkUniform(sgl::Uniform<T>*               uniform,
                                  iter != uniformBinders.end();
                                  ++iter)
     {
-        if ( UniformBinder<T>* binder = dynamic_cast< UniformBinder<T>* >(iter->get()) )
+		UniformBinder<T>* binder = dynamic_cast< UniformBinder<T>* >(iter->get());
+        if ( binder && binder->getBinding() == binding.get() )
         {
-            binder->addBinding(binding.get(), parameter);
-            return true;
+			binder->setParameter(parameter);
+			return true;
         }
     }
 
     // create binder
-    UniformBinder<T>* binder = new UniformBinder<T>();
-    binder->addBinding(binding.get(), parameter);
+    UniformBinder<T>* binder = new UniformBinder<T>(binding.get(), parameter);
     uniformBinders.push_back(binder);
 
     return true;
 }
 
 template<typename T>
-bool Pass::linkUniform(sgl::SamplerUniform<T>*        uniform,
-                       const parameter_binding<T>*    parameter)
+bool Pass::linkUniform(size_t					   uniform,
+					   const parameter_binding<T>* parameter)
+{
+	if ( uniform < uniformBinders.size() ) {
+		return false;
+	}
+	
+    if ( UniformBinder<T>* binder = dynamic_cast< UniformBinder<T>* >(uniformBinders[uniform].get()) )
+    {
+        binder->setParameter(parameter);
+        return true;
+    }
+
+	return false;
+}
+
+template<typename T>
+bool Pass::linkSamplerUniform(sgl::SamplerUniform<T>*     uniform,
+                              const parameter_binding<T>* parameter)
 {
     typedef boost::intrusive_ptr< sampler_uniform_binding<T> > uniform_binding_ptr;
 
@@ -312,20 +367,74 @@ bool Pass::linkUniform(sgl::SamplerUniform<T>*        uniform,
                                  iter != samplerBinders.end();
                                  ++iter)
     {
-        if ( SamplerUniformBinder<T>* binder = dynamic_cast< SamplerUniformBinder<T>* >(iter->get()) )
+		SamplerUniformBinder<T>* binder = dynamic_cast< SamplerUniformBinder<T>* >(iter->get());
+        if ( binder && binder->getBinding() == binding.get() )
         {
-            binder->addBinding(binding.get(), parameter);
-            return true;
+			binder->setParameter(parameter);
+			return true;
         }
     }
 
     // create binder
-    SamplerUniformBinder<T>* binder = new SamplerUniformBinder<T>();
-    binder->addBinding(binding.get(), parameter);
+    SamplerUniformBinder<T>* binder = new SamplerUniformBinder<T>(binding.get(), parameter);
     samplerBinders.push_back(binder);
 
     return true;
 }
+
+template<typename T>
+bool Pass::linkSamplerUniform(size_t					  uniform,
+						      const parameter_binding<T>* parameter)
+{
+	if ( uniform < samplerBinders.size() ) {
+		return false;
+	}
+	
+    if ( SamplerUniformBinder<T>* binder = dynamic_cast< SamplerUniformBinder<T>* >(samplerBinders[uniform].get()) )
+    {
+        binder->setParameter(parameter);
+        return true;
+    }
+
+	return false;
+}
+
+// explicit template instantiation
+template bool Pass::linkUniform<float>(size_t, const parameter_binding<float>*);
+template bool Pass::linkUniform<math::Vector2f>(size_t, const parameter_binding<math::Vector2f>*);
+template bool Pass::linkUniform<math::Vector3f>(size_t, const parameter_binding<math::Vector3f>*);
+template bool Pass::linkUniform<math::Vector4f>(size_t, const parameter_binding<math::Vector4f>*);
+
+template bool Pass::linkUniform<math::Matrix2x2f>(size_t, const parameter_binding<math::Matrix2x2f>*);
+template bool Pass::linkUniform<math::Matrix3x3f>(size_t, const parameter_binding<math::Matrix3x3f>*);
+template bool Pass::linkUniform<math::Matrix4x4f>(size_t, const parameter_binding<math::Matrix4x4f>*);
+
+template bool Pass::linkUniform<int>(size_t, const parameter_binding<int>*);
+template bool Pass::linkUniform<math::Vector2i>(size_t, const parameter_binding<math::Vector2i>*);
+template bool Pass::linkUniform<math::Vector3i>(size_t, const parameter_binding<math::Vector3i>*);
+template bool Pass::linkUniform<math::Vector4i>(size_t, const parameter_binding<math::Vector4i>*);
+
+template bool Pass::linkSamplerUniform<sgl::Texture2D>(size_t, const parameter_binding<sgl::Texture2D>*);
+template bool Pass::linkSamplerUniform<sgl::Texture3D>(size_t, const parameter_binding<sgl::Texture3D>*);
+template bool Pass::linkSamplerUniform<sgl::TextureCube>(size_t, const parameter_binding<sgl::TextureCube>*);
+
+template bool Pass::linkUniform<float>(sgl::Uniform<float>*, const parameter_binding<float>*);
+template bool Pass::linkUniform<math::Vector2f>(sgl::Uniform<math::Vector2f>*, const parameter_binding<math::Vector2f>*);
+template bool Pass::linkUniform<math::Vector3f>(sgl::Uniform<math::Vector3f>*, const parameter_binding<math::Vector3f>*);
+template bool Pass::linkUniform<math::Vector4f>(sgl::Uniform<math::Vector4f>*, const parameter_binding<math::Vector4f>*);
+
+template bool Pass::linkUniform<math::Matrix2x2f>(sgl::Uniform<math::Matrix2x2f>*, const parameter_binding<math::Matrix2x2f>*);
+template bool Pass::linkUniform<math::Matrix3x3f>(sgl::Uniform<math::Matrix3x3f>*, const parameter_binding<math::Matrix3x3f>*);
+template bool Pass::linkUniform<math::Matrix4x4f>(sgl::Uniform<math::Matrix4x4f>*, const parameter_binding<math::Matrix4x4f>*);
+
+template bool Pass::linkUniform<int>(sgl::Uniform<int>*, const parameter_binding<int>*);
+template bool Pass::linkUniform<math::Vector2i>(sgl::Uniform<math::Vector2i>*, const parameter_binding<math::Vector2i>*);
+template bool Pass::linkUniform<math::Vector3i>(sgl::Uniform<math::Vector3i>*, const parameter_binding<math::Vector3i>*);
+template bool Pass::linkUniform<math::Vector4i>(sgl::Uniform<math::Vector4i>*, const parameter_binding<math::Vector4i>*);
+
+template bool Pass::linkSamplerUniform<sgl::Texture2D>(sgl::SamplerUniform<sgl::Texture2D>*, const parameter_binding<sgl::Texture2D>*);
+template bool Pass::linkSamplerUniform<sgl::Texture3D>(sgl::SamplerUniform<sgl::Texture3D>*, const parameter_binding<sgl::Texture3D>*);
+template bool Pass::linkSamplerUniform<sgl::TextureCube>(sgl::SamplerUniform<sgl::TextureCube>*, const parameter_binding<sgl::TextureCube>*);
 
 } // namespace detail
 } // namespace graphics
