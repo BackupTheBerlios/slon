@@ -16,7 +16,7 @@ namespace {
         if (desc.collisionShape)
 		{
 		    collisionShape = createBtCollisionShape(*desc.collisionShape);
-			collisionShape->setMargin(0.01);
+			collisionShape->setMargin(0.001);
             
             if ( desc.mass > real(0.0) ) {
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
@@ -39,8 +39,10 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     assert(rigidBody);
 
     rigidBody->setUserPointer(this);
-    if ( !rigidBody->getMotionState() ) {
-        rigidBody->setMotionState(new btDefaultMotionState);
+    if ( !rigidBody->getMotionState() ) 
+    {
+        motionState.reset(new btDefaultMotionState);
+        rigidBody->setMotionState(motionState.get());
     }
 
     // fill up desc

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
+#include "Database/Bullet/Bullet.h"
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
@@ -200,6 +201,13 @@ void Engine::init()
             { "TIF",    2, {".*\\.(?i:tiff?)", ".*"},   new ImageLoader<sgl::Image::TIF>}
         };
         database::detail::registerLoaders<graphics::Texture>(numImageFormats, imageLoaders);
+
+        const size_t                      numPhysicsSceneLoaders = 1;
+        fmt_loader<physics::PhysicsModel> physicsSceneLoaders[numPhysicsSceneLoaders] = 
+        {
+            {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletLoader}
+        };
+        database::detail::registerLoaders<physics::PhysicsModel>(numPhysicsSceneLoaders, physicsSceneLoaders);
     }
 
     // init SDL

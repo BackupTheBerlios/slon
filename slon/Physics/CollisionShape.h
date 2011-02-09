@@ -24,6 +24,7 @@ public:
 		BOX,
 		CONE,
 		CAPSULE,
+        CYLINDER,
 		HEIGHTFIELD,
 		CONVEX_MESH,
 		TRIANGLE_MESH,
@@ -106,17 +107,12 @@ public:
 	math::Vector3r halfExtents;
 };
 
-/** Cone collision shape */
+/** Cone collision shape. Up axis is Y.  */
 class ConeShape :
 	public CollisionShape
 {
 public:
-	ConeShape() :
-	    radius(0),
-	    height(0)
-	{}
-
-	ConeShape(real _radius, real _height) :
+	ConeShape(real _radius = 0, real _height = 0) :
 	    radius(_radius),
 	    height(_height)
 	{}
@@ -134,11 +130,16 @@ public:
 	real height;
 };
 
-/** Capsule collision shape */
+/** Capsule collision shape. Up axis is Y. */
 class CapsuleShape :
 	public CollisionShape
 {
 public:
+	CapsuleShape(real _radius = 0, real _height = 0) :
+	    radius(_radius),
+	    height(_height)
+	{}
+
     CollisionShape* clone() const { return new CapsuleShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CAPSULE; }
     void applyScaling(const math::Vector3r& scaling)
@@ -148,8 +149,28 @@ public:
     }
 
 public:
-	real height;	/// height of the cylinder
 	real radius;	/// thickness of the cylinder
+	real height;	/// height of the cylinder
+};
+
+/** Capsule collision shape. Up axis is Y. */
+class CylinderShape :
+	public CollisionShape
+{
+public:
+    CylinderShape(const math::Vector3f& halfExtent_) :
+	    halfExtent(halfExtent_)
+	{}
+
+    CollisionShape* clone() const { return new CylinderShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CYLINDER; }
+    void applyScaling(const math::Vector3r& scaling)
+    {
+        halfExtent *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
+    }
+
+public:
+    math::Vector3r halfExtent;
 };
 
 /** Convex hull collision shape. Collision detection behaviour
@@ -229,6 +250,13 @@ public:
     typedef shape_transform_vector::const_iterator                                  const_shape_trasnform_iterator;
 
 public:
+    CompoundShape() {}
+    CompoundShape(const math::Matrix4r& transform,
+                  CollisionShape*       collisionShape) 
+    {
+        addShape(transform, collisionShape);
+    }
+
     // Override CollisionShape
     CollisionShape* clone() const { return new CompoundShape(*this); }
     SHAPE_TYPE      getShapeType() const { return COMPOUND; }
@@ -244,11 +272,11 @@ public:
      * @param collisionShape - collision shape. Do not allocate on stack.
      */
     void addShape( const math::Matrix4r& transform,
-                   CollisionShape&       collisionShape )
+                   CollisionShape*       collisionShape )
     {
         shape_transform shapeTransform;
         shapeTransform.transform = transform;
-        shapeTransform.shape.reset(&collisionShape);
+        shapeTransform.shape.reset(collisionShape);
         shapes.push_back(shapeTransform);
     }
 

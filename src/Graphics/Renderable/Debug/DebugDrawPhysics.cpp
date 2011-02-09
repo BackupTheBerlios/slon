@@ -11,6 +11,51 @@ namespace slon {
 namespace graphics {
 namespace debug {
 
+DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c)
+{
+    switch ( c.getShapeType() )
+    {
+        case physics::CollisionShape::PLANE:
+        case physics::CollisionShape::SPHERE:
+        case physics::CollisionShape::BOX:
+            mesh << static_cast<const physics::BoxShape&>(c);
+            break;
+
+        case physics::CollisionShape::CONE:
+            mesh << static_cast<const physics::ConeShape&>(c);
+            break;
+
+        case physics::CollisionShape::CAPSULE:
+            break;
+
+        case physics::CollisionShape::CYLINDER:
+            mesh << static_cast<const physics::CylinderShape&>(c);
+            break;
+
+        case physics::CollisionShape::HEIGHTFIELD:
+        case physics::CollisionShape::CONVEX_MESH:
+        case physics::CollisionShape::TRIANGLE_MESH:
+            break;
+
+        case physics::CollisionShape::COMPOUND:
+        {
+            const physics::CompoundShape& cShape = static_cast<const physics::CompoundShape&>(c);
+            
+            math::Matrix4f baseTransform = mesh.transform;
+            for (size_t i = 0; i<cShape.shapes.size(); ++i) {
+                mesh << transform(baseTransform * cShape.shapes[i].transform) << *cShape.shapes[i].shape;
+            }
+
+            break;
+        }
+
+        default:
+            assert(!"can't get here");
+    }
+
+    return mesh;
+}
+
 DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b)
 {
     return mesh << math::AABBf( math::Vector3f(-b.halfExtents), math::Vector3f(b.halfExtents) );
@@ -26,14 +71,14 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& coneShape)
     coneMesh.indices.resize(num_cone_vertices * 6);
 
     // make cap
-    coneMesh.vertices[0] = math::Vector3f(0.0f, 0.0f, float(coneShape.height) * 0.5f);
+    coneMesh.vertices[0] = math::Vector3f(0.0f, float(coneShape.height) * 0.5f, 0.0f);
     for (size_t i = 1; i<num_cone_vertices; ++i)
     {
         float angle = math::PI2 * float(i) / (num_cone_vertices - 1);
         float x     = float(coneShape.radius) * cos(angle);
-        float y     = float(coneShape.radius) * sin(angle);
+        float z     = float(coneShape.radius) * sin(angle);
 
-        coneMesh.vertices[i] = math::Vector3f(x, y, -float(coneShape.height) * 0.5f);
+        coneMesh.vertices[i] = math::Vector3f(x, -float(coneShape.height) * 0.5f, z);
     }
 
     for (size_t i = 1; i<num_cone_vertices; ++i)
@@ -55,9 +100,14 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& coneShape)
     return mesh << coneMesh;
 }
 
+DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& cylShape)
+{
+    return mesh;
+}
+
 float getArcEnd(const physics::Motor& motor, float scale)
 {
-    float end = 0.0f;
+    float end = motor.getPosition();
 
     if ( const physics::ServoMotor* m = dynamic_cast<const physics::ServoMotor*>(&motor) )
     {

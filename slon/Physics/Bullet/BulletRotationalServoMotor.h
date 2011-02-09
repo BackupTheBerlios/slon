@@ -24,7 +24,7 @@ public:
     void reset(BulletConstraint* constraint, int axis);
 
     // Override ServoMotor
-    bool enabled() const                   { return motor->m_enableMotor; }
+    bool enabled() const                   { return enableMotor; }
     real getTargetForce() const            { return targetForce; }
     void setTargetForce(real targetForce);
 

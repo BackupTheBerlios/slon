@@ -45,11 +45,17 @@ struct constraint
     float                       forceSectorScale;
 };
 
+/** Add collision shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c);
+
 /** Add box shape to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b);
 
 /** Add cone shape to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& c);
+
+/** Add cone shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& c);
 
 /** Add motor to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const motor& m);

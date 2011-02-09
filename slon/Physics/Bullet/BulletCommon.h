@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_PHYSICS_BULLET_BULLET_COMMON_H__
 
 #include "../CollisionShape.h"
-#include <btBulletCollisionCommon.h>
+#include <bullet/btBulletCollisionCommon.h>
 #include <sgl/Math/Matrix.hpp>
 
 namespace slon {
@@ -84,10 +84,26 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
             return bulletCollisionShape;
 		}
 
+		case CollisionShape::CAPSULE:
+		{
+			const CapsuleShape& capsuleShape         = static_cast<const CapsuleShape&>(collisionShape);
+			btCapsuleShape*     bulletCollisionShape = new btCapsuleShape(capsuleShape.radius, capsuleShape.height);
+            bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            return bulletCollisionShape;
+		}
+
 		case CollisionShape::CONE:
 		{
 			const ConeShape& coneShape            = static_cast<const ConeShape&>(collisionShape);
-			btConeShapeZ*    bulletCollisionShape = new btConeShapeZ(coneShape.radius, coneShape.height);
+			btConeShape*     bulletCollisionShape = new btConeShape(coneShape.radius, coneShape.height);
+            bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            return bulletCollisionShape;
+		}
+
+		case CollisionShape::CYLINDER:
+		{
+			const CylinderShape& cylShape             = static_cast<const CylinderShape&>(collisionShape);
+			btCylinderShape*     bulletCollisionShape = new btCylinderShape( to_bt_vec(cylShape.halfExtent) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
             return bulletCollisionShape;
 		}
@@ -161,9 +177,56 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
     {
         return new BoxShape( to_vec( btShape->getHalfExtentsWithoutMargin() ) );
     }
-    else if ( const btConeShapeZ* btShape = dynamic_cast<const btConeShapeZ*>(&collisionShape) )
+    else if ( const btConeShape* btShape = dynamic_cast<const btConeShape*>(&collisionShape) )
     {
-        return new ConeShape( btShape->getRadius(), btShape->getHeight() );
+        switch ( btShape->getConeUpIndex() ) 
+        {
+        case 0:
+            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
+
+        case 1:
+            return new ConeShape(btShape->getRadius(), btShape->getHeight());
+
+        case 2:
+            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
+
+        default:
+            assert(!"can't get here");
+        }
+    }
+    else if ( const btCapsuleShape* btShape = dynamic_cast<const btCapsuleShape*>(&collisionShape) )
+    {
+        switch ( btShape->getUpAxis() ) 
+        {
+        case 0:
+            return new CompoundShape( math::make_rotation_z(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
+
+        case 1:
+            return new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2);
+
+        case 2:
+            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
+
+        default:
+            assert(!"can't get here");
+        }
+    }
+    else if ( const btCylinderShape* btShape = dynamic_cast<const btCylinderShape*>(&collisionShape) )
+    {
+        switch ( btShape->getUpAxis() ) 
+        {
+        case 0:
+            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) ) );
+
+        case 1:
+            return new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) );
+
+        case 2:
+            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) ) );
+
+        default:
+            assert(!"can't get here");
+        }
     }
 
     return 0;

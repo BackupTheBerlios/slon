@@ -9,6 +9,7 @@ namespace physics {
 BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constraint, int axis)
 :   BulletRotationalMotor(constraint, axis)
 ,   targetForce(0.0f)
+,   enableMotor(false)
 {
 }
 

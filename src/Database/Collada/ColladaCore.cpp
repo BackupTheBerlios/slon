@@ -285,8 +285,8 @@ void collada_mesh::serialize( ColladaDocument& document,
 	if (state == xmlpp::LOAD)
 	{
 		// check mesh validness
-		if ( sources.empty() || primitives.empty() ) {
-			throw collada_error(logger, "Mesh must have at least one source or primitives element: " + id, element);
+		if ( sources.empty() ) {
+			throw collada_error(logger, "Mesh must have at least one source element: " + id, element);
 		}
 
 		if ( vertices.inputs.empty() ) {

@@ -35,15 +35,13 @@ public:
     /** Get rigid body which handles transformation for this node. */
     physics::RigidBody* getRigidBody() { return rigidBody.get(); }
 
-    /** Setup scaling removed from rigid body transform */
-    void setScaling(const math::Vector3f& _scaling) { scaling = _scaling; }
+    void setBaseTransform(const math::Matrix4f& transform) { baseTransform = transform; }
 
-    /** Get post scaling. */
-    const math::Vector3f& getScaling() const { return scaling; } 
+    const math::Matrix4f& getBaseTrasnform() const { return baseTransform; }
 
 private:
     physics::rigid_body_ptr rigidBody;
-    math::Vector3f          scaling;
+    math::Matrix4f          baseTransform;
     mutable unsigned int    modifiedCount;
 };
 

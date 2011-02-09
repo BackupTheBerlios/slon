@@ -219,8 +219,24 @@ private:
     std::string body;
 };
 
+/** Represents <mass_frame> element */
+class collada_mass_frame
+{
+public:
+    collada_mass_frame();
+
+    void save(ColladaDocument& d, xmlpp::element& n) const;
+    void load(const ColladaDocument& d, const xmlpp::element& n);
+
+    XMLPP_SERIALIZATION_SPLIT_MEMBER(ColladaDocument, xmlpp::element);
+
+public:
+    math::Matrix4f transform;
+};
+
 /** Represents <rigid_body> element */
-class collada_rigid_body
+class collada_rigid_body :
+    public sgl::Aligned16
 {
 public:
     typedef std::vector<collada_shape_ptr>  shape_vector;
@@ -233,11 +249,12 @@ public:
     XMLPP_ELEMENT_SERIALIZATION(collada_rigid_body, ColladaDocument);
 
 public:
-    std::string                         sid;
-    float                               mass;
-    bool                                dynamic;
-    shape_vector                        shapes;
-    collada_instance_physics_material   materialInstance;
+    collada_optional<collada_mass_frame>    massFrame;
+    collada_optional<float>                 mass;
+    std::string                             sid;
+    bool                                    dynamic;
+    shape_vector                            shapes;
+    collada_instance_physics_material       materialInstance;
 };
 
 /** Represents <instance_rigid_body> element */
@@ -250,7 +267,9 @@ public:
     XMLPP_ELEMENT_SERIALIZATION(collada_instance_rigid_body, ColladaDocument);
 
 public:
-    std::string target;
+    collada_optional<collada_mass_frame>    massFrame;
+    collada_optional<float>                 mass;
+    std::string                             target;
 
 private:
     std::string body;
@@ -281,7 +300,12 @@ class collada_instance<collada_physics_model> :
     public collada_instance_base<collada_physics_model>
 {
 public:
-    typedef std::vector<collada_instance_rigid_body>        instance_rigid_body_vector;
+    typedef sgl::vector
+    <
+        collada_instance_rigid_body,
+        sgl::aligned_allocator<collada_instance_rigid_body>
+    >                                                       instance_rigid_body_vector;
+    
     typedef instance_rigid_body_vector::iterator            instance_rigid_body_iterator;
 
     typedef std::vector<collada_instance_rigid_constraint>  instance_rigid_constraint_vector;

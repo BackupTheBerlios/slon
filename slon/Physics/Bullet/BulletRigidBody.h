@@ -3,7 +3,7 @@
 
 #include "../RigidBody.h"
 #include "BulletCollisionObject.h"
-#include <btBulletDynamicsCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
 
 namespace slon {
 namespace physics {

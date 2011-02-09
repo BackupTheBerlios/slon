@@ -21,6 +21,7 @@ class ColladaDocument;
 // misc typedefs
 typedef std::binary_function<const ColladaDocument&, const xmlpp::node&, void> 	collada_loader_function;
 typedef xmlpp::generic_loader<ColladaDocument> 									collada_loader;
+typedef xmlpp::generic_saver<ColladaDocument> 									collada_saver;
 
 typedef xmlpp::generic_serializer<ColladaDocument>                              collada_serializer;
 
@@ -48,6 +49,52 @@ public:
 
 private:
     xmlpp::node node;
+};
+
+template<typename T>
+class collada_optional
+{
+public:
+    collada_optional(const T& value_ = T(), bool specified_ = false) :
+        value(value_),
+        specified(specified_)
+    {}
+
+    operator T () const     { return value; }
+    operator bool () const  { return specified; }
+
+    T& operator = (const T& value)
+    {
+        value = value_;
+        specified = true;
+        return value;
+    }
+
+    template<typename Holder>
+	void load(const ColladaDocument& document, const Holder& holder)
+	{
+		value.load(document, holder);
+        specified = true;
+	}
+
+    template<typename Holder>
+	void save(ColladaDocument& document, Holder& holder) const
+	{
+        if (specified) {
+            value.save(document, holder);
+        }
+	}
+
+    template<typename Holder>
+    void serialize(ColladaDocument& d, Holder& n, xmlpp::s_state state)
+    {
+        if (state == xmlpp::LOAD) load(d, n);
+        else save(d, n);
+    }
+
+public:
+    T       value;
+    bool    specified;
 };
 
 /** Error class occuring during visual or physics scene construction */
@@ -302,5 +349,47 @@ struct warning
 
 } // namespace database
 } // namespace slon
+
+namespace xmlpp {
+
+template<typename T>
+struct text_serialization_policy< slon::database::collada_optional<T> >
+{
+    typedef element xmlpp_holder_type;
+
+    template<typename Document>
+    void load(const Document& d, const xmlpp::element& e, slon::database::collada_optional<T>& obj) 
+    { 
+        std::istringstream ss( e.get_text() );
+        ss >> obj.value;
+        
+        if ( ss.fail() ) {
+            throw dom_error("Can't read element value.");
+        }
+
+        obj.specified = true;
+    }
+
+    template<typename Document>
+    void save(Document& d, xmlpp::element& e, const slon::database::collada_optional<T>& obj) const
+    {
+        std::ostringstream ss;
+        if (obj) {
+            ss << obj.value;
+        }
+
+        if ( ss.fail() ) {
+            throw dom_error("Can't read element value.");
+        }
+        e.set_text( ss.str() );
+    }
+
+    bool valid(const T& val, xmlpp::s_state s) const { return (val == true) || (s == xmlpp::LOAD); }
+};
+
+template<typename T, typename A>
+struct is_container< sgl::vector<T, A> > : public boost::true_type {};
+
+} // namespace xmlpp
 
 #endif // __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__

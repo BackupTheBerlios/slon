@@ -88,6 +88,13 @@ BulletConstraint::BulletConstraint(const bullet_constraint_ptr& constraint_,
             if ( iter == rb->constraints.end() ) {
                 rb->constraints.push_back(this);
             }
+
+            if (!dynamicsWorld) {
+                dynamicsWorld = rb->dynamicsWorld;
+            }
+            else {
+                assert(dynamicsWorld == rb->dynamicsWorld);
+            }
         }
     }
 }

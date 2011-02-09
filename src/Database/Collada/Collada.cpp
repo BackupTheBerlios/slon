@@ -268,6 +268,11 @@ namespace {
 			}
             else
             {
+                // mesh without primitives elements is empty for SlonEngine
+                if ( colladaMesh.primitives.empty() ) {
+                    return graphics::mesh_ptr();
+                }
+
 		        // merge inputs
 		        collada_primitives::input_vector inputs = colladaMesh.vertices.inputs;
 		        for (size_t i = 0; i<colladaMesh.primitives.size(); ++i)
@@ -386,16 +391,19 @@ namespace {
                             }
                         }
 
-			            meshData->setAttributes( inputs[i].attributeName,
-                                                 inputs[i].attributeIndex,
-								                 inputs[i].source->stride,
-                                                 inputs[i].source->floatArray.size() / inputs[i].source->stride,
-								                 sgl::FLOAT,
-								                 &inputs[i].source->floatArray[0] );
+                        if ( !inputs[i].source->floatArray.empty() )
+                        {
+			                meshData->setAttributes( inputs[i].attributeName,
+                                                     inputs[i].attributeIndex,
+								                     inputs[i].source->stride,
+                                                     inputs[i].source->floatArray.size() / inputs[i].source->stride,
+								                     sgl::FLOAT,
+								                     &inputs[i].source->floatArray[0] );
 
-			            meshData->setIndices( inputs[i].attributeIndex,
-								              indices[i].size(),
-									          &indices[i][0] );
+			                meshData->setIndices( inputs[i].attributeIndex,
+								                  indices[i].size(),
+									              &indices[i][0] );
+                        }
 		            }
 
                     // reserve attributes for skinning
@@ -557,12 +565,18 @@ namespace {
 
 			// make mesh
             graphics::mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
-            graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
-			staticMesh->setName(colladaMesh.id);
-
-			logger << log::WL_NOTIFY << "Mesh succesfully created." << std::endl;
-
-			return staticMesh;
+            if (mesh)
+            {
+                graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
+			    staticMesh->setName(colladaMesh.id);
+			    logger << log::WL_NOTIFY << "Mesh succesfully created." << std::endl;
+			    return staticMesh;
+            }
+            else 
+            {
+			    logger << log::WL_WARNING << "Mesh is empty." << std::endl;
+                return 0;
+            }
 		}
 
 		scene::Node* createGeometry( const collada_geometry& 			colladaGeometry,
@@ -575,6 +589,12 @@ namespace {
 				{
 					const collada_mesh& mesh = static_cast<const collada_mesh&>(colladaGeometry);
 					geometry = createStaticMesh(mesh, bindMaterial);
+                    if (!geometry) 
+                    {
+                        // create dummy node replacement
+                        geometry = new scene::Node();
+                        geometry->setName(mesh.id);
+                    }
 					break;
 				}
 
@@ -987,17 +1007,26 @@ namespace {
                 {
                     const collada_tapered_cylinder_shape& colladaCylShape =
 						static_cast<const collada_tapered_cylinder_shape&>(*colladaShape.geometry);
-					// cone
-                    if (colladaCylShape.upperRadius[1] == 0) {
-					    return new physics::ConeShape(colladaCylShape.lowerRadius[0], colladaCylShape.height * 2.0f);
+					
+                    if (colladaCylShape.upperRadius[1] == 0) 
+                    {
+                        // cone Y
+                        return new physics::ConeShape(colladaCylShape.lowerRadius[0], colladaCylShape.height * 2.0f);
+                    }
+                    else if (colladaCylShape.upperRadius[0] == colladaCylShape.upperRadius[1]
+                             && colladaCylShape.upperRadius[0] == colladaCylShape.lowerRadius[0]
+                             && colladaCylShape.lowerRadius[0] == colladaCylShape.lowerRadius[1]) 
+                    {
+                        // capsule Y
+                        return new physics::CapsuleShape(colladaCylShape.lowerRadius[0], colladaCylShape.height * 2.0f);
                     }
                     else {
-                        return new physics::ConeShape(colladaCylShape.lowerRadius[0], colladaCylShape.height);
+                        throw collada_error(logger, "Unable to create collision shape. Unsupported geometry type.");
                     }
                 }
 
                 default:
-                    throw collada_error(logger, "Unable to create collision shape. Invalid geometry type");
+                    throw collada_error(logger, "Unable to create collision shape. Invalid geometry type.");
                     break;
             }
         }
@@ -1044,16 +1073,33 @@ namespace {
             desc.target = colladaRigidBodyInstance.target.substr(1);
             desc.name   = colladaRigidBody.sid;
             desc.type   = colladaRigidBody.dynamic ? RigidBody::DT_DYNAMIC : RigidBody::DT_STATIC;
-            desc.mass   = colladaRigidBody.mass;
 
+            if (colladaRigidBodyInstance.mass) {
+                desc.mass = colladaRigidBodyInstance.mass;
+            }
+            else {
+                desc.mass = colladaRigidBody.mass;
+            }
+
+            if (colladaRigidBodyInstance.massFrame) {
+                desc.initialTransform = colladaRigidBodyInstance.massFrame.value.transform;
+            }
+            else if (colladaRigidBody.massFrame) {
+                desc.initialTransform = colladaRigidBody.massFrame.value.transform;
+            }
+            else {
+                desc.initialTransform = math::make_identity<float, 4>();
+            }
+
+            math::Matrix4f invMassFrame = math::invert(desc.initialTransform);
             if ( colladaRigidBody.shapes.size() > 1
-                || colladaRigidBody.shapes[0]->transform != math::make_identity<float, 4>() )
+                || !math::equal(invMassFrame * colladaRigidBody.shapes[0]->transform, math::make_identity<float, 4>(), 0.01f) )
             {
                 physics::CompoundShape* compoundShape = new physics::CompoundShape();
                 for (size_t i = 0; i<colladaRigidBody.shapes.size(); ++i)
                 {
-                    compoundShape->addShape( math::Matrix4r(colladaRigidBody.shapes[i]->transform),
-                                             *createCollisionShape(*colladaRigidBody.shapes[i]) );
+                    compoundShape->addShape( math::Matrix4r(invMassFrame * colladaRigidBody.shapes[i]->transform),
+                                             createCollisionShape(*colladaRigidBody.shapes[i]) );
                 }
 
                 desc.collisionShape.reset(compoundShape);

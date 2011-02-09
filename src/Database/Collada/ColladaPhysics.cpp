@@ -187,11 +187,45 @@ void collada_instance_rigid_constraint::serialize( ColladaDocument&  document,
 	serializer.serialize(document, elem, state);
 }
 
+collada_mass_frame::collada_mass_frame()
+:   transform( math::make_identity<float, 4>() )
+{
+}
+
+void collada_mass_frame::load( const ColladaDocument&  document, 
+                               const xmlpp::element&   elem )
+{
+    collada_loader serializer;
+	serializer >>= xmlpp::make_nvp( "translate",	xmlpp::make_elem_loader( read_translate(transform) ) );
+	serializer >>= xmlpp::make_nvp( "rotate",		xmlpp::make_elem_loader( read_rotate(transform) ) );
+    serializer.load(document, elem);
+}
+
+void collada_mass_frame::save( ColladaDocument&  document, 
+                               xmlpp::element&   elem ) const
+{
+    collada_saver serializer;
+    {
+        math::Vector3f translation = math::get_translation(transform); 
+        if ( translation != math::Vector3f(0.0f) ) {
+            serializer <<= xmlpp::make_nvp( "translate", xmlpp::as_text(translation) );
+        }
+
+        math::Vector3f rotation    = math::to_axis_angle( math::from_matrix( math::get_rotation(transform) ) );
+        math::Vector4f rotationAA  = math::make_vec( math::normalize(rotation), math::length(rotation) );
+        if (rotationAA.w != 0.0f) {
+            serializer <<= xmlpp::make_nvp( "rotate", xmlpp::as_text(rotation) );
+        }
+    }
+    serializer.save(document, elem);
+}
+
 void collada_rigid_body::load_technique_common( const ColladaDocument& document,
                                                 const xmlpp::node&     node )
 {
     collada_serializer serializer;
     serializer  &= xmlpp::make_nvp( "mass",          xmlpp::as_text(mass) );
+    serializer  &= xmlpp::make_nvp( "mass_frame",    xmlpp::as_element(massFrame) );
     serializer >>= xmlpp::make_nvp( "dynamic",       xmlpp::make_elem_loader( read_bool(dynamic) ) );
     //serializer &= xmlpp::make_nvp( "instance_physics_material", boost::ref(materialInstance) );
     //serializer &= xmlpp::make_nvp( "physics_material",          read_ptr(materialInstance.element) );
@@ -214,8 +248,10 @@ void collada_instance_rigid_body::serialize( ColladaDocument&  document,
 											 xmlpp::s_state    state )
 {
 	collada_serializer serializer;
-	serializer &= xmlpp::make_nvp( "body",		xmlpp::as_attribute(body) );
-	serializer &= xmlpp::make_nvp( "target",	xmlpp::as_attribute(target) );
+	serializer &= xmlpp::make_nvp( "body",		    xmlpp::as_attribute(body) );
+	serializer &= xmlpp::make_nvp( "target",	    xmlpp::as_attribute(target) );
+    serializer &= xmlpp::make_nvp( "mass",          xmlpp::as_text(mass) );
+    serializer &= xmlpp::make_nvp( "mass_frame",    xmlpp::as_element(massFrame) );
 	serializer.serialize(document, elem, state);
 }
 
