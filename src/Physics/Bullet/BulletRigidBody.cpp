@@ -15,14 +15,15 @@ namespace {
         btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
         if (desc.collisionShape)
 		{
-		    collisionShape = createBtCollisionShape(*desc.collisionShape);
-			collisionShape->setMargin(0.001);
+            real minDimension;
+		    collisionShape = createBtCollisionShape(*desc.collisionShape, minDimension);
+			collisionShape->setMargin(desc.relativeMargin * minDimension + desc.margin);
             
             if ( desc.mass > real(0.0) ) {
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
             }
 		}
-		motionState.setWorldTransform( to_bt_mat(desc.initialTransform) );
+		motionState.setWorldTransform( to_bt_mat(desc.transform) );
 		
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
@@ -43,7 +44,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
 	rigidBody->setMotionState( motionState.get() );
 
     // fill up desc
-    desc.initialTransform = getTransform();
+    desc.transform = getTransform();
     if ( rigidBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT ) {
         desc.type = RigidBody::DT_KINEMATIC;
     }

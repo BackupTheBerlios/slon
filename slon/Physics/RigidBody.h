@@ -39,20 +39,24 @@ public:
        : public sgl::Aligned16
 #endif
     {
-        math::Matrix4r  initialTransform;
+        math::Matrix4r  transform;          /// initial transformation matrix
         DYNAMICS_TYPE   type;
         real            mass;
+        real            margin;             /// collision margin
+        real            relativeMargin;     /// collision margin relative to the lowest dimension of the collision shape (e.g. box side, sphere radius, cylinder height)
         math::Vector3r  linearVelocity;
         math::Vector3r  angularVelocity;
-        std::string     name;
-        std::string     target;
+        std::string     name;               /// name of the rigid body
+        std::string     target;             /// name of the scene graph node which targets this rigid body
 
         // collision shapes
         const_collision_shape_ptr collisionShape;
 
         state_desc(const std::string& _name = "") :
-            initialTransform( math::make_identity<float, 4>() ),
+            transform( math::make_identity<float, 4>() ),
             mass(0),
+            margin(0),
+            relativeMargin( real(0.02) ),
             linearVelocity(0, 0, 0),
             angularVelocity(0, 0, 0),
             name(_name)

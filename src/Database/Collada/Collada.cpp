@@ -1085,16 +1085,16 @@ namespace {
             }
 
             if (colladaRigidBodyInstance.massFrame) {
-                desc.initialTransform = colladaRigidBodyInstance.massFrame.value.transform;
+                desc.transform = colladaRigidBodyInstance.massFrame.value.transform;
             }
             else if (colladaRigidBody.massFrame) {
-                desc.initialTransform = colladaRigidBody.massFrame.value.transform;
+                desc.transform = colladaRigidBody.massFrame.value.transform;
             }
             else {
-                desc.initialTransform = math::make_identity<float, 4>();
+                desc.transform = math::make_identity<float, 4>();
             }
 
-            math::Matrix4f invMassFrame = math::invert(desc.initialTransform);
+            math::Matrix4f invMassFrame = math::invert(desc.transform);
             if ( colladaRigidBody.shapes.size() > 1
                 || !math::equal(invMassFrame * colladaRigidBody.shapes[0]->transform, math::make_identity<float, 4>(), 0.01f) )
             {

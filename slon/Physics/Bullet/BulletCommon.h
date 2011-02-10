@@ -56,7 +56,7 @@ inline math::Matrix4r to_mat(const btTransform& transform)
 }
 
 // create bullet collision shape from slon collision shape
-inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionShape)
+inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionShape, real& minDimension)
 {
 	switch ( collisionShape.getShapeType() )
 	{
@@ -65,6 +65,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const PlaneShape&   planeShape           = static_cast<const PlaneShape&>(collisionShape);
 			btStaticPlaneShape* bulletCollisionShape = new btStaticPlaneShape( to_bt_vec(planeShape.plane.normal), planeShape.plane.distance );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = real(0.0);
             return bulletCollisionShape;
 		}
 
@@ -73,6 +74,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const SphereShape& sphereShape          = static_cast<const SphereShape&>(collisionShape);
 			btSphereShape*     bulletCollisionShape = new btSphereShape(sphereShape.radius);
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = sphereShape.radius;
             return bulletCollisionShape;
 		}
 
@@ -81,6 +83,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const BoxShape& boxShape             = static_cast<const BoxShape&>(collisionShape);
 			btBoxShape*     bulletCollisionShape = new btBoxShape( to_bt_vec(boxShape.halfExtents) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = std::min(boxShape.halfExtents.x, std::min(boxShape.halfExtents.y, boxShape.halfExtents.z)) * 2;
             return bulletCollisionShape;
 		}
 
@@ -89,6 +92,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const CapsuleShape& capsuleShape         = static_cast<const CapsuleShape&>(collisionShape);
 			btCapsuleShape*     bulletCollisionShape = new btCapsuleShape(capsuleShape.radius, capsuleShape.height);
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = std::min(capsuleShape.height, capsuleShape.radius);
             return bulletCollisionShape;
 		}
 
@@ -97,6 +101,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const ConeShape& coneShape            = static_cast<const ConeShape&>(collisionShape);
 			btConeShape*     bulletCollisionShape = new btConeShape(coneShape.radius, coneShape.height);
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = std::min(coneShape.height, coneShape.radius);
             return bulletCollisionShape;
 		}
 
@@ -105,6 +110,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 			const CylinderShape& cylShape             = static_cast<const CylinderShape&>(collisionShape);
 			btCylinderShape*     bulletCollisionShape = new btCylinderShape( to_bt_vec(cylShape.halfExtent) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            minDimension = std::min(cylShape.halfExtent.x, std::min(cylShape.halfExtent.y, cylShape.halfExtent.z)) * 2;
             return bulletCollisionShape;
 		}
 
@@ -115,6 +121,19 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
                                                                              convexShape.vertices.size(),
                                                                              sizeof(math::Vector3r) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+
+            // find center
+            math::Vector3r center(0);
+            for (size_t i = 0; i<convexShape.vertices.size(); ++i) {
+                center += convexShape.vertices[i] / convexShape.vertices.size();
+            }
+
+            // find min dimension
+            minDimension = std::numeric_limits<real>::max();
+            for (size_t i = 0; i<convexShape.vertices.size(); ++i) {
+                minDimension = std::min(minDimension, math::length(convexShape.vertices[i] - center));
+            }
+
             return bulletCollisionShape;
 		}
 
@@ -130,6 +149,7 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
                                                                                            sizeof(math::Vector3r) );
 		    math::AABBr aabb = compute_aabb<real>( triangleMeshShape.vertices.begin(),
 												   triangleMeshShape.vertices.end() );
+            minDimension = std::min(aabb.size().x, std::min(aabb.size().y, aabb.size().z));
 
 		    btBvhTriangleMeshShape* bulletCollisionShape = new btBvhTriangleMeshShape( indexVertexArray, true, to_bt_vec( xyz(aabb.minVec) ), to_bt_vec( xyz(aabb.maxVec) ) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
@@ -141,13 +161,16 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 		    const CompoundShape& compoundShape = static_cast<const CompoundShape&>(collisionShape);
 
             // create compound shape from several shapes
+            minDimension = std::numeric_limits<real>::max();
             btCompoundShape* bulletCompoundCollisionShape = new btCompoundShape();
             for( CompoundShape::const_shape_trasnform_iterator shapeIter = compoundShape.shapes.begin();
                                                                shapeIter != compoundShape.shapes.end();
                                                                ++shapeIter )
             {
-                btCollisionShape* btChildCollisionShape = createBtCollisionShape(*shapeIter->shape);
+                real md;
+                btCollisionShape* btChildCollisionShape = createBtCollisionShape(*shapeIter->shape, md);
                 bulletCompoundCollisionShape->addChildShape( to_bt_mat(shapeIter->transform), btChildCollisionShape );
+                minDimension = std::min(md, minDimension);
             }
             bulletCompoundCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
 
