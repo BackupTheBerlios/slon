@@ -190,6 +190,7 @@ SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/PhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Motor.h
     ${TARGET_HEADER_PATH}/Physics/RigidBody.h
+    ${TARGET_HEADER_PATH}/Physics/RigidBodyTransform.h
     ${TARGET_HEADER_PATH}/Physics/ServoMotor.h
     ${TARGET_HEADER_PATH}/Physics/SpringMotor.h
     ${TARGET_HEADER_PATH}/Physics/VelocityMotor.h
@@ -200,6 +201,7 @@ SET ( TARGET_PHYSICS_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletConstraint.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletCollisionObject.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletDynamicsWorld.h
+    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletMotionState.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsMaterial.h
 #    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRigidBody.h
@@ -272,19 +274,11 @@ SET ( TARGET_SCENE_LIGHT_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Light/PointLight.h
 )
 
-SET ( TARGET_SCENE_PHYSICS_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Physics/RigidBodyTransform.h
-)
-
 SET ( TARGET_SCENE_VISITORS_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Visitors/CullVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/NodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/TraverseVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/UpdateVisitor.h
-)
-
-SET ( TARGET_SCENE_VISITORS_PHYSICS_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Visitors/Physics/DecomposeTransformVisitor.h
 )
 
 SET ( TARGET_THREAD_HEADERS
@@ -371,9 +365,7 @@ SOURCE_GROUP( headers\\Realm\\World FILES                  ${TARGET_REALM_WORLD_
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Physics FILES                ${TARGET_SCENE_PHYSICS_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Visitors FILES			   ${TARGET_SCENE_VISITORS_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Visitors\\Physics FILES	   ${TARGET_SCENE_VISITORS_PHYSICS_HEADERS} )
 SOURCE_GROUP( headers\\Thread FILES                        ${TARGET_THREAD_HEADERS} )
 SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
@@ -430,8 +422,6 @@ IF (SLON_ENGINE_USE_BULLET)
         ${TARGET_PHYSICS_HEADERS}
         ${TARGET_PHYSICS_BULLET_HEADERS}
         ${TARGET_PHYSICS_DETAIL_HEADERS}
-        ${TARGET_SCENE_PHYSICS_HEADERS} 
-        ${TARGET_SCENE_VISITORS_PHYSICS_HEADERS} 
     )
 ENDIF (SLON_ENGINE_USE_BULLET)
 
@@ -598,6 +588,7 @@ SET ( TARGET_PHYSICS_SOURCES
 #    Physics/DynamicsWorld.cpp
 #    Physics/PhysicsMaterial.cpp
     Physics/PhysicsModel.cpp
+    Physics/RigidBodyTransform.cpp
 #    Physics/RigidBody.cpp
 )
 
@@ -605,6 +596,7 @@ SET ( TARGET_PHYSICS_BULLET_SOURCES
     Physics/Bullet/BulletConstraint.cpp
     Physics/Bullet/BulletCollisionObject.cpp
     Physics/Bullet/BulletDynamicsWorld.cpp
+    Physics/Bullet/BulletMotionState.cpp
     Physics/Bullet/BulletPhysicsMaterial.cpp
 #    Physics/Bullet/BulletPhysicsModel.cpp
     Physics/Bullet/BulletRigidBody.cpp
@@ -664,18 +656,10 @@ SET ( TARGET_SCENE_LIGHT_SOURCES
     Scene/Light/PointLight.cpp
 )
 
-SET ( TARGET_SCENE_PHYSICS_SOURCES
-    Scene/Physics/RigidBodyTransform.cpp
-)
-
 SET ( TARGET_SCENE_VISITORS_SOURCES
     Scene/Visitors/CullVisitor.cpp
     Scene/Visitors/TraverseVisitor.cpp
     Scene/Visitors/UpdateVisitor.cpp
-)
-
-SET ( TARGET_SCENE_VISITORS_PHYSICS_SOURCES
-    Scene/Visitors/Physics/DecomposeTransformVisitor.cpp
 )
 
 SET ( TARGET_THREAD_SOURCES
@@ -731,9 +715,7 @@ SOURCE_GROUP( sources\\Realm\\World FILES                  ${TARGET_REALM_WORLD_
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Physics FILES                ${TARGET_SCENE_PHYSICS_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Visitors FILES               ${TARGET_SCENE_VISITORS_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Visitors\\Physics FILES      ${TARGET_SCENE_VISITORS_PHYSICS_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -784,8 +766,6 @@ IF (SLON_ENGINE_USE_BULLET)
         ${TARGET_PHYSICS_SOURCES}
         ${TARGET_PHYSICS_BULLET_SOURCES}
         ${TARGET_PHYSICS_DETAIL_SOURCES}
-        ${TARGET_SCENE_PHYSICS_SOURCES}
-        ${TARGET_SCENE_VISITORS_PHYSICS_SOURCES}
     )
 ENDIF (SLON_ENGINE_USE_BULLET)
 

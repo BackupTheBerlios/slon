@@ -23,7 +23,7 @@ namespace {
             }
 		}
 		motionState.setWorldTransform( to_bt_mat(desc.initialTransform) );
-      
+		
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}
@@ -37,13 +37,10 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     rigidBody(rigidBody_)
 {
     assert(rigidBody);
+	motionState.reset( new BulletMotionState(this) );
 
     rigidBody->setUserPointer(this);
-    if ( !rigidBody->getMotionState() ) 
-    {
-        motionState.reset(new btDefaultMotionState);
-        rigidBody->setMotionState(motionState.get());
-    }
+	rigidBody->setMotionState( motionState.get() );
 
     // fill up desc
     desc.initialTransform = getTransform();
@@ -56,6 +53,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     else {
         desc.type = RigidBody::DT_DYNAMIC;
     }
+
     desc.mass            = real(1.0) / rigidBody->getInvMass();
     desc.linearVelocity  = to_vec( rigidBody->getLinearVelocity() );
     desc.angularVelocity = to_vec( rigidBody->getAngularVelocity() );
@@ -71,6 +69,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
 BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWorld* dynamicsWorld_) :
 	base_type(dynamicsWorld_)
 {
+	motionState.reset( new BulletMotionState(this) );
     reset(desc_);
 }
 
@@ -120,7 +119,7 @@ math::Matrix4r BulletRigidBody::getTransform() const
 
 real BulletRigidBody::getMass() const
 {
-	return 1.0f / rigidBody->getInvMass();
+	return desc.type == DT_DYNAMIC ? 1.0f / rigidBody->getInvMass() : 0.0f;
 }
 
 RigidBody::ACTIVATION_STATE BulletRigidBody::getActivationState() const
@@ -220,7 +219,6 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         }
 
         // destroy rigid body
-        motionState.reset();
         dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
         rigidBody.reset();
     }
@@ -231,8 +229,6 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     // remove old rigid body
     destroy(false);
 
-    // create new
-    motionState.reset(new btDefaultMotionState);
 	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc_, *motionState) ) );
     rigidBody->setUserPointer(this);
 	rigidBody->setLinearVelocity( to_bt_vec(desc_.linearVelocity) );
@@ -262,7 +258,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)
 {
     //rigidBody->setWorldTransform( to_bt_mat(worldTransform) );
-    motionState->setWorldTransform( to_bt_mat(worldTransform) );
+    rigidBody->getMotionState()->setWorldTransform( to_bt_mat(worldTransform) );
 }
 
 void BulletRigidBody::removeConstraint(const Constraint& constraint)

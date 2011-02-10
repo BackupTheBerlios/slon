@@ -3,13 +3,14 @@
 
 #include "CollisionObject.h"
 #include "CollisionShape.h"
+#include "RigidBodyTransform.h"
 
 namespace slon {
 namespace physics {
 
 class Constraint;
 
-/** Rigid body in the phyics world */
+/** Rigid body in the physics world */
 class RigidBody :
     public CollisionObject
 {
@@ -106,6 +107,20 @@ public:
 
     /** Get rigid body description structure state. */
     virtual const state_desc& getStateDesc() const = 0;
+
+	/** Get motion state of rigid body for tracking its motion.
+	 * For dynamic rigid body motion state will treat rigid body transform as absolute transform for scene graph, for
+	 * kinematic it will setup scene graph transform as rigid body transform.
+	 * Use matrix to specify transition between rigidBody and scene frames.
+	 */
+	virtual RigidBodyTransform* getMotionState() = 0;
+
+	/** Get motion state of rigid body for tracking its motion.
+	 * For dynamic rigid body motion state will treat rigid body transform as absolute transform for scene graph, for
+	 * kinematic it will setup scene graph transform as rigid body transform.
+	 * Use matrix to specify transition between rigidBody and scene frames.
+	 */
+	virtual const RigidBodyTransform* getMotionState() const = 0;
 
     /** Recreate rigid body from desc */
     virtual void reset(const state_desc& desc) = 0;

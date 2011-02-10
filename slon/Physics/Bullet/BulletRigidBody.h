@@ -3,6 +3,7 @@
 
 #include "../RigidBody.h"
 #include "BulletCollisionObject.h"
+#include "BulletMotionState.h"
 #include <bullet/btBulletDynamicsCommon.h>
 
 namespace slon {
@@ -15,7 +16,7 @@ friend class BulletConstraint;
 public:
     typedef BulletCollisionObject<RigidBody>                base_type;
 
-	typedef boost::shared_ptr<btMotionState>                motion_state_ptr;
+	typedef boost::intrusive_ptr<BulletMotionState>         motion_state_ptr;
 	typedef boost::shared_ptr<btRigidBody>                  rigid_body_ptr;
 
 	typedef boost::intrusive_ptr<CollisionShape>            collision_shape_ptr;
@@ -64,6 +65,8 @@ public:
     const std::string&              getName() const             { return desc.name; }
     RigidBody::DYNAMICS_TYPE        getDynamicsType() const     { return desc.type; }
     const RigidBody::state_desc&    getStateDesc() const        { return desc; }
+	RigidBodyTransform*				getMotionState()			{ return motionState.get(); }
+	const RigidBodyTransform*		getMotionState() const		{ return motionState.get(); }
 
     void    reset(const RigidBody::state_desc& desc);
     void    setTransform(const math::Matrix4r& worldTransform);

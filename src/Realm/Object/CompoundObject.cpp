@@ -1,11 +1,49 @@
 #include "stdafx.h"
 #include "Log/Logger.h"
+#include "Physics/RigidBodyTransform.h"
 #include "Realm/Object/CompoundObject.h"
-#include "Scene/Physics/RigidBodyTransform.h"
-#include "Scene/Visitors/Physics/DecomposeTransformVisitor.h"
 #include "Scene/Visitors/TraverseVisitor.h"
 
 __DEFINE_LOGGER__("realm.CompoundObject")
+
+namespace {
+
+	using namespace slon;
+
+	class DecomposeTransformVisitor :
+		public scene::TraverseVisitor
+	{
+	public:
+		void visitAbsoluteTransform(scene::Transform& transform)
+		{
+			physics::RigidBodyTransform* rbTransform = dynamic_cast<physics::RigidBodyTransform*>(&transform);
+			if (rbTransform)
+			{
+				math::Matrix4f T( getLocalToWorldTransform() );
+				math::Matrix4f R( rbTransform->getRigidBody()->getTransform() );
+
+				switch ( rbTransform->getRigidBody()->getDynamicsType() )
+				{
+					case physics::RigidBody::DT_DYNAMIC:
+						rbTransform->setTransform( math::invert(R) * T );
+						break;
+						
+					case physics::RigidBody::DT_STATIC:
+					case physics::RigidBody::DT_KINEMATIC:
+						rbTransform->setTransform( math::invert(T) * R );
+						break;
+
+					default:
+						assert(!"Can't get here");
+				}
+			}
+
+			// Let traverse visitor to do rest of the work
+			TraverseVisitor::visitAbsoluteTransform(transform);
+		}
+	};
+
+} // anonymous namespace
 
 namespace slon {
 namespace realm {
@@ -86,8 +124,8 @@ void CompoundObject::clearPhysics(scene::Node* node)
 {
     if ( scene::Group* group = dynamic_cast<scene::Group*>(node) )
     {
-        scene::Group::node_vector       children( group->firstChild(), group->endChild() );
-        scene::rigid_body_transform_ptr rbTransform( dynamic_cast<scene::RigidBodyTransform*>(node) );
+        scene::Group::node_vector         children( group->firstChild(), group->endChild() );
+        physics::rigid_body_transform_ptr rbTransform( dynamic_cast<physics::RigidBodyTransform*>(node) );
         if (rbTransform)
         {
             if ( scene::Group* parent = rbTransform->getParent() )
@@ -139,7 +177,7 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                 scene::node_ptr targetNode( findNamedNode( *root, (*iter)->getTarget() ) );
                 if (targetNode)
                 {
-                    scene::RigidBodyTransform* rbTransform = new scene::RigidBodyTransform( iter->get() );
+                    physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
                     if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
                     {
                         // relink children
@@ -166,7 +204,7 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
             }
 
             // apply local transform to the shapes
-            scene::DecomposeTransformVisitor visitor;
+            DecomposeTransformVisitor visitor;
             visitor.traverse(*root);
         }
     }

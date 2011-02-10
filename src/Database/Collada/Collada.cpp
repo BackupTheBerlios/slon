@@ -13,10 +13,9 @@
 #include "Graphics/Effect/LightingEffect.h"
 #include "Physics/PhysicsManager.h"
 #include "Physics/PhysicsModel.h"
-#include "Scene/Physics/RigidBodyTransform.h"
 #include "Scene/Skeleton.h"
 #include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/Physics/DecomposeTransformVisitor.h"
+#include "Scene/Visitors/TraverseVisitor.h"
 #include "Utility/uri/file_uri.hpp"
 
 __DEFINE_LOGGER__("database.COLLADA")
@@ -776,6 +775,10 @@ namespace {
                         throw collada_error(logger, "Unsupported controller type");
                 }
             }
+			
+			// compute transforms after scene construction
+			scene::TraverseVisitor tv;
+			tv.traverse(*graphicsModel);
 
 			return graphicsModel;
 		}
