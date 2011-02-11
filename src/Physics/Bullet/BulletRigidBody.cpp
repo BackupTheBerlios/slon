@@ -7,9 +7,11 @@
 using namespace slon;
 using namespace physics;
 
+__DEFINE_LOGGER__("physics.BulletRigidBody")
+
 namespace {
 
-	inline btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState)
+	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState)
 	{
 		btCollisionShape* collisionShape = 0;
         btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
@@ -28,6 +30,101 @@ namespace {
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}
+	
+	std::ostream& operator << (std::ostream& os, const RigidBody::DYNAMICS_TYPE& type)
+	{
+		os << (type == RigidBody::DT_DYNAMIC) ? "DT_DYNAMIC" : (type == RigidBody::DT_KINEMATIC) ? "DT_KINEMATIC" : "DT_STATIC";
+		return os;
+	}
+
+	std::ostream& operator << (std::ostream& os, const BoxShape& shape)
+	{
+		os << "box { halfExtent = {" << shape.halfExtents << "} }";
+		return os;
+	}
+
+	std::ostream& operator << (std::ostream& os, const ConeShape& shape)
+	{
+		os << "cone { radius = " << shape.radius << "; height = " << shape.height << " }";
+		return os;
+	}
+
+	std::ostream& operator << (std::ostream& os, const CylinderShape& shape)
+	{
+		os << "cylinder { halfExtent = {" << shape.halfExtent << "} }";
+		return os;
+	}
+
+	std::ostream& operator << (std::ostream& os, const CollisionShape& shape)
+	{
+		switch ( shape.getShapeType() )
+		{
+			case CollisionShape::PLANE:
+			case CollisionShape::SPHERE:
+			case CollisionShape::BOX:
+				os << static_cast<const BoxShape&>(shape);
+				break;
+
+			case CollisionShape::CONE:
+				os << static_cast<const ConeShape&>(shape);
+				break;
+
+			case CollisionShape::CAPSULE:
+				break;
+
+			case CollisionShape::CYLINDER:
+				os << static_cast<const CylinderShape&>(shape);
+				break;
+
+			case CollisionShape::HEIGHTFIELD:
+			case CollisionShape::CONVEX_MESH:
+			case CollisionShape::TRIANGLE_MESH:
+				break;
+
+			case CollisionShape::COMPOUND:
+			{
+				const CompoundShape& cShape = static_cast<const CompoundShape&>(shape);
+            
+				for (size_t i = 0; i<cShape.shapes.size(); ++i) 
+				{
+					os << "compound\n"
+					   << "{\n" 
+					   << log::indent()
+					   << "transform = \n{\n" << log::indent() << cShape.shapes[i].transform << log::unindent() << "\n}\n"
+					   << "shape = " << *cShape.shapes[i].shape << std::endl
+					   << log::unindent()
+					   << "}";
+				}
+
+				break;
+			}
+
+			default:
+				assert(!"can't get here");
+		}
+
+		return os;
+	}
+
+	std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
+	{
+		os << "{\n" 
+		   << log::indent()
+		   << "transform =\n{\n" << log::indent() << desc.transform << log::unindent() << "\n}\n"
+		   << "type = " << desc.type << std::endl
+		   << "mass = " << desc.mass << std::endl
+		   << "margin = " << desc.margin << std::endl
+		   << "relativeMargin = " << desc.relativeMargin << std::endl
+		   << "linearVelocity = {" << desc.linearVelocity << "}\n"
+		   << "angularVelocity = {" << desc.angularVelocity << "}\n"
+		   << "name = " << desc.name << std::endl
+		   << "target = " << desc.target << std::endl
+		   << "shape = " << *desc.collisionShape << std::endl
+		   << log::unindent()
+		   << "}";
+
+		return os;
+	}
 
 } // anonymous namespace
 
@@ -39,9 +136,18 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
 {
     assert(rigidBody);
 	motionState.reset( new BulletMotionState(this) );
-
+	{
+		btTransform transform;
+		if (btMotionState* ms = rigidBody->getMotionState() ) {
+			ms->getWorldTransform(transform);
+		}
+		else {
+			transform = rigidBody->getWorldTransform();
+		}
+		motionState->setWorldTransform(transform);
+		rigidBody->setMotionState( motionState.get() );
+	}
     rigidBody->setUserPointer(this);
-	rigidBody->setMotionState( motionState.get() );
 
     // fill up desc
     desc.transform = getTransform();
@@ -59,12 +165,15 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     desc.linearVelocity  = to_vec( rigidBody->getLinearVelocity() );
     desc.angularVelocity = to_vec( rigidBody->getAngularVelocity() );
     desc.name            = name_;
+	desc.target          = name_;
     
     CollisionShape* collisionShape = reinterpret_cast<CollisionShape*>( rigidBody->getCollisionShape()->getUserPointer() );
     if (!collisionShape) {
         collisionShape = createCollisionShape( *rigidBody->getCollisionShape() );
     }
     desc.collisionShape.reset(collisionShape);
+
+	logger << log::WL_FLOOD << "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE;
 }
 
 BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWorld* dynamicsWorld_) :
@@ -222,6 +331,8 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         // destroy rigid body
         dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
         rigidBody.reset();
+
+		logger << log::WL_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
     }
 }
 
@@ -254,6 +365,8 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 
     // call handlers
     onResetSignal(*this);
+
+	logger << log::WL_FLOOD << "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE;
 }
 
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)

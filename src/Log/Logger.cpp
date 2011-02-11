@@ -25,6 +25,30 @@ namespace log {
 
 extern Logger::logger_output* findNode(Logger::logger_output& loggerOutput, const std::string& name);
 
+// construct output, redirect to cout
+Logger::logger_output::logger_output() :
+    os(new ostream)
+{
+	os->rdbuf( std::cout.rdbuf() );
+    os->setf(std::ios_base::unitbuf);
+}
+
+// construct output, redirect to parent output
+Logger::logger_output::logger_output(const logger_output_ptr& _parent, const std::string& _name) :
+    parent(_parent),
+    name(_name),
+    os(_parent->os)
+{
+    parent->children.push_back(this);
+}
+
+Logger::logger_output::~logger_output()
+{
+    if (parent) {
+        parent->children.erase( std::find(parent->children.begin(), parent->children.end(), this) );
+    }
+}
+
 Logger::Logger() :
     loggerOutput(new logger_output)
 {
@@ -59,13 +83,17 @@ Logger::Logger(const std::string& name)
     }
 }
 
-std::ostream& Logger::operator << (WARNING_LEVEL warningLevel)
+log::ostream& Logger::operator << (WARNING_LEVEL warningLevel)
 {
     using namespace slon::log;
 
     assert(loggerOutput);
     switch(warningLevel)
     {
+    case log::WL_FLOOD:
+        *(loggerOutput->os) << loggerOutput->name << " [flood] - ";
+        break;
+
     case log::WL_NOTIFY:
         *(loggerOutput->os) << loggerOutput->name << " [notify] - ";
         break;

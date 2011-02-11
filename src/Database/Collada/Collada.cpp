@@ -567,7 +567,7 @@ namespace {
             if (mesh)
             {
                 graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
-			    staticMesh->setName(colladaMesh.id);
+			    staticMesh->setName(colladaMesh.name);
 			    logger << log::WL_NOTIFY << "Mesh succesfully created." << std::endl;
 			    return staticMesh;
             }
@@ -592,7 +592,7 @@ namespace {
                     {
                         // create dummy node replacement
                         geometry = new scene::Node();
-                        geometry->setName(mesh.id);
+                        geometry->setName(mesh.name);
                     }
 					break;
 				}

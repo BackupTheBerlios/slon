@@ -222,6 +222,7 @@ SET ( TARGET_LOG_HEADERS
     ${TARGET_HEADER_PATH}/Log/Forward.h
     ${TARGET_HEADER_PATH}/Log/Logger.h
     ${TARGET_HEADER_PATH}/Log/LogManager.h
+    ${TARGET_HEADER_PATH}/Log/Stream.h
 )
 
 SET ( TARGET_REALM_HEADERS
