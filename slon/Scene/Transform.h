@@ -1,5 +1,5 @@
-#ifndef SLON_ENGINE_SCENE_GRAPH_TRANSFORM_H
-#define SLON_ENGINE_SCENE_GRAPH_TRANSFORM_H
+#ifndef __SLON_ENGINE_SCENE_TRANSFORM_H__
+#define __SLON_ENGINE_SCENE_TRANSFORM_H__
 
 #include "Group.h"
 #include <sgl/Math/Matrix.hpp>
@@ -11,18 +11,13 @@ namespace scene {
 class Transform :
     public Group
 {
-friend class TraverseVisitor;
+friend class TransformVisitor;
 public:
     Transform();
 
     // Override Node
-    void accept(NodeVisitor& visitor);
-    void accept(TraverseVisitor& visitor);
-    void accept(UpdateVisitor& visitor);
-    void accept(CullVisitor& visitor);
-
-    /** Get type of the node */
-    virtual TYPE getType() const { return TRANSFORM; }
+    TYPE getNodeType() const { return TRANSFORM; }
+    void accept(log::LogVisitor& visitor) const;
 
     /** Get node transformation matrix
      * @return node transformation matrix
@@ -34,11 +29,14 @@ public:
      */
     virtual const math::Matrix4f& getInverseTransform() const = 0;
 
+    /** Absolute transform know their localToWorld and worldToLocal transforms and are not affected by parent transformation nodes. */
+    virtual bool isAbsolute() const = 0;
+
     /** Get last modification time stamp. */
-    virtual unsigned int getModifiedTS() const = 0;
+    virtual unsigned int getModifiedCount() const { return modifiedCount; }
 
     /** Get last traverse time stamp. */
-    virtual unsigned int getTraverseTS() const { return traverseTS; }
+    virtual unsigned int getTransformTraverseStamp() const { return traverseStamp; }
 
     /** Get world to local space transformation matrix
      * @return cached transform from last traverse.
@@ -54,17 +52,19 @@ public:
 
     virtual ~Transform() {}
 
+protected:
+	/** Mark for traverse by transform visitor. */
+	void update();
+
 protected:    
     // cached transforms
     math::Matrix4f  worldToLocal;
     math::Matrix4f  localToWorld;
-    unsigned int    traverseTS;
+    unsigned int    traverseStamp;
+	unsigned int	modifiedCount;
 };
-
-typedef boost::intrusive_ptr<Transform>         transform_ptr;
-typedef boost::intrusive_ptr<const Transform>   const_transform_ptr;
 
 } // namespace scene
 } // namespace slon
 
-#endif // SLON_ENGINE_SCENE_GRAPH_TRANSFORM_H
+#endif // __SLON_ENGINE_SCENE_TRANSFORM_H__

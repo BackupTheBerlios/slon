@@ -2,21 +2,17 @@
 #define __SLON_ENGINE_REALM_OBJECT_H__
 
 #include "../Config.h"
+#include "../Physics/Forward.h"
+#include "../Scene/Forward.h"
 #include "../Scene/Node.h"
 #include "../Utility/Algorithm/spatial_node.hpp"
+#include "../Utility/referenced.hpp"
+#include "Forward.h"
 #include <sgl/Math/AABB.hpp>
-
-#ifdef SLON_ENGINE_USE_PHYSICS
-#include "../Physics/PhysicsModel.h"
-#endif
 
 namespace slon {
 namespace realm {
-
-// forward
-class Location;
-class World;
-
+	
 /** Single scene object */
 class Object :
     public Referenced
@@ -31,7 +27,7 @@ protected:
     Object() {}
 
 public:
-    /** Check wether object is dynamic */
+    /** Check whether object is dynamic */
     virtual bool isDynamic() const = 0;
 
     /** Get AABB of the object */
@@ -42,6 +38,9 @@ public:
 
     /** Traverse object scene graph */
     virtual void traverse(scene::NodeVisitor& nv) = 0;
+
+    /** Traverse object scene graph */
+    virtual void traverse(scene::ConstNodeVisitor& nv) const = 0;
 
     /** Get location where object is located */
     virtual const Location* getLocation() const { return location; }
@@ -82,10 +81,7 @@ public:
     static spatial_node_t*  get_spatial_node(Object& co)                            { return static_cast<spatial_node_t*>(co.spatialNode); }
 };
 
-typedef boost::intrusive_ptr<Object>          object_ptr;
-typedef boost::intrusive_ptr<const Object>    const_object_ptr;
-
 } // namespace realm
-} // namesapce slon
+} // namespace slon
 
 #endif // __SLON_ENGINE_REALM_OBJECT_H__

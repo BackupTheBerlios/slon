@@ -1,3 +1,6 @@
+#ifndef __SLON_ENGINE_PHYSICS_FORWARD_H__
+#define __SLON_ENGINE_PHYSICS_FORWARD_H__
+
 #include "../Config.h"
 
 namespace boost 
@@ -109,3 +112,5 @@ typedef math::Quaternion<real>     Quaternionr;
 
 } // namespace physics
 } // namespace slon
+
+#endif // __SLON_ENGINE_PHYSICS_FORWARD_H__

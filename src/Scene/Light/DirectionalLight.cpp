@@ -5,7 +5,7 @@
 namespace slon {
 namespace scene {
 
-void DirectionalLight::accept(scene::CullVisitor& visitor)
+void DirectionalLight::accept(scene::CullVisitor& visitor) const
 {
     visitor.addLight(this);
 }

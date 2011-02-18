@@ -30,8 +30,11 @@ public:
     const math::AABBf& getBounds() const;
 	
     void visit(const math::Ray3f& ray, scene::NodeVisitor& nv);
+    void visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const;
     void visit(const math::AABBf& aabb, scene::NodeVisitor& nv);
+    void visit(const math::AABBf& aabb, scene::ConstNodeVisitor& nv) const;
     void visit(const math::Frustumf& frustum, scene::NodeVisitor& nv);
+    void visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
 
     bool update(Object* object);
     bool remove(Object* object);

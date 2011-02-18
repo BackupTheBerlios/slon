@@ -15,6 +15,7 @@ typedef BulletDynamicsWorld DynamicsWorldImpl;
 #endif
 
 PhysicsManager::PhysicsManager()
+:   unsimulatedTime(0)
 {
 }
 
@@ -42,7 +43,7 @@ void PhysicsManager::handlePhysics()
     preFrameSignal();
     {
         thread::lock_ptr lock = dynamicsWorld->lockForWriting();
-        dynamicsWorld->stepSimulation( (float)deltaTimer() );
+        unsimulatedTime = dynamicsWorld->stepSimulation( (float)deltaTimer() + unsimulatedTime );
     }
     postFrameSignal();
 }

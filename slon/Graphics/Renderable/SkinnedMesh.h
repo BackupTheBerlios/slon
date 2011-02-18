@@ -59,15 +59,12 @@ public:
     SkinnedMesh(const DESC& desc);
 
     // Override Entity
+    using Entity::accept;
+
+    void accept(scene::TransformVisitor& visitor);
+    void accept(scene::CullVisitor& visitor) const;
+
     const math::AABBf& getBounds() const;
-
-    // Override node
-    using Node::accept;
-
-    void accept(scene::NodeVisitor& visitor);
-    void accept(scene::TraverseVisitor& visitor);
-    void accept(scene::UpdateVisitor& visitor);
-    void accept(scene::CullVisitor& visitor);
 
     /** Setup skeleton for the skinned mesh to link vertices with joints.
      * Skeleton must already have joint hierarchy.

@@ -3,7 +3,6 @@
 #include "Graphics/Detail/GraphicsManager.h"
 #include "Graphics/Renderer/FixedPipelineRenderer.h"
 #include "Graphics/Renderer/ForwardRenderer.h"
-#include "Scene/Visitors/TraverseVisitor.h"
 #include "Utility/error.hpp"
 #include <SDL.h>
 #if defined(__linux__)

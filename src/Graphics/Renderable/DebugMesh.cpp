@@ -4,7 +4,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Common.h"
 #include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace slon {
@@ -46,13 +46,12 @@ DebugMesh::DebugMesh() :
     aabb.reset_max();
 }
 
-void DebugMesh::accept(scene::TraverseVisitor& visitor)
+void DebugMesh::accept(scene::TransformVisitor& visitor)
 {
     baseTransform = visitor.getLocalToWorldTransform();
-    visitor.visitEntity(*this);
 }
 
-void DebugMesh::accept(scene::CullVisitor& visitor)
+void DebugMesh::accept(scene::CullVisitor& visitor) const
 {
     for (size_t i = 0; i<subsets.size(); ++i) {
         visitor.addRenderable(&subsets[i]); 

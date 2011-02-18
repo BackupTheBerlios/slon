@@ -75,7 +75,7 @@ public:
     void                setGravity(const math::Vector3r& gravity);
     math::Vector3r      getGravity() const;
     const state_desc&   getStateDesc() const;
-    void                stepSimulation(real dt);
+    real                stepSimulation(real dt);
     void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
     unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
 

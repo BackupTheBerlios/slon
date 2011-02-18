@@ -38,11 +38,11 @@ public:
     void setupGrid(int sizeX, int sizeY);
 
     // Override Entity
-    const math::AABBf& getBounds() const { return bounds<math::AABBf>::infinite(); }
+    using Entity::accept;
 
-    // Override Node
-    using Node::accept;
-    void accept(scene::CullVisitor& visitor);
+    void accept(scene::CullVisitor& visitor) const;
+
+    const math::AABBf& getBounds() const { return bounds<math::AABBf>::infinite(); }
 
 	// Override Renderable
     Effect* getEffect() const { return effect.get(); }
@@ -61,7 +61,7 @@ private:
     detail::AttributeTable::binding_ptr positionBinding;
 
     // for effect
-    math::Vector3f  corners[4];
+    mutable math::Vector3f corners[4];
 };
 
 } // namespace graphics

@@ -11,7 +11,7 @@ namespace physics {
 
 /** Set of rigid bodies, constraints and other physics models. */
 class PhysicsModel :
-    public Referenced
+	public Referenced
 {
 public: 
     typedef std::set<rigid_body_ptr>    rigid_body_set;

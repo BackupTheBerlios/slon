@@ -1,45 +1,42 @@
 #include "stdafx.h"
+#include "Detail/Engine.h"
+#include "Log/Formatters.h"
+#include "Log/LogVisitor.h"
+#include "Realm/World.h"
 #include "Scene/Transform.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
-#include "Scene/Visitors/UpdateVisitor.h"
 
 using namespace slon;
 using namespace scene;
 
 Transform::Transform() :
-    traverseTS(0)
+    traverseStamp(0),
+	modifiedCount(0)
 {
 }
 
-void Transform::accept(NodeVisitor& visitor)     
-{ 
-    if (nvCallback) {
-        (*nvCallback)(*this, visitor); 
+void Transform::accept(log::LogVisitor& visitor) const
+{
+    visitor << "Transform";
+    if ( getName() != "" ) {
+        visitor << " '" << getName() << "'";
     }
-    visitor.visitTransform(*this);
+    visitor << "\n{\n" << log::indent()
+            << "transform =" << log::detailed(getTransform(), true)  
+            << "localToWorld =" << log::detailed(getLocalToWorld(), true) ; 
+    visitor.visitGroup(*this);
+    visitor << log::unindent() << "}\n";
 }
 
-void Transform::accept(TraverseVisitor& visitor) 
-{ 
-    if (tvCallback) {
-        (*tvCallback)(*this, visitor);
-    }
-    visitor.visitTransform(*this);
-}
+void Transform::update()
+{
+	++modifiedCount;
 
-void Transform::accept(UpdateVisitor& visitor)   
-{ 
-    if (uvCallback) {
-        (*uvCallback)(*this, visitor);
-    }
-    visitor.visitTransform(*this);
-}
+	Node* node = this;
+	while (node && !node->getObject()) {
+		node = node->getParent();
+	}
 
-void Transform::accept(CullVisitor& visitor)     
-{ 
-    if (cvCallback) {
-        (*cvCallback)(*this, visitor);
-    }
-    visitor.visitTransform(*this);
+	if ( node && node->getObject() ) {
+		detail::Engine::engineInstance->addToUpdateQueue(node->getObject());
+	}
 }

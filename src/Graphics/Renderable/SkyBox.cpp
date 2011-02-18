@@ -113,7 +113,7 @@ void SkyBox::MakeFromSideTextures(const std::string maps[6])
             sideImages[i].reset( device->CreateImage() );
             if ( SGL_OK != sideImages[i]->LoadFromFile( maps[i].c_str() ) )
             {
-                logger << log::WL_WARNING << "Unable to load image form file: " + maps[i] << std::endl;
+                logger << log::S_WARNING << "Unable to load image form file: " + maps[i] << std::endl;
             }
 
             desc.sides[i].format = sideImages[i]->Format();
@@ -125,13 +125,13 @@ void SkyBox::MakeFromSideTextures(const std::string maps[6])
         cubemap.reset( device->CreateTextureCube(desc) );
         if (!cubemap) 
         {
-            logger << log::WL_WARNING << "Unable to create cubemap image\n";
+            logger << log::S_WARNING << "Unable to create cubemap image\n";
             return;
         }
         
         bool haveMipmaps = false;
         if ( sgl::SGL_OK != cubemap->GenerateMipmap() ) {
-            logger << log::WL_WARNING << "Unable to generate cubemap mipmaps\n";
+            logger << log::S_WARNING << "Unable to generate cubemap mipmaps\n";
         }
         else {
             haveMipmaps = true;
@@ -183,7 +183,7 @@ void SkyBox::render() const
     ibo->Unbind();
 }
 
-void SkyBox::accept(scene::CullVisitor& visitor)
+void SkyBox::accept(scene::CullVisitor& visitor) const
 {
     visitor.addRenderable(this);
 }

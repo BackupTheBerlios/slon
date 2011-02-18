@@ -1,46 +1,41 @@
 #include "stdafx.h"
+#include "Log/LogVisitor.h"
 #include "Scene/Group.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/UpdateVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
 
 namespace slon {
 namespace scene {
 
-void Node::accept(NodeVisitor& visitor)     
-{ 
-    if (nvCallback) {
-        (*nvCallback)(*this, visitor); 
-    }
-    visitor.visitNode(*this);
+Node::Node() 
+:   parent(0)
+,	left(0)
+,	right(0)
+,	userPointer(0)
+,	object(0)
+{}
+
+Node::Node(unique_string name_)
+:	name(name_)
+,	parent(0)
+,	left(0)
+,	right(0)
+,	userPointer(0)
+,	object(0)
+{
 }
 
-void Node::accept(TraverseVisitor& visitor) 
-{ 
-    if (tvCallback) {
-        (*tvCallback)(*this, visitor);
+void Node::accept(log::LogVisitor& visitor) const 
+{
+    if ( visitor.getLogger() )
+    {
+        visitor << "Node";
+        if ( getName() != "" ) {
+            visitor << " '" << getName() << "'";
+        }
+        visitor << " {}\n";
     }
-    visitor.visitNode(*this);
 }
 
-void Node::accept(UpdateVisitor& visitor)   
-{ 
-    if (uvCallback) {
-        (*uvCallback)(*this, visitor);
-    }
-    visitor.visitNode(*this);
-}
-
-void Node::accept(CullVisitor& visitor)     
-{ 
-    if (cvCallback) {
-        (*cvCallback)(*this, visitor);
-    }
-    visitor.visitNode(*this);
-}
-
-Node* findNamedNode( Node& 			 root,
-                     const std::string& name )
+Node* findNamedNode(Node& root, unique_string name)
 {
     if ( root.getName() == name ) {
         return &root;
@@ -48,12 +43,9 @@ Node* findNamedNode( Node& 			 root,
 
     if ( Group* group = dynamic_cast<Group*>(&root) )
     {
-        for( Group::node_iterator i = group->firstChild();
-                                  i != group->endChild();
-                                  ++i )
+        for(Node* i = group->getChild(); i; i = i->getRight())
         {
-		    Node* node = findNamedNode(**i, name);
-            if (node) {
+            if ( Node* node = findNamedNode(*i, name) ) {
                 return node;
             }
 	    }

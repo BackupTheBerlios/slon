@@ -67,6 +67,8 @@ public:
 	/** Get file system manager */
     filesystem::FileSystemManager& getFileSystemManager() { return *filesystemManager; }
 
+    void addToUpdateQueue(realm::Object* object) { updateQueue.push_back(object); }
+
 private:
     // manager
     database::detail::DatabaseManager           databaseManager;
@@ -77,8 +79,10 @@ private:
     filesystem::detail::file_system_manager_ptr filesystemManager;
     start_stop_timer_ptr                        simulationTimer;
 #ifdef SLON_ENGINE_USE_PHYSICS
-    physics::detail::PhysicsManager         physicsManager;
+    physics::detail::PhysicsManager             physicsManager;
 #endif
+
+    std::vector<realm::Object*> updateQueue;
 
     // scene
     realm::world_ptr    world;
@@ -87,6 +91,9 @@ private:
     DESC    desc;
     bool    working;
     int     frameNumber;
+
+public:
+    static Engine* engineInstance;
 };
 
 } // namespace detail

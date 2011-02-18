@@ -16,8 +16,8 @@ class saver_error :
 public:
     saver_error( log::Logger&         logger,
                  const std::string&   message,
-                 log::WARNING_LEVEL   warningLevel = log::WL_ERROR )
-    :   slon_error(logger, message, warningLevel)
+                 log::SEVERITY   severity = log::S_ERROR )
+    :   slon_error(logger, message, severity)
     {}
 
 	~saver_error() throw() {} 

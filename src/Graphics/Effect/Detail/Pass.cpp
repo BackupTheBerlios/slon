@@ -204,7 +204,7 @@ Pass::Pass(const DESC& desc)
                     break;
                 }
                 default:
-                    logger << log::WL_WARNING 
+                    logger << log::S_WARNING 
 						   << "Uniform '" 
 						   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
 						   << "' have unsupported type.\n";
@@ -214,21 +214,21 @@ Pass::Pass(const DESC& desc)
 
         if (!uniform) 
 		{
-            logger << log::WL_WARNING 
+            logger << log::S_WARNING 
 				   << "Uniform '" 
 				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
 				   << "' was not loaded.\n";
         }
         else if (!parameter) 
 		{
-            logger << log::WL_WARNING 
+            logger << log::S_WARNING 
 				   << "Parameter for uniform '" 
 				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
 				   << "' not specified.\n";
         }
         else if (!compatible) 
 		{
-            logger << log::WL_WARNING 
+            logger << log::S_WARNING 
 				   << "Parameter and uniform '" 
 				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
 				   << "' have incompatible types.\n";

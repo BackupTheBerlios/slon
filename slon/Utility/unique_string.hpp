@@ -58,7 +58,7 @@ public:
     bool operator != (const unique_string& rhs) const { return stringHolder != rhs.stringHolder; }
 
     /** Convert unique_string to cstring */
-    operator const char* () const { return stringHolder ? stringHolder->str.c_str() : 0; }
+    operator const char* () const { return stringHolder ? stringHolder->str.c_str() : ""; }
 
 private:
     void init(const std::string& str)

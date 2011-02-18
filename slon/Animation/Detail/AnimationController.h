@@ -27,7 +27,7 @@ private:
 	void advance(float time) const;
 
 	// Override scene::Node::traverse_visitor_callback
-    void operator () (scene::Node& node, scene::TraverseVisitor& tv);
+    //void operator () (scene::Node& node, scene::TraverseVisitor& tv);
 
 private:
 	const_animation_track_ptr	track;

@@ -21,8 +21,8 @@ class Camera :
     public scene::Entity
 {
 public:
-    // override entity
-    virtual ENTITY_TYPE getEntityType() const { return CAMERA; }
+    // Override Node
+    TYPE getNodeType() const { return CAMERA; }
 
     /** Get frustum */
     virtual const math::Frustumf& getFrustum() const = 0;

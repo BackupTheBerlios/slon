@@ -32,15 +32,15 @@ class collada_error :
 public:
     collada_error( log::Logger&          logger,
                    const std::string&    message,
-                   log::WARNING_LEVEL    warningLevel = log::WL_ERROR ) :
-        slon_error(logger, message, warningLevel)
+                   log::SEVERITY    severity = log::S_ERROR ) :
+        slon_error(logger, message, severity)
     {}
 
     collada_error( log::Logger&          logger,
                    const std::string&    message,
                    const xmlpp::node&    _node,
-                   log::WARNING_LEVEL    warningLevel = log::WL_ERROR ) :
-        slon_error(logger, message, warningLevel),
+                   log::SEVERITY    severity = log::S_ERROR ) :
+        slon_error(logger, message, severity),
         node(_node)
     {}
 
@@ -104,8 +104,8 @@ class construct_scene_error :
 public:
 	construct_scene_error( log::Logger&    	  logger,
 					       const std::string& message,
-					       log::WARNING_LEVEL warningLevel = log::WL_ERROR ) :
-		slon_error(logger, message, warningLevel)
+					       log::SEVERITY severity = log::S_ERROR ) :
+		slon_error(logger, message, severity)
 	{}
 };
 
@@ -328,23 +328,23 @@ struct read_bool
 
 struct warning
 {
-    warning( log::Logger&        _logger,
+    warning( log::Logger&       _logger,
              const std::string& _message,
-             log::WARNING_LEVEL _warningLevel = log::WL_WARNING ) :
+             log::SEVERITY      _severity = log::S_WARNING ) :
         logger(_logger),
         message(_message),
-        warningLevel(_warningLevel)
+        severity(_severity)
     {}
 
     void operator () ( const ColladaDocument&   /*document*/,
                        const xmlpp::node&       /*node*/)
     {
-        logger << warningLevel << message << std::endl;
+        logger << severity << message << std::endl;
     }
 
     log::Logger&        logger;
     std::string         message;
-    log::WARNING_LEVEL  warningLevel;
+    log::SEVERITY  severity;
 };
 
 } // namespace database

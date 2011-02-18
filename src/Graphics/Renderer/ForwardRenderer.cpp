@@ -320,7 +320,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
 
         if (renderTarget && sgl::SGL_OK != renderTarget->Bind())
         {
-            logger << log::WL_ERROR << "Can't bind cameras render target\n";
+            logger << log::S_ERROR << "Can't bind cameras render target\n";
             return;
         }
 

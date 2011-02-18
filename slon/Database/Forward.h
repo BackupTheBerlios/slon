@@ -1,3 +1,6 @@
+#ifndef __SLON_ENGINE_DATABASE_FORWARD_H__
+#define __SLON_ENGINE_DATABASE_FORWARD_H__
+
 #include "../Animation/Forward.h"
 #include "../Graphics/Forward.h"
 #include "../Scene/Forward.h"
@@ -77,5 +80,7 @@ typedef boost::intrusive_ptr<PhysicsSceneSaver>         physics_scene_saver_ptr;
 typedef boost::intrusive_ptr<const PhysicsSceneSaver>   const_physics_scene_saver_ptr;
 #endif
 
-}
-}
+} // namespace scene
+} // namespace slon
+
+#endif // __SLON_ENGINE_DATABASE_FORWARD_H__

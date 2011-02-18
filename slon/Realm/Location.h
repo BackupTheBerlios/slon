@@ -46,6 +46,12 @@ public:
      */
     virtual void visit(const math::Ray3f& ray, scene::NodeVisitor& nv) = 0;
 
+    /** Update objects intersecting the ray.
+     * @param ray - ray for visiting intersected objects.
+     * @param nv - updating visitor.
+     */
+    virtual void visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const = 0;
+
     /** Update objects in the specified area.
      * @param area - area where to update objects.
      * @param nv - updating visitor.
@@ -62,7 +68,19 @@ public:
      * @param area - area where to update objects.
      * @param nv - updating visitor.
      */
+    virtual void visit(const math::AABBf& area, scene::ConstNodeVisitor& nv) const = 0;
+
+    /** Update objects in the specified area.
+     * @param area - area where to update objects.
+     * @param nv - updating visitor.
+     */
     virtual void visit(const math::Frustumf& frustum, scene::NodeVisitor& nv) = 0;
+
+    /** Update objects in the specified area.
+     * @param area - area where to update objects.
+     * @param nv - updating visitor.
+     */
+    virtual void visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const = 0;
 
     /** Grant thread read access to the location.
      * @return lock object. Lock is freed wether object is deleted.
@@ -76,9 +94,6 @@ public:
 
     virtual ~Location() {}
 };
-
-typedef boost::intrusive_ptr<Location>          location_ptr;
-typedef boost::intrusive_ptr<const Location>    const_location_ptr;
 
 } // namespace realm
 } // namesapce slon

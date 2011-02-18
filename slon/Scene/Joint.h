@@ -12,38 +12,37 @@ namespace scene {
 class Joint :
     public MatrixTransform
 {
-friend class TraverseVisitor;
+friend class TransformVisitor;
 public:
     Joint();
 
     // unhide node functions
-    using Node::accept;
     using MatrixTransform::setTransform;
     using MatrixTransform::setInverseTransform;
 
-    // Override node
-    void accept(TraverseVisitor& visitor);
+    // Override Node
+    TYPE getNodeType() const { return JOINT; }
 
     /** Set index of the joint in the skinned mesh joint array */
-    virtual void setId(unsigned id_) { id = id_; }
+    void setId(unsigned id_) { id = id_; }
 
     /** Get index of the joint in the skinned mesh joint array */
-    virtual unsigned getId() const { return id; }
+    unsigned getId() const { return id; }
 
     /** Set transform */
-    virtual void setTransform(const math::Quaternionf& rotation, const math::Vector3f& translation);
+    void setTransform(const math::Quaternionf& rotation, const math::Vector3f& translation);
 
     /** Set local to world transformation matrix */
-    virtual void setInverseTransform(const math::Quaternionf& rotation, const math::Vector3f& translation);
+    void setInverseTransform(const math::Quaternionf& rotation, const math::Vector3f& translation);
 
     /** Get inverse bind matrix to transform vertex into the joint coordinate system. */
-    virtual const math::Matrix4f& getInverseBindMatrix() const { return inverseBindMatrix; }
+    const math::Matrix4f& getInverseBindMatrix() const { return inverseBindMatrix; }
 
     /** Set inverse bind matrix to transform vertex into the joint coordinate system. */
-    virtual void setInverseBindMatrix(const math::Matrix4f& inverseBindMatrix_) { inverseBindMatrix = inverseBindMatrix_; }
+    void setInverseBindMatrix(const math::Matrix4f& inverseBindMatrix_) { inverseBindMatrix = inverseBindMatrix_; }
 
     /** Get matrix used for skinning: localToWorld * objectToLocal */
-    virtual const math::Matrix4f& getSkinningMatrix() const { return skinningMatrix; }
+    const math::Matrix4f& getSkinningMatrix() const { return skinningMatrix; }
 
     virtual ~Joint() {}
 

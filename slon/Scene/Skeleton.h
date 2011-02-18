@@ -18,15 +18,6 @@ public:
     typedef Skeleton    this_type;
 
 public:
-    // unhide accept
-    using Node::accept;
-
-    // Override node
-    virtual void accept(NodeVisitor& visitor);
-    virtual void accept(TraverseVisitor& visitor);
-    virtual void accept(UpdateVisitor& visitor);
-    virtual void accept(CullVisitor& visitor);
-
     /** Setup root bone of the skeleton. Setup root joint for the skeleton
      * only after you prepared joint hierarchy. Once you change it, resetup
      * root joint, it will force updating of the joint bind matrices.

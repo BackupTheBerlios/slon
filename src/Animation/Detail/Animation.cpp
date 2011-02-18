@@ -16,7 +16,6 @@ void Animation::play(const Timer* timer)
 
     if (target && controller) 
     {
-        target->setTVCallback( controller.get() );
         controller->setTimer(timer);
     }
 }
@@ -32,7 +31,6 @@ void Animation::stop()
 
     if (target && controller) 
     {
-        target->setTVCallback(0);
         controller->setTimer(0);
     }
 }

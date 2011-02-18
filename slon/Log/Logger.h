@@ -4,7 +4,6 @@
 #include "../Utility/referenced.hpp"
 #include "Stream.h"
 #include <boost/intrusive_ptr.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <cassert>
 #include <fstream>
@@ -21,15 +20,6 @@
 
 namespace slon {
 namespace log {
-
-enum WARNING_LEVEL
-{
-	WL_FLOOD,      /// Dump every usefull information
-    WL_NOTIFY,     /// Just notify about some notisable events
-    WL_WARNING,    /// Warn user
-    WL_ERROR,      /// Report an error, that engine will resolve.
-    WL_FATAL_ERROR /// Report an error, that engine can't resolve.
-};
 
 /** Logger is simple ostream that redirects output
  * to the specified by LogManager destination. Loggers
@@ -83,7 +73,7 @@ public:
     std::string getName() const { return loggerOutput->name; }
 
     /** Write warning level and log name. */
-    log::ostream& operator << (WARNING_LEVEL warningLevel);
+    log::ostream& operator << (SEVERITY severity);
 
     /** Flush as ostream. */
     void flush() { loggerOutput->os->flush(); }

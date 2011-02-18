@@ -14,9 +14,6 @@ class BulletMotionState :
 public:
 	BulletMotionState(RigidBody* rigidBody);
 
-    // Override Node
-    void accept(scene::TraverseVisitor& visitor);
-
 	// Override btMotionState
 	void getWorldTransform(btTransform &worldTrans) const;
 	void setWorldTransform(const btTransform &worldTrans);

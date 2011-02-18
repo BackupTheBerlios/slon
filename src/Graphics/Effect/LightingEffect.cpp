@@ -357,13 +357,13 @@ void LightingEffect::dirty(const LightingMaterial* material_)
         }
 
         case Renderer::DEFERRED_SHADING:
-            logger << log::WL_ERROR << "Deferred renderer is not supported by lighting effect." << std::endl;
+            logger << log::S_ERROR << "Deferred renderer is not supported by lighting effect." << std::endl;
             break;
         }
     }
     catch(slon_error&)
     {
-        logger << log::WL_ERROR << "Can't create lighting effect." << std::endl;
+        logger << log::S_ERROR << "Can't create lighting effect." << std::endl;
     }
 
 	TransformEffect::dirty();

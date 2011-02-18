@@ -28,10 +28,10 @@ public:
     /** Get sky box cube map */
     sgl::TextureCube* getCubeMap() const { return cubemap.get(); }
 
-    // Override Node
-    using Node::accept;
+    // Override Entity
+    using Entity::accept;
 
-    void accept(scene::CullVisitor& visitor);
+    void accept(scene::CullVisitor& visitor) const;
 
     // Override Entity
     const math::AABBf& getBounds() const { return bounds<math::AABBf>::infinite(); }

@@ -390,6 +390,7 @@ void collada_node::serialize(ColladaDocument& document,
 	// load
 	collada_serializer serializer;
     serializer  &= xmlpp::make_nvp( "id",					xmlpp::as_attribute(id) );
+    serializer  &= xmlpp::make_nvp( "name",					xmlpp::as_attribute(name) );
     serializer  &= xmlpp::make_nvp( "sid",					xmlpp::as_attribute(sid) );
     serializer  &= xmlpp::make_nvp( "type",					xmlpp::as_attribute(type) );
     serializer  &= xmlpp::make_nvp( "instance_geometry",	xmlpp::as_element_set(geometries) );

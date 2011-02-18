@@ -56,6 +56,22 @@ void ScalableWorld::visit(const math::Ray3f& ray, scene::NodeVisitor& nv)
     }
 }
 
+void ScalableWorld::visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const
+{
+    // visit infinite objects
+    for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+        nv.traverse( *object_core_access::get_node(*infiniteObjects[i]) );
+    }
+
+    // visit others
+    for (size_t i = 0; i<locations.size(); ++i)
+    {
+        if ( test_intersection(locations[i]->getBounds(), ray) ) {
+            locations[i]->visit(ray, nv);
+        }
+    }
+}
+
 void ScalableWorld::visit(const math::AABBf& area, scene::NodeVisitor& nv)
 {
     // visit infinite objects
@@ -72,7 +88,39 @@ void ScalableWorld::visit(const math::AABBf& area, scene::NodeVisitor& nv)
     }
 }
 
+void ScalableWorld::visit(const math::AABBf& area, scene::ConstNodeVisitor& nv) const
+{
+    // visit infinite objects
+    for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+        nv.traverse( *object_core_access::get_node(*infiniteObjects[i]) );
+    }
+
+    // visit others
+    for (size_t i = 0; i<locations.size(); ++i)
+    {
+        if ( test_intersection(area, locations[i]->getBounds()) ) {
+            locations[i]->visit(area, nv);
+        }
+    }
+}
+
 void ScalableWorld::visit(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+{
+    // visit infinite objects
+    for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+        nv.traverse( *object_core_access::get_node(*infiniteObjects[i]) );
+    }
+
+    // visit others
+    for (size_t i = 0; i<locations.size(); ++i)
+    {
+        if ( test_intersection(frustum, locations[i]->getBounds()) ) {
+            locations[i]->visit(frustum, nv);
+        }
+    }
+}
+
+void ScalableWorld::visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
 {
     // visit infinite objects
     for (size_t i = 0; i<infiniteObjects.size(); ++i) {

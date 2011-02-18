@@ -96,7 +96,7 @@ physics::physics_model_ptr BulletLoader::load(std::istream& stream)
             }
 
             default:
-                logger << log::WL_ERROR << "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'";
+                logger << log::S_ERROR << "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'";
                 btWorld->removeConstraint( constraint.get() );
                 break;
         };

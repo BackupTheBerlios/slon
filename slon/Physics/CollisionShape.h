@@ -162,6 +162,10 @@ public:
 	    halfExtent(halfExtent_)
 	{}
 
+    CylinderShape(real x, real y, real z) :
+	    halfExtent(x, y, z)
+	{}
+
     CollisionShape* clone() const { return new CylinderShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CYLINDER; }
     void applyScaling(const math::Vector3r& scaling)

@@ -79,7 +79,7 @@ void SkyBoxEffect::dirtyShaderTechniques()
 
             case Renderer::DEFERRED_SHADING:
                 pass.reset();
-                logger << log::WL_ERROR << "Deferred renderer is not supported by sky box effect." << std::endl;
+                logger << log::S_ERROR << "Deferred renderer is not supported by sky box effect." << std::endl;
                 break;
         }
     }

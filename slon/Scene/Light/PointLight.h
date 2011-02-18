@@ -11,11 +11,11 @@ class PointLight :
     public Light
 {
 public:
-    // Override Node
-    using Node::accept;
+    // Override Entity
+    using Entity::accept;
 
-    void accept(scene::TraverseVisitor& visitor);
-    void accept(scene::CullVisitor& visitor);
+    void accept(scene::TransformVisitor& visitor);
+    void accept(scene::CullVisitor& visitor) const;
 
     // Oveerride Entity
     const math::AABBf& getBounds() const { return aabb; }
@@ -33,18 +33,18 @@ public:
     void setRadius(float radius);
 
     /** Get light position. */
-    const math::Vector4f& getPosition() const       { return position; }
+    const math::Vector4f& getPosition() const { return position; }
 
     /** Get normalized color of the light source. */
-    const math::Vector4f& getColor() const          { return color; }
+    const math::Vector4f& getColor() const { return color; }
 
     /** Get intensity of the light source. */
-    float getIntensity() const                      { return intensity; }
+    float getIntensity() const { return intensity; }
 
     /** Get radius of the light source. */
-    float getRadius() const                         { return radius; }
+    float getRadius() const { return radius; }
 
-protected:
+private:
     // light props
     math::Vector4f  color;
     float           intensity;

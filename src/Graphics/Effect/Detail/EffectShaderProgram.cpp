@@ -108,7 +108,7 @@ namespace {
                         std::string errorMsg( sglGetErrorMsg() );
                         throw shader_error(logger, "Can't create shader(" + *iter + "):" + errorMsg);
                     }
-                    logger << log::WL_NOTIFY << "Shader compilation log(" + *iter + "):\n"
+                    logger << log::S_NOTICE << "Shader compilation log(" + *iter + "):\n"
                                              << shader->CompilationLog() << std::endl;
 
                     program->AddShader(shader);
@@ -124,7 +124,7 @@ namespace {
                 if ( sgl::SGL_OK != program->Dirty() ) {
                     throw shader_error(logger, "Can't link shader program(" + shaderNames + "):\n" + program->CompilationLog() );
                 }
-                logger << log::WL_NOTIFY << "Program compilation log(" + shaderNames + "):\n"
+                logger << log::S_NOTICE << "Program compilation log(" + shaderNames + "):\n"
                                          << program->CompilationLog() << std::endl;
 
                 // bind all attributes to the default slots

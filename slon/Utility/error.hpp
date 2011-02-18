@@ -15,7 +15,7 @@ public:
 
     slon_error( log::Logger&         logger,
                 const std::string&   message,
-                log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                log::SEVERITY   severity = log::S_ERROR );
 
 	~slon_error() throw() {} 
 };
@@ -27,12 +27,12 @@ class system_error :
 public:
     system_error( log::Logger&         logger,
                   const std::string&   message,
-                  log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                  log::SEVERITY   severity = log::S_ERROR );
 
     system_error( log::Logger&         logger,
                   const std::string&   message,
                   int                  errorCode,
-                  log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                  log::SEVERITY   severity = log::S_ERROR );
 
 	~system_error() throw() {} 
 };
@@ -44,7 +44,7 @@ class file_not_found_error :
 public:
     file_not_found_error( log::Logger&         logger,
                           const std::string&   message,
-                          log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                          log::SEVERITY   severity = log::S_ERROR );
 
 	~file_not_found_error() throw() {} 
 };
@@ -56,7 +56,7 @@ class io_error :
 public:
     io_error( log::Logger&         logger,
               const std::string&   message,
-              log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+              log::SEVERITY   severity = log::S_ERROR );
 
 	~io_error() throw() {} 
 };
@@ -70,7 +70,7 @@ namespace graphics {
     public:
         shader_error( log::Logger&          logger,
                       const std::string&    message,
-                      log::WARNING_LEVEL    warningLevel = log::WL_ERROR );
+                      log::SEVERITY    severity = log::S_ERROR );
 		
 		~shader_error() throw() {} 
     };
@@ -82,7 +82,7 @@ namespace graphics {
     public:
         unsupported_error( log::Logger&         logger,
                            const std::string&   message,
-                           log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                           log::SEVERITY   severity = log::S_ERROR );
 
 		~unsupported_error() throw() {} 
     };
@@ -94,7 +94,7 @@ namespace graphics {
     public:
         gl_error( log::Logger&         logger,
                   const std::string&   message,
-                  log::WARNING_LEVEL   warningLevel = log::WL_ERROR );
+                  log::SEVERITY   severity = log::S_ERROR );
 
 		~gl_error() throw() {} 
     };

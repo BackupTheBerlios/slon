@@ -2,7 +2,7 @@
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Graphics/Renderable/Debug/DebugDrawSkinned.h"
 #include "Scene/Skeleton.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 
 namespace slon {
 namespace graphics {
@@ -31,9 +31,9 @@ DebugMesh& operator << (DebugMesh& mesh, const joint& j)
     if (j.drawChildren)
     {
         math::Matrix4f currentTransform = mesh.transform;
-        for (size_t i = 0; i<j.debugJoint->getNumChildren(); ++i)
+        for (const scene::Node* i = j.debugJoint->getChild(); i; i = i->getRight())
         {
-            const scene::Joint* childJoint = dynamic_cast<const scene::Joint*>(j.debugJoint->getChild(i));
+            const scene::Joint* childJoint = dynamic_cast<const scene::Joint*>(i);
             if (childJoint) {
                 mesh << transform(currentTransform) << joint(childJoint, j.radius, j.radiusFromBoneLength, j.drawChildren);
             }

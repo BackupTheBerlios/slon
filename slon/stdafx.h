@@ -26,6 +26,10 @@
 // BOOST
 #include <boost/bind.hpp>
 #include <boost/intrusive_ptr.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>

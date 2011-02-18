@@ -5,7 +5,7 @@
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
 #include "Scene/Camera.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/error.hpp"
 #include <boost/filesystem.hpp>
 #include <SDL.h>
@@ -86,23 +86,23 @@ namespace {
 		    switch(result)
 		    {
 		    case SGLERR_INVALID_CALL:
-			    logger << log::WL_ERROR << "Invalid call: " << msg << std::endl;
+			    logger << log::S_ERROR << "Invalid call: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_OUT_OF_MEMORY:
-			    logger << log::WL_ERROR << "Out of memory: " << msg << std::endl;
+			    logger << log::S_ERROR << "Out of memory: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_FILE_NOT_FOUND:
-			    logger << log::WL_ERROR << "File not found: " << msg << std::endl;
+			    logger << log::S_ERROR << "File not found: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_UNSUPPORTED:
-			    logger << log::WL_ERROR << "Unsupported function: " << msg << std::endl;
+			    logger << log::S_ERROR << "Unsupported function: " << msg << std::endl;
 			    break;
 
 		    default:
-			    logger << log::WL_ERROR << "Unknown error: " << msg << std::endl;
+			    logger << log::S_ERROR << "Unknown error: " << msg << std::endl;
 			    break;
 		    }
 	    }
@@ -112,7 +112,6 @@ namespace {
     };
 
     sgl::ref_ptr<LogErrorHandler> logErrorHandler;
-    std::auto_ptr<detail::Engine> engineInstance;
 
     template<sgl::Image::FILE_TYPE format>
     class ImageLoader :
@@ -151,6 +150,9 @@ namespace {
 
 namespace slon {
 namespace detail {
+
+// static
+Engine* Engine::engineInstance = 0;
 
 Engine::Engine() :
     working(false)
@@ -245,7 +247,7 @@ void Engine::run(const DESC& desc_)
 #endif
 
     // run main rendering cycle
-    scene::TraverseVisitor traverser;
+    scene::TransformVisitor traverser;
     simulationTimer->start();
     while (working)
     {
@@ -264,15 +266,15 @@ void Engine::run(const DESC& desc_)
         int i = 0;
         while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-        // traverse zone of interest
+        // traverse updated objects
         {
             thread::lock_ptr lock = world->lockForWriting();
-            for ( graphics::GraphicsManager::camera_const_iterator iter  = graphicsManager.firstCamera();
-                                                                   iter != graphicsManager.endCamera();
-                                                                   ++iter )
+            for (size_t i = 0; i<updateQueue.size(); ++i) 
             {
-                world->visit( (*iter)->getBounds(), traverser );
+                updateQueue[i]->traverse(traverser);
+                world->update(updateQueue[i]);
             }
+            updateQueue.clear();
         }
         graphicsManager.render(*world);
     }
@@ -316,18 +318,18 @@ void Engine::frame()
 
     // perform 10 delayed functions
     int i = 0;
-    scene::TraverseVisitor traverser;    
+    scene::TransformVisitor traverser;    
     while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-    // traverse zone of interest
+        // traverse updated objects
     {
         thread::lock_ptr lock = world->lockForWriting();
-        for ( graphics::GraphicsManager::camera_const_iterator iter  = graphicsManager.firstCamera();
-                                                               iter != graphicsManager.endCamera();
-                                                               ++iter )
+        for (size_t i = 0; i<updateQueue.size(); ++i) 
         {
-            world->visit( (*iter)->getBounds(), traverser );
+            updateQueue[i]->traverse(traverser);
+            world->update(updateQueue[i]);
         }
+        updateQueue.clear();
     }
     graphicsManager.render(*world);
 
@@ -347,11 +349,11 @@ Engine::~Engine()
 /** Get singleton engine instance */
 Engine* Engine::Instance()
 {
-    if ( !engineInstance.get() ) {
-        engineInstance.reset(new detail::Engine);
+    if (!detail::Engine::engineInstance) {
+        detail::Engine::engineInstance = new detail::Engine();
     }
 
-    return engineInstance.get();
+    return detail::Engine::engineInstance;
 }
 
 // Define manager get funcs

@@ -71,8 +71,8 @@ bool AnimationController::dirty() const
 {
 	return timer && track && abs(timer->getTime() - lastTime) > threshold;
 }
-
-void AnimationController::operator () (scene::Node& node, scene::TraverseVisitor& /*tv*/)
+/*
+void AnimationController::operator () (scene::Node& node, scene::TraverseVisitor& tv)
 {
 	if (timer && track) 
 	{
@@ -90,7 +90,7 @@ void AnimationController::operator () (scene::Node& node, scene::TraverseVisitor
                                    track->getInverseTransform(frame - 1, value) );
 	}
 }
-	
+*/	
 } // namespace detail
 } // namespace animation
 } // namespace slon

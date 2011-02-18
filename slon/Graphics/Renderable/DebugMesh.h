@@ -67,11 +67,11 @@ public:
 public:
     DebugMesh();
 
-    using Node::accept;
+    // Override Entity
+    using Entity::accept;
 
-    // Override node
-    void accept(scene::CullVisitor& visitor);
-    void accept(scene::TraverseVisitor& visitor);
+    void accept(scene::CullVisitor& visitor) const;
+    void accept(scene::TransformVisitor& visitor);
 
     // Override Entity
     const math::AABBf& getBounds() const;

@@ -18,13 +18,12 @@ public:
     StaticMesh(Mesh* mesh);
 
     // Override Entity
+    using Entity::accept;
+
+    void accept(scene::CullVisitor& visitor) const;
+    void accept(scene::TransformVisitor& visitor);
+
     const math::AABBf& getBounds() const { return mesh->getBounds(); }
-
-    // Override node
-    using Node::accept;
-
-    virtual void accept(scene::CullVisitor& visitor);
-    virtual void accept(scene::TraverseVisitor& visitor);
 
 	/** Check whenever mesh is shadow caster */
 	virtual bool IsShadowCaster() const         { return shadowCaster; }

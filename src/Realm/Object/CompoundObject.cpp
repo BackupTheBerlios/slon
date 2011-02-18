@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "Log/Logger.h"
+#include "Log/LogVisitor.h"
+#include "Physics/PhysicsModel.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Realm/Object/CompoundObject.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/DFSNodeVisitor.h"
+#include "Scene/Visitors/FilterVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 
 __DEFINE_LOGGER__("realm.CompoundObject")
 
@@ -11,35 +15,35 @@ namespace {
 	using namespace slon;
 
 	class DecomposeTransformVisitor :
-		public scene::TraverseVisitor
+        public scene::FilterVisitor<scene::DFSNodeVisitor, physics::RigidBodyTransform>
 	{
 	public:
-		void visitAbsoluteTransform(scene::Transform& transform)
+        DecomposeTransformVisitor(scene::Node& node)
+        {
+            traverse(node);
+        }
+
+		void visit(physics::RigidBodyTransform& rbTransform)
 		{
-			physics::RigidBodyTransform* rbTransform = dynamic_cast<physics::RigidBodyTransform*>(&transform);
-			if (rbTransform)
+			math::Matrix4f T( rbTransform.getLocalToWorld() );
+			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
+
+			switch ( rbTransform.getRigidBody()->getDynamicsType() )
 			{
-				math::Matrix4f T( getLocalToWorldTransform() );
-				math::Matrix4f R( rbTransform->getRigidBody()->getTransform() );
+			case physics::RigidBody::DT_DYNAMIC:
+                rbTransform.setAbsolute(true);
+				rbTransform.setTransform( math::invert(R) * T );
+				break;
+				
+			case physics::RigidBody::DT_STATIC:
+			case physics::RigidBody::DT_KINEMATIC:
+                rbTransform.setAbsolute(false);
+				rbTransform.setTransform( math::invert(T) * R );
+				break;
 
-				switch ( rbTransform->getRigidBody()->getDynamicsType() )
-				{
-					case physics::RigidBody::DT_DYNAMIC:
-						rbTransform->setTransform( math::invert(R) * T );
-						break;
-						
-					case physics::RigidBody::DT_STATIC:
-					case physics::RigidBody::DT_KINEMATIC:
-						rbTransform->setTransform( math::invert(T) * R );
-						break;
-
-					default:
-						assert(!"Can't get here");
-				}
+			default:
+				assert(!"Can't get here");
 			}
-
-			// Let traverse visitor to do rest of the work
-			TraverseVisitor::visitAbsoluteTransform(transform);
 		}
 	};
 
@@ -61,17 +65,8 @@ CompoundObject::CompoundObject(scene::Node*             root_,
     location    = 0;
     spatialNode = 0;
 
-    root.reset(root_);
-    if (root)
-    {
-        scene::TraverseVisitor visitor;
-        visitor.traverse(*root);
-        aabb = visitor.getBounds();
-    }
-    else {
-        aabb.reset_max();
-    }
-
+    logger << log::S_FLOOD << "Creating compound object" << LOG_FILE_AND_LINE;
+    setRoot(root_);
 #ifdef SLON_ENGINE_USE_PHYSICS
     setPhysicsModel(physicsModel_);
 #endif
@@ -81,7 +76,7 @@ void CompoundObject::traverse(scene::NodeVisitor& nv)
 {
     if (root)
     {
-        if ( scene::TraverseVisitor* tv = dynamic_cast<scene::TraverseVisitor*>(&nv) )
+        if ( scene::TransformVisitor* tv = dynamic_cast<scene::TransformVisitor*>(&nv) )
         {
             tv->traverse(*root);
             aabb = tv->getBounds();
@@ -93,21 +88,37 @@ void CompoundObject::traverse(scene::NodeVisitor& nv)
     }
 }
 
+void CompoundObject::traverse(scene::ConstNodeVisitor& nv) const
+{
+    if (root) {
+        nv.traverse(*root);
+    }
+}
+
 void CompoundObject::setRoot(scene::Node* root_)
 {
-#ifdef SLON_ENGINE_USE_PHYSICS
-    if (root && physicsModel) {
-        clearPhysics( root.get() );
+    if (root)
+    {
+        root->setObject(0);
+    #ifdef SLON_ENGINE_USE_PHYSICS
+        if (physicsModel) {
+            clearPhysics( root.get() );
+        }
+    #endif
     }
-#endif
 
+    logger << log::S_FLOOD << "Resetting root for compound object" << LOG_FILE_AND_LINE;
     root.reset(root_);
     if (root)
     {
-        scene::TraverseVisitor visitor;
-        visitor.traverse(*root);
+        root->setObject(this);
+
+        scene::TransformVisitor visitor(*root);
         aabb = visitor.getBounds();
     
+        // print scene graph
+        log::LogVisitor v(&logger, log::S_FLOOD, *root);
+
     #ifdef SLON_ENGINE_USE_PHYSICS
         if (physicsModel) {
             setPhysicsModel( physicsModel.get() );
@@ -124,35 +135,30 @@ void CompoundObject::clearPhysics(scene::Node* node)
 {
     if ( scene::Group* group = dynamic_cast<scene::Group*>(node) )
     {
-        scene::Group::node_vector         children( group->firstChild(), group->endChild() );
         physics::rigid_body_transform_ptr rbTransform( dynamic_cast<physics::RigidBodyTransform*>(node) );
         if (rbTransform)
         {
             if ( scene::Group* parent = rbTransform->getParent() )
             {
                 // relink children
-                parent->removeChild(*rbTransform);
-                while ( rbTransform->getNumChildren() > 0 ) {
-                    rbTransform->moveChild( *parent, rbTransform->firstChild() );
+                parent->removeChild(rbTransform.get());
+                while ( scene::Node* child = rbTransform->getChild() ) {
+                    parent->addChild(child);
                 }
+
+				for ( scene::Node* i = parent->getChild(); i; i = i->getRight() ) {
+					clearPhysics(i);
+				}
             }
             else
             {
-                scene::Group* newParent = new scene::Group();
-                while ( rbTransform->getNumChildren() > 0 ) {
-                    rbTransform->moveChild( *newParent, rbTransform->firstChild() );
+                parent = new scene::Group();
+                while ( scene::Node* child = rbTransform->getChild() ) {
+                    parent->addChild(child);
                 }
 
-                root.reset(newParent);
+                root.reset(parent);
             }
-        }
-
-        // remove all rigid body transforms further
-        for (scene::Group::node_iterator iter  = children.begin();
-                                         iter != children.end();
-                                         ++iter)
-        {
-            clearPhysics( iter->get() );
         }
     }
 }
@@ -164,6 +170,7 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
     physicsModel.reset(physicsModel_);
     if (root)
     {
+        logger << log::S_FLOOD << "Setting physics model for compound object" << LOG_FILE_AND_LINE; 
         clearPhysics( root.get() );
         
         // set transforms
@@ -174,38 +181,41 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                                                    ++iter)
             {
                 // insert rigid body into scene graph
-                scene::node_ptr targetNode( findNamedNode( *root, (*iter)->getTarget() ) );
+                scene::node_ptr targetNode( findNamedNode( *root, unique_string((*iter)->getTarget()) ) );
                 if (targetNode)
                 {
                     physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
                     if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
                     {
                         // relink children
-                        while ( group->getNumChildren() > 0 ) {
-                            group->moveChild( *rbTransform, group->firstChild() );
+                        while ( scene::Node* child = group->getChild() ) {
+                            rbTransform->addChild(child);
                         }
 
-                        group->addChild(*rbTransform);
+                        group->addChild(rbTransform);
                     }
                     else if ( targetNode->getParent() != 0 )
                     {
-                        targetNode->getParent()->addChild(*rbTransform);
-                        targetNode->getParent()->moveChild(*rbTransform, *targetNode);
+                        targetNode->getParent()->addChild(rbTransform);
+                        rbTransform->addChild(targetNode.get());
                     }
                     else 
                     {
-                        rbTransform->addChild(*targetNode);
+                        rbTransform->addChild(targetNode.get());
                         root.reset(rbTransform);
                     }
                 }
                 else {
-                    logger << log::WL_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
+                    logger << log::S_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
                 }
             }
 
             // apply local transform to the shapes
-            DecomposeTransformVisitor visitor;
-            visitor.traverse(*root);
+            scene::TransformVisitor tv(*root);
+            DecomposeTransformVisitor dv(*root);
+        
+            // print scene graph
+            log::LogVisitor lv(&logger, log::S_FLOOD, *root);
         }
     }
 }

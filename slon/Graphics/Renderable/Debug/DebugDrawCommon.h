@@ -176,6 +176,44 @@ struct sector
     unsigned        fullCircleSplits;
 };
 
+/** Debug primitive - cone(up axis is Y) */
+struct cone
+{
+    cone(float  radius_,
+         float  height_,
+         bool   wired_ = false,
+         size_t numVertices_ = 20)
+    :   radius(radius_)
+    ,   height(height_)
+    ,   wired(wired_)
+    ,   numVertices(numVertices_)
+    {}
+
+    float   radius;
+    float   height;
+    bool    wired;
+    size_t  numVertices; /// number of vertices in the base; total_num_vertices = numVertices + 1
+};
+
+/** Debug primitive - cylinder(up axis is Y) */
+struct cylinder
+{
+    cylinder(float  radius_,
+             float  height_,
+             bool   wired_ = false,
+             size_t numVertices_ = 20)
+    :   radius(radius_)
+    ,   height(height_)
+    ,   wired(wired_)
+    ,   numVertices(numVertices_)
+    {}
+
+    float   radius;
+    float   height;
+    bool    wired;
+    size_t  numVertices; /// number of vertices in the caps; total_num_vertices = numVertices * 2 
+};
+
 /** Setup debug mesh draw color. */
 DebugMesh& operator << (DebugMesh& mesh, const font& f);
 
@@ -208,6 +246,12 @@ DebugMesh& operator << (DebugMesh& mesh, const line& l);
 
 /** Add sector to the debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const sector& s);
+
+/** Add cone to the debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const cone& c);
+
+/** Add cylinder to the debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const cylinder& c);
 
 /** Add line to the debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const math::AABBf& a);

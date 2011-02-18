@@ -52,7 +52,7 @@ inline math::Matrix4r to_mat(const btTransform& transform)
 	return math::make_matrix( basis[0].x(), basis[0].y(), basis[0].z(), origin.x(),
 						      basis[1].x(), basis[1].y(), basis[1].z(), origin.y(),
 					          basis[2].x(), basis[2].y(), basis[2].z(), origin.z(),
-						      (real)0.0,    (real)0.0,    (real)0.0,    (real)1.0 );
+						      (real)0.0,    (real)0.0,   (real)0.0,     (real)1.0 );
 }
 
 // create bullet collision shape from slon collision shape
@@ -236,16 +236,17 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
     }
     else if ( const btCylinderShape* btShape = dynamic_cast<const btCylinderShape*>(&collisionShape) )
     {
+        math::Vector3r halfExtent = to_vec(btShape->getHalfExtentsWithoutMargin());
         switch ( btShape->getUpAxis() ) 
         {
         case 0:
-            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) ) );
+            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new CylinderShape(halfExtent.y, halfExtent.x, halfExtent.z) );
 
         case 1:
-            return new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) );
+            return new CylinderShape(halfExtent);
 
         case 2:
-            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CylinderShape( to_vec(btShape->getHalfExtentsWithoutMargin()) ) );
+            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CylinderShape(halfExtent.x, halfExtent.z, halfExtent.y) );
 
         default:
             assert(!"can't get here");

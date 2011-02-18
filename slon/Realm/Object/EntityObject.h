@@ -18,7 +18,9 @@ public:
     bool                isDynamic() const    { return dynamic; }
     const math::AABBf&  getBounds() const    { return static_cast<const scene::Entity&>(*root).getBounds(); }
     const scene::Node*  getRoot() const      { return root.get(); }
+
     void                traverse(scene::NodeVisitor& nv);
+    void                traverse(scene::ConstNodeVisitor& nv) const;
 
 #ifdef SLON_ENGINE_USE_PHYSICS
     void                         setPhysicsModel(physics::PhysicsModel* physicsModel);

@@ -12,14 +12,11 @@ namespace graphics {
 
 namespace scene {
 
-class Camera;
-class Light;
-
 /** CullVisitor performs some function on the geode renderable
  * that is not culled by the cull function.
  */
 class CullVisitor :
-    public NodeVisitor
+    public ConstNodeVisitor
 {
 public:
     typedef std::vector<const graphics::Renderable*>    renderable_vector;
@@ -34,6 +31,9 @@ public:
     CullVisitor(const Camera* camera_ = 0) :
         camera(camera_)
     {}
+
+    // Override NodeVisitor
+    void traverse(const scene::Node& node);
 
     /** Get camera of the CullVisitor */
     const Camera* getCamera() const { return camera; }
@@ -74,16 +74,13 @@ public:
     /** Remove all collected lights and renderables */
     void clear();
 
-    // Override NodeVisitor
-    virtual void acceptBy(Node& node) { node.accept(*this); }
-    virtual void visitEntity(Entity& entity);
-
     virtual ~CullVisitor() {}
 
 protected:
-    const Camera*       camera;
-    light_vector        lights;
-    renderable_vector   renderables;
+    const Camera*           camera;
+    std::stack<const Node*> forTraverse;
+    light_vector            lights;
+    renderable_vector       renderables;
 };
 
 } // namespace scene

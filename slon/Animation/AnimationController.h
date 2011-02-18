@@ -8,7 +8,7 @@ namespace slon {
 namespace animation {
 
 class AnimationController :
-    public scene::Node::traverse_visitor_callback
+    public Referenced
 {
 public:
 	/** Set animation for playback */

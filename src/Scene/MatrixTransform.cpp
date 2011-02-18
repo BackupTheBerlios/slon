@@ -1,6 +1,7 @@
 #include "stdafx.h"
+#include "Log/Formatters.h"
+#include "Log/LogVisitor.h"
 #include "Scene/MatrixTransform.h"
-#include "Scene/Visitors/TraverseVisitor.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
 using namespace slon;
@@ -8,12 +9,11 @@ using namespace scene;
 using namespace math;
 
 MatrixTransform::MatrixTransform() :
-    modifiedCount(0),
     transformDirty(false),
     invTransformDirty(false)
 {
-	transform    = math::make_identity<float, 4>();
-    invTransform = math::make_identity<float, 4>();
+	localToWorld = transform    = math::make_identity<float, 4>();
+    worldToLocal = invTransform = math::make_identity<float, 4>();
 }
 
 // Override transform
@@ -43,14 +43,14 @@ void MatrixTransform::setTransform(const Matrix4f& matrix)
 {
     transform         = matrix;
     invTransformDirty = true;
-    ++modifiedCount;
+    update();
 }
 
 void MatrixTransform::setInverseTransform(const Matrix4f& matrix)
 {
     invTransform   = matrix;
     transformDirty = true;
-    ++modifiedCount;
+    update();
 }
 
 void MatrixTransform::setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix)
@@ -58,5 +58,18 @@ void MatrixTransform::setTransformAndInverse(const math::Matrix4f& matrix, const
     transform      = matrix;
     invTransform   = invMatrix;
     transformDirty = invTransformDirty = false;
-    ++modifiedCount;
+    update();
+}    
+
+void MatrixTransform::accept(log::LogVisitor& visitor) const
+{
+    visitor << "MatrixTransform";
+    if ( getName() != "" ) {
+        visitor << " '" << getName() << "'";
+    }
+    visitor << "\n{\n" << log::indent()
+            << "transform =" << log::detailed(getTransform(), true)  
+            << "localToWorld =" << log::detailed(getLocalToWorld(), true);
+    visitor.visitGroup(*this);
+    visitor << log::unindent() << "}\n";
 }

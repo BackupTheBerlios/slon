@@ -12,9 +12,6 @@ class Geode :
     public Entity
 {
 public:
-    /** Get type of the entity */
-    virtual ENTITY_TYPE getEntityType() const { return Entity::GEODE; }
-
     /** Gather renderables to be rendered.
      * @param renderPass - render pass wherer renderables have to be rendered.
      */
@@ -28,9 +25,6 @@ public:
 
     virtual ~Geode() {}
 };
-
-typedef boost::intrusive_ptr<Geode>             geode_ptr;
-typedef boost::intrusive_ptr<const Geode>       const_geode_ptr;
 
 } // namespace scene
 } // namespace slon

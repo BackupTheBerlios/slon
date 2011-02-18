@@ -15,7 +15,9 @@
 #include "Physics/PhysicsModel.h"
 #include "Scene/Skeleton.h"
 #include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/DFSNodeVisitor.h"
+#include "Scene/Visitors/FilterVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/uri/file_uri.hpp"
 
 __DEFINE_LOGGER__("database.COLLADA")
@@ -90,35 +92,37 @@ namespace {
     };
 
     class find_transform_visitor :
-        public NodeVisitor
+        public scene::FilterVisitor<scene::DFSNodeVisitor, scene::Joint, scene::MatrixTransform>
     {
     public:
+        find_transform_visitor(unique_string name_)
+        :   found(0)
+        ,   name(name_)
+        {}
+
         find_transform_visitor(const std::string& name_)
         :   found(0)
         ,   name(name_)
         {}
 
-        void visitTransform(Transform& transform)
+        void visit(scene::Joint& joint)
         {
-            if (Joint* joint = dynamic_cast<Joint*>(&transform) )
-            {
-                find_by_id pred(name);
-                if ( pred(*joint) ) {
-                    found = joint;
-                }
+			std::string nstr(name);
+            find_by_id pr(nstr);
+            if ( pr(joint) ) {
+                found = &joint;
             }
-            else if ( MatrixTransform* mt = dynamic_cast<MatrixTransform*>(&transform) )
-            {
-                if (mt && mt->getName() == name) {
-                    found = mt;
-                }
-            }
+        }
 
-            visitGroup(transform);
+        void visit(scene::MatrixTransform& mt)
+        {
+            if (mt.getName() == name) {
+                found = &mt;
+            }
         }
 
         MatrixTransform*    found;
-        std::string         name;
+        unique_string       name;
     };
 
 	class SceneBuilder
@@ -154,7 +158,7 @@ namespace {
                 texture = dynamic_cast<graphics::Texture2D*>( database::loadTexture(fileName).get() );
 				if (!texture)
 				{
-					logger << log::WL_WARNING << "Failed to load texture from file: " << fileName << std::endl;
+					logger << log::S_WARNING << "Failed to load texture from file: " << fileName << std::endl;
 					return texture;
 				}
 			}
@@ -214,14 +218,14 @@ namespace {
 		{
 			assert(material.effect && "Material must have valid effect. Overwise it is COLLADA error.");
 
-			logger << log::WL_NOTIFY << "Creating material: " << material.id << std::endl;
+			logger << log::S_NOTICE << "Creating material: " << material.id << std::endl;
 			if (collada_effect* colladaEffect = material.effect)
 			{
-				logger << log::WL_NOTIFY << "Found effect: " << colladaEffect->id << std::endl;
+				logger << log::S_NOTICE << "Found effect: " << colladaEffect->id << std::endl;
 
 				collada_technique_ptr colladaTechnique = colladaEffect->techniques[0];
 				if (colladaEffect->techniques.size() > 1) {
-					logger << log::WL_WARNING << "Effect has more than one technique. SlonEngine will use first." << std::endl;
+					logger << log::S_WARNING << "Effect has more than one technique. SlonEngine will use first." << std::endl;
 				}
 
 				graphics::Material* material = 0;
@@ -239,14 +243,14 @@ namespace {
 				}
 
 				if (material) {
-					logger << log::WL_NOTIFY << "Material succesfully created." << std::endl;
+					logger << log::S_NOTICE << "Material succesfully created." << std::endl;
 				}
 
                 return graphics::material_ptr(material);
 			}
 			else
 			{
-				logger << log::WL_ERROR << "Material doesn't have attached effect." << std::endl;
+				logger << log::S_ERROR << "Material doesn't have attached effect." << std::endl;
 			}
 
 			return graphics::material_ptr();
@@ -386,7 +390,7 @@ namespace {
                                 }
                             }
                             else {
-                                logger << log::WL_WARNING << "Skinned mesh have non 3 or 4-component positions, ignoring bind shape matrix transformation\n";
+                                logger << log::S_WARNING << "Skinned mesh have non 3 or 4-component positions, ignoring bind shape matrix transformation\n";
                             }
                         }
 
@@ -443,7 +447,7 @@ namespace {
                                 {
                                     if (k == 4)
                                     {
-                                        logger << log::WL_WARNING << "SlonEngine doesn't support more than 4 bones per vertex, ignoring exceeded" << std::endl;
+                                        logger << log::S_WARNING << "SlonEngine doesn't support more than 4 bones per vertex, ignoring exceeded" << std::endl;
                                         index  += (vc - j - 1) * skin->weights.inputs.size();
                                         vc      = 4;
                                     }
@@ -539,7 +543,7 @@ namespace {
 							}
 						}
 						else {
-							logger << log::WL_ERROR << "Couldn't find material by symbol: " << prims.material << std::endl;
+							logger << log::S_ERROR << "Couldn't find material by symbol: " << prims.material << std::endl;
 						}
                     }
 				}
@@ -551,7 +555,7 @@ namespace {
                 for(size_t i = 0; i<colladaMesh.primitives.size(); ++i) {
                     mesh->getSubset(i).setEffect( defaultMaterial->createEffect() );
                 }
-                logger << log::WL_WARNING << "Mesh subset doesn't have any material, using default." << std::endl;
+                logger << log::S_WARNING << "Mesh subset doesn't have any material, using default." << std::endl;
             }
 
 			return mesh;
@@ -560,20 +564,17 @@ namespace {
 		graphics::StaticMesh* createStaticMesh( const collada_mesh& 				colladaMesh,
 						        			    const collada_bind_material_ptr& 	bindMaterial )
 		{
-			logger << log::WL_NOTIFY << "Creating mesh: " << colladaMesh.id << std::endl;
-
 			// make mesh
             graphics::mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
             if (mesh)
             {
                 graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
-			    staticMesh->setName(colladaMesh.name);
-			    logger << log::WL_NOTIFY << "Mesh succesfully created." << std::endl;
+			    staticMesh->setName( unique_string(colladaMesh.name) );
 			    return staticMesh;
             }
             else 
             {
-			    logger << log::WL_WARNING << "Mesh is empty." << std::endl;
+			    logger << log::S_WARNING << "Mesh is empty." << std::endl;
                 return 0;
             }
 		}
@@ -592,7 +593,7 @@ namespace {
                     {
                         // create dummy node replacement
                         geometry = new scene::Node();
-                        geometry->setName(mesh.name);
+                        geometry->setName( unique_string(mesh.name) );
                     }
 					break;
 				}
@@ -648,17 +649,17 @@ namespace {
             if (node.type == collada_node::JOINT)
             {
                 Joint* joint = new Joint();
-                joint->setName(node.id + "#" + node.sid);
+                joint->setName( unique_string(node.id + "#" + node.sid) );
 				joint->setTransform(node.transform);
 
 			    // create hierarchy
                 if ( !node.geometries.empty() || !node.controllers.empty() ) {
-                    logger << log::WL_WARNING << "Joint node '" << node.id << "' can't have entities children, skipping.";
+                    logger << log::S_WARNING << "Joint node '" << node.id << "' can't have entities children, skipping.";
                 }
 
 			    for (size_t i = 0; i<node.children.size(); ++i)
 			    {
-				    joint->addChild( *createNode(*node.children[i]) );
+				    joint->addChild( createNode(*node.children[i]) );
 			    }
 
                 return joint;
@@ -675,11 +676,11 @@ namespace {
 				    transform->setTransform(node.transform);
 				    group = transform;
 			    }
-			    group->setName(node.id);
+			    group->setName( unique_string(node.name) );
 
 			    // attach entities
 				for (size_t i = 0; i<node.geometries.size(); ++i) {
-					group->addChild( *createGeometry(*node.geometries[i]) );
+					group->addChild( createGeometry(*node.geometries[i]) );
 				}
 				
 				for (size_t i = 0; i<node.controllers.size(); ++i) {
@@ -689,7 +690,7 @@ namespace {
 			    // create hierarchy
 			    for (size_t i = 0; i<node.children.size(); ++i)
 			    {
-				    group->addChild( *createNode(*node.children[i]) );
+				    group->addChild( createNode(*node.children[i]) );
 			    }
 
 			    return group;
@@ -698,12 +699,12 @@ namespace {
 
 		scene::group_ptr createVisualScene(const collada_visual_scene& colladaScene)
 		{
-			scene::group_ptr graphicsModel(new scene::MatrixTransform);
-			for (size_t i = 0; i<colladaScene.nodes.size(); ++i)
-			{
-				// create node hierarchy
-				graphicsModel->addChild( *createNode(*colladaScene.nodes[i]) );
-			}
+            scene::group_ptr graphicsModel(new scene::MatrixTransform);
+		    for (size_t i = 0; i<colladaScene.nodes.size(); ++i)
+		    {
+			    // create node hierarchy
+			    graphicsModel->addChild( createNode(*colladaScene.nodes[i]) );
+		    }
 
             // attach controllers
             for (size_t i = 0; i<controllers.size(); ++i)
@@ -759,7 +760,8 @@ namespace {
                             scene::Skeleton* skeleton = new scene::Skeleton();
                             {
                                 scene::joint_ptr holder(rootJoint);
-                                rootJoint->getParent()->replaceChild(*rootJoint, *skinnedMesh);
+                                rootJoint->getParent()->removeChild(rootJoint);
+                                rootJoint->getParent()->addChild(skinnedMesh);
                                 skeleton->setRootJoint(rootJoint);
                             }
                             skinnedMesh->setSkeleton(skeleton);
@@ -777,9 +779,7 @@ namespace {
             }
 			
 			// compute transforms after scene construction
-			scene::TraverseVisitor tv;
-			tv.traverse(*graphicsModel);
-
+			scene::TransformVisitor tv(*graphicsModel);
 			return graphicsModel;
 		}
 
@@ -1140,7 +1140,7 @@ namespace {
 					catch(collada_error&)
 					{
 						std::string sid = colladaModel.rigidBodyInstances[i].element->sid;
-						logger << log::WL_ERROR << "Unable to create rigid body: " + sid << std::endl;
+						logger << log::S_ERROR << "Unable to create rigid body: " + sid << std::endl;
 					}
 				}
 
@@ -1180,6 +1180,11 @@ namespace {
 
 			nodeIds.insert(id);
 			return id;
+		}
+
+		std::string getUniqueId(unique_string name)
+		{
+			return getUniqueId( std::string(name) );
 		}
 
 		const graphics::Mesh* getMesh(const scene::Geode* geode)
@@ -1374,14 +1379,14 @@ namespace {
 
 		void attachEntity(collada_node& cNode, const scene::Entity* entity)
 		{
-			switch ( entity->getEntityType() )
+			switch ( entity->getNodeType() )
 			{
 			case scene::Entity::GEODE:
 				cNode.geometries.push_back( createGeometryInstance( static_cast<const scene::Geode*>(entity) ) );
 				break;
 
 			default:
-				logger << log::WL_WARNING << "Node '" << entity->getName() << "' will not be exported. Unsupported type.";
+				logger << log::S_WARNING << "Node '" << entity->getName() << "' will not be exported. Unsupported type.";
 				break;
 			}
 		}
@@ -1412,13 +1417,13 @@ namespace {
 				// add children
 				if ( const scene::Group* group = dynamic_cast<const scene::Group*>(node) )
 				{
-					for (size_t i = 0; i<group->getNumChildren(); ++i) 
+					for ( const scene::Node* i = group->getChild(); i; i = i->getRight() ) 
 					{
-						if ( const scene::Entity* entity = dynamic_cast<const scene::Entity*>(group->getChild(i)) ) {
+						if ( const scene::Entity* entity = dynamic_cast<const scene::Entity*>(i) ) {
 							attachEntity(*cNode, entity);
 						}
 						else {
-							cNode->children.push_back( createNode(group->getChild(i)) );
+							cNode->children.push_back( createNode(i) );
 						}
 					}
 				}
@@ -1430,10 +1435,10 @@ namespace {
 		collada_visual_scene_ptr createVisualScene(ColladaDocument& document, const scene::Group& graphicsModel)
 		{
 			collada_visual_scene_ptr visualScene(new collada_visual_scene);
-			for (size_t i = 0; i<graphicsModel.getNumChildren(); ++i)
+			for ( const scene::Node* i = graphicsModel.getChild(); i; i = i->getRight() )
 			{
 				// create node hierarchy
-				visualScene->nodes.push_back( createNode( graphicsModel.getChild(i) ) );
+				visualScene->nodes.push_back( createNode(i) );
 			}
 			document.libraryVisualScenes.elements.insert( std::make_pair(visualScene->id, visualScene) );
 
@@ -1480,7 +1485,7 @@ void collada_scene::serialize( ColladaDocument&  document,
 void ColladaDocument::set_file_source(const std::string& fileName)
 {
 	using namespace filesystem;
-	logger << log::WL_NOTIFY << "Loading COLLADA file: " << fileName << std::endl;
+	logger << log::S_NOTICE << "Loading COLLADA file: " << fileName << std::endl;
 
     filesystem::file_ptr file( asFile( currentFileSystemManager().getNode(fileName.c_str()) ) );
 	if ( file && file->open(filesystem::File::in) ) 
@@ -1518,7 +1523,7 @@ library_ptr ColladaLoader::load(std::istream& stream)
 									 ++iter )
 	{
 		scene::group_ptr visualScene = visualBuilder.createVisualScene(*iter->second);
-		root->addChild(*visualScene);
+		root->addChild(visualScene.get());
 		library->visualScenes.push_back( Library::key_visual_scene_pair(visualScene->getName(), visualScene) );
 	}
 

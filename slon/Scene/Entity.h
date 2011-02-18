@@ -14,29 +14,18 @@ class Entity :
     public Node
 {
 public:
-    enum ENTITY_TYPE
-    {
-        GEODE,
-        LIGHT,
-        CAMERA,
-    };
-
-public:
-    /** Get type of the node */
-    virtual TYPE getType() const { return ENTITY; }
-
-    /** Get type of the entity */
-    virtual ENTITY_TYPE getEntityType() const = 0;
+    // Override Node
+    TYPE getNodeType() const { return ENTITY; }
+    void accept(log::LogVisitor& visitor) const;
 
     /** Get bounds of the entity */
     virtual const math::AABBf& getBounds() const = 0;
 
-    // Override node
-    using Node::accept;
-    virtual void accept(NodeVisitor& visitor);
-    virtual void accept(TraverseVisitor& visitor);
-    virtual void accept(UpdateVisitor& visitor);
-    virtual void accept(CullVisitor& visitor);
+    /** Handle transform visitor */
+    virtual void accept(TransformVisitor& cv) {}
+
+    /** Handle cull visitor */
+    virtual void accept(CullVisitor& cv) const {}
 
     virtual ~Entity() {}
 };

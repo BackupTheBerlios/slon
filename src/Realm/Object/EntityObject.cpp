@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Realm/Object/EntityObject.h"
 #include "Scene/Visitors/NodeVisitor.h"
+#ifdef SLON_ENGINE_USE_PHYSICS
+#	include "Physics/PhysicsModel.h"
+#endif
 
 namespace slon {
 namespace realm {
@@ -18,7 +21,12 @@ EntityObject::EntityObject(scene::Entity& _entity, bool _dynamic) :
 
 void EntityObject::traverse(scene::NodeVisitor& nv)
 {
-    nv.acceptBy(*root);
+    nv.traverse(*root);
+}
+
+void EntityObject::traverse(scene::ConstNodeVisitor& nv) const
+{
+    nv.traverse(*root);
 }
 
 #ifdef SLON_ENGINE_USE_PHYSICS

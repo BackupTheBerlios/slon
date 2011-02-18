@@ -28,7 +28,7 @@ namespace {
                 throw loader_error(logger, "Duplicate item in the cache: " + key);
             }
             else {
-                logger << log::WL_WARNING << "Duplicate item in the cache: " << key << LOG_FILE_AND_LINE; 
+                logger << log::S_WARNING << "Duplicate item in the cache: " << key << LOG_FILE_AND_LINE; 
             }
         }
     }

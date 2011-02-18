@@ -1,125 +1,83 @@
 #include "stdafx.h"
+#include "Log/LogVisitor.h"
 #include "Scene/Group.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
-#include "Scene/Visitors/UpdateVisitor.h"
 
-using namespace slon;
-using namespace scene;
+namespace slon {
+namespace scene {
 
-Group::const_node_iterator Group::findChild(Node& child) const
+void Group::addChild(Node* child, Node* left)
 {
-    return find( children.begin(), children.end(), node_ptr(&child) );
+	assert(child->parent != this && (!left || left->parent == this));
+	node_ptr guard(child);
+
+	if (child->parent) {
+		child->parent->removeChild(child);
+	}
+
+	child->parent = this;
+	if (!left) 
+	{
+		child->left = 0;
+		child->right = firstChild.get();
+		if (firstChild) {
+			firstChild->left = child;
+		}
+		firstChild = child;
+	}
+	else 
+	{
+		child->right = left->right;
+		left->right = child;
+		child->left = left;
+	}
 }
 
-Group::node_iterator Group::findChild(Node& child)
+void Group::removeChild(Node* child)
 {
-    return find( children.begin(), children.end(), node_ptr(&child) );
+	assert(child->parent == this);
+	node_ptr guard(child);
+
+	if (child->left) {
+		child->left->right = child->right;
+	}
+	if (child == firstChild) {
+		firstChild = child->right;
+	}
+	if (child->right) {
+		child->right->left = child->left;
+	}
+	child->parent = 0;
+	child->right = 0;
+	child->left = 0;
 }
 
-void Group::moveChild(Group& group, Node& child)
+void Group::removeChildren()
 {
-    assert( child.parent == this && "Node is not child of this group" );
-
-    node_iterator childIter = findChild(child);
-    assert(childIter != children.end() && "Something is broken. Child parent is this node, but this node seems not to have this child.");
-    moveChild(group, childIter);
-}
-
-void Group::moveChild(Group& group, const node_iterator& childIter)
-{
-    assert( childIter != children.end() && "Invalid childIter." );
-
-    // add
-    node_ptr child = *childIter;
-    removeChild(childIter);
-    group.addChild(*child);
-}
-
-void Group::addChild(Node& child)
-{
-    assert( child.parent == 0 && "Child node may not have any parent. If so, remove it from old parent first." );
-
-    children.push_back( node_ptr(&child) );
-    child.parent = this;
-}
-
-void Group::removeChild(Node& child)
-{
-    assert( child.parent == this && "Can't to remove child of another node." );
-
-    node_iterator childIter = findChild(child);
-    assert(childIter != children.end() && "Something is broken. Child parent is this node, but this node seems not to have this child.");
-    removeChild(childIter);
-}
-
-void Group::removeChild(const node_iterator& childIter)
-{
-    assert( childIter != children.end() && "Invalid childIter." );
-    assert( (*childIter)->parent == this && "Node is not child of this group." );
-
-    (*childIter)->parent = 0;
-    std::swap( *childIter, children.back() );
-    children.pop_back();
-}
-
-void Group::replaceChild( Node& child,
-                          Node& newChild )
-{
-    assert( child.parent == this && "Can't to remove child of another node." );
-    assert( newChild.parent == 0 && "New child node may not have any parent. If so, remove it from old parent first." );
-
-    node_iterator childIter = findChild(child);
-    assert(childIter != children.end() && "Something is broken. Child parent is this node, but this node seems not to have this child.");
-    replaceChild(childIter, newChild);
-}
-
-void Group::replaceChild( const node_iterator& childIter,
-                          Node&                newChild )
-{
-    assert( childIter != children.end() && "Invalid childIter." );
-    assert( (*childIter)->parent == this && "Node is not child of this group." );
-
-    (*childIter)->parent = 0;
-    childIter->reset(&newChild);
-    newChild.parent = this;
+	while (firstChild != 0)
+	{
+		node_ptr next(firstChild->right);
+		firstChild->parent = 0;
+		firstChild->left = 0;
+		firstChild->right = 0;
+		firstChild = next;
+	}
 }
 
 Group::~Group()
 {
-    for(node_iterator i = children.begin(); i != children.end(); ++i) {
-        (*i)->parent = 0;
-    }
+	removeChildren();
 }
 
-void Group::accept(NodeVisitor& visitor)     
-{ 
-    if (nvCallback) {
-        (*nvCallback)(*this, visitor); 
+void Group::accept(log::LogVisitor& visitor) const
+{    
+    visitor << "Group";
+    if ( getName() != "" ) {
+        visitor << " '" << getName() << "'";
     }
+    visitor << "\n{\n" << log::indent();
     visitor.visitGroup(*this);
+    visitor << log::unindent() << "}\n";
 }
 
-void Group::accept(TraverseVisitor& visitor) 
-{ 
-    if (tvCallback) {
-        (*tvCallback)(*this, visitor);
-    }
-    visitor.visitGroup(*this);
-}
-
-void Group::accept(UpdateVisitor& visitor)   
-{ 
-    if (uvCallback) {
-        (*uvCallback)(*this, visitor);
-    }
-    visitor.visitGroup(*this);
-}
-
-void Group::accept(CullVisitor& visitor)     
-{ 
-    if (cvCallback) {
-        (*cvCallback)(*this, visitor);
-    }
-    visitor.visitGroup(*this);
-}
+} // namespace scene
+} // namespace slon

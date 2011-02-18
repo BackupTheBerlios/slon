@@ -23,9 +23,6 @@ public:
     };
 
 public:
-    // override entity
-    virtual ENTITY_TYPE getEntityType() const { return LIGHT; }
-
     /** Get light type */
     virtual LIGHT_TYPE getLightType() const = 0;
 
@@ -34,9 +31,6 @@ public:
 
     virtual ~Light() {}
 };
-
-typedef boost::intrusive_ptr<Light>         light_ptr;
-typedef boost::intrusive_ptr<const Light>   const_light_ptr;
 
 } // namespace scene
 } // namespace slon

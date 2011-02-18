@@ -14,7 +14,7 @@ namespace realm {
 /** World stores all locations represented in the application.
  * It handles location loading, storing and updating. World is not 
  * thread safe by itself, you must use lock functions to provide thread
- * safity.
+ * safety.
  */
 class World :
     public Referenced
@@ -48,29 +48,26 @@ public:
 
     virtual LOAD_POLICY getLoadPolicy() const = 0;
 	
-    /** Update objects intersecting the ray.
-     * @param ray - ray for visiting intersected objects.
-     * @param nv - updating visitor.
-     */
+    /** Visit objects intersecting the ray. */
     virtual void visit(const math::Ray3f& ray, scene::NodeVisitor& nv) = 0;
 
-    /** Update objects in the specified area.
-     * @param area - area where to update objects.
-     * @param nv - updating visitor.
-     */
+    /** Visit objects intersecting the ray. */
+    virtual void visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const = 0;
+
+    /** Visit objects in the specified area. */
     //virtual void visit(const math::Spheref& area, scene::NodeVisitor& nv) const = 0;
 
-    /** Update objects in the specified area.
-     * @param area - area where to update objects.
-     * @param nv - updating visitor.
-     */
+    /** Visit objects in the intersecting AABB area. */
     virtual void visit(const math::AABBf& area, scene::NodeVisitor& nv) = 0;
 
-    /** Update objects in the specified area.
-     * @param area - area where to update objects.
-     * @param nv - updating visitor.
-     */
+    /** Visit objects in the intersecting AABB area. */
+    virtual void visit(const math::AABBf& area, scene::ConstNodeVisitor& nv) const = 0;
+
+    /** Visit objects in the intersecting frustum area. */
     virtual void visit(const math::Frustumf& frustum, scene::NodeVisitor& nv) = 0;
+
+    /** Visit objects in the intersecting frustum area. */
+    virtual void visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const = 0;
 
     /** Update object in the spatial structure if it is presented. 
      * @return true if object updated.
@@ -97,9 +94,6 @@ public:
 
     virtual ~World() {}
 };
-
-typedef boost::intrusive_ptr<World>         world_ptr;
-typedef boost::intrusive_ptr<const World>   const_world_ptr;
 
 /** Get simulation world */
 World* currentWorld();

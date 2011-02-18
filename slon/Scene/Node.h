@@ -1,22 +1,13 @@
-#ifndef SLON_ENGINE_SCENE_GRAPH_NODE_H
-#define SLON_ENGINE_SCENE_GRAPH_NODE_H
+#ifndef __SLON_ENGINE_SCENE_NODE_H__
+#define __SLON_ENGINE_SCENE_NODE_H__
 
-#include "../Utility/callback.hpp"
-#include <boost/intrusive_ptr.hpp>
-#include <limits>
-#include <sgl/Utility/Aligned.h>
-#include <string>
+#include "../Log/Forward.h"
+#include "../Realm/Forward.h"
+#include "../Utility/unique_string.hpp"
+#include "Forward.h"
 
 namespace slon {
 namespace scene {
-
-// forward
-class Group;
-
-class NodeVisitor;
-class TraverseVisitor;
-class UpdateVisitor;
-class CullVisitor;
 
 /** Tree Node class. Stores hierarchy. Use intrusive ptr
  * on scene graph structures. You can't construct nodes on the stack.
@@ -26,26 +17,32 @@ class Node :
 {
 friend class Group;
 public:
+    enum
+    {
+        NODE_BIT      = 0,
+        SKELETON_BIT  = 1,
+        GROUP_BIT     = 1 << 1,
+        TRANSFORM_BIT = 1 << 2,
+        JOINT_BIT     = 1 << 3,
+        ENTITY_BIT    = 1 << 4,
+        LIGHT_BIT     = 1 << 5,
+        CAMERA_BIT    = 1 << 6,
+        GEODE_BIT     = 1 << 7
+    };
+
     /// Type of the scene graph node
     enum TYPE
     {
-        NODE,
-        GROUP,
-        TRANSFORM,
-        ENTITY
+        NODE      = 0,
+        SKELETON  = SKELETON_BIT,
+        GROUP     = GROUP_BIT,
+        TRANSFORM = GROUP | TRANSFORM_BIT,
+        JOINT     = TRANSFORM | JOINT_BIT,
+        ENTITY    = ENTITY_BIT,
+        LIGHT     = ENTITY | LIGHT_BIT,
+        CAMERA    = ENTITY | CAMERA_BIT,
+        GEODE     = ENTITY | GEODE_BIT
     };
-
-    typedef unsigned int    mask_type;
-
-    typedef callback<void (Node&, NodeVisitor&)>       node_visitor_callback;
-    typedef callback<void (Node&, TraverseVisitor&)>   traverse_visitor_callback;
-    typedef callback<void (Node&, UpdateVisitor&)>     update_visitor_callback;
-    typedef callback<void (Node&, CullVisitor&)>       cull_visitor_callback;
-
-    typedef boost::intrusive_ptr<node_visitor_callback>       node_visitor_callback_ptr;
-    typedef boost::intrusive_ptr<traverse_visitor_callback>   traverse_visitor_callback_ptr;
-    typedef boost::intrusive_ptr<update_visitor_callback>     update_visitor_callback_ptr;
-    typedef boost::intrusive_ptr<cull_visitor_callback>       cull_visitor_callback_ptr;
 
 private:
     // noncopyable
@@ -53,115 +50,75 @@ private:
     Node& operator = (const Node&);
 
 public:
-    /** Create empty node */
-    Node() :
-        parent(0),
-        acceptMask( std::numeric_limits<mask_type>::max() )
-    {}
-
-    /** Create node with specified name*/
-    explicit Node(const std::string& _name) :
-        name(_name),
-        parent(0),
-        acceptMask( std::numeric_limits<mask_type>::max() )
-    {}
+    Node();
+    explicit Node(unique_string name);
 
     /** Get type of the node */
-    virtual TYPE getType() const { return NODE; }
+    virtual TYPE getNodeType() const { return NODE; }
 
-    /** Get parent node */
-    Group* getParent() const { return parent; }
+    /** Helper function outputs information about node. Override in derived classes. */
+    virtual void accept(log::LogVisitor& visitor) const;
 
-	/** Setup node name */
-	virtual void setName(const std::string& _name) { name = _name; }
+    /** Get parent node in the hierarchy. */
+    Group* getParent() { return parent; }
 
-	/** Get node name */
-	virtual const std::string& getName() const { return name; }
+    /** Get parent node in the hierarchy. */
+    const Group* getParent() const { return parent; }
 
-    /** Setup accept mask. Node visitor will visit this node if (node_mask & visitor_mask) != 0.
-     * Mask test is handled by the visitor.
-     */
-    virtual void setAcceptMask(mask_type _acceptMask) { acceptMask = _acceptMask; }
+	/** Get left node in the hierarchy. */
+	Node* getLeft() { return left; }
 
-    /** Get accept mask. Node visitor will visit this node if (node_mask & visitor_mask) != 0.
-     * Mask test is handled by the visitor.
-     */
-    virtual mask_type getAcceptMask() const { return acceptMask; }
+	/** Get left node in the hierarchy. */
+	const Node* getLeft() const { return left; }
 
-    /** Accept NodeVisitor */
-    virtual void accept(NodeVisitor& visitor);
+	/** Get right node in the hierarchy. */
+	Node* getRight() { return right.get(); }
 
-    /** Accept TraverseVisitor */
-    virtual void accept(TraverseVisitor& visitor);
+	/** Get right node in the hierarchy. */
+	const Node* getRight() const { return right.get(); }
 
-    /** Accept UpdateVisitor */
-    virtual void accept(UpdateVisitor& visitor);
+	/** Setup user data, use it on your own. */
+	void setUserPointer(void* userPointer_) { userPointer = userPointer_; }
+	
+	/** Get user data. */
+	const void* getUserPointer() const { return userPointer; }
 
-    /** Accept CullVisitor */
-    virtual void accept(CullVisitor& visitor);
+	/** Get user data. */
+	void* getUserPointer() { return userPointer; }
 
-    /** Set callback for handling NodeVisitor */
-    virtual void setNVCallback(node_visitor_callback* callback) { nvCallback.reset(callback); }
+	/** Set node name */
+	void setName(unique_string _name) { name = _name; }
 
-    /** Set callback for handling TraverseVisitor */
-    virtual void setTVCallback(traverse_visitor_callback* callback) { tvCallback.reset(callback); }
-    
-    /** Set callback for handling UpdateVisitor */
-    virtual void setUVCallback(update_visitor_callback* callback) { uvCallback.reset(callback); }
-    
-    /** Set callback for handling CullVisitor */
-    virtual void setCVCallback(cull_visitor_callback* callback) { cvCallback.reset(callback); }
+	/** Get node name. */
+	unique_string getName() const { return name; }
 
-    /** Get callback for handling NodeVisitor */
-    virtual node_visitor_callback* getNVCallback() { return nvCallback.get(); }
+	/** Get object to which holds this node */
+	realm::Object* getObject() { return object; }
 
-    /** Get callback for handling TraverseVisitor */
-    virtual traverse_visitor_callback* getTVCallback() { return tvCallback.get(); }
-    
-    /** Get callback for handling UpdateVisitor */
-    virtual update_visitor_callback* getUVCallback() { return uvCallback.get(); }
-    
-    /** Get callback for handling CullVisitor */
-    virtual cull_visitor_callback* getCVCallback() { return cvCallback.get(); }
-
-    /** Get callback for handling NodeVisitor */
-    virtual const node_visitor_callback* getNVCallback() const { return nvCallback.get(); }
-
-    /** Get callback for handling TraverseVisitor */
-    virtual const traverse_visitor_callback* getTVCallback() const { return tvCallback.get(); }
-    
-    /** Get callback for handling UpdateVisitor */
-    virtual const update_visitor_callback* getUVCallback() const { return uvCallback.get(); }
-    
-    /** Get callback for handling CullVisitor */
-    virtual const cull_visitor_callback* getCVCallback() const { return cvCallback.get(); }
+	/** Set object which holds this node */
+	void setObject(realm::Object* object_) { object = object_; }
 
     virtual ~Node() {}
 
 protected:
 	// node info
-	std::string name;
-    Group*      parent;
-    mask_type   acceptMask;
+	unique_string   name;
+    Group*          parent;
+	Node*			left;
+	node_ptr		right;
+	void*			userPointer;
 
-    node_visitor_callback_ptr       nvCallback;
-    traverse_visitor_callback_ptr   tvCallback;
-    update_visitor_callback_ptr     uvCallback;
-    cull_visitor_callback_ptr       cvCallback;
+	realm::Object*	object;
 };
-
-typedef boost::intrusive_ptr<Node>              node_ptr;
-typedef boost::intrusive_ptr<const Node>        const_node_ptr;
 
 /** Find node with specified name in the graph
  * @param root - root of the subgraph to search for node
  * @param name - name of the node to search
  * @return pointer to node if found, NULL otherwise
  */
-Node* findNamedNode( Node& root,
-                     const std::string& name );
+Node* findNamedNode(Node& root, unique_string name);
 
 } // namespace scene
-} // namepsace slon
+} // namespace slon
 
-#endif // SLON_ENGINE_SCENE_GRAPH_NODE_H
+#endif // __SLON_ENGINE_SCENE_NODE_H__

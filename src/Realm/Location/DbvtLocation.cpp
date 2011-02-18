@@ -2,7 +2,7 @@
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Realm/Location/DbvtLocation.h"
 #include "Realm/World.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace {
@@ -36,9 +36,9 @@ namespace {
 
     // update object bounds when traversing
     template<>
-    struct update_dynamic_object_functor<scene::TraverseVisitor>
+    struct update_dynamic_object_functor<scene::TransformVisitor>
     {
-        update_dynamic_object_functor(scene::TraverseVisitor& _nv) :
+        update_dynamic_object_functor(scene::TransformVisitor& _nv) :
             nv(_nv)
         {}
 
@@ -51,7 +51,7 @@ namespace {
             }
         }
 
-        scene::TraverseVisitor& nv;
+        scene::TransformVisitor& nv;
     };
 
     template<typename NodeVisitor>
@@ -67,24 +67,40 @@ namespace {
     }
 
     template<typename Volume>
-    inline void traverse_static( DbvtLocation::object_tree&     aabbTree,
-                                 const Volume&                  volume,
-                                 scene::NodeVisitor&            nv )
+    inline void traverse_static( DbvtLocation::object_tree& aabbTree,
+                                 const Volume&              volume,
+                                 scene::NodeVisitor&        nv )
     {
         perform_on_leaves( aabbTree, volume, update_static_object(nv) );
     }
 
     template<typename Volume>
-    inline void traverse_dynamic( DbvtLocation::object_tree&     aabbTree,
-                                  const Volume&                  volume,
-                                  scene::NodeVisitor&            nv )
+    inline void traverse_static( const DbvtLocation::object_tree&   aabbTree,
+                                 const Volume&                      volume,
+                                 scene::ConstNodeVisitor&           nv )
     {
-        if ( scene::TraverseVisitor* tv = dynamic_cast<scene::TraverseVisitor*>(&nv) ) {
+        perform_on_leaves( aabbTree, volume, update_static_object(nv) );
+    }
+
+    template<typename Volume>
+    inline void traverse_dynamic( DbvtLocation::object_tree& aabbTree,
+                                  const Volume&              volume,
+                                  scene::NodeVisitor&        nv )
+    {
+        if ( scene::TransformVisitor* tv = dynamic_cast<scene::TransformVisitor*>(&nv) ) {
             perform_on_leaves( aabbTree, volume, update_dynamic_object(*tv) );
         }
         else {
             perform_on_leaves( aabbTree, volume, update_dynamic_object(nv) );
         }
+    }
+
+    template<typename Volume>
+    inline void traverse_dynamic( const DbvtLocation::object_tree&  aabbTree,
+                                  const Volume&                     volume,
+                                  scene::ConstNodeVisitor&          nv )
+    {
+        perform_on_leaves( aabbTree, volume, update_dynamic_object(nv) );
     }
 
     template<typename LeafData, typename RealType>
@@ -154,6 +170,13 @@ void DbvtLocation::visit(const math::Ray3f& ray, scene::NodeVisitor& nv)
     DEBUG_TRAVERSE_TREE(aabbTreeDebugMesh, nv);
 }
 
+void DbvtLocation::visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const
+{
+    traverse_static(staticAABBTree,   ray, nv);
+    traverse_dynamic(dynamicAABBTree, ray, nv);
+    DEBUG_TRAVERSE_TREE(aabbTreeDebugMesh, nv);
+}
+
 void DbvtLocation::visit(const math::AABBf& aabb, scene::NodeVisitor& nv)
 {
     traverse_static(staticAABBTree,   aabb, nv);
@@ -161,7 +184,21 @@ void DbvtLocation::visit(const math::AABBf& aabb, scene::NodeVisitor& nv)
     DEBUG_TRAVERSE_TREE(aabbTreeDebugMesh, nv);
 }
 
+void DbvtLocation::visit(const math::AABBf& aabb, scene::ConstNodeVisitor& nv) const
+{
+    traverse_static(staticAABBTree,   aabb, nv);
+    traverse_dynamic(dynamicAABBTree, aabb, nv);
+    DEBUG_TRAVERSE_TREE(aabbTreeDebugMesh, nv);
+}
+
 void DbvtLocation::visit(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+{
+    traverse_static(staticAABBTree,   frustum, nv);
+    traverse_dynamic(dynamicAABBTree, frustum, nv);
+    DEBUG_TRAVERSE_TREE(aabbTreeDebugMesh, nv);
+}
+
+void DbvtLocation::visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
 {
     traverse_static(staticAABBTree,   frustum, nv);
     traverse_dynamic(dynamicAABBTree, frustum, nv);
@@ -217,7 +254,7 @@ void DbvtLocation::add(Object* object)
     if ( object->isDynamic() ) 
     {
         // recompute aabb
-        scene::TraverseVisitor visitor;
+        scene::TransformVisitor visitor;
         object->traverse(visitor);
 
         // insert into tree

@@ -58,12 +58,12 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
 		file_ptr file( asFile( currentFileSystemManager().getNode(path.c_str()) ) );
 		if (!file) 
 		{    
-            (*logger) << log::WL_ERROR << "Can't find file: " << path << LOG_FILE_AND_LINE;
+            (*logger) << log::S_ERROR << "Can't find file: " << path << LOG_FILE_AND_LINE;
 			return value;
 		}
 		else if ( !file->open(mode)  )
 		{
-            (*logger) << log::WL_ERROR << "Can't open file: " << path << LOG_FILE_AND_LINE;
+            (*logger) << log::S_ERROR << "Can't open file: " << path << LOG_FILE_AND_LINE;
 			return value;
 		}
 		
@@ -75,13 +75,13 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
             storage.insert( storage_type::value_type(key, value) );
         }
         else if (logger) {
-            (*logger) << log::WL_ERROR << "Unable to load item: " << path << LOG_FILE_AND_LINE;
+            (*logger) << log::S_ERROR << "Unable to load item: " << path << LOG_FILE_AND_LINE;
         }
     }
     catch (loader_error& err) 
     {
         if (logger) {
-            (*logger) << log::WL_ERROR << err.what() << LOG_FILE_AND_LINE;
+            (*logger) << log::S_ERROR << err.what() << LOG_FILE_AND_LINE;
         }
     }
 

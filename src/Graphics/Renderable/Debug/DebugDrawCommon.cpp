@@ -151,6 +151,132 @@ DebugMesh& operator << (DebugMesh& mesh, const sector& s)
     return mesh;
 }
 
+DebugMesh& operator << (DebugMesh& mesh, const cone& c)
+{    
+    // make tip
+    DebugMesh coneMesh;
+    coneMesh.vertices.resize(c.numVertices + 1);
+
+    // make cap
+    coneMesh.vertices[0] = math::Vector3f(0.0f, c.height * 0.5f, 0.0f);
+    for (size_t i = 1; i<c.numVertices + 1; ++i)
+    {
+        float angle = math::PI2 * float(i) / c.numVertices;
+        float x     = c.radius * cos(angle);
+        float z     = c.radius * sin(angle);
+
+        coneMesh.vertices[i] = math::Vector3f(x, -c.height * 0.5f, z);
+    }
+
+    if (c.wired)
+    {
+        coneMesh.indices.resize(c.numVertices * 6 + 6);
+        for (size_t i = 1; i<c.numVertices + 1; ++i)
+        {
+            coneMesh.indices[i*6]     = 0;
+            coneMesh.indices[i*6 + 1] = i;
+            coneMesh.indices[i*6 + 2] = i;
+            coneMesh.indices[i*6 + 3] = i+1;
+            coneMesh.indices[i*6 + 4] = i+1;
+            coneMesh.indices[i*6 + 5] = 0;
+        }
+        coneMesh.indices[c.numVertices * 6 + 3] = 1;
+        coneMesh.indices[c.numVertices * 6 + 4] = 1;
+
+        // make subset
+        coneMesh.pushPrimitive( sgl::LINES, coneMesh.indices.size() );
+    }
+    else
+    {
+        coneMesh.indices.resize(c.numVertices * 2 + 1);
+
+        // make cone
+        for (size_t i = 0; i<c.numVertices + 1; ++i) {
+            coneMesh.indices[i] = i;
+        }
+        coneMesh.pushPrimitive( sgl::TRIANGLE_FAN, c.numVertices + 1 );
+
+        // make base
+        for (size_t i = 1; i<c.numVertices + 1; ++i) {
+            coneMesh.indices[i + c.numVertices] = i;
+        }
+        coneMesh.pushPrimitive( sgl::TRIANGLE_FAN, c.numVertices );
+    }
+
+    // dirty
+    return mesh << coneMesh;
+}
+
+DebugMesh& operator << (DebugMesh& mesh, const cylinder& c)
+{
+    // make tip
+    DebugMesh cylMesh;
+    cylMesh.vertices.resize(c.numVertices * 2);
+
+    // make cap
+    for (size_t i = 0; i<c.numVertices; ++i)
+    {
+        float angle = math::PI2 * float(i) / (c.numVertices - 1);
+        float x     = c.radius * cos(angle);
+        float z     = c.radius * sin(angle);
+
+        cylMesh.vertices[i] = math::Vector3f(x, -c.height * 0.5f, z);
+        cylMesh.vertices[i + c.numVertices] = math::Vector3f(x, c.height * 0.5f, z);
+    }
+
+    if (c.wired)
+    {
+        cylMesh.indices.reserve(c.numVertices * 4);
+
+        // make bottom cap
+        for (size_t i = 0; i<c.numVertices; ++i) {
+            cylMesh.indices.push_back(i);
+        }
+        cylMesh.pushPrimitive(sgl::LINE_LOOP, c.numVertices);
+
+        // make top cap
+        for (size_t i = 0; i<c.numVertices; ++i) {
+            cylMesh.indices.push_back(i + c.numVertices);
+        }
+        cylMesh.pushPrimitive(sgl::LINE_LOOP, c.numVertices);
+
+        // make walls
+        for (size_t i = 0; i<c.numVertices; ++i) 
+        {
+            cylMesh.indices.push_back(i);
+            cylMesh.indices.push_back(i + c.numVertices);
+        }
+        cylMesh.pushPrimitive(sgl::LINES, c.numVertices * 2);
+    }
+    else
+    {
+        cylMesh.indices.reserve(c.numVertices * 4);
+
+        // make bottom cap
+        for (size_t i = 0; i<c.numVertices; ++i) {
+            cylMesh.indices.push_back(i);
+        }
+        cylMesh.pushPrimitive(sgl::TRIANGLE_FAN, c.numVertices);
+
+        // make top cap
+        for (size_t i = 0; i<c.numVertices; ++i) {
+            cylMesh.indices.push_back(i + c.numVertices);
+        }
+        cylMesh.pushPrimitive(sgl::TRIANGLE_FAN, c.numVertices);
+
+        // make walls
+        for (size_t i = 0; i<c.numVertices; ++i) 
+        {
+            cylMesh.indices.push_back(i);
+            cylMesh.indices.push_back(i + c.numVertices);
+        }
+        cylMesh.pushPrimitive(sgl::TRIANGLE_STRIP, c.numVertices * 2);
+    }
+
+    // dirty
+    return mesh << cylMesh;
+}
+
 DebugMesh& operator << (DebugMesh& mesh, const math::AABBf& a)
 {
     using namespace math;

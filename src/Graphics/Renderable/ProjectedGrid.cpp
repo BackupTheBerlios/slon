@@ -201,7 +201,7 @@ void ProjectedGrid::setupGrid(int sizeX, int sizeY)
     }
 }
 
-void ProjectedGrid::accept(scene::CullVisitor& visitor)
+void ProjectedGrid::accept(scene::CullVisitor& visitor) const
 {
     if ( const Camera* camera = visitor.getCamera() )
     {
@@ -289,8 +289,6 @@ void ProjectedGrid::accept(scene::CullVisitor& visitor)
             visitor.addRenderable(this);
         }
     }
-
-    base_type::accept(visitor);
 }
 
 void ProjectedGrid::render() const

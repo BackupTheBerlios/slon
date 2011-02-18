@@ -38,8 +38,11 @@ public:
     LOAD_POLICY     getLoadPolicy() const       { return LOAD_ON_STARTUP; }
 	
     void visit(const math::Ray3f& ray, scene::NodeVisitor& nv);
+    void visit(const math::Ray3f& ray, scene::ConstNodeVisitor& nv) const;
     void visit(const math::AABBf& area, scene::NodeVisitor& nv);
+    void visit(const math::AABBf& area, scene::ConstNodeVisitor& nv) const;
     void visit(const math::Frustumf& frustum, scene::NodeVisitor& nv);
+    void visit(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
 
     bool update(Object* object);
     bool remove(Object* object);

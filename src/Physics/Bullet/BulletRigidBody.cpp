@@ -173,7 +173,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     }
     desc.collisionShape.reset(collisionShape);
 
-	logger << log::WL_FLOOD << "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE;
+	logger << log::S_FLOOD << "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE;
 }
 
 BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWorld* dynamicsWorld_) :
@@ -332,7 +332,7 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
         rigidBody.reset();
 
-		logger << log::WL_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
+		logger << log::S_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
     }
 }
 
@@ -366,7 +366,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     // call handlers
     onResetSignal(*this);
 
-	logger << log::WL_FLOOD << "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE;
+	logger << log::S_FLOOD << "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE;
 }
 
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)

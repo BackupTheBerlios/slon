@@ -39,7 +39,7 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
     Logger::logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
     if (!loggerOutput)
     {
-        mainLogger << log::WL_ERROR << "Can't find requested logger: " << loggerName << std::endl;
+        mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
         return false;
     }
 
@@ -48,7 +48,7 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
     loggerOutput->fb->open( fileName.c_str(), std::ios::out );
     if ( !loggerOutput->fb->is_open() )
     {
-        mainLogger << log::WL_ERROR << "Can't open output for logger: " << fileName << std::endl;
+        mainLogger << log::S_ERROR << "Can't open output for logger: " << fileName << std::endl;
         return false;
     }
 
@@ -56,11 +56,11 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
-        mainLogger << log::WL_NOTIFY << "Output for loggers redirected to file '"
+        mainLogger << log::S_NOTICE << "Output for loggers redirected to file '"
                                      << fileName << "'" << std::endl;
     }
     else {
-        mainLogger << log::WL_NOTIFY << "Output for loggers '" << loggerName << "' redirected to file '"
+        mainLogger << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to file '"
                                      << fileName << "'" << std::endl;
     }
 
@@ -72,7 +72,7 @@ bool LogManager::redirectOutputToConsole(const std::string& loggerName)
     Logger::logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
     if (!loggerOutput)
     {
-        mainLogger << log::WL_ERROR << "Can't find requested logger: " << loggerName << std::endl;
+        mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
         return false;
     }
 
@@ -83,10 +83,10 @@ bool LogManager::redirectOutputToConsole(const std::string& loggerName)
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
-        mainLogger << log::WL_NOTIFY << "Output for loggers redirected to console" << std::endl;
+        mainLogger << log::S_NOTICE << "Output for loggers redirected to console" << std::endl;
     }
     else {
-        mainLogger << log::WL_NOTIFY << "Output for loggers '" << loggerName << "' redirected to console" << std::endl;
+        mainLogger << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to console" << std::endl;
     }
 
     return true;

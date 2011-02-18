@@ -26,10 +26,9 @@ namespace log {
 extern Logger::logger_output* findNode(Logger::logger_output& loggerOutput, const std::string& name);
 
 // construct output, redirect to cout
-Logger::logger_output::logger_output() :
-    os(new ostream)
+Logger::logger_output::logger_output()
+:   os( new ostream( logger_sink( std::cout.rdbuf() ) ) )
 {
-	os->rdbuf( std::cout.rdbuf() );
     os->setf(std::ios_base::unitbuf);
 }
 
@@ -83,36 +82,40 @@ Logger::Logger(const std::string& name)
     }
 }
 
-log::ostream& Logger::operator << (WARNING_LEVEL warningLevel)
+log::ostream& Logger::operator << (SEVERITY severity)
 {
     using namespace slon::log;
 
     assert(loggerOutput);
-    switch(warningLevel)
+    size_t flags = (*loggerOutput->os)->get_flags();
+    if ( !(flags & logger_sink::SKIP_INFO) )
     {
-    case log::WL_FLOOD:
-        *(loggerOutput->os) << loggerOutput->name << " [flood] - ";
-        break;
+    switch(severity)
+    {
+        case log::S_FLOOD:
+            *(loggerOutput->os) << loggerOutput->name << " [flood] - ";
+            break;
 
-    case log::WL_NOTIFY:
-        *(loggerOutput->os) << loggerOutput->name << " [notify] - ";
-        break;
+        case log::S_NOTICE:
+            *(loggerOutput->os) << loggerOutput->name << " [notify] - ";
+            break;
 
-    case log::WL_WARNING:
-        *(loggerOutput->os) << loggerOutput->name << " [warning] - ";
-        break;
+        case log::S_WARNING:
+            *(loggerOutput->os) << loggerOutput->name << " [warning] - ";
+            break;
 
-    case log::WL_ERROR:
-        *(loggerOutput->os) << loggerOutput->name << " [error] - ";
-        break;
+        case log::S_ERROR:
+            *(loggerOutput->os) << loggerOutput->name << " [error] - ";
+            break;
 
-    case log::WL_FATAL_ERROR:
-        *(loggerOutput->os) << loggerOutput->name << " [fatal error] - ";
-        break;
+        case log::S_FATAL_ERROR:
+            *(loggerOutput->os) << loggerOutput->name << " [fatal error] - ";
+            break;
 
-    default:
-        assert(!"Invalid case condition");
-        break;
+        default:
+            assert(!"Invalid case condition");
+            break;
+        }
     }
 
     return *(loggerOutput->os);

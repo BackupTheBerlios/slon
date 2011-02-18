@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Graphics/Renderable/StaticMesh.h"
 #include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 using namespace slon;
@@ -25,7 +25,7 @@ StaticMesh::StaticMesh(Mesh* _mesh) :
 }
 
 // Override node
-void StaticMesh::accept(scene::CullVisitor& visitor)
+void StaticMesh::accept(scene::CullVisitor& visitor) const
 {
     for( Mesh::subset_const_iterator subsetIter  = mesh->firstSubset();
                                      subsetIter != mesh->endSubset();
@@ -33,12 +33,9 @@ void StaticMesh::accept(scene::CullVisitor& visitor)
     {
         visitor.addRenderable( subsetIter->get() );
     }
-
-    base_type::accept(visitor);
 }
 
-void StaticMesh::accept(scene::TraverseVisitor& visitor)
+void StaticMesh::accept(scene::TransformVisitor& visitor)
 {
     worldMatrix = visitor.getLocalToWorldTransform();
-    visitor.visitEntity(*this);
 }

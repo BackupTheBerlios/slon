@@ -219,15 +219,18 @@ SET ( TARGET_PHYSICS_DETAIL_HEADERS
 )
 
 SET ( TARGET_LOG_HEADERS
+    ${TARGET_HEADER_PATH}/Log/Formatters.h
     ${TARGET_HEADER_PATH}/Log/Forward.h
     ${TARGET_HEADER_PATH}/Log/Logger.h
     ${TARGET_HEADER_PATH}/Log/LogManager.h
+    ${TARGET_HEADER_PATH}/Log/LogVisitor.h
     ${TARGET_HEADER_PATH}/Log/Stream.h
 )
 
 SET ( TARGET_REALM_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/Object.h
+    ${TARGET_HEADER_PATH}/Realm/Forward.h
     ${TARGET_HEADER_PATH}/Realm/Location.h
+    ${TARGET_HEADER_PATH}/Realm/Object.h
     ${TARGET_HEADER_PATH}/Realm/World.h
 )
 
@@ -276,10 +279,12 @@ SET ( TARGET_SCENE_LIGHT_HEADERS
 )
 
 SET ( TARGET_SCENE_VISITORS_HEADERS
+    ${TARGET_HEADER_PATH}/Scene/Visitors/BFSNodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/CullVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitors/DFSNodeVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitors/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/NodeVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/TraverseVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/UpdateVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitors/TransformVisitor.h
 )
 
 SET ( TARGET_THREAD_HEADERS
@@ -297,6 +302,7 @@ SET ( TARGET_UTILITY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/cached_value.hpp
     ${TARGET_HEADER_PATH}/Utility/callback.hpp
     ${TARGET_HEADER_PATH}/Utility/error.hpp
+    ${TARGET_HEADER_PATH}/Utility/if_then_else.hpp
     ${TARGET_HEADER_PATH}/Utility/math.hpp
     ${TARGET_HEADER_PATH}/Utility/referenced.hpp
     ${TARGET_HEADER_PATH}/Utility/singleton.hpp
@@ -314,7 +320,6 @@ SET ( TARGET_UTILITY_ALGORITHM_HEADERS
 SET ( TARGET_UTILITY_MEMORY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/Memory/aligned_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/block_allocator.hpp
-    ${TARGET_HEADER_PATH}/Utility/Memory/if_then_else.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/small_object_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/object_in_pool.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/object_pool.hpp
@@ -582,6 +587,7 @@ SET ( TARGET_GRAPHICS_RENDERER_SOURCES
 SET ( TARGET_LOG_SOURCES
     Log/Logger.cpp
     Log/LogManager.cpp
+    Log/LogVisitor.cpp
 )
 
 SET ( TARGET_PHYSICS_SOURCES
@@ -658,9 +664,10 @@ SET ( TARGET_SCENE_LIGHT_SOURCES
 )
 
 SET ( TARGET_SCENE_VISITORS_SOURCES
+    Scene/Visitors/BFSNodeVisitor.cpp
     Scene/Visitors/CullVisitor.cpp
-    Scene/Visitors/TraverseVisitor.cpp
-    Scene/Visitors/UpdateVisitor.cpp
+    Scene/Visitors/DFSNodeVisitor.cpp
+    Scene/Visitors/TransformVisitor.cpp
 )
 
 SET ( TARGET_THREAD_SOURCES

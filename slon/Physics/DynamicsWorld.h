@@ -3,8 +3,7 @@
 
 #include "../Thread/Lock.h"
 #include "../Utility/referenced.hpp"
-#include "Constraint.h"
-#include "RigidBody.h"
+#include "PhysicsModel.h"
 #include <sgl/Math/AABB.hpp>
 #include <vector>
 
@@ -57,8 +56,10 @@ public:
     /** Get description of the world. */
     virtual const state_desc& getStateDesc() const = 0;
 
-    /** Step simulation. */
-    virtual void stepSimulation(real dt) = 0;
+    /** Step simulation. 
+     * @return "unsimulated" time < fixedTimeStep
+     */
+    virtual real stepSimulation(real dt) = 0;
 
     /** Set maximum number of substeps in the simulation step. */
     virtual void setMaxNumSubSteps(unsigned maxSubSteps) = 0;

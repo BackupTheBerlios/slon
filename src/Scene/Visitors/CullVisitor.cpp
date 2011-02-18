@@ -1,39 +1,30 @@
 #include "stdafx.h"
+#include "Scene/Entity.h"
+#include "Scene/Group.h"
 #include "Scene/Visitors/CullVisitor.h"
 
-using namespace slon;
-using namespace scene;
+namespace slon {
+namespace scene {
 
-void CullVisitor::visitEntity(Entity& entity)
-{/*
-    using namespace graphics;
-
-    switch( entity.getEntityType() )
+void CullVisitor::traverse(const Node& node)
+{
+    forTraverse.push(&node);
+    while ( !forTraverse.empty() )
     {
-        case Entity::GEODE:
+        const Node* traversed = forTraverse.top(); forTraverse.pop();
+
+        // add group children to traverse queue
+        if (traversed->getNodeType() & Node::ENTITY_BIT) {
+            static_cast<const Entity*>(traversed)->accept(*this);
+        }
+        else if (traversed->getNodeType() & Node::GROUP_BIT) 
         {
-            if (renderPass) {
-                static_cast<Geode&>(entity).gatherRenderables(*renderPass);
+            const Group* group = static_cast<const Group*>(traversed);
+            for(const Node* i = group->getChild(); i; i = i->getRight()) {
+                forTraverse.push(i);
             }
-            break;
         }
-
-        case Entity::CAMERA:
-        {
-            break;
-        }
-
-        case Entity::LIGHT:
-        {
-            if (renderer) {
-                renderer->handleLight( &static_cast<Light&>(entity) );
-            }
-            break;
-        }
-
-        default:
-            break;
-    }*/
+    }
 }
 
 void CullVisitor::clear()
@@ -41,3 +32,6 @@ void CullVisitor::clear()
     renderables.clear();
     lights.clear();
 }
+
+} // namespace scene
+} // namespace slon

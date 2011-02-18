@@ -68,17 +68,17 @@ void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
                    boost::bind(&BulletConstraint::accept, _1, boost::ref(collector)) );
 }
 
-void BulletDynamicsWorld::stepSimulation(real dt)
+real BulletDynamicsWorld::stepSimulation(real dt)
 {
     // simulate
     accept(solverCollector);
+
+    real t = 0;
     {
-        real t = 0;
-        for (unsigned i = 0; i<maxSubSteps && t < dt; ++i, t += desc.fixedTimeStep)
+        for (unsigned i = 0; i<maxSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep)
         {
-            real timeStep = std::min(desc.fixedTimeStep, dt - t);
-            solverCollector.solve(timeStep); // run proprietary solvers
-            dynamicsWorld->stepSimulation(timeStep, 1, desc.fixedTimeStep);
+            solverCollector.solve(desc.fixedTimeStep); // run proprietary solvers
+            dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
         }
     }
     solverCollector.clear();
@@ -143,6 +143,8 @@ void BulletDynamicsWorld::stepSimulation(real dt)
         dissapearingContacts[i].collisionObjects[0]->handleDissappearingContact(dissapearingContacts[i]);
         dissapearingContacts[i].collisionObjects[1]->handleDissappearingContact(dissapearingContacts[i]);
     }
+
+    return dt - t;
 }
 
 RigidBody* BulletDynamicsWorld::createRigidBody(const RigidBody::state_desc& rigidBodyDesc)

@@ -13,6 +13,14 @@ class RigidBodyTransform :
 public:
     RigidBodyTransform(physics::RigidBody* rigidBody = 0);
 
+    // Override Node
+    void accept(log::LogVisitor& visitor) const;
+
+    // Override Transform
+    bool isAbsolute() const;
+
+    void setAbsolute(bool absolute_) { absolute = absolute_; }
+
     /** Get rigid body which handles transformation for this node. */
     physics::RigidBody* getRigidBody() { return rigidBody.get(); }
 
@@ -20,6 +28,7 @@ public:
     const physics::RigidBody* getRigidBody() const { return rigidBody.get(); }
 
 protected:
+    bool                    absolute;
     physics::rigid_body_ptr rigidBody;
 };
 

@@ -442,7 +442,7 @@ void collada_effect::load_profile_COMMON( const ColladaDocument&  document,
 	}
 	else
 	{
-		logger << log::WL_WARNING << "Unknown common profile technique: " << techniqueIter->get_value() << std::endl;
+		logger << log::S_WARNING << "Unknown common profile technique: " << techniqueIter->get_value() << std::endl;
 		return;
 	}
 

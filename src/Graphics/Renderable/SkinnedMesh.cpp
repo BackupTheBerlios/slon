@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "Graphics/Renderable/SkinnedMesh.h"
+#include "Scene/Visitors/DFSNodeVisitor.h"
 #include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TraverseVisitor.h"
-#include "Scene/Visitors/UpdateVisitor.h"
+#include "Scene/Visitors/FilterVisitor.h"
+#include "Scene/Visitors/TransformVisitor.h"
 #include "Scene/Skeleton.h"
 #include "Utility/error.hpp"
 #include "Utility/math.hpp"
@@ -15,7 +16,7 @@ namespace {
     using namespace graphics;
 
     struct gather_joints_visitor :
-        public scene::NodeVisitor
+        public scene::FilterVisitor<scene::DFSNodeVisitor, scene::Joint>
     {
         gather_joints_visitor(SkinnedMesh&                  skinnedMesh_,
                               SkinnedMesh::joint_vector&    joints_)
@@ -25,37 +26,32 @@ namespace {
 			extendable = joints.empty();
 		}
 
-        void visitTransform(scene::Transform& transform)
+        void visit(scene::Joint& joint)
         {
-            if ( scene::Joint* joint = dynamic_cast<scene::Joint*>(&transform) )
+            unsigned id = joint.getId();
+
+            if ( id >= joints.size() ) 
             {
-                unsigned id = joint->getId();
-
-                if ( id >= joints.size() ) 
-                {
-					if (extendable) 
-					{
-						joints.resize(id + 1);
-						joints[id].reset(joint);
-					}
-					else
-					{
-						logger << log::WL_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
-							                    << "'. Joint '" << joint->getName() << "' has invalid id: " << id << std::endl;
-					}
-                }
-                else if ( joints[id] ) 
-                {
-                    logger << log::WL_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
-                                            << "'. Joint '" << joint->getName() << "' overrides another joint '" << joints[id]->getName() << "'\n";
-                }
-                else 
-                {
-                    joints[id].reset(joint);
-                }
+				if (extendable) 
+				{
+					joints.resize(id + 1);
+					joints[id].reset(&joint);
+				}
+				else
+				{
+					logger << log::S_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
+						                    << "'. Joint '" << joint.getName() << "' has invalid id: " << id << std::endl;
+				}
             }
-
-            visitGroup(transform);
+            else if ( joints[id] ) 
+            {
+                logger << log::S_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
+                                        << "'. Joint '" << joint.getName() << "' overrides another joint '" << joints[id]->getName() << "'\n";
+            }
+            else 
+            {
+                joints[id].reset(&joint);
+            }
         }
 
         SkinnedMesh&                skinnedMesh;
@@ -526,32 +522,14 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
     }
     else 
     {
-        logger << log::WL_WARNING << "SkinnedMesh '" << getName() << "have no skeleton" << std::endl;
+        logger << log::S_WARNING << "SkinnedMesh '" << getName() << "have no skeleton" << std::endl;
     }
 }
 
-// Override node
-void SkinnedMesh::accept(scene::NodeVisitor& visitor)
-{
-    visitor.visitEntity(*this);
-    if (skeleton) {
-        skeleton->accept(visitor);
-    }
-}
-
-void SkinnedMesh::accept(scene::UpdateVisitor& visitor)
-{
-    visitor.visitEntity(*this);
-    if (skeleton) {
-        skeleton->accept(visitor);
-    }
-}
-
-void SkinnedMesh::accept(scene::TraverseVisitor& visitor)
+void SkinnedMesh::accept(scene::TransformVisitor& visitor)
 {
     worldMatrix    = visitor.getLocalToWorldTransform();
     invWorldMatrix = visitor.getWorldToLocalTransform();
-    visitor.visitEntity(*this);
 
 	// query joint matrices
 	bounds = mesh->getBounds();
@@ -585,14 +563,9 @@ void SkinnedMesh::accept(scene::TraverseVisitor& visitor)
             boneTranslations[i] = math::get_translation(boneMatrices[i]);
         }
     }
-
-	// pass through
-    if (skeleton) {
-        skeleton->accept(visitor);
-    }
 }
 
-void SkinnedMesh::accept(scene::CullVisitor& visitor)
+void SkinnedMesh::accept(scene::CullVisitor& visitor) const
 {
     // perform CPU skinning
 	if (cpuSkinning)

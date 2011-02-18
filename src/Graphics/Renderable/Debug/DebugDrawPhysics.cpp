@@ -45,6 +45,7 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c)
             for (size_t i = 0; i<cShape.shapes.size(); ++i) {
                 mesh << transform(baseTransform * cShape.shapes[i].transform) << *cShape.shapes[i].shape;
             }
+            mesh << transform(baseTransform);
 
             break;
         }
@@ -63,46 +64,16 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b)
 
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& coneShape)
 {
-    const size_t num_cone_vertices = 20;
-
-    // make tip
-    DebugMesh coneMesh;
-    coneMesh.vertices.resize(num_cone_vertices);
-    coneMesh.indices.resize(num_cone_vertices * 6);
-
-    // make cap
-    coneMesh.vertices[0] = math::Vector3f(0.0f, float(coneShape.height) * 0.5f, 0.0f);
-    for (size_t i = 1; i<num_cone_vertices; ++i)
-    {
-        float angle = math::PI2 * float(i) / (num_cone_vertices - 1);
-        float x     = float(coneShape.radius) * cos(angle);
-        float z     = float(coneShape.radius) * sin(angle);
-
-        coneMesh.vertices[i] = math::Vector3f(x, -float(coneShape.height) * 0.5f, z);
-    }
-
-    for (size_t i = 1; i<num_cone_vertices; ++i)
-    {
-        coneMesh.indices[i*6]     = 0;
-        coneMesh.indices[i*6 + 1] = i;
-        coneMesh.indices[i*6 + 2] = i;
-        coneMesh.indices[i*6 + 3] = i+1;
-        coneMesh.indices[i*6 + 4] = i+1;
-        coneMesh.indices[i*6 + 5] = 0;
-    }
-    coneMesh.indices[num_cone_vertices * 6 - 3] = 1;
-    coneMesh.indices[num_cone_vertices * 6 - 2] = 1;
-
-    // make subset
-    coneMesh.pushPrimitive(sgl::LINES, num_cone_vertices * 6);
-
-    // dirty
-    return mesh << coneMesh;
+    return mesh << cone(coneShape.radius, coneShape.height, true);
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& cylShape)
 {
-    return mesh;
+    math::Matrix4f tr = mesh.transform;
+    if (cylShape.halfExtent.x != cylShape.halfExtent.z) {
+        mesh << transform( tr * math::make_scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.x) );
+    }
+    return mesh << cylinder(cylShape.halfExtent.x, cylShape.halfExtent.y * 2.0f, true) << transform(tr);
 }
 
 float getArcEnd(const physics::Motor& motor, float scale)

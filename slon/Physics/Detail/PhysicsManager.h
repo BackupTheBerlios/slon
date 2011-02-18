@@ -42,6 +42,7 @@ private:
 	dynamics_world_ptr  dynamicsWorld;
     const_timer_ptr     timer;
     delta_timer         deltaTimer;
+    real                unsimulatedTime;
     bool                realtime;
 
     // connections
