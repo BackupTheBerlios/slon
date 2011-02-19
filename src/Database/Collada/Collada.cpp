@@ -1524,7 +1524,7 @@ library_ptr ColladaLoader::load(std::istream& stream)
 	{
 		scene::group_ptr visualScene = visualBuilder.createVisualScene(*iter->second);
 		root->addChild(visualScene.get());
-		library->visualScenes.push_back( Library::key_visual_scene_pair(visualScene->getName(), visualScene) );
+        library->visualScenes.push_back( Library::key_visual_scene_pair(std::string(visualScene->getName()), visualScene) );
 	}
 
 #ifdef SLON_ENGINE_USE_PHYSICS				
