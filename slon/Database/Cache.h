@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_DATABASE_CACHE_H__
 #define __SLON_ENGINE_DATABASE_CACHE_H__
 
-#include "../Utility/unique_string.hpp"
+#include "../Utility/handle.hpp"
 #include "Loader.h"
 #include "Saver.h"
 #include <vector>
@@ -9,11 +9,8 @@
 namespace slon {
 namespace database {
 
-/** File format id. Each format has its string representation. Formats with equal
- * string representation are equal.
- * @see unique_string
- */
-typedef unique_string format_id;
+/** File format handle. */
+typedef handle format_id;
 
 /** Interface for accessing common objects in the storage. */
 template<typename T>
@@ -123,13 +120,12 @@ public:
      * has the lowest priority.
      * @see getAppropriateFormats
      */
-    virtual void registerFormat(format_id       format,
-                                string_array    pathExpr) = 0;
+    virtual format_id registerFormat(string_array pathExpr) = 0;
 
     /** Unregister item format. Function will not remove format loaders. */
     virtual void unregisterFormat(format_id format) = 0;
 
-    /** Remove all formats from the cache */
+    /** Remove all formats, savers and loaders from the cache. */
     virtual void clearFormats() = 0;
 
     /** Get all registered loaders. */
@@ -190,7 +186,7 @@ public:
 };
 
 template<typename T>
-const format_id Cache<T>::format_auto = format_id("*");
+const format_id Cache<T>::format_auto = format_id(0);
 
 } // namespace database
 } // namespace slon

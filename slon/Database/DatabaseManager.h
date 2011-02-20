@@ -118,8 +118,7 @@ public:
      * has the lowest priority.
      * @see getAppropriateFormats
      */
-    virtual void registerLibraryFormat(format_id       format,
-                                       string_array    pathExpr) = 0;
+    virtual format_id registerLibraryFormat(string_array pathExpr) = 0;
 
     /** Unregister library format. Function will not remove format loaders. */
     virtual void unregisterLibraryFormat(format_id format) = 0;

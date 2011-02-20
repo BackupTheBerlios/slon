@@ -23,7 +23,9 @@ public:
     key_effect_array        getEffects() const          { return effects; }
     key_texture_array       getTextures() const         { return textures; }
     key_visual_scene_array  getVisualScenes() const     { return visualScenes; }
+#ifdef SLON_ENGINE_USE_PHYSICS
     key_physics_scene_array getPhysicsScenes() const    { return physicsScenes; }
+#endif
 
 public:
 	key_animation_array		animations;

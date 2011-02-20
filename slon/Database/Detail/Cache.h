@@ -32,6 +32,9 @@ private:
     typedef typename base_type::loader_array        loader_array;
     typedef typename base_type::saver_array         saver_array;
 
+    typedef std::set<loader_ptr>                    loader_set;
+    typedef std::set<saver_ptr>                     saver_set;
+
     typedef prefix_tree<char, value_ptr>            storage_type;
 
 #if BOOST_VERSION < 104200 && __GNUC__
@@ -42,18 +45,19 @@ private:
 
     struct format_desc
     {
-        format_id       id;
-        regex_vector    pathExprs;
-        bool            haveAnyMatch;
+        Cache*       cache;
+        regex_vector pathExprs;
+        bool         haveAnyMatch;
+        loader_set   loaders;
+        saver_set    savers;
+
+        bool operator == (const format_desc& rhs) const { return this == &rhs; }
     };
 
-    typedef std::vector<format_desc>                format_desc_vector;
-    typedef std::map<format_id, loader_array>       format_loader_map;
-    typedef std::map<format_id, saver_array>        format_saver_map;
+    typedef std::list<format_desc>                  format_desc_list;
 
 private:
-    format_desc makeFormatDesc(format_id            id, 
-                               const string_array&  regexps);
+    format_desc* unwrap(format_id format) const;
     
     value_ptr loadImpl(const std::string& key,
                        const std::string& path, 
@@ -83,8 +87,7 @@ public:
 
     format_array getFormats() const;
     format_array getAppropriateFormats(const std::string& path) const;
-    void         registerFormat(format_id       format,
-                                string_array    pathExpr);
+    format_id    registerFormat(string_array pathExpr);
     void         unregisterFormat(format_id format);
     void         clearFormats();
 
@@ -103,11 +106,9 @@ public:
 	void         clearSavers();
 
 private:
-    log::Logger*        logger;
-    storage_type        storage;
-    format_desc_vector  formatDescs;
-    format_loader_map   formatLoaders;
-	format_saver_map	formatSavers;
+    log::Logger*                logger;
+    storage_type                storage;
+    mutable format_desc_list    formatDescs;
 };
 
 } // namespace detail

@@ -69,7 +69,7 @@ public:
 
     format_array getLibraryFormats() const										{ return libraryCache.getFormats(); }
     format_array getAppropriateLibraryFormats(const std::string& path) const	{ return libraryCache.getAppropriateFormats(path); }
-    void         registerLibraryFormat(format_id format, string_array pathExpr) { return libraryCache.registerFormat(format, pathExpr); }
+    format_id    registerLibraryFormat(string_array pathExpr)                   { return libraryCache.registerFormat(pathExpr); }
     void         unregisterLibraryFormat(format_id format)						{ libraryCache.unregisterFormat(format); }
     void         clearLibraryFormats()											{ libraryCache.clearFormats(); }
 
@@ -121,10 +121,9 @@ inline void registerLoaders(size_t numLoaders, fmt_loader<T>* loaders)
     database::Cache<T>& cache = currentCache<T>();
     for (size_t i = 0; i<numLoaders; ++i)
     {
-        format_id                fmtId(loaders[i].fmtName);
         std::vector<std::string> fmtExpr(loaders[i].fmtExpr, loaders[i].fmtExpr + loaders[i].numExpr);
         
-        cache.registerFormat(fmtId, fmtExpr);
+        format_id fmtId = cache.registerFormat(fmtId, fmtExpr);
         cache.registerLoader(fmtId, typename fmt_loader<T>::loader_ptr(loaders[i].fmtLoader));
     }
 }
@@ -135,10 +134,9 @@ inline void registerLoaders<database::Library>(size_t numLoaders, fmt_loader<dat
     database::DatabaseManager& dm = currentDatabaseManager();
     for (size_t i = 0; i<numLoaders; ++i)
     {
-        format_id                fmtId(loaders[i].fmtName);
         std::vector<std::string> fmtExpr(loaders[i].fmtExpr, loaders[i].fmtExpr + loaders[i].numExpr);
         
-        dm.registerLibraryFormat(fmtId, fmtExpr);
+        format_id fmtId = dm.registerLibraryFormat(fmtExpr);
         dm.registerLibraryLoader(fmtId, library_loader_ptr(loaders[i].fmtLoader));
     }
 }

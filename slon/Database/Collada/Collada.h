@@ -101,8 +101,6 @@ void collada_instance<ElementType>::serialize(ColladaDocument&  document,
     }
 }
 
-#ifdef SLON_ENGINE_USE_PHYSICS
-
 /** Loader of COLLADA files for DatabaseManager */
 class ColladaLoader :
     public LibraryLoader
@@ -111,8 +109,6 @@ public:
 	bool binary() const { return false; }
     library_ptr load(std::istream& stream);
 };
-
-#endif // SLON_ENGINE_USE_PHYSICS
 
 } // namespace database
 } // namespace slon

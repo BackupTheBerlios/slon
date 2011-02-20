@@ -3,7 +3,7 @@
 
 #include "../Log/Forward.h"
 #include "../Realm/Forward.h"
-#include "../Utility/unique_string.hpp"
+#include "../Utility/hash_string.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -51,7 +51,7 @@ private:
 
 public:
     Node();
-    explicit Node(unique_string name);
+    explicit Node(hash_string name);
 
     /** Get type of the node */
     virtual TYPE getNodeType() const { return NODE; }
@@ -87,10 +87,10 @@ public:
 	void* getUserPointer() { return userPointer; }
 
 	/** Set node name */
-	void setName(unique_string _name) { name = _name; }
+	void setName(hash_string _name) { name = _name; }
 
 	/** Get node name. */
-	unique_string getName() const { return name; }
+	hash_string getName() const { return name; }
 
 	/** Get object to which holds this node */
 	realm::Object* getObject() { return object; }
@@ -102,7 +102,7 @@ public:
 
 protected:
 	// node info
-	unique_string   name;
+	hash_string   name;
     Group*          parent;
 	Node*			left;
 	node_ptr		right;
@@ -116,7 +116,7 @@ protected:
  * @param name - name of the node to search
  * @return pointer to node if found, NULL otherwise
  */
-Node* findNamedNode(Node& root, unique_string name);
+Node* findNamedNode(Node& root, hash_string name);
 
 } // namespace scene
 } // namespace slon
