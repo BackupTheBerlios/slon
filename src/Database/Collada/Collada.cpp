@@ -11,14 +11,17 @@
 #include "Graphics/Renderable/SkinnedMesh.h"
 #include "Graphics/Renderable/StaticMesh.h"
 #include "Graphics/Effect/LightingEffect.h"
-#include "Physics/PhysicsManager.h"
-#include "Physics/PhysicsModel.h"
 #include "Scene/Skeleton.h"
 #include "Scene/Visitors/CullVisitor.h"
 #include "Scene/Visitors/DFSNodeVisitor.h"
 #include "Scene/Visitors/FilterVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/uri/file_uri.hpp"
+
+#ifdef SLON_ENGINE_USE_PHYSICS
+#   include "Physics/PhysicsManager.h"
+#   include "Physics/PhysicsModel.h"
+#endif
 
 __DEFINE_LOGGER__("database.COLLADA")
 
@@ -59,7 +62,7 @@ namespace {
         
         bool operator () (const scene::Node& node) const
         {
-            std::string node_id = node.getName();
+            std::string node_id = node.getName().str();
             size_t      sharp_i = node_id.find('#');
             if ( sharp_i != std::string::npos ) {
                 node_id = node_id.substr(0, sharp_i);
@@ -79,7 +82,7 @@ namespace {
         
         bool operator () (const scene::Node& node) const
         {
-            std::string node_sid = node.getName();
+            std::string node_sid = node.getName().str();
             size_t      sharp_i  = node_sid.find('#');
             if ( sharp_i != std::string::npos ) {
                 node_sid = node_sid.substr(sharp_i + 1);
@@ -95,7 +98,7 @@ namespace {
         public scene::FilterVisitor<scene::DFSNodeVisitor, scene::Joint, scene::MatrixTransform>
     {
     public:
-        find_transform_visitor(unique_string name_)
+        find_transform_visitor(hash_string name_)
         :   found(0)
         ,   name(name_)
         {}
@@ -107,8 +110,7 @@ namespace {
 
         void visit(scene::Joint& joint)
         {
-			std::string nstr(name);
-            find_by_id pr(nstr);
+            find_by_id pr(name.str());
             if ( pr(joint) ) {
                 found = &joint;
             }
@@ -121,8 +123,8 @@ namespace {
             }
         }
 
-        MatrixTransform*    found;
-        unique_string       name;
+        MatrixTransform*  found;
+        hash_string       name;
     };
 
 	class SceneBuilder
@@ -569,7 +571,7 @@ namespace {
             if (mesh)
             {
                 graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
-			    staticMesh->setName( unique_string(colladaMesh.name) );
+			    staticMesh->setName( hash_string(colladaMesh.name) );
 			    return staticMesh;
             }
             else 
@@ -593,7 +595,7 @@ namespace {
                     {
                         // create dummy node replacement
                         geometry = new scene::Node();
-                        geometry->setName( unique_string(mesh.name) );
+                        geometry->setName( hash_string(mesh.name) );
                     }
 					break;
 				}
@@ -649,7 +651,7 @@ namespace {
             if (node.type == collada_node::JOINT)
             {
                 Joint* joint = new Joint();
-                joint->setName( unique_string(node.id + "#" + node.sid) );
+                joint->setName( hash_string(node.id + "#" + node.sid) );
 				joint->setTransform(node.transform);
 
 			    // create hierarchy
@@ -676,7 +678,7 @@ namespace {
 				    transform->setTransform(node.transform);
 				    group = transform;
 			    }
-			    group->setName( unique_string(node.name) );
+			    group->setName( hash_string(node.name) );
 
 			    // attach entities
 				for (size_t i = 0; i<node.geometries.size(); ++i) {
@@ -883,7 +885,8 @@ namespace {
         mesh_map            meshMap;
         controller_vector   controllers;
 	};
-	
+
+#ifdef SLON_ENGINE_USE_PHYSICS
     class PhysicsSceneBuilder
     {
     public:
@@ -1158,6 +1161,7 @@ namespace {
         const ColladaDocument&  document;
         physics::DynamicsWorld& dynamicsWorld;
     };
+#endif // SLON_ENGINE_USE_PHYSICS
 
 	class ColladaSceneBuilder
 	{
@@ -1180,11 +1184,6 @@ namespace {
 
 			nodeIds.insert(id);
 			return id;
-		}
-
-		std::string getUniqueId(unique_string name)
-		{
-			return getUniqueId( std::string(name) );
 		}
 
 		const graphics::Mesh* getMesh(const scene::Geode* geode)
@@ -1310,7 +1309,7 @@ namespace {
 				const graphics::abstract_parameter_binding* parameter = 0;
 				collada_phong_technique_ptr					technique(new collada_phong_technique);
 				
-				parameter = lightingEffect->getParameter( unique_string("materialDiffuseSpecular") );
+				parameter = lightingEffect->getParameter( hash_string("materialDiffuseSpecular") );
 				if (const graphics::binding_vec4f* diffuseSpecular = graphics::cast_binding<math::Vector4f>(parameter) ) 
 				{					
 					technique->ambient.setColor(diffuseSpecular->value());
@@ -1319,17 +1318,17 @@ namespace {
 					technique->specular.setColor( math::Vector4f(1.0f, 1.0f, 1.0f, 1.0f) );
 				}
 				
-				parameter = lightingEffect->getParameter( unique_string("materialShininess") );
+				parameter = lightingEffect->getParameter( hash_string("materialShininess") );
 				if (const graphics::binding_float* shininess = graphics::cast_binding<float>(parameter) ) {					
 					technique->shininess = shininess->value();
 				}
 
-				parameter = lightingEffect->getParameter( unique_string("opacity") );
+				parameter = lightingEffect->getParameter( hash_string("opacity") );
 				if (const graphics::binding_float* opacity = graphics::cast_binding<float>(parameter) ) {					
 					technique->opacity = opacity->value();
 				}
 
-				parameter = lightingEffect->getParameter( unique_string("diffuseSpecularMap") );
+				parameter = lightingEffect->getParameter( hash_string("diffuseSpecularMap") );
 				if (const graphics::binding_tex_2d* diffuseSpecular = graphics::cast_binding<sgl::Texture2D>(parameter) ) 
 				{
 					/*
@@ -1396,14 +1395,14 @@ namespace {
 			collada_node_ptr cNode(new collada_node);
             if ( const scene::Entity* entity = dynamic_cast<const scene::Entity*>(node) )
             {
-				cNode->id   = getUniqueId( node->getName() ); 
-				cNode->name = node->getName();
+				cNode->id   = getUniqueId( node->getName().str() ); 
+				cNode->name = node->getName().str();
 				attachEntity(*cNode, entity);
             }
             else
             {
-				cNode->id   = getUniqueId( node->getName() ); 
-				cNode->name = node->getName();
+				cNode->id   = getUniqueId( node->getName().str() ); 
+				cNode->name = node->getName().str();
 
 				// setup transform
 				if ( const scene::Transform* transform = dynamic_cast<const scene::Transform*>(node) ) 
@@ -1524,7 +1523,7 @@ library_ptr ColladaLoader::load(std::istream& stream)
 	{
 		scene::group_ptr visualScene = visualBuilder.createVisualScene(*iter->second);
 		root->addChild(visualScene.get());
-        library->visualScenes.push_back( Library::key_visual_scene_pair(std::string(visualScene->getName()), visualScene) );
+        library->visualScenes.push_back( Library::key_visual_scene_pair(visualScene->getName().str(), visualScene) );
 	}
 
 #ifdef SLON_ENGINE_USE_PHYSICS				

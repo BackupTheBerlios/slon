@@ -12,7 +12,7 @@ __DEFINE_LOGGER__("graphics.SkyBoxEffect")
 
 namespace {
 
-    static const slon::unique_string OpaquePass = slon::unique_string("OpaquePass");
+    static const slon::hash_string OpaquePass = slon::hash_string("OpaquePass");
 
 } // anonymous namespace
 
@@ -92,8 +92,8 @@ void SkyBoxEffect::dirtyShaderTechniques()
 
 int SkyBoxEffect::present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes)
 {
-    if ( (renderGroup == detail::ForwardRenderer::mainGroupHandle() && renderPass == detail::ForwardRenderer::opaquePassHandle())
-         || (renderGroup == detail::FixedPipelineRenderer::mainGroupHandle() && renderPass == detail::FixedPipelineRenderer::opaquePassHandle()) )
+    if ( (renderGroup == detail::ForwardRenderer::RG_MAIN && renderPass == detail::ForwardRenderer::RP_OPAQUE)
+         || (renderGroup == detail::FixedPipelineRenderer::RG_MAIN && renderPass == detail::FixedPipelineRenderer::RP_OPAQUE) )
     {
         if (myProjectionMatrixBinder)
         {

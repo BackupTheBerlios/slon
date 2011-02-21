@@ -177,13 +177,13 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
                                ++iter)
     {
         graphics::Effect* effect = (*iter)->getEffect();
-        effect->bindParameter(unique_string("worldMatrix"), worldMatrixBinder.get());
+        effect->bindParameter(hash_string("worldMatrix"), worldMatrixBinder.get());
 
 		// bind dummy binders just to test effect to support skinning
 		if ( !cpuSkinning 
-             && !effect->bindParameter(unique_string("boneMatrices"), dummyMatrixBinder.get()) 
-             && (!effect->bindParameter(unique_string("boneRotations"), dummyVec4Binder.get())
-                 || !effect->bindParameter(unique_string("boneTranslations"), dummyVec3Binder.get())) )
+             && !effect->bindParameter(hash_string("boneMatrices"), dummyMatrixBinder.get()) 
+             && (!effect->bindParameter(hash_string("boneRotations"), dummyVec4Binder.get())
+                 || !effect->bindParameter(hash_string("boneTranslations"), dummyVec3Binder.get())) )
 		{
 			// toggle to CPU skinning
 			cpuSkinning = true;
@@ -191,9 +191,9 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 									   j != iter;
 									   ++j)
 			{
-				(*j)->getEffect()->bindParameter(unique_string("boneMatrices"), 0);
-				(*j)->getEffect()->bindParameter(unique_string("boneRotations"), 0);
-				(*j)->getEffect()->bindParameter(unique_string("boneTranslations"), 0);
+				(*j)->getEffect()->bindParameter(hash_string("boneMatrices"), 0);
+				(*j)->getEffect()->bindParameter(hash_string("boneRotations"), 0);
+				(*j)->getEffect()->bindParameter(hash_string("boneTranslations"), 0);
 			}
 
 			break;
@@ -498,7 +498,7 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
 									   ++iter)
 			{
                 graphics::Effect* effect = (*iter)->getEffect();
-				if ( !effect->bindParameter(unique_string("boneMatrices"), boneMatricesBinder.get()) )
+				if ( !effect->bindParameter(hash_string("boneMatrices"), boneMatricesBinder.get()) )
                 {
                     if ( boneRotations.empty() ) 
                     {
@@ -512,8 +512,8 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
                         boneTranslationsBinder.reset( new parameter_binding<math::Vector3f>(&boneTranslations[0], boneTranslations.size(), true) );
                     }
 
-                    effect->bindParameter(unique_string("boneRotations"), boneRotationsBinder.get());
-                    effect->bindParameter(unique_string("boneTranslations"), boneTranslationsBinder.get());
+                    effect->bindParameter(hash_string("boneRotations"), boneRotationsBinder.get());
+                    effect->bindParameter(hash_string("boneTranslations"), boneTranslationsBinder.get());
                 }
 			}
 		}

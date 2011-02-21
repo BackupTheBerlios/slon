@@ -10,7 +10,7 @@ AttributeTable::AttributeTable()
     std::fill(bindings, bindings + MAX_NUM_ATTRIBUTES, (binding*)0);
 }
 
-AttributeTable::binding_ptr AttributeTable::queryAttribute(unique_string name)
+AttributeTable::binding_ptr AttributeTable::queryAttribute(hash_string name)
 {
     // find attribute
     for (int i = 0; i<MAX_NUM_ATTRIBUTES; ++i)

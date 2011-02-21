@@ -136,13 +136,13 @@ namespace detail {
 
 ForwardRenderer::camera_params::camera_params(detail::ParameterTable& parameterTable)
 {
-    normalMatrixBinder          = parameterTable.addParameterBinding( unique_string("normalMatrix"), &normalMatrix, 1, false);
-    viewMatrixBinder            = parameterTable.addParameterBinding( unique_string("viewMatrix"), &viewMatrix, 1, false);
-    invViewMatrixBinder         = parameterTable.addParameterBinding( unique_string("invViewMatrix"), &invViewMatrix, 1, false);
-    projectionMatrixBinder      = parameterTable.addParameterBinding( unique_string("projectionMatrix"), &projectionMatrix, 1, false);
-    invProjectionMatrixBinder   = parameterTable.addParameterBinding( unique_string("invProjectionMatrix"), &invProjectionMatrix, 1, false);
-    depthParamsBinder           = parameterTable.addParameterBinding( unique_string("depthParams"), &depthParams, 1, false);
-    eyePositionBinder           = parameterTable.addParameterBinding( unique_string("eyePosition"), &eyePosition, 1, false);
+    normalMatrixBinder          = parameterTable.addParameterBinding( hash_string("normalMatrix"), &normalMatrix, 1, false);
+    viewMatrixBinder            = parameterTable.addParameterBinding( hash_string("viewMatrix"), &viewMatrix, 1, false);
+    invViewMatrixBinder         = parameterTable.addParameterBinding( hash_string("invViewMatrix"), &invViewMatrix, 1, false);
+    projectionMatrixBinder      = parameterTable.addParameterBinding( hash_string("projectionMatrix"), &projectionMatrix, 1, false);
+    invProjectionMatrixBinder   = parameterTable.addParameterBinding( hash_string("invProjectionMatrix"), &invProjectionMatrix, 1, false);
+    depthParamsBinder           = parameterTable.addParameterBinding( hash_string("depthParams"), &depthParams, 1, false);
+    eyePositionBinder           = parameterTable.addParameterBinding( hash_string("eyePosition"), &eyePosition, 1, false);
 }
 
 void ForwardRenderer::camera_params::setup(const scene::Camera& camera)
@@ -164,12 +164,12 @@ ForwardRenderer::light_params::light_params(detail::ParameterTable& parameterTab
     lightPositionRadius(new math::Vector4f[maxLightCount]),
     lightColorIntensity(new math::Vector4f[maxLightCount])
 {
-    lightCountBinder                = parameterTable.addParameterBinding( unique_string("lightCount"), &lightCount, 1, false);
-    lightViewDirectionAmbientBinder = parameterTable.addParameterBinding( unique_string("lightViewDirectionAmbient"),lightViewDirectionAmbient.get(), maxLightCount, false);
-    lightViewPositionRadiusBinder   = parameterTable.addParameterBinding( unique_string("lightViewPositionRadius"), lightViewPositionRadius.get(), maxLightCount, false);
-    lightDirectionAmbientBinder     = parameterTable.addParameterBinding( unique_string("lightDirectionAmbient"),lightDirectionAmbient.get(), maxLightCount, false);
-    lightPositionRadiusBinder       = parameterTable.addParameterBinding( unique_string("lightPositionRadius"), lightPositionRadius.get(), maxLightCount, false);
-    lightColorIntensityBinder       = parameterTable.addParameterBinding( unique_string("lightColorIntensity"), lightColorIntensity.get(), maxLightCount, false);
+    lightCountBinder                = parameterTable.addParameterBinding( hash_string("lightCount"), &lightCount, 1, false);
+    lightViewDirectionAmbientBinder = parameterTable.addParameterBinding( hash_string("lightViewDirectionAmbient"),lightViewDirectionAmbient.get(), maxLightCount, false);
+    lightViewPositionRadiusBinder   = parameterTable.addParameterBinding( hash_string("lightViewPositionRadius"), lightViewPositionRadius.get(), maxLightCount, false);
+    lightDirectionAmbientBinder     = parameterTable.addParameterBinding( hash_string("lightDirectionAmbient"),lightDirectionAmbient.get(), maxLightCount, false);
+    lightPositionRadiusBinder       = parameterTable.addParameterBinding( hash_string("lightPositionRadius"), lightPositionRadius.get(), maxLightCount, false);
+    lightColorIntensityBinder       = parameterTable.addParameterBinding( hash_string("lightColorIntensity"), lightColorIntensity.get(), maxLightCount, false);
 }
 
 void ForwardRenderer::light_params::setup_directional(const scene::Camera& camera,
@@ -247,9 +247,9 @@ void ForwardRenderer::init()
 
 
         // create rest parameters
-        inputMapBinder = parameterTable.addParameterBinding<sgl::Texture2D>( unique_string("inputMap"), 0, 1, false);
+        inputMapBinder = parameterTable.addParameterBinding<sgl::Texture2D>( hash_string("inputMap"), 0, 1, false);
         if (desc.makeDepthMap) {
-            depthMapBinder = parameterTable.addParameterBinding<sgl::Texture2D>( unique_string("depthMap"), 0, 1, false);
+            depthMapBinder = parameterTable.addParameterBinding<sgl::Texture2D>( hash_string("depthMap"), 0, 1, false);
         }
     }
 
@@ -268,11 +268,11 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
     preRenderSignal(camera);
 
     // get reflect pass resources
-    render_group_handle renderGroup = mainGroupHandle();
+    render_group_handle renderGroup = RG_MAIN;
     sgl::Texture2D* reflectRT = 0;
     if ( const scene::ReflectCamera* reflectCamera = dynamic_cast<const scene::ReflectCamera*>(&camera) )
     {
-        renderGroup = reflectGroupHandle();
+        renderGroup = RG_REFLECT;
         reflectRT   = static_cast<sgl::Texture2D*>( reflectCamera->getRenderTarget()->ColorAttachment(0) );
     }
 
@@ -350,7 +350,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                     device->Clear(false, true, false);
                 }
 
-                render_pass( renderGroup, depthPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                render_pass( renderGroup, RP_DEPTH, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
 
                 // setup input textures
                 if (desc.makeDepthMap && depthMapBinder && renderTarget) {
@@ -385,17 +385,17 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                         {
                         case scene::Light::DIRECTIONAL:
                             lightParams->setup_directional(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, directionalLightingPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_DIRECTIONAL_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
                             break;
                                                 
                         case scene::Light::POINT:
                             lightParams->setup_point(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, pointLightingPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_POINT_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
                             break;
 
                         case scene::Light::SPOT:
                             //lightParams->setup(lightIter, lightIterEnd);
-                            render_pass( renderGroup, spotLightingPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_SPOT_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
                             break;
 
                         default:
@@ -412,10 +412,10 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
             }
 
             // render non lightened objects
-            render_pass( renderGroup, opaquePassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+            render_pass( renderGroup, RP_OPAQUE, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
 
             if (desc.useDebugRender) {
-                render_pass( renderGroup, debugPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                render_pass( renderGroup, RP_DEBUG, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
             }
         }
 
@@ -508,54 +508,6 @@ long long ForwardRenderer::makePriority(RENDER_BIN bin, const void* programPtr)
     long long priority = (long)bin << (sizeof(long) / 8)
                        | (long)programPtr;
     return priority;
-}
-
-inline render_group_handle ForwardRenderer::mainGroupHandle()
-{
-    static render_group_handle handle("Main");
-    return handle;
-}
-
-inline render_group_handle ForwardRenderer::reflectGroupHandle()
-{
-    static render_group_handle handle("Reflect");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::depthPassHandle()
-{
-    static render_pass_handle handle("DepthPass");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::opaquePassHandle()
-{
-    static render_pass_handle handle("OpaquePass");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::directionalLightingPassHandle()
-{
-    static render_pass_handle handle("DirectionalLightingPass");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::pointLightingPassHandle()
-{
-    static render_pass_handle handle("PointLightingPass");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::spotLightingPassHandle()
-{
-    static render_pass_handle handle("SpotLightingPass");
-    return handle;
-}
-
-render_pass_handle ForwardRenderer::debugPassHandle()
-{
-    static render_pass_handle handle("DebugPass");
-    return handle;
 }
 
 } // namespace detail

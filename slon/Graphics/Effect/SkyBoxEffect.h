@@ -15,7 +15,7 @@ public:
 
     // override Effect
     int     present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
-    int     queryAttribute(unique_string /*name*/) { return -1; }
+    int     queryAttribute(hash_string /*name*/) { return -1; }
 
     /** Setup cubemap of the skyBox */
     void setEnvironmentMap(sgl::TextureCube* _environmentMap);

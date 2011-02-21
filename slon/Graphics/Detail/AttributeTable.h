@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_ATTRIBUTE_TABLE_H__
 
 #include "../../Utility/referenced.hpp"
-#include "../../Utility/unique_string.hpp"
+#include "../../Utility/hash_string.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
 
@@ -28,7 +28,7 @@ public:
     {
     friend class AttributeTable;
     private:
-        binding(unique_string       _name,
+        binding(hash_string       _name,
                 unsigned            _index,
                 AttributeTable*     _table) :
             name(_name),
@@ -45,7 +45,7 @@ public:
         }
 
     public:
-        const unique_string name;
+        const hash_string name;
         const unsigned      index;
 
     private:
@@ -60,7 +60,7 @@ public:
      * Otherwise make attribute with unused index. You must keep requested attribute
      * all time you are using it.
      */
-    binding_ptr queryAttribute(unique_string name);
+    binding_ptr queryAttribute(hash_string name);
 
 private:
     /** Remove attribute from the table. It is called in the attribute destructor. */

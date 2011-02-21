@@ -6,7 +6,7 @@ __DEFINE_LOGGER__("slon.db.DatabaseManager")
 namespace slon {
 namespace database {
 
-const format_id DatabaseManager::library_format_auto = format_id("*");
+const format_id DatabaseManager::library_format_auto = format_id(0);
     
 namespace detail {
 

@@ -15,8 +15,8 @@ TransformEffect::TransformEffect()
 {
     // query parameters
     detail::ParameterTable& parameterTable = detail::currentParameterTable();
-    viewMatrixBinder                       = parameterTable.getParameterBinding<math::Matrix4f>( unique_string("viewMatrix") );
-    projectionMatrixBinder                 = parameterTable.getParameterBinding<math::Matrix4f>( unique_string("projectionMatrix") );
+    viewMatrixBinder                       = parameterTable.getParameterBinding<math::Matrix4f>("viewMatrix");
+    projectionMatrixBinder                 = parameterTable.getParameterBinding<math::Matrix4f>("projectionMatrix");
 
     // create binders
     worldViewMatrixBinder.reset( new parameter_binding<math::Matrix4f>(&worldViewMatrix, 1, false) );
@@ -109,13 +109,13 @@ int TransformEffect::present(render_group_handle renderGroup, render_pass_handle
 		dirty();
 	}
 
-    if ( renderPass == detail::ForwardRenderer::depthPassHandle() )
+    if ( renderPass == detail::ForwardRenderer::RP_DEPTH)
     {
         // prepare values for uniforms
         worldViewProjMatrixBinder->write_value( projectionMatrixBinder->value() * viewMatrixBinder->value() * worldMatrixBinder->value() );
 
         // get pass
-        if ( renderGroup == detail::ForwardRenderer::reflectGroupHandle() ) {
+        if ( renderGroup == detail::ForwardRenderer::RG_REFLECT ) {
             passes[0] = backFaceDepthPass.get();
         }
         else {
@@ -127,43 +127,43 @@ int TransformEffect::present(render_group_handle renderGroup, render_pass_handle
     return 0;
 }
 
-const abstract_parameter_binding* TransformEffect::getParameter(unique_string name) const
+const abstract_parameter_binding* TransformEffect::getParameter(hash_string name) const
 {
-    if ( name == unique_string("worldMatrix") ) {
+    if ( name == hash_string("worldMatrix") ) {
         return worldMatrixBinder.get();
     }
-    else if ( name == unique_string("boneRotations") ) {
+    else if ( name == hash_string("boneRotations") ) {
         return boneRotationsBinder.get();
     }
-    else if ( name == unique_string("boneTranslations") ) {
+    else if ( name == hash_string("boneTranslations") ) {
         return boneTranslationsBinder.get();
     }
 
     return 0;
 }
 
-bool TransformEffect::bindParameter(unique_string                        name,
+bool TransformEffect::bindParameter(hash_string                        name,
                                     const abstract_parameter_binding*    binding)
 {
-    if ( name == unique_string("worldMatrix") && (worldMatrixBinder = cast_binding<math::Matrix4f>(binding)) ) {
+    if ( name == hash_string("worldMatrix") && (worldMatrixBinder = cast_binding<math::Matrix4f>(binding)) ) {
         return true;
     }
 
 	if ( currentRenderer()->getRenderTechnique() != Renderer::FIXED_PIPELINE )
 	{
         /*
-		if ( name == unique_string("boneMatrices") && (boneMatricesBinder = cast_binding<math::Matrix4f>(binding)) ) 
+		if ( name == hash_string("boneMatrices") && (boneMatricesBinder = cast_binding<math::Matrix4f>(binding)) ) 
 		{
 			isDirty = true;
 			return true;
 		}
         */
-		if ( name == unique_string("boneRotations") && (boneRotationsBinder = cast_binding<math::Vector4f>(binding)) ) 
+		if ( name == hash_string("boneRotations") && (boneRotationsBinder = cast_binding<math::Vector4f>(binding)) ) 
 		{
 			isDirty = true;
 			return true;
 		}
-        else if ( name == unique_string("boneTranslations") && (boneTranslationsBinder = cast_binding<math::Vector3f>(binding)) ) 
+        else if ( name == hash_string("boneTranslations") && (boneTranslationsBinder = cast_binding<math::Vector3f>(binding)) ) 
         {
 			isDirty = true;
 			return true;
@@ -173,7 +173,7 @@ bool TransformEffect::bindParameter(unique_string                        name,
     return false;
 }
 
-int TransformEffect::queryAttribute(unique_string name)
+int TransformEffect::queryAttribute(hash_string name)
 {
     return detail::currentAttributeTable().queryAttribute(name)->index;
 }

@@ -34,7 +34,7 @@ DebugMesh::DebugMesh() :
     }
     else
     {
-        detail::AttributeTable::binding_ptr positionBinding = detail::currentAttributeTable().queryAttribute( unique_string("position") );
+        detail::AttributeTable::binding_ptr positionBinding = detail::currentAttributeTable().queryAttribute( hash_string("position") );
 
         sgl::VertexLayout::ELEMENT elements[] = 
         {
@@ -138,7 +138,7 @@ void DebugMesh::pushPrimitive( sgl::PRIMITIVE_TYPE primType,
 				s.debugEffect.reset( new DebugEffect(desc) );
 			}
         }
-        s.debugEffect->bindParameter( unique_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&baseTransform, 1) );
+        s.debugEffect->bindParameter( hash_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&baseTransform, 1) );
         s.debugMesh     = this;
         s.transform     = transform;
         s.primitiveType = primType;

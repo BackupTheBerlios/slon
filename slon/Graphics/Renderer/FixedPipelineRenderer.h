@@ -31,6 +31,19 @@ class ParameterTable;
 class FixedPipelineRenderer :
 	public Renderer
 {
+public:
+	enum RENDER_GROUP
+	{
+		RG_MAIN
+	};
+
+	enum RENDER_PASS
+	{
+		RP_OPAQUE,
+		RP_LIGHTING,
+		RP_DEBUG
+	};
+
 private:
     typedef scene::CullVisitor::light_iterator              light_iterator;
     typedef scene::CullVisitor::light_const_iterator        light_const_iterator;
@@ -118,18 +131,6 @@ public:
     void                handleLight(const scene::Light* light) const;
     RENDER_TECHNIQUE    getRenderTechnique() const { return FIXED_PIPELINE; }
     void                render(realm::World& world, const scene::Camera& mainCamera) const;
-
-    /** Get handle of the opaque pass */
-    static render_group_handle mainGroupHandle();
-
-    /** Get handle of the opaque pass */
-    static render_pass_handle opaquePassHandle();
-
-    /** Get handle of the lighting pass */
-    static render_pass_handle lightingPassHandle();
-
-    /** Get handle of the debug pass */
-    static render_pass_handle debugPassHandle();
 
     virtual ~FixedPipelineRenderer() {}
 

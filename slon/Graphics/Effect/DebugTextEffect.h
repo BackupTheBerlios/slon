@@ -39,9 +39,9 @@ public:
 
     // Override Effect
     int                               present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
-    int                               queryAttribute(unique_string /*name*/) { return -1; }
-    const abstract_parameter_binding* getParameter(unique_string /*name*/) const { return 0; }
-    bool                              bindParameter(unique_string                        /*name*/,
+    int                               queryAttribute(hash_string /*name*/) { return -1; }
+    const abstract_parameter_binding* getParameter(hash_string /*name*/) const { return 0; }
+    bool                              bindParameter(hash_string                        /*name*/,
                                                     const abstract_parameter_binding*    /*binding*/) { return false; }
 
 private:

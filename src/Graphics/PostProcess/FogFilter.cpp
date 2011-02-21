@@ -52,10 +52,10 @@ FogFilter::FogFilter() :
     // require params
     detail::ParameterTable& parameterTable = detail::currentParameterTable();
 
-    inputMapBinder                 = parameterTable.getParameterBinding<sgl::Texture2D>( unique_string("inputMap") );
-    depthMapBinder                 = parameterTable.getParameterBinding<sgl::Texture2D>( unique_string("depthMap") );
-    projectionMatrixInverseBinder  = parameterTable.getParameterBinding<math::Matrix4f>( unique_string("invProjectionMatrix") );
-    normalMatrixBinder             = parameterTable.getParameterBinding<math::Matrix3f>( unique_string("normalMatrix") );
+    inputMapBinder                 = parameterTable.getParameterBinding<sgl::Texture2D>( hash_string("inputMap") );
+    depthMapBinder                 = parameterTable.getParameterBinding<sgl::Texture2D>( hash_string("depthMap") );
+    projectionMatrixInverseBinder  = parameterTable.getParameterBinding<math::Matrix4f>( hash_string("invProjectionMatrix") );
+    normalMatrixBinder             = parameterTable.getParameterBinding<math::Matrix3f>( hash_string("normalMatrix") );
 
     assert(inputMapBinder);
     assert(depthMapBinder);

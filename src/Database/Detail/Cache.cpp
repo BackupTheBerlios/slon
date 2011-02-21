@@ -17,24 +17,17 @@ namespace database {
 namespace detail {
 
 template<typename T>
-typename Cache<T>::format_desc Cache<T>::makeFormatDesc(format_id id, const string_array& regexps)
+typename Cache<T>::format_desc* Cache<T>::unwrap(format_id format) const
 {
-    format_desc desc;
-    desc.id = id;
-    desc.haveAnyMatch = false;
-    
-    boost::xpressive::sregex_compiler compiler;
-    for (size_t i = 0; i<regexps.size(); ++i)
+    if (format.pObj)
     {
-        if (regexps[i] == "*") {
-            desc.haveAnyMatch = true;
-        }
-        else {
-            desc.pathExprs.push_back( compiler.compile(regexps[i]) );
+        format_desc* fdesc = reinterpret_cast<format_desc*>(format.pObj);
+        if (fdesc->cache == this) {
+            return fdesc;
         }
     }
 
-    return desc;
+    return 0;
 }
 
 template<typename T>
@@ -134,21 +127,29 @@ typename Cache<T>::value_ptr Cache<T>::load(const std::string& key,
         format_array formats = getAppropriateFormats(path);
         for (size_t i = 0; i<formats.size(); ++i)
         {
-            loader_array loaders = getAppropriateLoaders(formats[i]);
-            for (size_t j = 0; j<loaders.size(); ++j)
+            format_desc* fdesc = unwrap(formats[i]);
+            for (loader_set::iterator loaderIt  = fdesc->loaders.begin();
+                                      loaderIt != fdesc->loaders.end();
+                                      ++loaderIt)
             {
-                if ( (value = loadImpl(key, path, *loaders[j])) ) {
+                if ( (value = loadImpl(key, path, **loaderIt)) ) {
                     return value;
                 }
             }
         }
     }
     else 
-    {
-        loader_array loaders = getAppropriateLoaders(format);
-        for (size_t j = 0; j<loaders.size(); ++j)
+    {    
+        format_desc* fdesc = unwrap(format);
+        if (!fdesc) {
+            return value;
+        }
+
+        for (loader_set::iterator loaderIt  = fdesc->loaders.begin();
+                                  loaderIt != fdesc->loaders.end();
+                                  ++loaderIt)
         {
-            if ( (value = loadImpl(key, path, *loaders[j])) ) {
+            if ( (value = loadImpl(key, path, **loaderIt)) ) {
                 return value;
             }
         }
@@ -172,11 +173,14 @@ void Cache<T>::clear()
 template<typename T>
 typename Cache<T>::format_array Cache<T>::getFormats() const
 {
-    format_array formats( formatDescs.size() );
-    std::transform( formatDescs.begin(), 
-                    formatDescs.end(),
-                    formats.begin(),
-                    boost::bind(&format_desc::id, _1) );
+    format_array formats;
+    for (format_desc_list::iterator iter  = formatDescs.begin();
+                                    iter != formatDescs.end();
+                                    ++iter)
+    {
+        formats.push_back( format_id(&*iter) );
+    }
+
     return formats;
 }
 
@@ -186,16 +190,19 @@ typename Cache<T>::format_array Cache<T>::getAppropriateFormats(const std::strin
     using namespace boost::xpressive;
 
     std::vector<format_array> formats;
-    for (size_t i = 0; i<formatDescs.size(); ++i)
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
     {
-        for (size_t j = 0; j<formatDescs[i].pathExprs.size(); ++j)
+        format_desc& fdesc = *fIt;
+        for (size_t j = 0; j<fdesc.pathExprs.size(); ++j)
         {
-            if ( regex_match(path, formatDescs[i].pathExprs[j]) )
+            if ( regex_match(path, fdesc.pathExprs[j]) )
             {
                 if (formats.size() < j + 1) {
                     formats.resize(j + 1);
                 }
-                formats[j].push_back(formatDescs[i].id);
+                formats[j].push_back( format_id(&fdesc) );
             }
         }
     }
@@ -213,25 +220,34 @@ typename Cache<T>::format_array Cache<T>::getAppropriateFormats(const std::strin
 }
 
 template<typename T>
-void Cache<T>::registerFormat(format_id       format,
-                              string_array    pathExpr)
+format_id Cache<T>::registerFormat(string_array pathExpr)
 {
-    for (size_t i = 0; i<formatDescs.size(); ++i)
+    format_desc desc;
+    desc.cache = this;
+    desc.haveAnyMatch = false;
+    
+    boost::xpressive::sregex_compiler compiler;
+    for (size_t i = 0; i<pathExpr.size(); ++i)
     {
-        if (formatDescs[i].id == format) 
-        {
-            formatDescs[i] = makeFormatDesc(format, pathExpr);
-            return;
+        if (pathExpr[i] == "*") {
+            desc.haveAnyMatch = true;
+        }
+        else {
+            desc.pathExprs.push_back( compiler.compile(pathExpr[i]) );
         }
     }
 
-    formatDescs.push_back( makeFormatDesc(format, pathExpr) );
+    formatDescs.push_back(desc);
+    return format_id( &formatDescs.back() );
 }
 
 template<typename T>
 void Cache<T>::unregisterFormat(format_id format)
 {
-    quick_remove_if(formatDescs, boost::bind(&format_desc::id, _1) == format);
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        formatDescs.remove(*fdesc);    
+    }
 }
 
 template<typename T>
@@ -243,23 +259,23 @@ void Cache<T>::clearFormats()
 template<typename T>
 typename Cache<T>::loader_array Cache<T>::getLoaders() const
 {
-    loader_array loaders;
-    for (typename format_loader_map::const_iterator iter  = formatLoaders.begin();
-                                                    iter != formatLoaders.end();
-                                                    ++iter)
+    loader_set loaderSet;
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
     {
-        std::copy( iter->second.begin(), iter->second.end(), std::back_inserter(loaders) );
+        std::copy( fIt->loaders.begin(), fIt->loaders.end(), std::inserter(loaderSet, loaderSet.begin()) );
     }
 
-    return loaders;
+    return loader_array(loaderSet.begin(), loaderSet.end() );
 }
 
 template<typename T>
 typename Cache<T>::loader_array Cache<T>::getAppropriateLoaders(format_id format) const
 {
-    typename format_loader_map::const_iterator iter = formatLoaders.find(format);
-    if ( iter != formatLoaders.end() ) {
-        return iter->second;
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        return loader_array(fdesc->loaders.begin(), fdesc->loaders.end());
     }
 
     return loader_array();
@@ -268,28 +284,18 @@ typename Cache<T>::loader_array Cache<T>::getAppropriateLoaders(format_id format
 template<typename T>
 void Cache<T>::registerLoader(format_id format, const loader_ptr& loader)
 {
-    typename format_loader_map::iterator iter = formatLoaders.find(format);
-    if ( iter != formatLoaders.end() )
-    {
-        typename loader_array::iterator it = std::find(iter->second.begin(), iter->second.end(), loader);
-        if ( it == iter->second.end() ) {
-            iter->second.push_back(loader);
-        }
-    }
-    else 
-    {
-        loader_array loaders;
-        loaders.push_back(loader);
-        formatLoaders.insert( typename format_loader_map::value_type(format, loaders) );
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        fdesc->loaders.insert(loader);
     }
 }
 
 template<typename T>
 void Cache<T>::unregisterLoader(format_id format, loader_type* loader)
 {
-    typename format_loader_map::iterator iter = formatLoaders.find(format);
-    if ( iter != formatLoaders.end() ) {
-        quick_remove( iter->second, loader_ptr(loader) );
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        fdesc->loaders.erase(loader_ptr(loader));
     }
 }
 
@@ -297,11 +303,11 @@ template<typename T>
 size_t Cache<T>::unregisterLoader(loader_type* loader)
 {
     size_t count = 0;
-    for (typename format_loader_map::iterator iter  = formatLoaders.begin();
-                                              iter != formatLoaders.end();
-                                              ++iter)
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
     {
-        count += quick_remove( iter->second, loader_ptr(loader) );
+        count += fIt->loaders.erase(loader_ptr(loader));
     }
 
     return count;
@@ -310,29 +316,34 @@ size_t Cache<T>::unregisterLoader(loader_type* loader)
 template<typename T>
 void Cache<T>::clearLoaders()
 {
-    formatLoaders.clear();
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
+    {
+        fIt->loaders.clear();
+    }
 }
 
 template<typename T>
 typename Cache<T>::saver_array Cache<T>::getSavers() const
 {
-    saver_array savers;
-    for (typename format_saver_map::const_iterator iter  = formatSavers.begin();
-                                                   iter != formatSavers.end();
-                                                   ++iter)
+    saver_set saverSet;
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
     {
-        std::copy( iter->second.begin(), iter->second.end(), std::back_inserter(savers) );
+        std::copy( fIt->savers.begin(), fIt->savers.end(), std::inserter(saverSet, saverSet.begin()) );
     }
 
-    return savers;
+    return saver_array(saverSet.begin(), saverSet.end());
 }
 
 template<typename T>
 typename Cache<T>::saver_array Cache<T>::getAppropriateSavers(format_id format) const
 {
-    typename format_saver_map::const_iterator iter = formatSavers.find(format);
-    if ( iter != formatSavers.end() ) {
-        return iter->second;
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        return saver_array(fdesc->savers.begin(), fdesc->savers.end());
     }
 
     return saver_array();
@@ -341,28 +352,18 @@ typename Cache<T>::saver_array Cache<T>::getAppropriateSavers(format_id format) 
 template<typename T>
 void Cache<T>::registerSaver(format_id format, const saver_ptr& saver)
 {
-    typename format_saver_map::iterator iter = formatSavers.find(format);
-    if ( iter != formatSavers.end() )
-    {
-        typename saver_array::iterator it = std::find(iter->second.begin(), iter->second.end(), saver);
-        if ( it == iter->second.end() ) {
-            iter->second.push_back(*it);
-        }
-    }
-    else 
-    {
-        saver_array savers;
-        savers.push_back(saver);
-        formatSavers.insert( typename format_saver_map::value_type(format, savers) );
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        fdesc->savers.insert(saver);
     }
 }
 
 template<typename T>
 void Cache<T>::unregisterSaver(format_id format, saver_type* saver)
 {
-    typename format_saver_map::iterator iter = formatSavers.find(format);
-    if ( iter != formatSavers.end() ) {
-        quick_remove( iter->second, saver_ptr(saver) );
+    format_desc* fdesc = unwrap(format);
+    if (fdesc) {
+        fdesc->savers.erase(saver_ptr(saver));
     }
 }
 
@@ -370,11 +371,11 @@ template<typename T>
 size_t Cache<T>::unregisterSaver(saver_type* saver)
 {
     size_t count = 0;
-    for (typename format_saver_map::iterator iter  = formatSavers.begin();
-                                             iter != formatSavers.end();
-                                             ++iter)
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
     {
-        count += quick_remove( iter->second, saver_ptr(saver) );
+        count += fIt->savers.erase(saver_ptr(saver));
     }
 
     return count;
@@ -383,7 +384,12 @@ size_t Cache<T>::unregisterSaver(saver_type* saver)
 template<typename T>
 void Cache<T>::clearSavers()
 {
-    formatSavers.clear();
+    for (format_desc_list::iterator fIt  = formatDescs.begin();
+                                    fIt != formatDescs.end();
+                                    ++fIt)
+    {
+        fIt->savers.clear();
+    }
 }
 
 template class Cache<database::Library>;

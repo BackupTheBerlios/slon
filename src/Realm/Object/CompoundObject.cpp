@@ -181,7 +181,7 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                                                    ++iter)
             {
                 // insert rigid body into scene graph
-                scene::node_ptr targetNode( findNamedNode( *root, unique_string((*iter)->getTarget()) ) );
+                scene::node_ptr targetNode( findNamedNode( *root, hash_string((*iter)->getTarget()) ) );
                 if (targetNode)
                 {
                     physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();

@@ -13,7 +13,7 @@ Node::Node()
 ,	object(0)
 {}
 
-Node::Node(unique_string name_)
+Node::Node(hash_string name_)
 :	name(name_)
 ,	parent(0)
 ,	left(0)
@@ -35,7 +35,7 @@ void Node::accept(log::LogVisitor& visitor) const
     }
 }
 
-Node* findNamedNode(Node& root, unique_string name)
+Node* findNamedNode(Node& root, hash_string name)
 {
     if ( root.getName() == name ) {
         return &root;

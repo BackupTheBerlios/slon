@@ -32,7 +32,7 @@ public:
 
     // Override Effect
     int     present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
-    int     queryAttribute(unique_string /*name*/) { return -1; }
+    int     queryAttribute(hash_string /*name*/) { return -1; }
 
 private:
     DESC                desc;

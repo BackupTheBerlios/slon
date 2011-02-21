@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
-#include "Database/Bullet/Bullet.h"
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
@@ -9,6 +8,9 @@
 #include "Utility/error.hpp"
 #include <boost/filesystem.hpp>
 #include <SDL.h>
+#ifdef SLON_ENGINE_USE_BULLET
+#   include "Database/Bullet/Bullet.h"
+#endif
 
 __DEFINE_LOGGER__("engine")
 
@@ -204,12 +206,14 @@ void Engine::init()
         };
         database::detail::registerLoaders<graphics::Texture>(numImageFormats, imageLoaders);
 
+#ifdef SLON_ENGINE_USE_BULLET
         const size_t                      numPhysicsSceneLoaders = 1;
         fmt_loader<physics::PhysicsModel> physicsSceneLoaders[numPhysicsSceneLoaders] = 
         {
             {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletLoader}
         };
         database::detail::registerLoaders<physics::PhysicsModel>(numPhysicsSceneLoaders, physicsSceneLoaders);
+#endif
     }
 
     // init SDL

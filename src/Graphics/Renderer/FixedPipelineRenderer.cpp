@@ -13,13 +13,13 @@ namespace detail {
 
 FixedPipelineRenderer::camera_params::camera_params(detail::ParameterTable& parameterTable)
 {
-    normalMatrixBinder          = parameterTable.addParameterBinding( unique_string("normalMatrix"), &normalMatrix, 1, false);
-    viewMatrixBinder            = parameterTable.addParameterBinding( unique_string("viewMatrix"), &viewMatrix, 1, false);
-    invViewMatrixBinder         = parameterTable.addParameterBinding( unique_string("invViewMatrix"), &invViewMatrix, 1, false);
-    projectionMatrixBinder      = parameterTable.addParameterBinding( unique_string("projectionMatrix"), &projectionMatrix, 1, false);
-    invProjectionMatrixBinder   = parameterTable.addParameterBinding( unique_string("invProjectionMatrix"), &invProjectionMatrix, 1, false);
-    depthParamsBinder           = parameterTable.addParameterBinding( unique_string("depthParams"), &depthParams, 1, false);
-    eyePositionBinder           = parameterTable.addParameterBinding( unique_string("eyePosition"), &eyePosition, 1, false);
+    normalMatrixBinder          = parameterTable.addParameterBinding( hash_string("normalMatrix"), &normalMatrix, 1, false);
+    viewMatrixBinder            = parameterTable.addParameterBinding( hash_string("viewMatrix"), &viewMatrix, 1, false);
+    invViewMatrixBinder         = parameterTable.addParameterBinding( hash_string("invViewMatrix"), &invViewMatrix, 1, false);
+    projectionMatrixBinder      = parameterTable.addParameterBinding( hash_string("projectionMatrix"), &projectionMatrix, 1, false);
+    invProjectionMatrixBinder   = parameterTable.addParameterBinding( hash_string("invProjectionMatrix"), &invProjectionMatrix, 1, false);
+    depthParamsBinder           = parameterTable.addParameterBinding( hash_string("depthParams"), &depthParams, 1, false);
+    eyePositionBinder           = parameterTable.addParameterBinding( hash_string("eyePosition"), &eyePosition, 1, false);
 }
 
 void FixedPipelineRenderer::camera_params::setup(const scene::Camera& camera)
@@ -41,12 +41,12 @@ FixedPipelineRenderer::light_params::light_params(detail::ParameterTable& parame
     lightPositionRadius(new math::Vector4f[maxLightCount]),
     lightColorIntensity(new math::Vector4f[maxLightCount])
 {
-    lightCountBinder                = parameterTable.addParameterBinding( unique_string("lightCount"), &lightCount, 1, false);
-    lightViewDirectionAmbientBinder = parameterTable.addParameterBinding( unique_string("lightViewDirectionAmbient"),lightViewDirectionAmbient.get(), maxLightCount, false);
-    lightViewPositionRadiusBinder   = parameterTable.addParameterBinding( unique_string("lightViewPositionRadius"), lightViewPositionRadius.get(), maxLightCount, false);
-    lightDirectionAmbientBinder     = parameterTable.addParameterBinding( unique_string("lightDirectionAmbient"),lightDirectionAmbient.get(), maxLightCount, false);
-    lightPositionRadiusBinder       = parameterTable.addParameterBinding( unique_string("lightPositionRadius"), lightPositionRadius.get(), maxLightCount, false);
-    lightColorIntensityBinder       = parameterTable.addParameterBinding( unique_string("lightColorIntensity"), lightColorIntensity.get(), maxLightCount, false);
+    lightCountBinder                = parameterTable.addParameterBinding( hash_string("lightCount"), &lightCount, 1, false);
+    lightViewDirectionAmbientBinder = parameterTable.addParameterBinding( hash_string("lightViewDirectionAmbient"),lightViewDirectionAmbient.get(), maxLightCount, false);
+    lightViewPositionRadiusBinder   = parameterTable.addParameterBinding( hash_string("lightViewPositionRadius"), lightViewPositionRadius.get(), maxLightCount, false);
+    lightDirectionAmbientBinder     = parameterTable.addParameterBinding( hash_string("lightDirectionAmbient"),lightDirectionAmbient.get(), maxLightCount, false);
+    lightPositionRadiusBinder       = parameterTable.addParameterBinding( hash_string("lightPositionRadius"), lightPositionRadius.get(), maxLightCount, false);
+    lightColorIntensityBinder       = parameterTable.addParameterBinding( hash_string("lightColorIntensity"), lightColorIntensity.get(), maxLightCount, false);
 }
 
 void FixedPipelineRenderer::light_params::setup(int stage, const scene::Light& light)
@@ -131,12 +131,12 @@ void FixedPipelineRenderer::render(realm::World& world, const scene::Camera& cam
 			}
 
             // render lightened objects
-            render_pass( mainGroupHandle(), lightingPassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+            render_pass( RG_MAIN, RP_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
         }
 
         device->FixedPipelineProgram()->GetLightingToggleUniform()->Set(false);
-        render_pass( mainGroupHandle(), opaquePassHandle(), cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
-        render_pass( mainGroupHandle(), debugPassHandle(),  cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+        render_pass( RG_MAIN, RP_OPAQUE, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+        render_pass( RG_MAIN, RP_DEBUG,  cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
 
         if (wireframe) {
             device->PopState(sgl::State::RASTERIZER_STATE);
@@ -173,30 +173,6 @@ void FixedPipelineRenderer::render_pass(render_group_handle        renderGroup,
         iter->renderable->render();
         iter->pass->end();
     }
-}
-
-render_group_handle FixedPipelineRenderer::mainGroupHandle()
-{
-    static render_group_handle handle("Main");
-    return handle;
-}
-
-render_pass_handle FixedPipelineRenderer::opaquePassHandle()
-{
-    static render_pass_handle handle("FFPOpaquePass");
-    return handle;
-}
-
-render_pass_handle FixedPipelineRenderer::lightingPassHandle()
-{
-    static render_pass_handle handle("FFPLightingPass");
-    return handle;
-}
-
-render_pass_handle FixedPipelineRenderer::debugPassHandle()
-{
-    static render_pass_handle handle("DebugPass");
-    return handle;
 }
 
 } // namespace detail

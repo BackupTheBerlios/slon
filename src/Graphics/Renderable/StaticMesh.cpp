@@ -20,7 +20,7 @@ StaticMesh::StaticMesh(Mesh* _mesh) :
                                iter != mesh->endSubset();
                                ++iter)
     {
-        (*iter)->getEffect()->bindParameter( unique_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&worldMatrix, 1, true) );
+        (*iter)->getEffect()->bindParameter( hash_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&worldMatrix, 1, true) );
     }
 }
 

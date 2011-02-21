@@ -43,6 +43,7 @@ SET ( TARGET_DATABASE_COLLADA_HEADERS
     ${TARGET_HEADER_PATH}/Database/Collada/ColladaCommon.h
     ${TARGET_HEADER_PATH}/Database/Collada/ColladaCore.h
     ${TARGET_HEADER_PATH}/Database/Collada/ColladaFX.h
+	${TARGET_HEADER_PATH}/Database/Collada/ColladaPhysics.h
 )
 
 SET ( TARGET_DATABASE_DETAIL_HEADERS
@@ -50,12 +51,6 @@ SET ( TARGET_DATABASE_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Database/Detail/Library.h
     ${TARGET_HEADER_PATH}/Database/Detail/DatabaseManager.h
 )
-
-IF (SLON_ENGINE_USE_PHYSICS)
-    LIST ( APPEND TARGET_DATABASE_COLLADA_HEADERS
-        ${TARGET_HEADER_PATH}/Database/Collada/ColladaPhysics.h
-    )
-ENDIF (SLON_ENGINE_USE_PHYSICS)
 
 SET ( TARGET_INPUT_HEADERS
     ${TARGET_HEADER_PATH}/Input/InputManager.h
@@ -307,7 +302,8 @@ SET ( TARGET_UTILITY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/referenced.hpp
     ${TARGET_HEADER_PATH}/Utility/singleton.hpp
     ${TARGET_HEADER_PATH}/Utility/tmp_file.hpp
-    ${TARGET_HEADER_PATH}/Utility/unique_string.hpp
+    ${TARGET_HEADER_PATH}/Utility/handle.hpp
+    ${TARGET_HEADER_PATH}/Utility/hash_string.hpp
 )
 
 SET ( TARGET_UTILITY_ALGORITHM_HEADERS
@@ -466,6 +462,7 @@ SET ( TARGET_DATABASE_COLLADA_SOURCES
     Database/Collada/Collada.cpp
     Database/Collada/ColladaCore.cpp
     Database/Collada/ColladaFX.cpp
+	Database/Collada/ColladaPhysics.cpp
 )
 
 SET ( TARGET_DATABASE_DETAIL_SOURCES
@@ -473,12 +470,6 @@ SET ( TARGET_DATABASE_DETAIL_SOURCES
     Database/Detail/DatabaseManager.cpp
     Database/Detail/Library.cpp
 )
-
-IF (SLON_ENGINE_USE_PHYSICS)
-    LIST ( APPEND TARGET_DATABASE_COLLADA_SOURCES
-        Database/Collada/ColladaPhysics.cpp
-    )
-ENDIF (SLON_ENGINE_USE_PHYSICS)
 
 SET ( TARGET_FILESYSTEM_SOURCES
 )

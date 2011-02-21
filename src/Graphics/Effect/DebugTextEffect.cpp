@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Graphics/Effect/DebugTextEffect.h"
+#include "Graphics/Renderer/ForwardRenderer.h"
+#include "Graphics/Renderer/FixedPipelineRenderer.h"
 #include "Log/Logger.h"
 
 __DEFINE_LOGGER__("graphics.DebugTextEffect")
@@ -9,7 +11,7 @@ namespace {
     using namespace slon;
     using namespace graphics;
 
-    static const slon::unique_string DebugPass = slon::unique_string("DebugPass");
+    static const slon::hash_string DebugPass = slon::hash_string("DebugPass");
 
     class TextPass :
         public Pass
@@ -60,7 +62,7 @@ DebugTextEffect::DebugTextEffect(const sgl::Font*      font_,
 
 int DebugTextEffect::present(render_group_handle /*renderGroup*/, render_pass_handle renderPass, Pass** passes)
 {
-    if (renderPass == DebugPass)
+    if (renderPass == detail::ForwardRenderer::RP_DEBUG || renderPass == detail::FixedPipelineRenderer::RP_DEBUG)
     {
         passes[0] = pass.get();
         return 1;

@@ -275,8 +275,8 @@ WaterEffect::WaterEffect(const frequency_spectrum_ptr& _frequencySpectrum) :
     // get binders
     {
         detail::ParameterTable& parameterTable  = detail::currentParameterTable();
-        viewMatrixBinder                        = parameterTable.getParameterBinding<math::Matrix4f>( unique_string("viewMatrix") );
-        viewMatrixInverseBinder                 = parameterTable.getParameterBinding<math::Matrix4f>( unique_string("invViewMatrix") );
+        viewMatrixBinder                        = parameterTable.getParameterBinding<math::Matrix4f>( hash_string("viewMatrix") );
+        viewMatrixInverseBinder                 = parameterTable.getParameterBinding<math::Matrix4f>( hash_string("invViewMatrix") );
     }
 
     // create binders
@@ -462,8 +462,8 @@ void WaterEffect::setDepthTexture(sgl::Texture2D* _depthTexture)
 
 int WaterEffect::present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** p)
 {
-    if ( renderGroup == detail::ForwardRenderer::mainGroupHandle()
-         && renderPass == detail::ForwardRenderer::opaquePassHandle() ) 
+    if ( renderGroup == detail::ForwardRenderer::RG_MAIN
+         && renderPass == detail::ForwardRenderer::RP_OPAQUE ) 
     {
         // setup spectrum if changed
         mapsGenerator->set_frequency_spectrum(frequencySpectrum);
@@ -513,27 +513,27 @@ int WaterEffect::present(render_group_handle renderGroup, render_pass_handle ren
     return 0;
 }
 
-const abstract_parameter_binding* WaterEffect::getParameter(unique_string name) const
+const abstract_parameter_binding* WaterEffect::getParameter(hash_string name) const
 {
-    if ( name == unique_string("projectedGridCorners") ) {
+    if ( name == hash_string("projectedGridCorners") ) {
         return projectedGridCornersBinder.get();
     }
-    else if ( name == unique_string("allowCulling") ) {
+    else if ( name == hash_string("allowCulling") ) {
         return allowCullingBinder.get();
     }
 
     return 0;
 }
 
-bool WaterEffect::bindParameter(unique_string                     name,
+bool WaterEffect::bindParameter(hash_string                     name,
                                 const abstract_parameter_binding* binding)
 {
-    if (name == unique_string("projectedGridCorners") && (projectedGridCornersBinder = cast_binding<math::Vector3f>(binding)) ) 
+    if (name == hash_string("projectedGridCorners") && (projectedGridCornersBinder = cast_binding<math::Vector3f>(binding)) ) 
     {
         dirtyShaderTechniques();
         return true;
     }
-    else if (name == unique_string("allowCulling") && (allowCullingBinder = cast_binding<bool>(binding)) ) {
+    else if (name == hash_string("allowCulling") && (allowCullingBinder = cast_binding<bool>(binding)) ) {
         return true;
     }
 

@@ -318,7 +318,7 @@ Mesh::Mesh(const MeshData* data_)
             if (data->attributeArrays[i].count > 0)
             {
                 Mesh::attribute attribute;
-                attribute.binding   = detail::currentAttributeTable().queryAttribute( unique_string(data->attributeArrays[i].name) );
+                attribute.binding   = detail::currentAttributeTable().queryAttribute( hash_string(data->attributeArrays[i].name) );
                 attribute.size      = data->attributeArrays[i].size;
                 attribute.type      = data->attributeArrays[i].type;
                 attribute.offset    = offset;

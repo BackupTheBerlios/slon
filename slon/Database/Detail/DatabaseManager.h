@@ -123,7 +123,7 @@ inline void registerLoaders(size_t numLoaders, fmt_loader<T>* loaders)
     {
         std::vector<std::string> fmtExpr(loaders[i].fmtExpr, loaders[i].fmtExpr + loaders[i].numExpr);
         
-        format_id fmtId = cache.registerFormat(fmtId, fmtExpr);
+        format_id fmtId = cache.registerFormat(fmtExpr);
         cache.registerLoader(fmtId, typename fmt_loader<T>::loader_ptr(loaders[i].fmtLoader));
     }
 }

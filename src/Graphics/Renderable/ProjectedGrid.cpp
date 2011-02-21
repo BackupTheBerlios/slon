@@ -151,8 +151,8 @@ ProjectedGrid::ProjectedGrid(const effect_ptr& _effect) :
 {
     assert(effect);
     setupGrid(128, 512);
-    effect->bindParameter( unique_string("projectedGridCorners"), new parameter_binding<math::Vector3f>(corners, 4, true) );
-    effect->bindParameter( unique_string("allowCulling"),  new parameter_binding<bool>(&allowCulling, 1, false) );
+    effect->bindParameter( hash_string("projectedGridCorners"), new parameter_binding<math::Vector3f>(corners, 4, true) );
+    effect->bindParameter( hash_string("allowCulling"),  new parameter_binding<bool>(&allowCulling, 1, false) );
 }
 
 ProjectedGrid::ProjectedGrid(int sizeX, int sizeY, const effect_ptr& _effect) :
@@ -160,8 +160,8 @@ ProjectedGrid::ProjectedGrid(int sizeX, int sizeY, const effect_ptr& _effect) :
 {
     assert(effect);
     setupGrid(sizeX, sizeY);
-    effect->bindParameter( unique_string("projectedGridCorners"), new parameter_binding<math::Vector3f>(corners, 4, true) );
-    effect->bindParameter( unique_string("allowCulling"),  new parameter_binding<bool>(&allowCulling, 1, false) );
+    effect->bindParameter( hash_string("projectedGridCorners"), new parameter_binding<math::Vector3f>(corners, 4, true) );
+    effect->bindParameter( hash_string("allowCulling"),  new parameter_binding<bool>(&allowCulling, 1, false) );
 }
 
 void ProjectedGrid::setupGrid(int sizeX, int sizeY)
@@ -190,7 +190,7 @@ void ProjectedGrid::setupGrid(int sizeX, int sizeY)
         indexBuffer->SetData(indices.size() * sizeof(unsigned int), &indices[0]);
 
         // retrieve binding
-        positionBinding = detail::currentAttributeTable().queryAttribute( unique_string("position") );
+        positionBinding = detail::currentAttributeTable().queryAttribute( hash_string("position") );
 
         // make vertex layout
         sgl::VertexLayout::ELEMENT elements[] = 

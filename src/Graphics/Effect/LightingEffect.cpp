@@ -24,7 +24,7 @@ LightingEffect::LightingEffect(const LightingMaterial*          material_,
 
     // bind parameters
     detail::ParameterTable& parameterTable = detail::currentParameterTable();
-    lightCountBinder = parameterTable.getParameterBinding<int>( unique_string("lightCount") );
+    lightCountBinder = parameterTable.getParameterBinding<int>( hash_string("lightCount") );
 
     dirtyConnection = dirtySignal.connect( boost::bind(&LightingEffect::dirty, this, _1) );
     dirty(material_);
@@ -37,7 +37,7 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
 		dirty(material.get());
 	}
 
-    if ( renderPass == detail::FixedPipelineRenderer::lightingPassHandle() )
+    if ( ffpPass && renderPass == detail::FixedPipelineRenderer::RP_LIGHTING )
     {
         worldViewMatrixBinder->write_value( viewMatrixBinder->value() * worldMatrixBinder->value() );
         p[0] = ffpPass.get();
@@ -46,23 +46,23 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
 
     int    numPasses = 0;
     size_t numLights = lightCountBinder->value();
-    if ( renderGroup == detail::ForwardRenderer::reflectGroupHandle() )
+    if ( renderGroup == detail::ForwardRenderer::RG_REFLECT )
     {
         if (opacityBinder)
         {
-            if ( renderPass == detail::ForwardRenderer::directionalLightingPassHandle() )
+            if ( renderPass == detail::ForwardRenderer::RP_DIRECTIONAL_LIGHTING )
             {
                 p[0] = backFacePasses[scene::Light::DIRECTIONAL][numLights].get();
                 p[1] = passes[scene::Light::DIRECTIONAL][numLights].get();
                 numPasses = 2;
             }
-            else if ( renderPass == detail::ForwardRenderer::pointLightingPassHandle() )
+            else if ( renderPass == detail::ForwardRenderer::RP_POINT_LIGHTING )
             {
                 p[0] = backFacePasses[scene::Light::POINT][numLights].get();
                 p[1] = passes[scene::Light::POINT][numLights].get();
                 numPasses = 2;
             }
-            else if ( renderPass == detail::ForwardRenderer::spotLightingPassHandle() )
+            else if ( renderPass == detail::ForwardRenderer::RP_SPOT_LIGHTING )
             {
                 p[0] = backFacePasses[scene::Light::SPOT][numLights].get();
                 p[1] = passes[scene::Light::SPOT][numLights].get();
@@ -71,17 +71,17 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
         }
         else
         {
-            if ( renderPass == detail::ForwardRenderer::directionalLightingPassHandle() )
+            if ( renderPass == detail::ForwardRenderer::RP_DIRECTIONAL_LIGHTING )
             {
                 p[0] = backFacePasses[scene::Light::DIRECTIONAL][numLights].get();
                 numPasses = 1;
             }
-            else if ( renderPass == detail::ForwardRenderer::pointLightingPassHandle()  )
+            else if ( renderPass == detail::ForwardRenderer::RP_POINT_LIGHTING  )
             {
                 p[0] = backFacePasses[scene::Light::POINT][numLights].get();
                 numPasses = 1;
             }
-            else if ( renderPass == detail::ForwardRenderer::spotLightingPassHandle()  )
+            else if ( renderPass == detail::ForwardRenderer::RP_SPOT_LIGHTING  )
             {
                 p[0] = backFacePasses[scene::Light::SPOT][numLights].get();
                 numPasses = 1;
@@ -95,19 +95,19 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
     {
         if (opacityBinder)
         {
-            if ( renderPass == detail::ForwardRenderer::directionalLightingPassHandle() )
+            if ( renderPass == detail::ForwardRenderer::RP_DIRECTIONAL_LIGHTING )
             {
                 p[0] = passes[scene::Light::DIRECTIONAL][numLights].get();
                 p[1] = backFacePasses[scene::Light::DIRECTIONAL][numLights].get();
                 numPasses = 2;
             }
-            else if ( renderPass == detail::ForwardRenderer::pointLightingPassHandle() )
+            else if ( renderPass == detail::ForwardRenderer::RP_POINT_LIGHTING )
             {
                 p[0] = passes[scene::Light::POINT][numLights].get();
                 p[1] = backFacePasses[scene::Light::POINT][numLights].get();
                 numPasses = 2;
             }
-            else if ( renderPass == detail::ForwardRenderer::spotLightingPassHandle() )
+            else if ( renderPass == detail::ForwardRenderer::RP_SPOT_LIGHTING )
             {
                 p[0] = passes[scene::Light::SPOT][numLights].get();
                 p[1] = backFacePasses[scene::Light::SPOT][numLights].get();
@@ -116,17 +116,17 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
         }
         else
         {
-            if ( renderPass == detail::ForwardRenderer::directionalLightingPassHandle() )
+            if ( renderPass == detail::ForwardRenderer::RP_DIRECTIONAL_LIGHTING )
             {
                 p[0] = passes[scene::Light::DIRECTIONAL][numLights].get();
                 numPasses = 1;
             }
-            else if ( renderPass == detail::ForwardRenderer::pointLightingPassHandle()  )
+            else if ( renderPass == detail::ForwardRenderer::RP_POINT_LIGHTING )
             {
                 p[0] = passes[scene::Light::POINT][numLights].get();
                 numPasses = 1;
             }
-            else if ( renderPass == detail::ForwardRenderer::spotLightingPassHandle()  )
+            else if ( renderPass == detail::ForwardRenderer::RP_SPOT_LIGHTING )
             {
                 p[0] = passes[scene::Light::SPOT][numLights].get();
                 numPasses = 1;
@@ -147,19 +147,19 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
     return numPasses;
 }
 
-const abstract_parameter_binding* LightingEffect::getParameter(unique_string name) const
+const abstract_parameter_binding* LightingEffect::getParameter(hash_string name) const
 {
-    if ( name == unique_string("opacity") ) {
+    if ( name == hash_string("opacity") ) {
         return opacityBinder.get();
     }
 
     return base_type::getParameter(name);
 }
 
-bool LightingEffect::bindParameter(unique_string                        name,
+bool LightingEffect::bindParameter(hash_string                        name,
                                    const abstract_parameter_binding*    binding)
 {
-    if ( name == unique_string("opacity") && ((opacityBinder = cast_binding<float>(binding)) || !binding) )
+    if ( name == hash_string("opacity") && ((opacityBinder = cast_binding<float>(binding)) || !binding) )
     {
         isDirty = true;
         return true;
@@ -171,7 +171,7 @@ bool LightingEffect::bindParameter(unique_string                        name,
     return false;
 }
 
-int LightingEffect::queryAttribute(unique_string name)
+int LightingEffect::queryAttribute(hash_string name)
 {
     return detail::currentAttributeTable().queryAttribute(name)->index;
 }

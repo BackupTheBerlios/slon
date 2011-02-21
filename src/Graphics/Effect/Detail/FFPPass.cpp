@@ -74,16 +74,16 @@ FFPPass::FFPPass(const DESC& desc) :
     {
         projectionMatrixParameter.reset( desc.projectionMatrixBinding.parameter ?
                                          desc.projectionMatrixBinding.parameter :
-                                         pTable.getParameterBinding<math::Matrix4f>( unique_string(desc.projectionMatrixBinding.parameterName) ).get() );
+                                         pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.projectionMatrixBinding.parameterName) ).get() );
         worldViewMatrixParameter.reset( desc.worldViewMatrixBinding.parameter ?
                                         desc.worldViewMatrixBinding.parameter :
-                                        pTable.getParameterBinding<math::Matrix4f>( unique_string(desc.worldViewMatrixBinding.parameterName) ).get() );
+                                        pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.worldViewMatrixBinding.parameterName) ).get() );
         diffuseSpecularParameter.reset( desc.diffuseSpecularBinding.parameter ?
                                         desc.diffuseSpecularBinding.parameter :
-                                        pTable.getParameterBinding<math::Vector4f>( unique_string(desc.diffuseSpecularBinding.parameterName) ).get() );
+                                        pTable.getParameterBinding<math::Vector4f>( hash_string(desc.diffuseSpecularBinding.parameterName) ).get() );
         shininessParameter.reset( desc.shininessBinding.parameter ?
                                   desc.shininessBinding.parameter :
-                                  pTable.getParameterBinding<float>( unique_string(desc.shininessBinding.parameterName) ).get() );
+                                  pTable.getParameterBinding<float>( hash_string(desc.shininessBinding.parameterName) ).get() );
     }
 
     std::copy( desc.textureParameters, 
@@ -110,14 +110,14 @@ void FFPPass::setProjectionMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& bi
 {
     projectionMatrixParameter.reset( binding.parameter ?
                                      binding.parameter :
-                                     currentParameterTable().getParameterBinding<math::Matrix4f>( unique_string(binding.parameterName) ).get() );
+                                     currentParameterTable().getParameterBinding<math::Matrix4f>( hash_string(binding.parameterName) ).get() );
 }
 
 void FFPPass::setWorldViewMatrixBinder(const PARAMETER_DESC<math::Matrix4f>& binding)
 {
     worldViewMatrixParameter.reset( binding.parameter ?
                                     binding.parameter :
-                                    currentParameterTable().getParameterBinding<math::Matrix4f>( unique_string(binding.parameterName) ).get() );
+                                    currentParameterTable().getParameterBinding<math::Matrix4f>( hash_string(binding.parameterName) ).get() );
 }
 
 void FFPPass::begin() const

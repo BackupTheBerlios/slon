@@ -79,13 +79,17 @@ Pass::Pass(const DESC& desc)
 			continue;
 		}
 
+		if (!desc.uniforms[i].parameter && !desc.uniforms[i].parameterName) {
+			continue;
+		}
+
 		// find corresponding uniform <-> parameter pairs, check their types
         sgl::AbstractUniform*             uniform    = desc.uniforms[i].uniform ? 
                                                        desc.uniforms[i].uniform :
                                                        program->GetUniform(desc.uniforms[i].uniformName);
         const abstract_parameter_binding* parameter  = desc.uniforms[i].parameter ?
                                                        desc.uniforms[i].parameter :
-                                                       currentParameterTable().getParameterBinding( unique_string(desc.uniforms[i].parameterName) ).get();
+                                                       currentParameterTable().getParameterBinding(desc.uniforms[i].parameterName).get();
         bool                              compatible = false;
         if (uniform && parameter)
         {

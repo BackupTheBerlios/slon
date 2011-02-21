@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_H__
 
-#include "../Utility/unique_string.hpp"
+#include "../Utility/hash_string.hpp"
 #include "ParameterBinding.h"
 
 namespace slon {
@@ -10,19 +10,21 @@ namespace graphics {
 // Forward
 class Pass;
 
-typedef unique_string render_group_handle;
-typedef unique_string render_pass_handle;
-typedef unique_string parameter_handle;
-typedef unique_string attribute_handle;
+typedef unsigned	render_group_handle;
+typedef unsigned	render_pass_handle;
+typedef hash_string parameter_handle;
+typedef hash_string attribute_handle;
 
 /** Effect unify effects that share states and(or) shaders.
  * Traditionally rendering can be represented as followed:
  * \code
- * if ( Pass* pass = effect->present(renderPassName) )
+ * Pass* passes[Effect::MAX_NUM_PASSES];
+ * int nPasses = effect->present(renderGroup, renderPass, passes);
+ * for (int i = 0; i<nPasses; ++i)
  * {
- *     pass->begin();      // begin using effect, remember states
+ *     passes[i]->begin();      // begin using effect, remember states
  *     someDrawable->render();
- *     pass->end();        // restore states
+ *     passes[i]->end();        // restore states
  * }
  * \uncode
  */
@@ -34,11 +36,11 @@ public:
 
 public:
     /** Present effect in the render pass. Get technique used to render objects. 
-     * Render passes are grouped in render groups for convinience and some performance speed up.
+     * Render passes are grouped in render groups for convenience and some performance speed up.
      * E.g. ForwardRenderer have render group "Reflect" for rendering scene into reflect texture with
      * simplified states and front face culling.
-     * @param renderGroup - current render pass group.
-     * @param renderPass - current render pass.
+     * @param renderGroup - current render group index.
+     * @param renderPass - current render pass index.
      * @param passes [out] - array of the techniques for rendering object
      * @return number of passes for rendering object.
      */

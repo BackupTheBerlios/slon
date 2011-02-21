@@ -131,7 +131,7 @@ namespace {
                 for (size_t i = 0; i<program->NumAttributes(); ++i)
                 {
                     sgl::Program::ATTRIBUTE attribute = program->Attribute(i);
-                    bindings.push_back( detail::currentAttributeTable().queryAttribute( unique_string(attribute.name) ) );
+                    bindings.push_back( detail::currentAttributeTable().queryAttribute( hash_string(attribute.name) ) );
 
                     if (bindings.back()->index != attribute.index) {
                         program->BindAttributeLocation(attribute.name, bindings.back()->index);

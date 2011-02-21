@@ -4,6 +4,7 @@
 #include "../../Scene/Visitors/CullVisitor.h"
 #include "../Effect/Pass.h"
 #include "../Renderer.h"
+#include <sgl/Device.h>
 #include <vector>
 
 namespace slon {
@@ -37,6 +38,22 @@ public:
         BACK_TRANSPARENT_BIN,
         FRONT_TRANSPARENT_BIN
     };
+
+	enum RENDER_GROUP
+	{
+		RG_MAIN,
+		RG_REFLECT
+	};
+
+	enum RENDER_PASS
+	{
+		RP_DEPTH,
+		RP_OPAQUE,
+		RP_DIRECTIONAL_LIGHTING,
+		RP_POINT_LIGHTING,
+		RP_SPOT_LIGHTING,
+		RP_DEBUG
+	};
 
 private:
     typedef scene::CullVisitor::light_iterator              light_iterator;
@@ -147,30 +164,6 @@ public:
 
     /** Make priority for rendering using ForwardRenderer */
     static long long makePriority(RENDER_BIN bin, const void* programPtr);
-
-    /** Get handle of the main render group */
-    static render_group_handle mainGroupHandle();
-
-    /** Get handle of the reflect render group */
-    static render_group_handle reflectGroupHandle();
-
-    /** Get handle of the depth pass */
-    static render_pass_handle depthPassHandle();
-
-    /** Get handle of the opaque pass */
-    static render_pass_handle opaquePassHandle();
-
-    /** Get handle of the directional lighting pass */
-    static render_pass_handle directionalLightingPassHandle();
-
-    /** Get handle of the point lighting pass */
-    static render_pass_handle pointLightingPassHandle();
-
-    /** Get handle of the spot lighting pass */
-    static render_pass_handle spotLightingPassHandle();
-
-    /** Get handle of the debug pass */
-    static render_pass_handle debugPassHandle();
 
     ~ForwardRenderer() {}
 

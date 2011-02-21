@@ -5,6 +5,7 @@
 #include "Graphics/Effect/Detail/FFPPass.h"
 #include "Graphics/Effect/Detail/Pass.h"
 #include "Graphics/Renderer/ForwardRenderer.h"
+#include "Graphics/Renderer/FixedPipelineRenderer.h"
 #include "Log/Logger.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
@@ -12,7 +13,7 @@ __DEFINE_LOGGER__("graphics.DebugEffect")
 
 namespace {
 
-    static const slon::unique_string DebugPass = slon::unique_string("DebugPass");
+    static const slon::hash_string DebugPass = slon::hash_string("DebugPass");
 
 } // anonymous namespace
 
@@ -223,7 +224,7 @@ void DebugEffect::reset(const DESC& desc_)
 
 int DebugEffect::present(render_group_handle /*renderGroup*/, render_pass_handle renderPass, Pass** passes)
 {
-    if (renderPass == DebugPass)
+    if (renderPass == detail::ForwardRenderer::RP_DEBUG || renderPass == detail::FixedPipelineRenderer::RP_DEBUG)
     {
         if (desc.useCameraProjection)
         {

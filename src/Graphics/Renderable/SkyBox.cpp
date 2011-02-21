@@ -80,7 +80,7 @@ SkyBox::SkyBox()
         }
         else
         {
-            positionBinding = detail::currentAttributeTable().queryAttribute( unique_string("position") );
+            positionBinding = detail::currentAttributeTable().queryAttribute( hash_string("position") );
 
             sgl::VertexLayout::ELEMENT elements[] = 
             {

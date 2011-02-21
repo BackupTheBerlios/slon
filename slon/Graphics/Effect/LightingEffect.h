@@ -26,10 +26,10 @@ public:
 
     // Override Effect
     int                               present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
-    const abstract_parameter_binding* getParameter(unique_string name) const;
-    bool                              bindParameter(unique_string                        name,
+    const abstract_parameter_binding* getParameter(hash_string name) const;
+    bool                              bindParameter(hash_string                        name,
                                                     const abstract_parameter_binding*    binding);
-    int                               queryAttribute(unique_string attribute);
+    int                               queryAttribute(hash_string attribute);
 
 private:
     void        dirty(const LightingMaterial* material);
