@@ -30,6 +30,7 @@ private:
     math::Matrix4f                  viewProjectionMatrix;
     sgl::ref_ptr<sgl::TextureCube>  environmentMap;
     pass_ptr                        pass;
+    bool                            ffp;
 
     // binders
     binding_mat4x4f_ptr             myProjectionMatrixBinder;

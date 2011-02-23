@@ -59,6 +59,7 @@ void SkyBoxEffect::dirtyShaderTechniques()
 				}
 
                 pass.reset( new detail::Pass(desc) );
+                ffp = false;
 
                 break;
             }
@@ -73,6 +74,7 @@ void SkyBoxEffect::dirtyShaderTechniques()
                 desc.worldViewMatrixBinding.parameter   = worldViewMatrixBinder.get();
                 desc.textureParameters[0]               = environmentMapBinder2.get();
                 pass.reset( new detail::FFPPass(desc) );
+                ffp = true;
 
                 break;
             }
@@ -92,8 +94,8 @@ void SkyBoxEffect::dirtyShaderTechniques()
 
 int SkyBoxEffect::present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes)
 {
-    if ( (renderGroup == detail::ForwardRenderer::RG_MAIN && renderPass == detail::ForwardRenderer::RP_OPAQUE)
-         || (renderGroup == detail::FixedPipelineRenderer::RG_MAIN && renderPass == detail::FixedPipelineRenderer::RP_OPAQUE) )
+    if ( (!ffp && renderGroup == detail::ForwardRenderer::RG_MAIN && renderPass == detail::ForwardRenderer::RP_OPAQUE)
+         || (ffp && renderGroup == detail::FixedPipelineRenderer::RG_MAIN && renderPass == detail::FixedPipelineRenderer::RP_OPAQUE) )
     {
         if (myProjectionMatrixBinder)
         {
