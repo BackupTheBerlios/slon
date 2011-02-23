@@ -4,8 +4,8 @@
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 
-using namespace slon;
-using namespace physics;
+namespace slon {
+namespace physics {
 
 __DEFINE_LOGGER__("physics.BulletRigidBody")
 
@@ -30,103 +30,103 @@ namespace {
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}
-	
-	std::ostream& operator << (std::ostream& os, const RigidBody::DYNAMICS_TYPE& type)
-	{
-		os << (type == RigidBody::DT_DYNAMIC) ? "DT_DYNAMIC" : (type == RigidBody::DT_KINEMATIC) ? "DT_KINEMATIC" : "DT_STATIC";
-		return os;
-	}
-
-	std::ostream& operator << (std::ostream& os, const BoxShape& shape)
-	{
-		os << "box { halfExtent = {" << shape.halfExtents << "} }";
-		return os;
-	}
-
-	std::ostream& operator << (std::ostream& os, const ConeShape& shape)
-	{
-		os << "cone { radius = " << shape.radius << "; height = " << shape.height << " }";
-		return os;
-	}
-
-	std::ostream& operator << (std::ostream& os, const CylinderShape& shape)
-	{
-		os << "cylinder { halfExtent = {" << shape.halfExtent << "} }";
-		return os;
-	}
-
-	std::ostream& operator << (std::ostream& os, const CollisionShape& shape)
-	{
-		switch ( shape.getShapeType() )
-		{
-			case CollisionShape::PLANE:
-			case CollisionShape::SPHERE:
-			case CollisionShape::BOX:
-				os << static_cast<const BoxShape&>(shape);
-				break;
-
-			case CollisionShape::CONE:
-				os << static_cast<const ConeShape&>(shape);
-				break;
-
-			case CollisionShape::CAPSULE:
-				break;
-
-			case CollisionShape::CYLINDER:
-				os << static_cast<const CylinderShape&>(shape);
-				break;
-
-			case CollisionShape::HEIGHTFIELD:
-			case CollisionShape::CONVEX_MESH:
-			case CollisionShape::TRIANGLE_MESH:
-				break;
-
-			case CollisionShape::COMPOUND:
-			{
-				const CompoundShape& cShape = static_cast<const CompoundShape&>(shape);
-            
-				for (size_t i = 0; i<cShape.shapes.size(); ++i) 
-				{
-					os << "compound\n"
-					   << "{\n" 
-					   << log::indent()
-					   << "transform = \n{\n" << log::indent() << cShape.shapes[i].transform << log::unindent() << "\n}\n"
-					   << "shape = " << *cShape.shapes[i].shape << std::endl
-					   << log::unindent()
-					   << "}";
-				}
-
-				break;
-			}
-
-			default:
-				assert(!"can't get here");
-		}
-
-		return os;
-	}
-
-	std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
-	{
-		os << "{\n" 
-		   << log::indent()
-		   << "transform =\n{\n" << log::indent() << desc.transform << log::unindent() << "\n}\n"
-		   << "type = " << desc.type << std::endl
-		   << "mass = " << desc.mass << std::endl
-		   << "margin = " << desc.margin << std::endl
-		   << "relativeMargin = " << desc.relativeMargin << std::endl
-		   << "linearVelocity = {" << desc.linearVelocity << "}\n"
-		   << "angularVelocity = {" << desc.angularVelocity << "}\n"
-		   << "name = " << desc.name << std::endl
-		   << "target = " << desc.target << std::endl
-		   << "shape = " << *desc.collisionShape << std::endl
-		   << log::unindent()
-		   << "}";
-
-		return os;
-	}
 
 } // anonymous namespace
+
+std::ostream& operator << (std::ostream& os, const RigidBody::DYNAMICS_TYPE& type)
+{
+	os << (type == RigidBody::DT_DYNAMIC) ? "DT_DYNAMIC" : (type == RigidBody::DT_KINEMATIC) ? "DT_KINEMATIC" : "DT_STATIC";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const BoxShape& shape)
+{
+	os << "box { halfExtent = {" << shape.halfExtents << "} }";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const ConeShape& shape)
+{
+	os << "cone { radius = " << shape.radius << "; height = " << shape.height << " }";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CylinderShape& shape)
+{
+	os << "cylinder { halfExtent = {" << shape.halfExtent << "} }";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CollisionShape& shape)
+{
+	switch ( shape.getShapeType() )
+	{
+		case CollisionShape::PLANE:
+		case CollisionShape::SPHERE:
+		case CollisionShape::BOX:
+			os << static_cast<const BoxShape&>(shape);
+			break;
+
+		case CollisionShape::CONE:
+			os << static_cast<const ConeShape&>(shape);
+			break;
+
+		case CollisionShape::CAPSULE:
+			break;
+
+		case CollisionShape::CYLINDER:
+			os << static_cast<const CylinderShape&>(shape);
+			break;
+
+		case CollisionShape::HEIGHTFIELD:
+		case CollisionShape::CONVEX_MESH:
+		case CollisionShape::TRIANGLE_MESH:
+			break;
+
+		case CollisionShape::COMPOUND:
+		{
+			const CompoundShape& cShape = static_cast<const CompoundShape&>(shape);
+        
+			for (size_t i = 0; i<cShape.shapes.size(); ++i) 
+			{
+				os << "compound\n"
+				   << "{\n" 
+				   << log::indent()
+				   << "transform = \n{\n" << log::indent() << cShape.shapes[i].transform << log::unindent() << "\n}\n"
+				   << "shape = " << *cShape.shapes[i].shape << std::endl
+				   << log::unindent()
+				   << "}";
+			}
+
+			break;
+		}
+
+		default:
+			assert(!"can't get here");
+	}
+
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
+{
+	os << "{\n" 
+	   << log::indent()
+	   << "transform =\n{\n" << log::indent() << desc.transform << log::unindent() << "\n}\n"
+	   << "type = " << desc.type << std::endl
+	   << "mass = " << desc.mass << std::endl
+	   << "margin = " << desc.margin << std::endl
+	   << "relativeMargin = " << desc.relativeMargin << std::endl
+	   << "linearVelocity = {" << desc.linearVelocity << "}\n"
+	   << "angularVelocity = {" << desc.angularVelocity << "}\n"
+	   << "name = " << desc.name << std::endl
+	   << "target = " << desc.target << std::endl
+	   << "shape = " << *desc.collisionShape << std::endl
+	   << log::unindent()
+	   << "}";
+
+	return os;
+}
 
 BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
                                  const std::string&   name_,
@@ -394,3 +394,6 @@ BulletRigidBody::connection_type BulletRigidBody::connectDestroyHandler(rigid_bo
 {
     return onDestroySignal.connect(handler);
 }
+
+} // namespace physics
+} // namespace slon
