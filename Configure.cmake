@@ -6,7 +6,6 @@ INCLUDE (FindNecessaryLibraries.cmake)
 INCLUDE (OptionDependentOnPackage)
 
 # options
-
 IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	OPTION (BUILD_EXAMPLES "Set ON to build library examples" OFF)
 	MESSAGE ( "Build examples: " ${BUILD_EXAMPLES} )
@@ -16,6 +15,9 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 
 	OPTION (INSTALL_EXAMPLES "Set to ON to install examples" OFF)
 	MESSAGE ("Install examples: " ${INSTALL_EXAMPLES})
+    
+    OPTION_DEPENDENT_ON_PACKAGE ( SLON_ENGINE_BUILD_DOCUMENTATION "Set ON to build doxygen reference documentation" DOXYGEN_FOUND )
+    MESSAGE ( "Build documentation: " ${BUILD_DOCUMENTATION} )
 ENDIF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 
 # check settings
@@ -35,9 +37,6 @@ MESSAGE ( "Using bullet physics: " ${SLON_ENGINE_USE_BULLET} )
 
 OPTION_DEPENDENT_ON_PACKAGE ( SLON_ENGINE_USE_GNUPLOT "Set ON to enable gnuplot for drawing graphics" GNUPLOT_FOUND )
 MESSAGE ( "Use gnuplot: " ${SLON_ENGINE_USE_GNUPLOT} )
-
-OPTION_DEPENDENT_ON_PACKAGE ( BUILD_DOCUMENTATION "Set ON to build doxygen reference documentation" DOXYGEN_FOUND )
-MESSAGE ( "Build documentation: " ${BUILD_DOCUMENTATION} )
 
 # directory setup
 LINK_DIRECTORIES ( ${PROJECT_BINARY_DIR}/lib )
