@@ -36,12 +36,17 @@ int LightingEffect::present(render_group_handle renderGroup, render_pass_handle 
 	if (isDirty) {
 		dirty(material.get());
 	}
-
-    if ( ffpPass && renderPass == detail::FixedPipelineRenderer::RP_LIGHTING )
+    
+    if (ffpPass)
     {
-        worldViewMatrixBinder->write_value( viewMatrixBinder->value() * worldMatrixBinder->value() );
-        p[0] = ffpPass.get();
-        return 1;
+        if ( renderPass == detail::FixedPipelineRenderer::RP_LIGHTING )
+        {
+            worldViewMatrixBinder->write_value( viewMatrixBinder->value() * worldMatrixBinder->value() );
+            p[0] = ffpPass.get();
+            return 1;
+        }
+
+        return 0;
     }
 
     int    numPasses = 0;

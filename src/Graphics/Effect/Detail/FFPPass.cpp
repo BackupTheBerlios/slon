@@ -72,18 +72,30 @@ FFPPass::FFPPass(const DESC& desc) :
 
     detail::ParameterTable& pTable = currentParameterTable();
     {
-        projectionMatrixParameter.reset( desc.projectionMatrixBinding.parameter ?
-                                         desc.projectionMatrixBinding.parameter :
-                                         pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.projectionMatrixBinding.parameterName) ).get() );
-        worldViewMatrixParameter.reset( desc.worldViewMatrixBinding.parameter ?
-                                        desc.worldViewMatrixBinding.parameter :
-                                        pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.worldViewMatrixBinding.parameterName) ).get() );
-        diffuseSpecularParameter.reset( desc.diffuseSpecularBinding.parameter ?
-                                        desc.diffuseSpecularBinding.parameter :
-                                        pTable.getParameterBinding<math::Vector4f>( hash_string(desc.diffuseSpecularBinding.parameterName) ).get() );
-        shininessParameter.reset( desc.shininessBinding.parameter ?
-                                  desc.shininessBinding.parameter :
-                                  pTable.getParameterBinding<float>( hash_string(desc.shininessBinding.parameterName) ).get() );
+        if (desc.projectionMatrixBinding.parameter || desc.projectionMatrixBinding.parameterName)
+        {
+            projectionMatrixParameter.reset( desc.projectionMatrixBinding.parameter ?
+                                             desc.projectionMatrixBinding.parameter :
+                                             pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.projectionMatrixBinding.parameterName) ).get() );
+        }
+        if (desc.worldViewMatrixBinding.parameter || desc.worldViewMatrixBinding.parameterName)
+        {
+            worldViewMatrixParameter.reset( desc.worldViewMatrixBinding.parameter ?
+                                            desc.worldViewMatrixBinding.parameter :
+                                            pTable.getParameterBinding<math::Matrix4f>( hash_string(desc.worldViewMatrixBinding.parameterName) ).get() );
+        }
+        if (desc.diffuseSpecularBinding.parameter || desc.diffuseSpecularBinding.parameterName)
+        {
+            diffuseSpecularParameter.reset( desc.diffuseSpecularBinding.parameter ?
+                                            desc.diffuseSpecularBinding.parameter :
+                                            pTable.getParameterBinding<math::Vector4f>( hash_string(desc.diffuseSpecularBinding.parameterName) ).get() );
+        }
+        if (desc.shininessBinding.parameter || desc.shininessBinding.parameterName)
+        {
+            shininessParameter.reset( desc.shininessBinding.parameter ?
+                                      desc.shininessBinding.parameter :
+                                      pTable.getParameterBinding<float>( hash_string(desc.shininessBinding.parameterName) ).get() );
+        }
     }
 
     std::copy( desc.textureParameters, 

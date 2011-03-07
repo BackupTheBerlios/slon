@@ -20,7 +20,20 @@ public:
     /** Load '*.bullet' scene */
     physics::physics_model_ptr load(std::istream& stream);
 };
+/*
+class BulletSaver :
+    public database::PhysicsSceneSaver
+{
+public:
+    bool binary() const 
+    { 
+        return true; 
+    }
 
+    /** Saver '*.bullet' scene 
+    void save(physics::physics_model_ptr item, std::ostream& sink);
+};
+*/
 } // namespace detail
 } // namespace database
 } // namespace slon

@@ -72,6 +72,12 @@ CompoundObject::CompoundObject(scene::Node*             root_,
 #endif
 }
 
+    
+CompoundObject::~CompoundObject()
+{
+    setRoot(0);
+}
+
 void CompoundObject::traverse(scene::NodeVisitor& nv)
 {
     if (root)

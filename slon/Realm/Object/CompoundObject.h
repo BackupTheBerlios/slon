@@ -17,6 +17,7 @@ public:
                    , physics::PhysicsModel* physicsModel = 0
 #endif
                     );
+    ~CompoundObject();
 
     /** Setup graphics model for the object */
     void setRoot(scene::Node* root);

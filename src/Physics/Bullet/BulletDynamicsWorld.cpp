@@ -70,6 +70,10 @@ void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
 
 real BulletDynamicsWorld::stepSimulation(real dt)
 {
+    if (dt < 0) {
+        return 0;
+    }
+
     // simulate
     accept(solverCollector);
 

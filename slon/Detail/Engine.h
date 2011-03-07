@@ -82,7 +82,7 @@ private:
     physics::detail::PhysicsManager             physicsManager;
 #endif
 
-    std::vector<realm::Object*> updateQueue;
+    std::vector<realm::object_ptr> updateQueue;
 
     // scene
     realm::world_ptr    world;

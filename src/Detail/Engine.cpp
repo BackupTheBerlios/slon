@@ -276,7 +276,7 @@ void Engine::run(const DESC& desc_)
             for (size_t i = 0; i<updateQueue.size(); ++i) 
             {
                 updateQueue[i]->traverse(traverser);
-                world->update(updateQueue[i]);
+                world->update(updateQueue[i].get());
             }
             updateQueue.clear();
         }
@@ -331,7 +331,7 @@ void Engine::frame()
         for (size_t i = 0; i<updateQueue.size(); ++i) 
         {
             updateQueue[i]->traverse(traverser);
-            world->update(updateQueue[i]);
+            world->update(updateQueue[i].get());
         }
         updateQueue.clear();
     }
