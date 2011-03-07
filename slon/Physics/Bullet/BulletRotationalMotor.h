@@ -62,11 +62,15 @@ public:
     Motor::TYPE        getType() const       { return Motor::TYPE(Motor::MOTOR_X_ROT + axis); }
     real               getLoLimit() const    { return motor->m_loLimit; }
     real               getHiLimit() const    { return motor->m_hiLimit; }
-    real               getPosition() const   { return motor->m_currentPosition; }
+    real               getPosition() const   { return position; }
     real               getVelocity() const   { return velocity; }
     real               getForce() const      { return force; }
 
 protected:
+    void calculateAngleInfo();
+
+protected:
+    btScalar    position;
     btScalar    velocity;
     btScalar    force;
 };
