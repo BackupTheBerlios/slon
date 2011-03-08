@@ -94,5 +94,12 @@ PhysicsModel::constraint_iterator PhysicsModel::findConstraint(const std::string
                          boost::bind(&Constraint::getName, _1) == name ).base();
 }
 
+void PhysicsModel::toggleSimulation(bool toggle)
+{
+    std::for_each( boost::make_indirect_iterator( rigidBodies.begin() ),
+                   boost::make_indirect_iterator( rigidBodies.end() ),
+                   boost::bind(&RigidBody::toggleSimulation, _1, toggle) );
+}
+
 } // namespace physics
 } // namespace slon

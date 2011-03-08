@@ -290,6 +290,33 @@ math::Vector3r BulletRigidBody::getAngularVelocity() const
 	return to_vec( rigidBody->getAngularVelocity() );
 }
 
+void BulletRigidBody::toggleSimulation(bool toggle)
+{
+    btDynamicsWorld& world = dynamicsWorld->getBtDynamicsWorld();
+    if (toggle && !rigidBody->isInWorld()) 
+    {
+        world.addRigidBody( rigidBody.get() );
+        for (constraint_iterator iter = constraints.begin(); iter != constraints.end(); ++iter)
+        {
+            btGeneric6DofConstraint* constraint = static_cast<BulletConstraint*>(*iter)->getBtConstraint();
+            if ( constraint->getRigidBodyA().isInWorld() && constraint->getRigidBodyB().isInWorld() ) {
+                world.addConstraint(constraint);
+            }
+        }
+    }
+    else if (!toggle && rigidBody->isInWorld()) 
+    {
+        world.removeRigidBody( rigidBody.get() );
+        for (constraint_iterator iter = constraints.begin(); iter != constraints.end(); ++iter)
+        {
+            btGeneric6DofConstraint* constraint = static_cast<BulletConstraint*>(*iter)->getBtConstraint();
+            if ( !constraint->getRigidBodyA().isInWorld() && !constraint->getRigidBodyB().isInWorld() ) {
+                world.removeConstraint(constraint);
+            }
+        }
+    }
+}
+
 void BulletRigidBody::destroy(bool unlinkConstraints)
 {
     if (rigidBody) 
@@ -329,7 +356,9 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         }
 
         // destroy rigid body
-        dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
+        if ( rigidBody->isInWorld() ) {
+            dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
+        }
         rigidBody.reset();
 
 		logger << log::S_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
@@ -338,6 +367,8 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
 
 void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 {
+    bool isInWorld = rigidBody ? rigidBody->isInWorld() : false;
+
     // remove old rigid body
     destroy(false);
 
@@ -353,7 +384,6 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
         rigidBody->setCollisionFlags( rigidBody->getCollisionFlags() | flags );
         rigidBody->setActivationState(DISABLE_DEACTIVATION);
     }
-    dynamicsWorld->getBtDynamicsWorld().addRigidBody( rigidBody.get() );
 
     // recreate constraints
     for (size_t i = 0; i<constraints.size(); ++i) {
@@ -362,6 +392,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 
     // remember
     desc = desc_;
+    toggleSimulation(isInWorld);
 
     // call handlers
     onResetSignal(*this);

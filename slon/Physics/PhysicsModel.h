@@ -66,6 +66,9 @@ public:
     /** find constraint by the name. */
     constraint_iterator findConstraint(const std::string& name);
 
+    /** Toggle physics simulation for model */
+    void toggleSimulation(bool toggle);
+
 private:
 	std::string			 name;
     rigid_body_set       rigidBodies;

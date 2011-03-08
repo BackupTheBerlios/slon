@@ -147,6 +147,9 @@ public:
      *
     bool addInWorld(); */
 
+    /** Toggle simulation of the rigid body */
+    virtual void toggleSimulation(bool toggle) = 0;
+
     /** Get iterator addressing first constraint attached to this rigid body */
     virtual constraint_iterator firstConstraint() = 0;
 

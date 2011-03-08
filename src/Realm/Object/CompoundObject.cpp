@@ -166,6 +166,8 @@ void CompoundObject::clearPhysics(scene::Node* node)
                 root.reset(parent);
             }
         }
+
+        physicsModel->toggleSimulation(false);
     }
 }
 
@@ -215,6 +217,7 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                     logger << log::S_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
                 }
             }
+            physicsModel->toggleSimulation(true);
 
             // apply local transform to the shapes
             scene::TransformVisitor tv(*root);

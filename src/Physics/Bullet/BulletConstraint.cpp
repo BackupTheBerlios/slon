@@ -157,7 +157,9 @@ void BulletConstraint::reset(const state_desc& _desc)
     assert( rigidBodyA->dynamicsWorld == rigidBodyB->dynamicsWorld && "Linked bodies must be in same dynamics world" );
     {
         dynamicsWorld = rigidBodyA->dynamicsWorld;
-        dynamicsWorld->getBtDynamicsWorld().addConstraint(newConstraint.get());
+        if ( newConstraint->getRigidBodyA().isInWorld() && newConstraint->getRigidBodyB().isInWorld() ) {
+            dynamicsWorld->getBtDynamicsWorld().addConstraint( newConstraint.get() );
+        }
         
         // attach constraints to rigid body
         for (int i = 0; i<2; ++i) 

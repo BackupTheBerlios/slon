@@ -71,6 +71,7 @@ public:
     void    reset(const RigidBody::state_desc& desc);
     void    setTransform(const math::Matrix4r& worldTransform);
     void    setActivationState(ACTIVATION_STATE state);
+    void    toggleSimulation(bool toggle);
 
     RigidBody::constraint_iterator firstConstraint()    { return constraints.begin(); }
     RigidBody::constraint_iterator endConstraint()      { return constraints.end(); }
