@@ -58,7 +58,7 @@ void TransformVisitor::traverse(Node& node)
 void TransformVisitor::visitGroup(Group& group)
 {
     traverse_node child = *currentNode;
-    for (Node* i = group.getChild(); i; i = i->getRight())
+    for(Node* i = group.getChild(); i; i = i->getRight())
     {
         child.node = i;
         forTraverse.push(child);
@@ -87,7 +87,7 @@ bool TransformVisitor::visitTransform(Transform& transform)
     traverse_node child;
     child.transform = &transform;
     child.dirty     = dirty;
-    for (Node* i = transform.getChild(); i; i = i->getRight())
+    for(Node* i = transform.getChild(); i; i = i->getRight())
     {
         child.node = i;
         forTraverse.push(child);

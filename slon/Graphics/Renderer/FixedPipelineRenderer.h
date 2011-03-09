@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_RENDERER_FIXED_PIPELINE_RENDERER_H__
 
 #include "../../Scene/Visitors/CullVisitor.h"
+#include "../Detail/Utility.h"
 #include "../Renderer.h"
 #include <vector>
 
@@ -148,7 +149,7 @@ private:
     sgl::ref_ptr<sgl::RasterizerState> wireframeState;
 
     // frame
-    mutable scene::CullVisitor  cullVisitor;
+    mutable RenderableGatherer  gatherer;
     mutable camera_params_ptr   cameraParams;
     mutable light_params_ptr    lightParams;
     mutable render_packets      renderPackets;

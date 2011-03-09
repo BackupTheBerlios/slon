@@ -34,11 +34,11 @@ namespace {
 
         void operator () (void)
         {
-            realm::World* world;
+            realm::detail::World& world = static_cast<realm::detail::World&>(engine.getWorld());
             thread::detail::ThreadManager& threadManager = static_cast<thread::detail::ThreadManager&>(engine.getThreadManager());
 			if (multithreaded)
 			{
-				while( engine.isRunning() && ( world = engine.getWorld() ) )
+				while( engine.isRunning() )
 				{
 					// perform up to 10 delayed functions
 					int i = 0;
@@ -46,13 +46,13 @@ namespace {
 
 					// physics simulation doesn't modify the world directly, but
 					// we will get problems if world simulation and traverse overlap
-					thread::lock_ptr lock = world->lockForReading();
+					thread::lock_ptr lock = world.lockForReading();
 				#ifdef SLON_ENGINE_USE_PHYSICS
                     static_cast<physics::detail::PhysicsManager&>( engine.getPhysicsManager() ).handlePhysics();
 				#endif
 				}
 			}
-            else if ( (world = engine.getWorld()) )
+            else
 			{
 				// perform up to 10 delayed functions
 				int i = 0;
@@ -60,7 +60,7 @@ namespace {
 
 				// physics simulation doesn't modify the world directly, but
 				// we will get problems if world simulation and traverse overlap
-				thread::lock_ptr lock = world->lockForReading();
+				thread::lock_ptr lock = world.lockForReading();
 			#ifdef SLON_ENGINE_USE_PHYSICS
 				static_cast<physics::detail::PhysicsManager&>( engine.getPhysicsManager() ).handlePhysics();
 			#endif
@@ -230,8 +230,6 @@ void Engine::init()
 
 void Engine::run(const DESC& desc_)
 {
-    assert(world && "Engine must have world to run");
-
     desc           = desc_;
     frameNumber    = 0;
     working        = true;
@@ -272,15 +270,15 @@ void Engine::run(const DESC& desc_)
 
         // traverse updated objects
         {
-            thread::lock_ptr lock = world->lockForWriting();
+            thread::lock_ptr lock = world.lockForWriting();
             for (size_t i = 0; i<updateQueue.size(); ++i) 
             {
                 updateQueue[i]->traverse(traverser);
-                world->update(updateQueue[i].get());
+                world.update(updateQueue[i].get());
             }
             updateQueue.clear();
         }
-        graphicsManager.render(*world);
+        graphicsManager.render(world);
     }
 
     // remove useless now delegates
@@ -304,9 +302,7 @@ void Engine::run(const DESC& desc_)
 
 void Engine::frame()
 {
-    assert(world && "Engine must have world to run");
     bool fullFrame = !working;
-
     if (fullFrame)
     {
         working = true;
@@ -327,15 +323,15 @@ void Engine::frame()
 
         // traverse updated objects
     {
-        thread::lock_ptr lock = world->lockForWriting();
+        thread::lock_ptr lock = world.lockForWriting();
         for (size_t i = 0; i<updateQueue.size(); ++i) 
         {
             updateQueue[i]->traverse(traverser);
-            world->update(updateQueue[i].get());
+            world.update(updateQueue[i].get());
         }
         updateQueue.clear();
     }
-    graphicsManager.render(*world);
+    graphicsManager.render(world);
 
     ++frameNumber;
 

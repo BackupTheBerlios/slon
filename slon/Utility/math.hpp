@@ -1,8 +1,12 @@
 #ifndef __SLON_ENGINE_MATH_H__
 #define __SLON_ENGINE_MATH_H__
 
+#include <boost/variant.hpp>
 #include <limits>
 #include <sgl/Math/AABB.hpp>
+#include <sgl/Math/Frustum.hpp>
+#include <sgl/Math/Ray.hpp>
+#include <sgl/Math/Sphere.hpp>
 
 namespace slon {
 
@@ -37,6 +41,11 @@ namespace slon {
                                                                                 -std::numeric_limits<T>::max(),
                                                                                 -std::numeric_limits<T>::max(),
                                                                                 -std::numeric_limits<T>::max() );
+
+	typedef boost::variant<math::Ray3f,
+						   math::Sphere3f,
+						   math::AABBf,
+						   math::Frustumf> body_variant;
 
 } // namespace slon
 

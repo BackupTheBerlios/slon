@@ -276,7 +276,7 @@ void aabb_tree<LeafData, RealType>::clear()
  * @param tree - tree for gathering elements.
  * @param volume - volume for gathering.
  * @param iterator - iterator for adding gathered elements.
- * @param functor - perform functor.
+ * @param functor - perform functor(visitor). Return true to stop traverse.
  */
 template< typename LeafData,
           typename RealType,
@@ -308,8 +308,11 @@ void perform_on_leaves( const aabb_tree<LeafData, RealType>& tree,
                     queue.push( root->get_child(1) );
                 }
             }
-            else {
-                functor(root->leafData);
+            else 
+			{
+                if ( functor(root->leafData) ) {
+					return;
+				}
             }
         }
     }

@@ -762,7 +762,6 @@ namespace {
                             scene::Skeleton* skeleton = new scene::Skeleton();
                             {
                                 scene::joint_ptr holder(rootJoint);
-                                rootJoint->getParent()->removeChild(rootJoint);
                                 rootJoint->getParent()->addChild(skinnedMesh);
                                 skeleton->setRootJoint(rootJoint);
                             }

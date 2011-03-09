@@ -6,6 +6,7 @@
 #include "../Graphics/Detail/GraphicsManager.h"
 #include "../Input/Detail/InputManager.h"
 #include "../FileSystem/Detail/FileSystemManager.h"
+#include "../Realm/Detail/World.h"
 #include "../Thread/Detail/ThreadManager.h"
 #include "../Thread/StartStopTimer.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -25,9 +26,7 @@ public:
     Engine();
     ~Engine();
 
-    // Override Engine
-    void setWorld(realm::World* _world) { world.reset(_world); }
-
+	// Override Engine
     void init();
     void run(const DESC& desc);
     void frame();
@@ -39,7 +38,7 @@ public:
     unsigned int getFrameNumber() const { return frameNumber; }
 
     /** Get simulation world */
-    realm::World* getWorld() { return world.get(); }
+    realm::World& getWorld() { return world; }
 
     /** Get timer measuring time from start of the simulation. */
     Timer& getSimulationTimer() { return *simulationTimer; }
@@ -77,15 +76,13 @@ private:
     log::LogManager                             logManager;
     thread::detail::ThreadManager               threadManager;
     filesystem::detail::file_system_manager_ptr filesystemManager;
+    realm::detail::World						world;
     start_stop_timer_ptr                        simulationTimer;
 #ifdef SLON_ENGINE_USE_PHYSICS
     physics::detail::PhysicsManager             physicsManager;
 #endif
 
     std::vector<realm::object_ptr> updateQueue;
-
-    // scene
-    realm::world_ptr    world;
 
     // misc
     DESC    desc;

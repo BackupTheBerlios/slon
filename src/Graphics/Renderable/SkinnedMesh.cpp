@@ -465,12 +465,12 @@ const math::AABBf& SkinnedMesh::getBounds() const
 
 void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
 {
-    if (skeleton_)
+    if ( skeleton_ && skeleton_->getRootJoint() )
     {
         std::fill( joints.begin(), joints.end(), scene::const_joint_ptr() );
 
         gather_joints_visitor visitor(*this, joints);
-        visitor.traverse(*skeleton_);
+        visitor.traverse( *skeleton_->getRootJoint() );
 
         // check we have all necessary joints
         for (int i = 0; i<int(joints.size() - 1); ++i)

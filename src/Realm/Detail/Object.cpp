@@ -3,12 +3,12 @@
 #include "Log/LogVisitor.h"
 #include "Physics/PhysicsModel.h"
 #include "Physics/RigidBodyTransform.h"
-#include "Realm/Object/CompoundObject.h"
+#include "Realm/Detail/Object.h"
 #include "Scene/Visitors/DFSNodeVisitor.h"
 #include "Scene/Visitors/FilterVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
 
-__DEFINE_LOGGER__("realm.CompoundObject")
+__DEFINE_LOGGER__("realm.Object")
 
 namespace {
 
@@ -51,20 +51,18 @@ namespace {
 
 namespace slon {
 namespace realm {
+namespace detail {
 
-CompoundObject::CompoundObject(scene::Node*             root_, 
-                               bool                     dynamic_
+Object::Object(scene::Node*             root_, 
+               bool                     dynamic_
 #ifdef SLON_ENGINE_USE_PHYSICS
-                               , physics::PhysicsModel* physicsModel_
+               , physics::PhysicsModel* physicsModel_
 #endif
-                               ) :
-    dynamic(dynamic_),
-    alwaysUpdate(false)
+               ) :
+	location(0),
+	locationData(0),
+    dynamic(dynamic_)
 {
-    world       = 0;
-    location    = 0;
-    spatialNode = 0;
-
     logger << log::S_FLOOD << "Creating compound object" << LOG_FILE_AND_LINE;
     setRoot(root_);
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -72,13 +70,7 @@ CompoundObject::CompoundObject(scene::Node*             root_,
 #endif
 }
 
-    
-CompoundObject::~CompoundObject()
-{
-    setRoot(0);
-}
-
-void CompoundObject::traverse(scene::NodeVisitor& nv)
+void Object::traverse(scene::NodeVisitor& nv)
 {
     if (root)
     {
@@ -94,14 +86,14 @@ void CompoundObject::traverse(scene::NodeVisitor& nv)
     }
 }
 
-void CompoundObject::traverse(scene::ConstNodeVisitor& nv) const
+void Object::traverse(scene::ConstNodeVisitor& nv) const
 {
     if (root) {
         nv.traverse(*root);
     }
 }
 
-void CompoundObject::setRoot(scene::Node* root_)
+void Object::setRoot(scene::Node* root_)
 {
     if (root)
     {
@@ -137,7 +129,7 @@ void CompoundObject::setRoot(scene::Node* root_)
 }
 
 #ifdef SLON_ENGINE_USE_PHYSICS
-void CompoundObject::clearPhysics(scene::Node* node)
+void Object::clearPhysics(scene::Node* node)
 {
     if ( scene::Group* group = dynamic_cast<scene::Group*>(node) )
     {
@@ -166,12 +158,10 @@ void CompoundObject::clearPhysics(scene::Node* node)
                 root.reset(parent);
             }
         }
-
-        physicsModel->toggleSimulation(false);
     }
 }
 
-void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
+void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
 {
     using namespace physics;
 
@@ -217,7 +207,6 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                     logger << log::S_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
                 }
             }
-            physicsModel->toggleSimulation(true);
 
             // apply local transform to the shapes
             scene::TransformVisitor tv(*root);
@@ -230,5 +219,6 @@ void CompoundObject::setPhysicsModel(physics::PhysicsModel* physicsModel_)
 }
 #endif // SLON_ENGINE_USE_PHYSICS
 
-} // namesapce realm
+} // namespace detail
+} // namespace realm
 } // namespace slon

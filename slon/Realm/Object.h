@@ -4,8 +4,6 @@
 #include "../Config.h"
 #include "../Physics/Forward.h"
 #include "../Scene/Forward.h"
-#include "../Scene/Node.h"
-#include "../Utility/Algorithm/spatial_node.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
 #include <sgl/Math/AABB.hpp>
@@ -17,68 +15,51 @@ namespace realm {
 class Object :
     public Referenced
 {
-friend class object_core_access;
-private:
-    // noncopyable
-    Object(const Object&);
-    Object& operator = (const Object&);
-
-protected:
-    Object() {}
-
 public:
-    /** Check whether object is dynamic */
+    /** Check whether object is dynamic. */
     virtual bool isDynamic() const = 0;
 
-    /** Get AABB of the object */
-    virtual const math::AABBf& getBounds() const = 0;
+	/** Setup dynamic flag for the object. */
+	virtual void toggleDynamic(bool toggle) = 0;
 
-    /** Get root node of the object scene graph */
+    /** Get AABB of the object. */
+    virtual const math::AABBf& getBounds() const = 0;
+	
+    /** Get root node of the object scene graph. */
+    virtual scene::Node* getRoot() = 0;
+
+    /** Get root node of the object scene graph. */
     virtual const scene::Node* getRoot() const = 0;
+
+	/** Set root node of the object scene graph. */
+	virtual void setRoot(scene::Node* root) = 0;
 
     /** Traverse object scene graph */
     virtual void traverse(scene::NodeVisitor& nv) = 0;
 
     /** Traverse object scene graph */
     virtual void traverse(scene::ConstNodeVisitor& nv) const = 0;
+	
+    /** Get location where object is located */
+    virtual Location* getLocation() = 0;
 
     /** Get location where object is located */
-    virtual const Location* getLocation() const { return location; }
+    virtual const Location* getLocation() const = 0;
 
-    /** Get world where object is located */
-    virtual const World* getWorld() const { return world; }
+    virtual bool isInWorld() const = 0;
 
 #ifdef SLON_ENGINE_USE_PHYSICS
     /** Get physics model of the object. */
-    const physics::PhysicsModel* getPhysicsModel() const;
+    virtual physics::PhysicsModel* getPhysicsModel() = 0;
+
+    /** Get physics model of the object. */
+    virtual const physics::PhysicsModel* getPhysicsModel() const = 0;
+
+	/** Set physics model for the object. */
+    virtual void setPhysicsModel(physics::PhysicsModel* physicsModel) = 0;
 #endif
 
     virtual ~Object() {}
-
-protected:
-    // spatial structure
-    World*          world;
-    Location*       location;
-    spatial_node*   spatialNode; // place binary hacks here
-
-    // node
-    scene::node_ptr root;
-};
-
-// access to the object fields
-class object_core_access
-{
-public:
-    static void             set_world(Object& co, World* world)                     { co.world = world; }
-    static void             set_location(Object& co, Location* location)            { co.location = location; }
-    static void             set_spatial_node(Object& co, spatial_node* spatialNode) { co.spatialNode = spatialNode; }
-    static World*           get_world(Object& co)                                   { return co.world; }
-    static Location*        get_location(Object& co)                                { return co.location; }
-    static spatial_node*    get_spatial_node(Object& co)                            { return co.spatialNode; }
-    static scene::Node*     get_node(Object& co)                                    { return co.root.get(); }
-
-    template<typename spatial_node_t>
-    static spatial_node_t*  get_spatial_node(Object& co)                            { return static_cast<spatial_node_t*>(co.spatialNode); }
 };
 
 } // namespace realm

@@ -7,10 +7,6 @@
 #include "Graphics/Renderer/ForwardRenderer.h"
 #include "Input/KeyboardHandler.h"
 #include "Input/MouseHandler.h"
-#include "Realm/Location/DbvtLocation.h"
-#include "Realm/Object/CompoundObject.h"
-#include "Realm/Object/EntityObject.h"
-#include "Realm/World/ScalableWorld.h"
 #include "Scene/Camera/LookAtCamera.h"
 #include "Scene/Camera/ReflectCamera.h"
 #include "Scene/Light/DirectionalLight.h"
@@ -97,9 +93,9 @@ public:
         #ifdef WIN32
             FreeConsole();
         #endif
+
             // create world
-            world.reset(new realm::ScalableWorld);
-            engine->setWorld( world.get() );
+            realm::World& world = realm::currentWorld();
 
             // Create skybox
             SkyBox* skyBox = new SkyBox();
@@ -115,14 +111,12 @@ public:
                 };
                 skyBox->MakeFromSideTextures(SKY_BOX_MAPS);
             }
-            skyBoxObject.reset( new realm::EntityObject(*skyBox, false) );
-            world->add( skyBoxObject.get() );
+            world.add(skyBox, false);
 
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
-				scene::node_ptr       model   = library->getVisualScenes().front().second;
-                world->add( new realm::CompoundObject(model.get(), true) );
+                world.add(library->getVisualScenes().front().second.get());
 
 				database::Library::key_animation_array animations = library->getAnimations();
 				if ( !animations.empty() )
@@ -138,8 +132,7 @@ public:
                 light->setColor( Vector4f(0.8f, 0.8f, 0.8f, 1.0f) );
                 light->setAmbient(0.3f);
                 light->setIntensity(1.5f);
-
-                world->add( new realm::EntityObject(*light, false) );
+                world.add(light, false);
             }
 
             // Create camera
@@ -317,14 +310,8 @@ private:
     }
 
 private:
-    // world
-    boost::intrusive_ptr<realm::ScalableWorld>      world;
-
     // water
     boost::intrusive_ptr<LookAtCamera>              camera;
-
-    // skybox
-    realm::entity_object_ptr                        skyBoxObject;
 
     // modes
     sgl::ref_ptr<sgl::RasterizerState>              backFaceCullState;

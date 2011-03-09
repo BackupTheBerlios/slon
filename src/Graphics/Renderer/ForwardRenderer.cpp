@@ -279,23 +279,23 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
     cameraParams->setup(camera);
     {
         // gather lights && frustum renderables
-        cullVisitor.clear();
-        cullVisitor.setCamera(&camera);
+        gatherer.cv.clear();
+        gatherer.cv.setCamera(&camera);
         {
             thread::lock_ptr lock = world.lockForReading();
-            world.visit(camera.getFrustum(), cullVisitor);
+            world.visitVisible(camera.getFrustum(), gatherer);
         }
 
         // partition lights by their types
         std::vector<Light::LIGHT_TYPE> lightTypes;
         {
-            light_iterator partitionIter = cullVisitor.beginLight();
+            light_iterator partitionIter = gatherer.cv.beginLight();
             for (size_t i = 0;
-                        i != Light::NUM_LIGHT_TYPES && partitionIter != cullVisitor.endLight();
+                        i != Light::NUM_LIGHT_TYPES && partitionIter != gatherer.cv.endLight();
                         ++i)
             {
                 Light::LIGHT_TYPE   lightType = Light::LIGHT_TYPE(i);
-                light_iterator      iter = std::partition( partitionIter, cullVisitor.endLight(), partition_by_type(lightType) );
+                light_iterator      iter = std::partition( partitionIter, gatherer.cv.endLight(), partition_by_type(lightType) );
                 if (iter != partitionIter)
                 {
                     lightTypes.push_back(lightType);
@@ -350,7 +350,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                     device->Clear(false, true, false);
                 }
 
-                render_pass( renderGroup, RP_DEPTH, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                render_pass( renderGroup, RP_DEPTH, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
 
                 // setup input textures
                 if (desc.makeDepthMap && depthMapBinder && renderTarget) {
@@ -371,12 +371,12 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                 }
 
                 // render scene for each light source
-                light_const_iterator lightIter    = cullVisitor.beginLight();
-                light_const_iterator lightIterEnd = cullVisitor.beginLight();
+                light_const_iterator lightIter    = gatherer.cv.beginLight();
+                light_const_iterator lightIterEnd = gatherer.cv.beginLight();
                 size_t i = 0;
-                while ( lightIter != cullVisitor.endLight() ) 
+                while ( lightIter != gatherer.cv.endLight() ) 
                 {
-                    if ( lightIterEnd == cullVisitor.endLight()
+                    if ( lightIterEnd == gatherer.cv.endLight()
                          || std::distance(lightIter, lightIterEnd) == lightParams->max_light_count() 
                          || (*lightIterEnd)->getLightType() != lightTypes[i] ) 
                     {
@@ -385,17 +385,17 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                         {
                         case scene::Light::DIRECTIONAL:
                             lightParams->setup_directional(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_DIRECTIONAL_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_DIRECTIONAL_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
                             break;
                                                 
                         case scene::Light::POINT:
                             lightParams->setup_point(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_POINT_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_POINT_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
                             break;
 
                         case scene::Light::SPOT:
                             //lightParams->setup(lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_SPOT_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                            render_pass( renderGroup, RP_SPOT_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
                             break;
 
                         default:
@@ -412,10 +412,10 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
             }
 
             // render non lightened objects
-            render_pass( renderGroup, RP_OPAQUE, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+            render_pass( renderGroup, RP_OPAQUE, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
 
             if (desc.useDebugRender) {
-                render_pass( renderGroup, RP_DEBUG, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+                render_pass( renderGroup, RP_DEBUG, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
             }
         }
 

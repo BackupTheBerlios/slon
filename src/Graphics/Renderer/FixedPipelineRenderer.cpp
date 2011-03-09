@@ -102,11 +102,11 @@ void FixedPipelineRenderer::render(realm::World& world, const scene::Camera& cam
     cameraParams->setup(camera);
     {
         // gather lights && frustum renderables
-        cullVisitor.clear();
-        cullVisitor.setCamera(&camera);
+        gatherer.cv.clear();
+        gatherer.cv.setCamera(&camera);
         {
             thread::lock_ptr lock = world.lockForReading();
-            world.visit(camera.getFrustum(), cullVisitor);
+            world.visitVisible(camera.getFrustum(), gatherer);
         }
 
         // perform forward rendering
@@ -120,8 +120,8 @@ void FixedPipelineRenderer::render(realm::World& world, const scene::Camera& cam
         }
 
 		const int               maxFFPLights = 8;
-        light_const_iterator    lightIter    = cullVisitor.beginLight();
-        light_const_iterator    lightIterEnd = cullVisitor.endLight();
+        light_const_iterator    lightIter    = gatherer.cv.beginLight();
+        light_const_iterator    lightIterEnd = gatherer.cv.endLight();
 		while (lightIter != lightIterEnd)
         {
 			// setup lights
@@ -131,12 +131,12 @@ void FixedPipelineRenderer::render(realm::World& world, const scene::Camera& cam
 			}
 
             // render lightened objects
-            render_pass( RG_MAIN, RP_LIGHTING, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+            render_pass( RG_MAIN, RP_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
         }
 
         device->FixedPipelineProgram()->GetLightingToggleUniform()->Set(false);
-        render_pass( RG_MAIN, RP_OPAQUE, cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
-        render_pass( RG_MAIN, RP_DEBUG,  cullVisitor.beginRenderable(), cullVisitor.endRenderable() );
+        render_pass( RG_MAIN, RP_OPAQUE, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+        render_pass( RG_MAIN, RP_DEBUG,  gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
 
         if (wireframe) {
             device->PopState(sgl::State::RASTERIZER_STATE);

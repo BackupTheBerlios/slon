@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_FORWARD_RENDERER_H__
 
 #include "../../Scene/Visitors/CullVisitor.h"
+#include "../Detail/Utility.h"
 #include "../Effect/Pass.h"
 #include "../Renderer.h"
 #include <sgl/Device.h>
@@ -193,7 +194,7 @@ private:
     mutable sgl::ref_ptr<sgl::RenderTarget> postProcessRenderTarget;
 
     // frame
-    mutable scene::CullVisitor  cullVisitor;
+    mutable RenderableGatherer  gatherer;
     mutable camera_params_ptr   cameraParams;
     mutable light_params_ptr    lightParams;
     mutable render_packets      renderPackets;

@@ -98,6 +98,7 @@ SET ( TARGET_GRAPHICS_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Detail/ParameterTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/StateTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/UniformTable.h
+    ${TARGET_HEADER_PATH}/Graphics/Detail/Utility.h
 )
 
 SET ( TARGET_GRAPHICS_EFFECT_HEADERS
@@ -229,18 +230,10 @@ SET ( TARGET_REALM_HEADERS
     ${TARGET_HEADER_PATH}/Realm/World.h
 )
 
-SET ( TARGET_REALM_OBJECT_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/Object/CompoundObject.h
-    ${TARGET_HEADER_PATH}/Realm/Object/EntityObject.h
-)
-
-SET ( TARGET_REALM_LOCATION_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/Location/DbvtLocation.h
-)
-
-SET ( TARGET_REALM_WORLD_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/World/ScalableWorld.h
-    ${TARGET_HEADER_PATH}/Realm/World/WorldBase.h
+SET ( TARGET_REALM_DETAIL_HEADERS
+    ${TARGET_HEADER_PATH}/Realm/Detail/BVHLocation.h
+    ${TARGET_HEADER_PATH}/Realm/Detail/Object.h
+    ${TARGET_HEADER_PATH}/Realm/Detail/World.h
 )
 
 SET ( TARGET_SCENE_HEADERS
@@ -361,9 +354,7 @@ SOURCE_GROUP( headers\\Physics FILES                       ${TARGET_PHYSICS_HEAD
 SOURCE_GROUP( headers\\Physics\\Bullet FILES               ${TARGET_PHYSICS_BULLET_HEADERS} )
 SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Realm FILES                         ${TARGET_REALM_HEADERS} )
-SOURCE_GROUP( headers\\Realm\\Object FILES                 ${TARGET_REALM_OBJECT_HEADERS} )
-SOURCE_GROUP( headers\\Realm\\Location FILES               ${TARGET_REALM_LOCATION_HEADERS} )
-SOURCE_GROUP( headers\\Realm\\World FILES                  ${TARGET_REALM_WORLD_HEADERS} )
+SOURCE_GROUP( headers\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_HEADERS} )
@@ -404,9 +395,7 @@ SET ( TARGET_HEADERS
     ${TARGET_INPUT_DETAIL_HEADERS}
     ${TARGET_LOG_HEADERS}
     ${TARGET_REALM_HEADERS}
-    ${TARGET_REALM_OBJECT_HEADERS}
-    ${TARGET_REALM_LOCATION_HEADERS}
-    ${TARGET_REALM_WORLD_HEADERS}
+    ${TARGET_REALM_DETAIL_HEADERS}
     ${TARGET_SCENE_LIGHT_HEADERS}
     ${TARGET_SCENE_HEADERS}
     ${TARGET_SCENE_VISITORS_HEADERS}
@@ -503,6 +492,7 @@ SET ( TARGET_GRAPHICS_DETAIL_SOURCES
     Graphics/Detail/GraphicsManager.cpp
     Graphics/Detail/StateTable.cpp
     Graphics/Detail/UniformTable.cpp
+    Graphics/Detail/Utility.cpp
 )
 
 SET ( TARGET_GRAPHICS_EFFECT_SOURCES
@@ -610,22 +600,10 @@ SET ( TARGET_PHYSICS_DETAIL_SOURCES
     Physics/Detail/PhysicsManager.cpp
 )
 
-SET ( TARGET_REALM_SOURCES
-    Realm/World.cpp
-)
-
-SET ( TARGET_REALM_OBJECT_SOURCES
-    Realm/Object/CompoundObject.cpp
-    Realm/Object/EntityObject.cpp
-)
-
-SET ( TARGET_REALM_LOCATION_SOURCES
-    Realm/Location/DbvtLocation.cpp
-)
-
-SET ( TARGET_REALM_WORLD_SOURCES
-    Realm/World/ScalableWorld.cpp
-	Realm/World/WorldBase.cpp
+SET ( TARGET_REALM_DETAIL_SOURCES
+    Realm/Detail/BVHLocation.cpp
+    Realm/Detail/Object.cpp
+    Realm/Detail/World.cpp
 )
 
 SET ( TARGET_SCENE_SOURCES
@@ -708,9 +686,7 @@ SOURCE_GROUP( sources\\Physics FILES                       ${TARGET_PHYSICS_SOUR
 SOURCE_GROUP( sources\\Physics\\Bullet FILES               ${TARGET_PHYSICS_BULLET_SOURCES} )
 SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Realm FILES                         ${TARGET_REALM_SOURCES} )
-SOURCE_GROUP( sources\\Realm\\Object FILES                 ${TARGET_REALM_OBJECT_SOURCES} )
-SOURCE_GROUP( sources\\Realm\\Location FILES               ${TARGET_REALM_LOCATION_SOURCES} )
-SOURCE_GROUP( sources\\Realm\\World FILES                  ${TARGET_REALM_WORLD_SOURCES} )
+SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_SOURCES} )
@@ -747,9 +723,7 @@ SET ( TARGET_SOURCES
     ${TARGET_GRAPHICS_WATER_SOURCES}
     ${TARGET_LOG_SOURCES}
     ${TARGET_REALM_SOURCES}
-    ${TARGET_REALM_OBJECT_SOURCES}
-    ${TARGET_REALM_LOCATION_SOURCES}
-    ${TARGET_REALM_WORLD_SOURCES}
+    ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
     ${TARGET_SCENE_CAMERA_SOURCES}
     ${TARGET_SCENE_LIGHT_SOURCES}

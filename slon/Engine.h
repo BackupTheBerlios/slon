@@ -35,9 +35,6 @@ public:
     };
 
 public:
-    /** Set simulation world */
-    virtual void setWorld(realm::World* _world) = 0;
-
     /** Initialize engine. Call this before any actions with engine. */
     virtual void init() = 0;
 
@@ -60,7 +57,7 @@ public:
     virtual Timer& getSimulationTimer() = 0;
 
     /** Get simulation world */
-    virtual realm::World* getWorld() = 0;
+    virtual realm::World& getWorld() = 0;
 
     /** Get database manager */
     virtual database::DatabaseManager& getDatabaseManager() = 0;
