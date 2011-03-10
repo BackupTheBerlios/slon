@@ -70,6 +70,11 @@ Object::Object(scene::Node*             root_,
 #endif
 }
 
+Object::~Object()
+{
+    setRoot(0);
+}
+
 void Object::traverse(scene::NodeVisitor& nv)
 {
     if (root)
@@ -99,7 +104,9 @@ void Object::setRoot(scene::Node* root_)
     {
         root->setObject(0);
     #ifdef SLON_ENGINE_USE_PHYSICS
-        if (physicsModel) {
+        if (physicsModel) 
+        {
+            physicsModel->toggleSimulation(false);
             clearPhysics( root.get() );
         }
     #endif
@@ -165,11 +172,16 @@ void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
 {
     using namespace physics;
 
+    if (physicsModel) 
+    {
+        physicsModel->toggleSimulation(false);
+        clearPhysics( root.get() );
+    }
+
     physicsModel.reset(physicsModel_);
     if (root)
     {
         logger << log::S_FLOOD << "Setting physics model for compound object" << LOG_FILE_AND_LINE; 
-        clearPhysics( root.get() );
         
         // set transforms
         if (physicsModel)
@@ -207,6 +219,9 @@ void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                     logger << log::S_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
                 }
             }
+
+            // enable simulation
+            physicsModel->toggleSimulation(true);
 
             // apply local transform to the shapes
             scene::TransformVisitor tv(*root);
