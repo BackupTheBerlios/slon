@@ -63,6 +63,10 @@ private:
                        const std::string& path, 
                        loader_type&       loader);
 
+    bool saveImpl( const std::string& path,
+                   const value_ptr&   item,
+                   saver_type&        saver );
+
 public:
     Cache(log::Logger* logger_ = 0) 
     :   logger(logger_) 
@@ -81,6 +85,9 @@ public:
                    format_id          format = base_type::format_auto);
     value_ptr load(const std::string& path,
                    format_id          format = base_type::format_auto) { return load(path, path, format); }
+    bool      save(const std::string& path,
+				   const value_ptr&	  item,
+				   format_id		  format = base_type::format_auto);
 
     void      remove(const std::string& key);
     void      clear();

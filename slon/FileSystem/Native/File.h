@@ -17,8 +17,9 @@ public:
          const boost::filesystem::path&     virtualPath);
 
 	// Override Node
-	void reload();
-	void flush();
+	filesystem::Node::TYPE  getType() const { return filesystem::Node::FILE; }
+	void                    reload();
+	void                    flush();
 
 	// Override File
 	bool	open(mask_t mode);

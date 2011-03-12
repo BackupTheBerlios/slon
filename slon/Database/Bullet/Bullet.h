@@ -3,6 +3,7 @@
 
 #include "../../Physics/PhysicsModel.h"
 #include "../Loader.h"
+#include "../Saver.h"
 
 namespace slon {
 namespace database {
@@ -12,28 +13,20 @@ class BulletLoader :
     public database::PhysicsSceneLoader
 {
 public:
-    bool binary() const 
-    { 
-        return true; 
-    }
-
-    /** Load '*.bullet' scene */
+    // Override database::PhysicsSceneLoader
+    bool binary() const { return true; }
     physics::physics_model_ptr load(std::istream& stream);
 };
-/*
+
 class BulletSaver :
     public database::PhysicsSceneSaver
 {
 public:
-    bool binary() const 
-    { 
-        return true; 
-    }
-
-    /** Saver '*.bullet' scene 
+    // Override database::PhysicsSceneSaver
+    bool binary() const { return true; }
     void save(physics::physics_model_ptr item, std::ostream& sink);
 };
-*/
+
 } // namespace detail
 } // namespace database
 } // namespace slon

@@ -213,6 +213,13 @@ void Engine::init()
             {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletLoader}
         };
         database::detail::registerLoaders<physics::PhysicsModel>(numPhysicsSceneLoaders, physicsSceneLoaders);
+
+        const size_t                      numPhysicsSceneSavers = 1;
+        fmt_saver<physics::PhysicsModel>  physicsSceneSavers[numPhysicsSceneSavers] = 
+        {
+            {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletSaver}
+        };
+        database::detail::registerSavers<physics::PhysicsModel>(numPhysicsSceneSavers, physicsSceneSavers);
 #endif
     }
 

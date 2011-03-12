@@ -9,6 +9,7 @@
 #include "Physics/Bullet/BulletRigidBody.h"
 #include "Utility/error.hpp"
 #include <bullet/Extras/Serialize/BulletWorldImporter/btBulletWorldImporter.h>
+#include <bullet/LinearMath/btSerializer.h>
 
 __DEFINE_LOGGER__("Database.Bullet")
 
@@ -103,6 +104,60 @@ physics::physics_model_ptr BulletLoader::load(std::istream& stream)
     }
 
     return sceneModel;
+}
+
+void BulletSaver::save(physics::physics_model_ptr model, std::ostream& sink)
+{
+    using namespace physics;
+
+	btDefaultSerializer* btSerializer = new btDefaultSerializer(1024*1024*5);
+
+    btSerializer->startSerialization();
+    {
+        // serialize collision shapes
+        std::set<btCollisionShape*>	serializedShapes;
+
+        for (PhysicsModel::rigid_body_iterator iter  = model->firstRigidBody();
+                                               iter != model->endRigidBody();
+                                               ++iter)
+        {
+            BulletRigidBody&  rigidBody = static_cast<BulletRigidBody&>(**iter);
+            btRigidBody*      btRB      = rigidBody.getBtRigidBody().get();
+            btCollisionShape* btShape   = btRB->getCollisionShape();
+
+            if (serializedShapes.count(btShape) == 0)
+            {
+	            serializedShapes.insert(btShape);
+                btSerializer->registerNameForPointer(btShape, rigidBody.getTarget().c_str());
+	            btShape->serializeSingleShape(btSerializer);
+            }
+        }
+
+        // serialize rigid bodies
+        for (PhysicsModel::rigid_body_iterator iter  = model->firstRigidBody();
+                                               iter != model->endRigidBody();
+                                               ++iter)
+        {
+            btRigidBody*  btRB       = static_cast<BulletRigidBody&>(**iter).getBtRigidBody().get();
+			btChunk*      chunk      = btSerializer->allocate(btRB->calculateSerializeBufferSize(), 1);
+			const char*   structType = btRB->serialize(chunk->m_oldPtr, btSerializer);
+			btSerializer->finalizeChunk(chunk, structType, BT_RIGIDBODY_CODE, btRB);
+        }
+
+        // serialize constraints
+        for (PhysicsModel::constraint_iterator iter  = model->firstConstraint();
+                                               iter != model->endConstraint();
+                                               ++iter)
+        {
+            btGeneric6DofConstraint* btConstraint = static_cast<BulletConstraint&>(**iter).getBtConstraint();
+	        btChunk*                 chunk        = btSerializer->allocate(btConstraint->calculateSerializeBufferSize(), 1);
+	        const char*              structType   = btConstraint->serialize(chunk->m_oldPtr, btSerializer);
+	        btSerializer->finalizeChunk(chunk, structType, BT_CONSTRAINT_CODE, btConstraint);
+        }
+    }
+    btSerializer->finishSerialization();
+
+    sink.write((const char*)btSerializer->getBufferPointer(), btSerializer->getCurrentBufferSize());
 }
 
 } // namespace detail

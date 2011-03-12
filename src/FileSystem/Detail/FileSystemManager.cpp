@@ -82,7 +82,6 @@ filesystem::Node* FileSystemManager::getNode(const char* path)
                                  ++iter)
         {
             boost::fs::path systemPath(*iter);
-            pathStr.substr( systemPath.filename().length() + 1 ); // stem
             systemPath /= pathStr;
 
             // try to find active node
@@ -120,7 +119,20 @@ filesystem::Directory* FileSystemManager::createDirectory(const char* name)
 
 filesystem::File* FileSystemManager::createFile(const char* path)
 {
-    return 0;
+    if ( filesystem::File* file = asFile( getNode(path) ) ) {
+        return file;
+    }
+
+    boost::fs::path    vPath(path);
+    native::Directory* parentDir = static_cast<native::Directory*>( asDirectory( getNode(vPath.parent_path().string().c_str()) ) );
+    if (!parentDir) {
+        return 0;
+    }
+
+    boost::fs::path sPath = parentDir->getSystemPath() / vPath.filename();
+    std::ofstream file( sPath.string().c_str() );
+
+    return new native::File(this, sPath, vPath);
 }
 
 void FileSystemManager::registerNode(const std::string& sysPath, filesystem::Node* node)

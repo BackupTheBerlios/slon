@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Detail/Engine.h"
 
-__DEFINE_LOGGER__("slon.db.DatabaseManager")
+__DEFINE_LOGGER__("database.DatabaseManager")
 
 namespace slon {
 namespace database {
@@ -34,6 +34,18 @@ namespace {
     }
 
 } // anonymous namespace
+   
+DatabaseManager::DatabaseManager()
+:   libraryCache(&logger)
+,   animationCache(&logger)
+,   effectCache(&logger)
+,   textureCache(&logger)
+,   visualSceneCache(&logger)
+#ifdef SLON_ENGINE_USE_PHYSICS
+,   physicsSceneCache(&logger)
+#endif
+{
+}
 
 DatabaseManager::format_desc DatabaseManager::makeFormatDesc(format_id id, const string_array& regexps)
 {
@@ -162,12 +174,21 @@ scene::node_ptr loadVisualScene(const std::string& path,
 }
 
 #ifdef SLON_ENGINE_USE_PHYSICS
+
 physics::physics_model_ptr loadPhysicsScene(const std::string& path,
                                             format_id          format)
 {
     return currentDatabaseManager().getPhysicsSceneCache().load(path, format);
 }
-#endif
+
+bool savePhysicsScene(const std::string&				path,
+					  const physics::physics_model_ptr&	scene,
+					  format_id							format)
+{
+    return currentDatabaseManager().getPhysicsSceneCache().save(path, scene, format);
+}
+
+#endif // SLON_ENGINE_USE_PHYSICS
 
 } // namespace database
 } // namespace slon

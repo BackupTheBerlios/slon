@@ -43,7 +43,7 @@ public:
     /** Create directory with specified path */
     virtual Directory* createDirectory(const char* name) = 0;
 
-    /** Create file with dpecified path */
+    /** Create file with specified path */
     virtual File* createFile(const char* path) = 0;
 
 	virtual ~FileSystemManager() {}

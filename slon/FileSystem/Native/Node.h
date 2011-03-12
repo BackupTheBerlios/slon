@@ -31,9 +31,8 @@ public:
     virtual const boost::filesystem::path& getSystemPath() const { return systemPath; }
 
 	// Override Node
-	filesystem::Node::TYPE	getType() const { return filesystem::Node::FILE; }
-    const char*				getPath() const { return vpath.c_str(); }
-	const char*				getName() const { return name.c_str(); }
+    const char*	getPath() const { return vpath.c_str(); }
+	const char*	getName() const { return name.c_str(); }
 
 protected:
     detail::file_system_manager_ptr manager;

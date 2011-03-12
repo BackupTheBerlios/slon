@@ -21,8 +21,9 @@ public:
               bool                              initialize = false);
 
     // Override Node
-	void reload();
-	void flush();
+	filesystem::Node::TYPE  getType() const { return filesystem::Node::DIRECTORY; }
+	void                    reload();
+	void                    flush();
 
 	// Override Directory
     unsigned				getNumChildren() const;

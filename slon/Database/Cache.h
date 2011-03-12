@@ -155,6 +155,16 @@ public:
     /** Remove all loaders from the cache */
     virtual void clearLoaders() = 0;
 	
+    /** Save physics item to the file.
+     * @param path - path to the file.
+     * @param scene - item to save.
+     * @param format - format of the physics scene to save.
+     * @return true on success.
+     */
+    virtual bool save(const std::string& path,
+					  const value_ptr&	 item,
+					  format_id          format = format_auto) = 0;
+
     /** Get all registered saver. */
     virtual saver_array getSavers() const = 0;
 	

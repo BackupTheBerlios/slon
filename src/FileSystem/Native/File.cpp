@@ -39,18 +39,19 @@ bool File::open(mask_t mode_)
 	if ( (mode_ & in) ) {
 		mode += "r";
 	}
-	if ( (mode_ & binary) ) {
-		mode += "b";
-	}
 
 	if ( (mode_ & append) ) {
 		mode += "a+";
 	}
-	else if ( (mode_ & truncate) ) {
+	else if ( mode_ & at_end ) {
+		mode += "a";
+	}
+	else if ( (mode_ & truncate) || (mode_ & out) ) {
 		mode += "w";
 	}
-	else if ( (mode_ & out) || (mode_ & at_end) ) {
-		mode += "a";
+
+	if ( (mode_ & binary) ) {
+		mode += "b";
 	}
 
     std::string completePath = systemPath.file_string();

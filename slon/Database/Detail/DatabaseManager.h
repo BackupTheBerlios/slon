@@ -47,7 +47,7 @@ private:
                            bool                ignoreDuplicates);
 
 public:
-    DatabaseManager() {}
+    DatabaseManager();
 
 	AnimationCache&		getAnimationCache()     { return animationCache; }
     EffectCache&        getEffectCache()        { return effectCache; }
@@ -138,6 +138,32 @@ inline void registerLoaders<database::Library>(size_t numLoaders, fmt_loader<dat
         
         format_id fmtId = dm.registerLibraryFormat(fmtExpr);
         dm.registerLibraryLoader(fmtId, library_loader_ptr(loaders[i].fmtLoader));
+    }
+}
+
+template<typename T>
+struct fmt_saver
+{
+    typedef boost::intrusive_ptr<T>             value_ptr;
+    typedef database::Saver<value_ptr>          saver_type;
+    typedef boost::intrusive_ptr<saver_type>    saver_ptr;
+
+    const char*     fmtName;
+    size_t          numExpr;
+    const char*     fmtExpr[10];
+    saver_type*     fmtSaver;
+};
+
+template<typename T>
+inline void registerSavers(size_t numSavers, fmt_saver<T>* savers)
+{
+    database::Cache<T>& cache = currentCache<T>();
+    for (size_t i = 0; i<numSavers; ++i)
+    {
+        std::vector<std::string> fmtExpr(savers[i].fmtExpr, savers[i].fmtExpr + savers[i].numExpr);
+        
+        format_id fmtId = cache.registerFormat(fmtExpr);
+        cache.registerSaver(fmtId, typename fmt_saver<T>::saver_ptr(savers[i].fmtSaver));
     }
 }
 

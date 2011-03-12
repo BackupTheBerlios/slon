@@ -82,6 +82,52 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
 }
 
 template<typename T>
+bool Cache<T>::saveImpl( const std::string& path, 
+                         const value_ptr&   item,
+                         saver_type&        saver )
+{
+	using namespace filesystem;
+	using namespace boost::iostreams;
+
+    try
+    {
+		// determine file mode
+        File::mask_t mode = File::out;
+		if ( saver.binary() ) {
+			mode |= File::binary;
+		}
+
+		// open file
+		file_ptr file( currentFileSystemManager().createFile(path.c_str()) );
+		if (!file) 
+		{    
+            (*logger) << log::S_ERROR << "Can't create file: " << path << LOG_FILE_AND_LINE;
+			return false;
+		}
+		else if ( !file->open(mode)  )
+		{
+            (*logger) << log::S_ERROR << "Can't open file: " << path << LOG_FILE_AND_LINE;
+			return false;
+		}
+		
+		stream_buffer<filesystem::file_device> buf(file);
+		std::ostream stream(&buf);
+        
+        saver.save(item, stream);
+    }
+    catch (saver_error& err) 
+    {
+        if (logger) {
+            (*logger) << log::S_ERROR << err.what() << LOG_FILE_AND_LINE;
+        }
+        
+        return false;
+    }
+
+    return true;
+}
+
+template<typename T>
 void Cache<T>::add(const std::string& key, const value_ptr& value)
 {
     bool res = storage.insert( storage_type::value_type(key, value) ).second;
@@ -122,29 +168,19 @@ typename Cache<T>::value_ptr Cache<T>::load(const std::string& key,
         return value;
     }
 
-    if (format == base_type::format_auto)
-    {
-        format_array formats = getAppropriateFormats(path);
-        for (size_t i = 0; i<formats.size(); ++i)
-        {
-            format_desc* fdesc = unwrap(formats[i]);
-            for (loader_set::iterator loaderIt  = fdesc->loaders.begin();
-                                      loaderIt != fdesc->loaders.end();
-                                      ++loaderIt)
-            {
-                if ( (value = loadImpl(key, path, **loaderIt)) ) {
-                    return value;
-                }
-            }
-        }
+    // choose formats
+    format_array formats;
+    if (format == base_type::format_auto) {
+        formats = getAppropriateFormats(path);
     }
-    else 
-    {    
-        format_desc* fdesc = unwrap(format);
-        if (!fdesc) {
-            return value;
-        }
+    else {
+        formats.push_back(format);
+    }
 
+    // try loaders
+    for (size_t i = 0; i<formats.size(); ++i)
+    {
+        format_desc* fdesc = unwrap(formats[i]);
         for (loader_set::iterator loaderIt  = fdesc->loaders.begin();
                                   loaderIt != fdesc->loaders.end();
                                   ++loaderIt)
@@ -156,6 +192,41 @@ typename Cache<T>::value_ptr Cache<T>::load(const std::string& key,
     }
 
     return value;
+}
+
+template<typename T>
+bool Cache<T>::save(const std::string&  path,
+			        const value_ptr&	item,
+			        format_id			format)
+{
+    if (!item) {
+        return false;
+    }
+
+    // choose formats
+    format_array formats;
+    if (format == base_type::format_auto) {
+        formats = getAppropriateFormats(path);
+    }
+    else {
+        formats.push_back(format);
+    }
+
+    // try savers
+    for (size_t i = 0; i<formats.size(); ++i)
+    {
+        format_desc* fdesc = unwrap(formats[i]);
+        for (saver_set::iterator saverIt  = fdesc->savers.begin();
+                                 saverIt != fdesc->savers.end();
+                                 ++saverIt)
+        {
+            if ( saveImpl(path, item, **saverIt) ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 template<typename T>

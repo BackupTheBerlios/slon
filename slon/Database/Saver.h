@@ -29,6 +29,9 @@ class Saver :
     public Referenced
 {
 public:
+    /** Check wether need to open ostream in binary mode */
+    virtual bool binary() const = 0;
+
     /** Just save item. Throw saver_error if can't. 
      * @param sink - sink where to dump item.
      * @see saver_error
