@@ -13,6 +13,7 @@ class BulletRotationalVelocityMotor :
 {
 public:
     BulletRotationalVelocityMotor(BulletConstraint* constraint, int axis);
+    ~BulletRotationalVelocityMotor();
 
     // Override BulletRotationalMotor
     void reset(BulletConstraint* constraint, int axis);

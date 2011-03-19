@@ -11,6 +11,11 @@ BulletRotationalVelocityMotor::BulletRotationalVelocityMotor(BulletConstraint* c
 {
 }
 
+BulletRotationalVelocityMotor::~BulletRotationalVelocityMotor()
+{
+    motor->m_enableMotor = false;
+}
+
 void BulletRotationalVelocityMotor::reset(BulletConstraint* constraint_, int axis_)
 {
     btRotationalLimitMotor* motor_ = constraint_->getBtConstraint()->getRotationalLimitMotor(axis_);
