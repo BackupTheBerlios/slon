@@ -21,11 +21,12 @@ void BulletRotationalServoMotor::reset(BulletConstraint* constraint, int axis)
 
 void BulletRotationalServoMotor::solve(real dt)
 {
-    btVector3 torque = constraint->getBtConstraint()->getAxis(axis) * targetForce;
+    btGeneric6DofConstraint* constraint = motor_base::constraint->getBtConstraint();
+   
+    btRigidBody& rbA = constraint->getRigidBodyA();
+    btRigidBody& rbB = constraint->getRigidBodyB();
 
-    btRigidBody& rbA = motor_base::constraint->getBtConstraint()->getRigidBodyA();
-    btRigidBody& rbB = motor_base::constraint->getBtConstraint()->getRigidBodyB();
-
+    btVector3 torque = constraint->getAxis(axis) * targetForce;
     rbA.applyTorque( torque);
     rbA.activate(true);
     rbB.applyTorque(-torque);

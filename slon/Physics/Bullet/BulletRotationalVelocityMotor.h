@@ -11,6 +11,7 @@ namespace physics {
 class BulletRotationalVelocityMotor :
     public BulletRotationalMotor<VelocityMotor>
 {
+typedef BulletRotationalMotor<VelocityMotor> motor_base;
 public:
     BulletRotationalVelocityMotor(BulletConstraint* constraint, int axis);
     ~BulletRotationalVelocityMotor();
@@ -19,14 +20,14 @@ public:
     void reset(BulletConstraint* constraint, int axis);
 
     // Override VelocityMotor
-    bool enabled() const     { return motor->m_enableMotor; }
-    void toggle(bool toggle) { motor->m_enableMotor = toggle; }
+    bool enabled() const { return motor->m_enableMotor; }
+    void toggle(bool toggle);
 
-    real getTargetVelocity() const        { return motor->m_targetVelocity; }
-    void setTargetVelocity(real velocity) { motor->m_targetVelocity = velocity; }
+    real getTargetVelocity() const { return motor->m_targetVelocity; }
+    void setTargetVelocity(real velocity);
 
-    real getMaxForce() const     { return motor->m_maxMotorForce; }
-    void setMaxForce(real force) { motor->m_maxMotorForce = force; }
+    real getMaxForce() const { return motor->m_maxMotorForce; }
+    void setMaxForce(real force);
 };
 
 } // namespace physics
