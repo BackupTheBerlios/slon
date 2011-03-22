@@ -1,5 +1,3 @@
-SET (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules;${CMAKE_MODULE_PATH}")
-
 # standart
 INCLUDE (StandartIncludes)
 INCLUDE (FindNecessaryLibraries.cmake)
@@ -7,11 +5,11 @@ INCLUDE (OptionDependentOnPackage)
 
 # options
 IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
-	OPTION (BUILD_EXAMPLES "Set ON to build library examples" OFF)
-	MESSAGE ( "Build examples: " ${BUILD_EXAMPLES} )
+	OPTION (SLON_ENGINE_BUILD_EXAMPLES "Set ON to build library examples" OFF)
+	MESSAGE ( "Build examples: " ${SLON_ENGINE_BUILD_EXAMPLES} )
 
-	OPTION (BUILD_TESTS "Set ON to build library tests" OFF)
-	MESSAGE ( "Build tests: " ${BUILD_TESTS} )
+	OPTION (SLON_ENGINE_BUILD_TESTS "Set ON to build library tests" OFF)
+	MESSAGE ( "Build tests: " ${SLON_ENGINE_BUILD_TESTS} )
 
 	OPTION (INSTALL_EXAMPLES "Set to ON to install examples" OFF)
 	MESSAGE ("Install examples: " ${INSTALL_EXAMPLES})
