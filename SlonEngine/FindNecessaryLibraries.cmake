@@ -1,8 +1,12 @@
 SET (Boost_USE_MULTITHREADED ON)
-SET (Boost_USE_STATIC_LIBS   OFF)
+IF (WIN32 AND SLON_ENGINE_3RD_PARTY_FOUND)
+    SET (Boost_USE_STATIC_LIBS ON)
+ELSE (WIN32 AND SLON_ENGINE_3RD_PARTY_FOUND)
+    SET (Boost_USE_STATIC_LIBS OFF)
+ENDIF (WIN32 AND SLON_ENGINE_3RD_PARTY_FOUND)
 
 # find packages
-FIND_PACKAGE ( Boost 1.36.0 	REQUIRED	COMPONENTS signals thread unit_test_framework system filesystem iostreams)
+FIND_PACKAGE ( Boost 1.45.0 	REQUIRED	COMPONENTS signals thread unit_test_framework system filesystem iostreams)
 FIND_PACKAGE ( SDL              REQUIRED )
 FIND_PACKAGE ( Doxygen )
 FIND_PACKAGE ( Bullet  )
