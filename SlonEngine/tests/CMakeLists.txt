@@ -1,3 +1,6 @@
+# boost 
+FIND_PACKAGE ( Boost 1.42.0 REQUIRED COMPONENTS unit_test_framework )
+
 # vars
 SET (TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
