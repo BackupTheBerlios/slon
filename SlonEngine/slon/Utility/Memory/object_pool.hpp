@@ -2,6 +2,7 @@
 
 #include "../if_then_else.hpp"
 #include "block_allocator.hpp"
+#include <boost/noncopyable.hpp>
 #include <boost/type_traits/has_trivial_constructor.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>
 

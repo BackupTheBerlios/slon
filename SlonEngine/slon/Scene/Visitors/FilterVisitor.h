@@ -53,7 +53,7 @@ public:
     virtual void visit(T& node) = 0;
 
 protected:
-    void visit(node_type&) 
+    void visit(node_type& node)
     {
         if ( T* typedNode = dynamic_cast<T*>(&node) ) {
             visit(*typedNode);

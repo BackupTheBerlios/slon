@@ -81,9 +81,9 @@ math::Vector3r BulletRotationalMotor<Base>::getAxis() const
     return to_vec(constraint->getBtConstraint()->getAxis(axis)); 
 }
 
-template BulletRotationalMotor<ServoMotor>;
-template BulletRotationalMotor<SpringMotor>;
-template BulletRotationalMotor<VelocityMotor>;
+template class BulletRotationalMotor<ServoMotor>;
+template class BulletRotationalMotor<SpringMotor>;
+template class BulletRotationalMotor<VelocityMotor>;
 
 } // namespace physics
 } // namespace slon

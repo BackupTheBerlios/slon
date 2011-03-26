@@ -3,6 +3,7 @@
 
 #include "../Config.h"
 #include "Stream.h"
+#include <iomanip>
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Math/Vector.hpp>
 

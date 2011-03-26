@@ -62,7 +62,7 @@ public:
 	void on_save();
 
 	template<typename ElementType>
-	collada_library<ElementType>& get_library();
+    inline collada_library<ElementType>& get_library();
 
 public:
 	// flags
@@ -83,6 +83,17 @@ public:
 	// main scene element
 	mutable collada_scene						scene;
 };
+
+
+template<> inline collada_library<collada_image>&				ColladaDocument::get_library() { return libraryImages; }
+template<> inline collada_library<collada_material>&			ColladaDocument::get_library() { return libraryMaterials; }
+template<> inline collada_library<collada_effect>&				ColladaDocument::get_library() { return libraryEffects; }
+template<> inline collada_library<collada_geometry>&			ColladaDocument::get_library() { return libraryGeometries; }
+template<> inline collada_library<collada_visual_scene>&		ColladaDocument::get_library() { return libraryVisualScenes; }
+template<> inline collada_library<collada_controller>&			ColladaDocument::get_library() { return libraryControllers; }
+template<> inline collada_library<collada_physics_scene>&		ColladaDocument::get_library() { return libraryPhysicsScenes; }
+template<> inline collada_library<collada_physics_model>&		ColladaDocument::get_library() { return libraryPhysicsModels; }
+template<> inline collada_library<collada_physics_material>&	ColladaDocument::get_library() { return libraryPhysicsMaterials; }
 
 // declare default instance loader function
 template<typename ElementType>

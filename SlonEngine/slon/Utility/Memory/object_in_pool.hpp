@@ -11,7 +11,7 @@ class singleton_pool :
     public block_allocator<UserAllocator>
 {
 public:
-    static const size_type element_size = Size;
+    static const size_t element_size = Size;
 
 	typedef block_allocator<UserAllocator>	                block_allocator_type;
 	typedef UserAllocator									user_allocator;

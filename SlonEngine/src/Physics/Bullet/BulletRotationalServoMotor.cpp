@@ -7,7 +7,7 @@ namespace slon {
 namespace physics {
 
 BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constraint, int axis)
-:   BulletRotationalMotor(constraint, axis)
+:   BulletRotationalMotor<ServoMotor>(constraint, axis)
 ,   targetForce(0.0f)
 ,   enableMotor(false)
 {
@@ -15,7 +15,7 @@ BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constra
 
 void BulletRotationalServoMotor::reset(BulletConstraint* constraint, int axis)
 {
-    BulletRotationalMotor::reset(constraint, axis);
+    BulletRotationalMotor<ServoMotor>::reset(constraint, axis);
     setTargetForce(targetForce);
 }
 

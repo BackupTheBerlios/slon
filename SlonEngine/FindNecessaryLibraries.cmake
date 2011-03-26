@@ -7,7 +7,7 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 # find packages
-FIND_PACKAGE ( Boost 1.45.0 	REQUIRED	COMPONENTS signals thread unit_test_framework system filesystem iostreams)
+FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS signals thread unit_test_framework system filesystem iostreams)
 FIND_PACKAGE ( SDL              REQUIRED )
 FIND_PACKAGE ( Doxygen )
 FIND_PACKAGE ( Bullet  )

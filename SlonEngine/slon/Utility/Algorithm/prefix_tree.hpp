@@ -512,24 +512,12 @@ private:
         return p;
     }
 
-	size_type extend(size_type size)
-	{
-		return std::max(size * 3 / 2, min_capacity);
-	}
-
 public:
     prefix_tree( const allocator_type& allocator = allocator_type() )
     :   root(0)
 	,	valueMapper(0, allocator)
     {
     }
-
-	/** Reserve tree to hold up to size elements */
-	void reserve(size_type size)
-	{
-		reserve(prefixes, prefixCapacity, size, prefixAllocator);
-		reserve(prefixes, prefixCapacity, size, prefixAllocator);
-	}
 
     /** Find nearest leaf element in the prefix tree. E.g. you are looking for "C:/Files/file1.txt" key, but
      * prefix tree only have element with "C:/Files" key, so it will be returned.
@@ -595,12 +583,6 @@ public:
     /** Get iterator addressing element after last in the prefix tree. */
     const_iterator end() const { return const_iterator(this, 0); }
 
-    /** Get number of elements in the prefix tree. */
-    size_type size() const { return numValues; }
-
-    /** Check if prefix tree have no elements */
-    bool empty() const { return numValues == 0; }
-
     /** Insert element in the prefix tree. */
     std::pair<iterator, bool> insert(value_type value)
     {
@@ -617,8 +599,8 @@ public:
 		prefix* p    = root;
         int     diff = -1;
 
-		key_type::const_iterator beginLabel = value.first.begin();
-		key_type::const_iterator endLabel   = value.first.end();
+        typename key_type::const_iterator beginLabel = value.first.begin();
+        typename key_type::const_iterator endLabel   = value.first.end();
         while (!value.first.empty() && p)
         {
             diff = compare_label(p, beginLabel, endLabel);
@@ -689,7 +671,7 @@ public:
     void swap(this_type& other) throw()
     {
 		prefixMapper.swap(other.prefixMapper);
-        elementMapper.swap(other.elementMapper);
+        valueMapper.swap(other.valueMapper);
     }
 
 private:

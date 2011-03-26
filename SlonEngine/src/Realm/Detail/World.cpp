@@ -34,7 +34,7 @@ public:
 
 	void operator () (const math::Ray3f& body) const
 	{
-		world.visit<math::Ray3f>(body, cb);
+        world.visit(body, cb);
 	}
     
 	void operator () (const math::Sphere3f& body) const
@@ -44,12 +44,12 @@ public:
 
 	void operator () (const math::AABBf& body) const
 	{
-		world.visit<math::AABBf>(body, cb);
+        world.visit(body, cb);
 	}
 		
 	void operator () (const math::Frustumf& body) const
 	{
-		world.visit<math::Frustumf>(body, cb);
+        world.visit(body, cb);
 	}
 
 private:

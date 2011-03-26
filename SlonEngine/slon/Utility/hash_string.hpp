@@ -200,10 +200,10 @@ public:
         return os << str.c_str();
     }
 
-    friend std::istream& operator >> (std::istream& os, basic_hash_string str)
+    friend std::istream& operator >> (std::istream& is, basic_hash_string str)
     {
         string s; is >> s;
-        (*this) = basic_hash_string(s);
+        str = basic_hash_string(s);
         return is;
     }
 

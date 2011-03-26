@@ -162,8 +162,7 @@ public:
 
     bool		empty() const			{ return endNode_ == 0; }
 	size_type	block_size() const		{ return blockSize_; }
-	size_type	next_size() const		{ return nextSize_; }
-	size_type	page_size() const		{ return blocksPerPage_ + sizeof(pointer); }
+    size_type	next_size() const		{ return nextSize_; }
     size_type	capacity() const		{ return capacity_; }
 
 	void set_next_size(size_type nextSize)

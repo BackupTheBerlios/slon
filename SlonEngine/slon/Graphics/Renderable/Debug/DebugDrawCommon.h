@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_RENDERABLE_DEBUG_MESH_COMMON_H__
 
 #include "../DebugMesh.h"
+#include <cstring>
 
 namespace slon {
 namespace graphics {

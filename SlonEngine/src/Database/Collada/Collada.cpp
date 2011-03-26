@@ -16,7 +16,7 @@
 #include "Scene/Visitors/DFSNodeVisitor.h"
 #include "Scene/Visitors/FilterVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
-#include "Utility/uri/file_uri.hpp"
+#include "Utility/URI/file_uri.hpp"
 
 #ifdef SLON_ENGINE_USE_PHYSICS
 #   include "Physics/PhysicsManager.h"
@@ -1600,13 +1600,3 @@ void ColladaDocument::on_save()
 	serializer &= xmlpp::make_nvp( "scene",						xmlpp::as_element(scene) );
 	serializer.save(*this, colladaElem);
 }
-
-template<> collada_library<collada_image>&				ColladaDocument::get_library() { return libraryImages; }
-template<> collada_library<collada_material>&			ColladaDocument::get_library() { return libraryMaterials; }
-template<> collada_library<collada_effect>&				ColladaDocument::get_library() { return libraryEffects; }
-template<> collada_library<collada_geometry>&			ColladaDocument::get_library() { return libraryGeometries; }
-template<> collada_library<collada_visual_scene>&		ColladaDocument::get_library() { return libraryVisualScenes; }
-template<> collada_library<collada_controller>&			ColladaDocument::get_library() { return libraryControllers; }
-template<> collada_library<collada_physics_scene>&		ColladaDocument::get_library() { return libraryPhysicsScenes; }
-template<> collada_library<collada_physics_model>&		ColladaDocument::get_library() { return libraryPhysicsModels; }
-template<> collada_library<collada_physics_material>&	ColladaDocument::get_library() { return libraryPhysicsMaterials; }

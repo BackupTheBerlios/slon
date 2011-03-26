@@ -18,7 +18,7 @@ void BFSNodeVisitorImpl<Node>::traverse(Node& node)
         // add group children to traverse queue
         if (traversed->getNodeType() & scene::Node::GROUP) 
         {
-            typedef if_then_else<boost::is_const<Node>::value, const Group, Group>::type Group;
+            typedef typename if_then_else<boost::is_const<Node>::value, const Group, Group>::type Group;
 
             Group* group = static_cast<Group*>(traversed);
             for(Node* i = group->getChild(); i; i = i->getRight()) {

@@ -8,7 +8,7 @@ namespace slon {
 namespace physics {
 
 BulletRotationalVelocityMotor::BulletRotationalVelocityMotor(BulletConstraint* constraint, int axis)
-:   BulletRotationalMotor(constraint, axis)
+:   BulletRotationalMotor<VelocityMotor>(constraint, axis)
 {
 }
 
@@ -23,7 +23,7 @@ void BulletRotationalVelocityMotor::reset(BulletConstraint* constraint_, int axi
     motor_->m_enableMotor          = motor->m_enableMotor;
     motor_->m_maxMotorForce        = motor->m_maxMotorForce;
     motor_->m_targetVelocity       = motor->m_targetVelocity;
-    BulletRotationalMotor::reset(constraint_, axis_);
+    BulletRotationalMotor<VelocityMotor>::reset(constraint_, axis_);
 }
 
 void BulletRotationalVelocityMotor::toggle(bool toggle) 

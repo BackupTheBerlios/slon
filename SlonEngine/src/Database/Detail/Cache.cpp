@@ -65,7 +65,7 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
 
         value = loader.load(stream);
         if (value) {
-            storage.insert( storage_type::value_type(key, value) );
+            storage.insert( typename storage_type::value_type(key, value) );
         }
         else if (logger) {
             (*logger) << log::S_ERROR << "Unable to load item: " << path << LOG_FILE_AND_LINE;
@@ -130,7 +130,7 @@ bool Cache<T>::saveImpl( const std::string& path,
 template<typename T>
 void Cache<T>::add(const std::string& key, const value_ptr& value)
 {
-    bool res = storage.insert( storage_type::value_type(key, value) ).second;
+    bool res = storage.insert( typename storage_type::value_type(key, value) ).second;
     assert(res);
 }
 
@@ -181,9 +181,9 @@ typename Cache<T>::value_ptr Cache<T>::load(const std::string& key,
     for (size_t i = 0; i<formats.size(); ++i)
     {
         format_desc* fdesc = unwrap(formats[i]);
-        for (loader_set::iterator loaderIt  = fdesc->loaders.begin();
-                                  loaderIt != fdesc->loaders.end();
-                                  ++loaderIt)
+        for (typename loader_set::iterator loaderIt  = fdesc->loaders.begin();
+                                           loaderIt != fdesc->loaders.end();
+                                           ++loaderIt)
         {
             if ( (value = loadImpl(key, path, **loaderIt)) ) {
                 return value;
@@ -216,9 +216,9 @@ bool Cache<T>::save(const std::string&  path,
     for (size_t i = 0; i<formats.size(); ++i)
     {
         format_desc* fdesc = unwrap(formats[i]);
-        for (saver_set::iterator saverIt  = fdesc->savers.begin();
-                                 saverIt != fdesc->savers.end();
-                                 ++saverIt)
+        for (typename saver_set::iterator saverIt  = fdesc->savers.begin();
+                                          saverIt != fdesc->savers.end();
+                                          ++saverIt)
         {
             if ( saveImpl(path, item, **saverIt) ) {
                 return true;
@@ -245,9 +245,9 @@ template<typename T>
 typename Cache<T>::format_array Cache<T>::getFormats() const
 {
     format_array formats;
-    for (format_desc_list::iterator iter  = formatDescs.begin();
-                                    iter != formatDescs.end();
-                                    ++iter)
+    for (typename format_desc_list::iterator iter  = formatDescs.begin();
+                                             iter != formatDescs.end();
+                                             ++iter)
     {
         formats.push_back( format_id(&*iter) );
     }
@@ -261,9 +261,9 @@ typename Cache<T>::format_array Cache<T>::getAppropriateFormats(const std::strin
     using namespace boost::xpressive;
 
     std::vector<format_array> formats;
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         format_desc& fdesc = *fIt;
         for (size_t j = 0; j<fdesc.pathExprs.size(); ++j)
@@ -331,9 +331,9 @@ template<typename T>
 typename Cache<T>::loader_array Cache<T>::getLoaders() const
 {
     loader_set loaderSet;
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         std::copy( fIt->loaders.begin(), fIt->loaders.end(), std::inserter(loaderSet, loaderSet.begin()) );
     }
@@ -374,9 +374,9 @@ template<typename T>
 size_t Cache<T>::unregisterLoader(loader_type* loader)
 {
     size_t count = 0;
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         count += fIt->loaders.erase(loader_ptr(loader));
     }
@@ -387,9 +387,9 @@ size_t Cache<T>::unregisterLoader(loader_type* loader)
 template<typename T>
 void Cache<T>::clearLoaders()
 {
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         fIt->loaders.clear();
     }
@@ -399,9 +399,9 @@ template<typename T>
 typename Cache<T>::saver_array Cache<T>::getSavers() const
 {
     saver_set saverSet;
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         std::copy( fIt->savers.begin(), fIt->savers.end(), std::inserter(saverSet, saverSet.begin()) );
     }
@@ -442,9 +442,9 @@ template<typename T>
 size_t Cache<T>::unregisterSaver(saver_type* saver)
 {
     size_t count = 0;
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         count += fIt->savers.erase(saver_ptr(saver));
     }
@@ -455,9 +455,9 @@ size_t Cache<T>::unregisterSaver(saver_type* saver)
 template<typename T>
 void Cache<T>::clearSavers()
 {
-    for (format_desc_list::iterator fIt  = formatDescs.begin();
-                                    fIt != formatDescs.end();
-                                    ++fIt)
+    for (typename format_desc_list::iterator fIt  = formatDescs.begin();
+                                             fIt != formatDescs.end();
+                                             ++fIt)
     {
         fIt->savers.clear();
     }

@@ -63,7 +63,7 @@ public:
     operator T () const     { return value; }
     operator bool () const  { return specified; }
 
-    T& operator = (const T& value)
+    T& operator = (const T& value_)
     {
         value = value_;
         specified = true;
@@ -183,22 +183,24 @@ public:
 
 	void save(ColladaDocument& document, xmlpp::element& elem) const
 	{
+        /*
 		xmlpp::element libraryElem( library_elements<Element>::name() );
 		xmlpp::add_child(document, libraryElem);
 
-		for (element_set::const_iterator iter  = elements.begin();
-                                         iter != elements.end();
-                                         ++iter)
+        for (typename element_set::const_iterator iter  = elements.begin();
+                                                  iter != elements.end();
+                                                  ++iter)
 		{
 			xmlpp::element elem;
 			iter->second->save(document, elem);
 			xmlpp::add_child(libraryElem, elem);
 		}
+        */
 	}
 
 	element_ptr get_element(const std::string& name)
 	{
-		element_set::iterator iter = elements.find(name);
+        typename element_set::iterator iter = elements.find(name);
 		if (iter != elements.end()) {
 			return iter->second;
 		}

@@ -52,7 +52,7 @@ namespace {
 		template<typename T>
 		void perform(const T& body)
 		{
-			perform_on_leaves(tree, body, cb)
+            perform_on_leaves(tree, body, cb);
 		}
 
 	public:
@@ -89,7 +89,7 @@ namespace {
 	template<typename Tree, typename Callback>
 	visitor<Tree, Callback> make_visitor(Tree& tree, Callback& cb)
 	{
-		return visitor<Tree, Callback>(tree, cb)
+        return visitor<Tree, Callback>(tree, cb);
 	}
 
 }
@@ -127,7 +127,7 @@ public:
 
 	void operator () (const math::Ray3f& body) const
 	{
-		location.visit<math::Ray3f>(body, cb);
+        location.visit(body, cb);
 	}
     
 	void operator () (const math::Sphere3f& body) const
@@ -137,12 +137,12 @@ public:
 
 	void operator () (const math::AABBf& body) const
 	{
-		location.visit<math::AABBf>(body, cb);
+        location.visit(body, cb);
 	}
 		
 	void operator () (const math::Frustumf& body) const
 	{
-		location.visit<math::Frustumf>(body, cb);
+        location.visit(body, cb);
 	}
 
 private:

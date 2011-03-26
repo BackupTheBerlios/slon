@@ -94,8 +94,8 @@ public:
 #endif                  
 						);
 	
-	thread::lock_ptr World::lockForReading() const;
-	thread::lock_ptr World::lockForWriting();
+    thread::lock_ptr lockForReading() const;
+    thread::lock_ptr lockForWriting();
 
 private:
     location_vector locations;

@@ -25,6 +25,7 @@ private:
     typedef typename base_type::value_ptr           value_ptr;
     typedef typename base_type::loader_type         loader_type;
     typedef typename base_type::loader_ptr          loader_ptr;
+    typedef typename base_type::saver_type          saver_type;
     typedef typename base_type::saver_ptr           saver_ptr;
 
     typedef typename base_type::string_array        string_array;
