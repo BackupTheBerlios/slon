@@ -78,13 +78,18 @@ namespace {
         public sgl::ReferencedImpl<sgl::ErrorHandler>
     {
     public:
-        LogErrorHandler(const std::string& logName) :
-            logger(logName)
+        LogErrorHandler(const std::string& logName, bool breakOnError_)
+        :   logger(logName)
+		,	breakOnError(breakOnError_)
         {}
 
         // Override error handler
 	    void HandleError(SGL_HRESULT result, const char* msg)
 	    {
+			if (breakOnError) {
+				debug_break();
+			}
+
 		    switch(result)
 		    {
 		    case SGLERR_INVALID_CALL:
@@ -111,6 +116,7 @@ namespace {
 
     private:
         log::Logger logger;
+		bool		breakOnError;
     };
 
     sgl::ref_ptr<LogErrorHandler> logErrorHandler;
@@ -170,7 +176,7 @@ void Engine::init()
     filesystemManager->mount( fs::system_complete( fs::current_path() ).file_string().c_str(), "/" );
 
     // Setup error logger
-    logErrorHandler.reset( new LogErrorHandler("graphics.sgl") );
+    logErrorHandler.reset( new LogErrorHandler("graphics.sgl", true) );
     sglSetErrorHandler( logErrorHandler.get() );
 
     // redirect loggers

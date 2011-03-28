@@ -6,6 +6,18 @@
 
 namespace slon {
 
+/** Stop application, raise debugger. Platform independent variant for msvs DebugBreak() */
+inline void debug_break()
+{
+#ifdef _MSC_VER
+	DebugBreak();
+#elif __linux__
+	raise(SIGTRAP);
+#else
+	assert(!"Debug break");
+#endif
+}
+
 /** Base class for slon engine errors */
 class slon_error :
     public std::runtime_error
