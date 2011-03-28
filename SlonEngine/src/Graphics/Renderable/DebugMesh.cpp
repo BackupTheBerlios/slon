@@ -87,8 +87,8 @@ void DebugMesh::dirty()
         indexBuffer.reset( currentDevice()->CreateIndexBuffer() );
     }
 
-    vertexBuffer->SetData( vertices.size() * sizeof(math::Vector3f), &vertices[0] );
-    indexBuffer->SetData( indices.size() * sizeof(unsigned int), &indices[0] );
+    vertexBuffer->SetData( vertices.size() * sizeof(math::Vector3f), &vertices[0], sgl::Buffer::STREAM_DRAW );
+    indexBuffer->SetData( indices.size() * sizeof(unsigned int), &indices[0], sgl::Buffer::STREAM_DRAW );
     geometryDirty = false;
 }
 
