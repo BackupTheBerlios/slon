@@ -21,10 +21,10 @@ BulletRotationalMotorBase::BulletRotationalMotorBase(BulletConstraint* constrain
 
 void BulletRotationalMotorBase::reset(BulletConstraint* constraint_, int axis_)
 {
-    constraint = constraint_;
+	assert(constraint_ && axis_ >= 0 && axis_ < 3);
+	constraint = constraint_;
     axis       = axis_;
     motor      = constraint->getBtConstraint()->getRotationalLimitMotor(axis);
-    assert(constraint && axis >= 0 && axis < 3);
 }
 
 template<typename Base>
@@ -38,8 +38,7 @@ template<typename Base>
 void BulletRotationalMotor<Base>::reset(BulletConstraint* constraint, int axis)
 {
     BulletRotationalMotorBase::reset(constraint, axis);
-    velocity = 0.0f;
-    force    = 0.0f;
+	calculateAngleInfo();
 }
 
 template<typename Base>
