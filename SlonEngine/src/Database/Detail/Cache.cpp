@@ -41,12 +41,6 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
     value_ptr value;
     try
     {
-		// determine file mode
-		File::mask_t mode = File::in;
-		if ( loader.binary() ) {
-			mode |= File::binary;
-		}
-
 		// open file
 		file_ptr file( asFile( currentFileSystemManager().getNode(path.c_str()) ) );
 		if (!file) 
@@ -54,16 +48,8 @@ typename Cache<T>::value_ptr Cache<T>::loadImpl( const std::string& key,
             (*logger) << log::S_ERROR << "Can't find file: " << path << LOG_FILE_AND_LINE;
 			return value;
 		}
-		else if ( !file->open(mode)  )
-		{
-            (*logger) << log::S_ERROR << "Can't open file: " << path << LOG_FILE_AND_LINE;
-			return value;
-		}
 		
-		stream_buffer<filesystem::file_device> buf(file);
-		std::istream stream(&buf);
-
-        value = loader.load(stream);
+        value = loader.load(file.get());
         if (value) {
             storage.insert( typename storage_type::value_type(key, value) );
         }
@@ -91,29 +77,15 @@ bool Cache<T>::saveImpl( const std::string& path,
 
     try
     {
-		// determine file mode
-        File::mask_t mode = File::out;
-		if ( saver.binary() ) {
-			mode |= File::binary;
-		}
-
-		// open file
+		// create file
 		file_ptr file( currentFileSystemManager().createFile(path.c_str()) );
 		if (!file) 
 		{    
             (*logger) << log::S_ERROR << "Can't create file: " << path << LOG_FILE_AND_LINE;
 			return false;
 		}
-		else if ( !file->open(mode)  )
-		{
-            (*logger) << log::S_ERROR << "Can't open file: " << path << LOG_FILE_AND_LINE;
-			return false;
-		}
-		
-		stream_buffer<filesystem::file_device> buf(file);
-		std::ostream stream(&buf);
-        
-        saver.save(item, stream);
+		        
+        saver.save(item, file.get());
     }
     catch (saver_error& err) 
     {

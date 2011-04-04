@@ -342,6 +342,10 @@ Mesh::Mesh(const MeshData* data_)
     dirtyVertexLayout();
 }
 
+Mesh::Mesh()
+{
+}
+
 Mesh::Mesh(const DESC& desc) :
     aabb(desc.aabb),
     indexType(desc.indexType),

@@ -1498,7 +1498,7 @@ void ColladaDocument::set_file_source(const std::string& fileName)
 	}
 }
 
-library_ptr ColladaLoader::load(std::istream& stream)
+library_ptr ColladaLoader::load(filesystem::File* file)
 {
 	typedef collada_library_visual_scenes::element_set	visual_scene_set;
 	typedef collada_library_animations::element_set		animation_set;
@@ -1507,11 +1507,13 @@ library_ptr ColladaLoader::load(std::istream& stream)
 #endif
 		
 	// read file content
-	std::ostringstream buffer;
-	buffer << stream.rdbuf();
+    file->open(filesystem::File::in);
+	std::string fileContent(file->size(), ' ');
+    file->read( &fileContent[0], fileContent.size() );
+    file->close();
 
 	ColladaDocument document;
-	document.set_source( buffer.str().size(), buffer.str().c_str() );
+	document.set_source( fileContent.length(), fileContent.data() );
 
 	detail::library_ptr library(new detail::Library);
 	scene::group_ptr	root(new scene::Group);

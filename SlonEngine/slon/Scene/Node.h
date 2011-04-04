@@ -97,12 +97,18 @@ public:
 
 	/** Set object which holds this node */
 	void setObject(realm::Object* object_) { object = object_; }
+    
+    template<typename Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & BOOST_SERIALIZATION_NVP(name);
+    }
 
     virtual ~Node() {}
 
 protected:
 	// node info
-	hash_string   name;
+	hash_string     name;
     Group*          parent;
 	Node*			left;
 	node_ptr		right;

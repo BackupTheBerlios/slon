@@ -19,8 +19,8 @@ template<typename T> class Saver;
 class DatabaseManager;
 class Library;
 
-typedef boost::intrusive_ptr<Library>           library_ptr;
-typedef boost::intrusive_ptr<const Library>     const_library_ptr;
+typedef boost::intrusive_ptr<Library>               library_ptr;
+typedef boost::intrusive_ptr<const Library>         const_library_ptr;
 
 // common typedefs
 typedef Loader<library_ptr>                     LibraryLoader;

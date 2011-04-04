@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Bullet/Bullet.h"
+#include "Filesystem/File.h"
 #include "Physics/PhysicsManager.h"
 #include "Physics/PhysicsModel.h"
 #include "Physics/Bullet/BulletCommon.h"
@@ -11,23 +12,25 @@
 #include <bullet/Extras/Serialize/BulletWorldImporter/btBulletWorldImporter.h>
 #include <bullet/LinearMath/btSerializer.h>
 
-__DEFINE_LOGGER__("Database.Bullet")
+__DEFINE_LOGGER__("database.Bullet")
 
 namespace slon {
 namespace database {
 namespace detail {
 
-physics::physics_model_ptr BulletLoader::load(std::istream& stream)
+physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
 {
     physics::BulletDynamicsWorld& world   = static_cast<physics::BulletDynamicsWorld&>( *physics::currentPhysicsManager().getDynamicsWorld() );
     btDynamicsWorld*              btWorld = &world.getBtDynamicsWorld();
     	
     // read file content
-	std::ostringstream buffer;
-	buffer << stream.rdbuf();
+    file->open(filesystem::File::in | filesystem::File::binary);
+	std::string fileContent(file->size(), ' ');
+    file->read( &fileContent[0], fileContent.size() );
+    file->close();
 
     std::auto_ptr<btBulletWorldImporter> fileLoader( new btBulletWorldImporter( &world.getBtDynamicsWorld() ) );
-    if ( !fileLoader->loadFileFromMemory( (char*)buffer.str().data(), buffer.str().length() ) ) {
+    if ( !fileLoader->loadFileFromMemory( (char*)fileContent.data(), fileContent.length() ) ) {
         throw file_not_found_error(logger, "Can't load bullet physics file");
     }
 
@@ -106,7 +109,7 @@ physics::physics_model_ptr BulletLoader::load(std::istream& stream)
     return sceneModel;
 }
 
-void BulletSaver::save(physics::physics_model_ptr model, std::ostream& sink)
+void BulletSaver::save(physics::physics_model_ptr model, filesystem::File* file)
 {
     using namespace physics;
 
@@ -157,7 +160,11 @@ void BulletSaver::save(physics::physics_model_ptr model, std::ostream& sink)
     }
     btSerializer->finishSerialization();
 
-    sink.write((const char*)btSerializer->getBufferPointer(), btSerializer->getCurrentBufferSize());
+    if ( file->open(filesystem::File::out | filesystem::File::binary) )
+    {
+        file->write((const char*)btSerializer->getBufferPointer(), btSerializer->getCurrentBufferSize());
+        file->close();
+    }
 }
 
 } // namespace detail

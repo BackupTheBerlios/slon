@@ -37,16 +37,16 @@ public:
 	~system_error() throw() {} 
 };
 
-/** Error occured when necessary file is not found. */
-class file_not_found_error :
+/** Error occured when necessary file is not found or error occured opening it. */
+class file_error :
     public slon_error
 {
 public:
-    file_not_found_error( log::Logger&         logger,
-                          const std::string&   message,
-                          log::SEVERITY   severity = log::S_ERROR );
+    file_error( log::Logger&       logger,
+                const std::string& message,
+                log::SEVERITY      severity = log::S_ERROR );
 
-	~file_not_found_error() throw() {} 
+	~file_error() throw() {} 
 };
 
 /** Error occures due to failed input/output operation */

@@ -31,6 +31,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_array.hpp>

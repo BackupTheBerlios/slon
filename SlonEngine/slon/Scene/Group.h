@@ -3,6 +3,7 @@
 
 #include "Node.h"
 #include <boost/intrusive_ptr.hpp>
+#include <boost/serialization/base_object.hpp>
 
 namespace slon {
 namespace scene {
@@ -33,6 +34,12 @@ public:
 
 	/** Get first child of the group. */
 	const Node* getChild() const { return firstChild.get(); }
+    
+    template<typename Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar & boost::serialization::base_object<Node>(*this)
+    }
 
     virtual ~Group();
 

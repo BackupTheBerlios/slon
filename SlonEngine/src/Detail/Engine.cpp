@@ -122,13 +122,14 @@ namespace {
     public:
 		bool binary() const { return true; }
 
-        graphics::texture_ptr load(std::istream& stream)
+        graphics::texture_ptr load(filesystem::File* file)
         {
             graphics::texture_ptr texture;
 
-			std::stringstream buffer;
-			buffer << stream.rdbuf();
-			std::string data( buffer.str() );
+            file->open(filesystem::File::in | filesystem::File::binary);
+			std::string data(file->size(), ' ');
+            file->read(&data[0], data.size());
+            file->close();
 
             graphics::image_ptr image( graphics::currentDevice()->CreateImage() );
 		    if ( sgl::SGL_OK == image->LoadFromFileInMemory(format, data.size(), &data[0]) )

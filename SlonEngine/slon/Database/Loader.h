@@ -3,6 +3,7 @@
 
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
+#include "../Filesystem/Forward.h"
 #include "Forward.h"
 #include <istream>
 
@@ -29,14 +30,10 @@ class Loader :
     public Referenced
 {
 public:
-	/** Return tru if file need to be open in binary mode. */
-	virtual bool binary() const = 0;
-
     /** Just load item. Throw loader_error if can't. 
-     * @param source - source containing item file.
      * @see loader_error
      */
-    virtual T load(std::istream& source) = 0;
+    virtual T load(filesystem::File* file) = 0;
 
     virtual ~Loader() {}
 };

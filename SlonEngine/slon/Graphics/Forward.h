@@ -27,6 +27,7 @@ namespace graphics {
     // forward types
     class Effect;
     class Renderable;
+    class Mesh;
 
     // export types into graphics namespace
     typedef sgl::Device                Device;
@@ -50,6 +51,7 @@ namespace graphics {
 
     typedef boost::intrusive_ptr<Effect>        effect_ptr;
     typedef boost::intrusive_ptr<Renderable>    renderable_ptr;
+    typedef boost::intrusive_ptr<Mesh>          mesh_ptr;
 
 } // namespace graphics
 } // namespace slon

@@ -364,8 +364,9 @@ private:
     Mesh& operator = (const Mesh&);
 
 public:
-	Mesh(const MeshData* meshData);
-    Mesh(const DESC& desc);
+    Mesh();
+	explicit Mesh(const MeshData* meshData);
+    explicit Mesh(const DESC& desc);
 
     /** Add primitives subset to the mesh.
      * @param effect - effect for rendering subset.
