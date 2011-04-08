@@ -61,7 +61,7 @@ graphics::Renderer* GraphicsManager::initRenderer(const ForwardRendererDesc& des
 {
     for (int i = sgl::DV_OPENGL_3_2; i >= sgl::DV_OPENGL_2_1; --i)
     {
-        device.reset( sglCreateDeviceFromCurrent( sgl::DEVICE_VERSION(i) ) );
+        device.reset( sglCreateDeviceFromCurrent(sgl::DEVICE_VERSION(i)) );
         if (device) {
             break;
         }
@@ -84,7 +84,8 @@ graphics::Renderer* GraphicsManager::initRenderer(const FFPRendererDesc& desc)
 {
     for (int i = sgl::DV_OPENGL_2_1; i >= 0; --i)
     {
-        device.reset( sglCreateDeviceFromCurrent( sgl::DEVICE_VERSION(i) ) );
+        bool force = (i == 0); // there is nothing to loose anyway
+        device.reset( sglCreateDeviceFromCurrent(sgl::DEVICE_VERSION(i), force) );
         if (device) {
             break;
         }
