@@ -17,8 +17,11 @@ void BulletMotionState::getWorldTransform(btTransform &worldTrans) const
     if (rigidBody->getDynamicsType() == RigidBody::DT_DYNAMIC) {
 	    worldTrans = worldTransform;
     }
+    else if (rigidBody->getDynamicsType() == RigidBody::DT_STATIC) {
+        worldTrans = to_bt_mat( rigidBody->getStateDesc().transform );
+    }
     else {
-	    worldTrans = to_bt_mat( math::Matrix4r(localToWorld * transform) );
+	    worldTrans = to_bt_mat( math::Matrix4r(localToWorld * invTransform) );
     }
 }
 

@@ -56,7 +56,7 @@ protected:
 	/** Mark for traverse by transform visitor. */
 	void update();
 
-protected:    
+public:    
     // cached transforms
     math::Matrix4f  worldToLocal;
     math::Matrix4f  localToWorld;

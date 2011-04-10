@@ -28,17 +28,16 @@ namespace {
 			math::Matrix4f T( rbTransform.getLocalToWorld() );
 			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
 
+			rbTransform.setTransform( math::invert(R) * T ); // physics -> graphics 
 			switch ( rbTransform.getRigidBody()->getDynamicsType() )
 			{
+			case physics::RigidBody::DT_STATIC:
 			case physics::RigidBody::DT_DYNAMIC:
                 rbTransform.setAbsolute(true);
-				rbTransform.setTransform( math::invert(R) * T );
 				break;
 				
-			case physics::RigidBody::DT_STATIC:
 			case physics::RigidBody::DT_KINEMATIC:
                 rbTransform.setAbsolute(false);
-				rbTransform.setTransform( math::invert(T) * R );
 				break;
 
 			default:
