@@ -11,7 +11,7 @@ __DEFINE_LOGGER__("physics.BulletRigidBody")
 
 namespace {
 
-	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState)
+	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState, math::Matrix3r& inertia)
 	{
 		btCollisionShape* collisionShape = 0;
         btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
@@ -26,7 +26,12 @@ namespace {
             }
 		}
 		motionState.setWorldTransform( to_bt_mat(desc.transform) );
-		
+
+		inertia       = math::Matrix3r(0);
+		inertia[0][0] = localInertia[0];
+		inertia[1][1] = localInertia[1];
+		inertia[2][2] = localInertia[2];
+
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}
@@ -232,6 +237,11 @@ real BulletRigidBody::getMass() const
 	return desc.type == DT_DYNAMIC ? 1.0f / rigidBody->getInvMass() : 0.0f;
 }
 
+math::Matrix3r BulletRigidBody::getInertiaTensor() const
+{
+	return localInertia;
+}
+
 RigidBody::ACTIVATION_STATE BulletRigidBody::getActivationState() const
 {
     switch ( rigidBody->getActivationState() )
@@ -372,7 +382,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     // remove old rigid body
     destroy(false);
 
-	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc_, *motionState) ) );
+	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc_, *motionState, localInertia) ) );
     rigidBody->setUserPointer(this);
 	rigidBody->setLinearVelocity( to_bt_vec(desc_.linearVelocity) );
 	rigidBody->setAngularVelocity( to_bt_vec(desc_.angularVelocity) );
