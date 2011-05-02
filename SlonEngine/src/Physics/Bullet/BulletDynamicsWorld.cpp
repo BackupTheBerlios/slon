@@ -87,6 +87,10 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     }
     solverCollector.clear();
 
+    // calculate angle info after
+    accept(solverCollector);
+    solverCollector.clear();
+
     // enumerate contacts
     contact_vector              currentContacts;
     std::vector<math::Vector3r> currentContactPoints;

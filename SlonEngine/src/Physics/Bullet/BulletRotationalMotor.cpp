@@ -44,22 +44,29 @@ void BulletRotationalMotor<Base>::reset(BulletConstraint* constraint, int axis)
 template<typename Base>
 void BulletRotationalMotor<Base>::calculateAngleInfo()
 {
-    btRigidBody& bodyA = constraint->getBtConstraint()->getRigidBodyA();
-    btRigidBody& bodyB = constraint->getBtConstraint()->getRigidBodyB();
+    btGeneric6DofConstraint* bConstraint = constraint->getBtConstraint();
 
+    btRigidBody& rbA = constraint->getBtConstraint()->getRigidBodyA();
+    btRigidBody& rbB = constraint->getBtConstraint()->getRigidBodyB();
+    btTransform  trans;
+    
     // position
-    position     = btAdjustAngleToLimits(constraint->getBtConstraint()->getAngle(axis),motor->m_loLimit, motor->m_hiLimit);
+    position     = btAdjustAngleToLimits(bConstraint->getAngle(axis), motor->m_loLimit, motor->m_hiLimit);
 
     // velocity
-    btVector3 ax = constraint->getBtConstraint()->getAxis(axis);
-    btVector3 a  = bodyA.getAngularVelocity();
-    btVector3 b  = bodyB.getAngularVelocity();
-    velocity     = ax.dot(a - b);
+    btVector3 ax = bConstraint->getAxis(axis);
+    velocity     = ax.dot( rbA.getAngularVelocity() - rbB.getAngularVelocity() ); // angular term
+
+    rbA.getMotionState()->getWorldTransform(trans);
+    btVector3 rA = trans.getBasis() * bConstraint->getFrameOffsetA().getOrigin();
+    velocity    += rbA.getLinearVelocity().dot( ax.cross(rA) ) / rA.length2(); // linear from A
+
+    rbB.getMotionState()->getWorldTransform(trans);
+    btVector3 rB = trans.getBasis() * bConstraint->getFrameOffsetB().getOrigin();
+    velocity    -= rbB.getLinearVelocity().dot( ax.cross(rB) ) / rB.length2(); // linear from B
 
     // force
-    a     = bodyA.getTotalTorque();
-    b     = bodyB.getTotalTorque();
-    force = ax.dot(a - b);
+    force = ax.dot( rbA.getTotalTorque() - rbB.getTotalTorque() );
 }
 
 template<typename Base>

@@ -25,7 +25,21 @@ void BulletRotationalServoMotor::solve(real dt)
    
     btRigidBody& rbA = constraint->getRigidBodyA();
     btRigidBody& rbB = constraint->getRigidBodyB();
+    /*
+    btTransform  trans;
 
+    rbA.getMotionState()->getWorldTransform(trans);
+    btVector3 rA     = trans.getBasis() * constraint->getFrameOffsetA().getOrigin();
+    btVector3 forceA = targetForce * constraint->getAxis(axis).cross(rA) / rA.length2();
+    rbA.applyCentralForce(forceA);
+    rbA.activate(true);
+
+    rbB.getMotionState()->getWorldTransform(trans);
+    btVector3 rB     = trans.getBasis() * constraint->getFrameOffsetB().getOrigin();
+    btVector3 forceB = targetForce * constraint->getAxis(axis).cross(rB) / rB.length2();
+    rbB.applyCentralForce(forceB);
+    rbB.activate(true);
+    */
     btVector3 torque = constraint->getAxis(axis) * targetForce;
     rbA.applyTorque( torque);
     rbA.activate(true);
