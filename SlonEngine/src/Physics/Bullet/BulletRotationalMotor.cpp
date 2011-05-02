@@ -55,7 +55,7 @@ void BulletRotationalMotor<Base>::calculateAngleInfo()
 
     // velocity
     btVector3 ax = bConstraint->getAxis(axis);
-    velocity     = ax.dot( rbA.getAngularVelocity() - rbB.getAngularVelocity() ); // angular term
+    velocity     = 0;//ax.dot( rbA.getAngularVelocity() - rbB.getAngularVelocity() ); // angular term
 
     rbA.getMotionState()->getWorldTransform(trans);
     btVector3 rA = trans.getBasis() * bConstraint->getFrameOffsetA().getOrigin();
@@ -63,7 +63,7 @@ void BulletRotationalMotor<Base>::calculateAngleInfo()
 
     rbB.getMotionState()->getWorldTransform(trans);
     btVector3 rB = trans.getBasis() * bConstraint->getFrameOffsetB().getOrigin();
-    velocity    -= rbB.getLinearVelocity().dot( ax.cross(rB) ) / rB.length2(); // linear from B
+    velocity    += rbB.getLinearVelocity().dot( ax.cross(rB) ) / rB.length2(); // linear from B
 
     // force
     force = ax.dot( rbA.getTotalTorque() - rbB.getTotalTorque() );
