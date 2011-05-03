@@ -50,20 +50,24 @@ void BulletRotationalMotor<Base>::calculateAngleInfo()
     btRigidBody& rbB = constraint->getBtConstraint()->getRigidBodyB();
     btTransform  trans;
     
-    // position
-    position     = btAdjustAngleToLimits(bConstraint->getAngle(axis), motor->m_loLimit, motor->m_hiLimit);
-
-    // velocity
-    btVector3 ax = bConstraint->getAxis(axis);
-    velocity     = 0;//ax.dot( rbA.getAngularVelocity() - rbB.getAngularVelocity() ); // angular term
-
+    // get offset from rigid body CM to joint
     rbA.getMotionState()->getWorldTransform(trans);
     btVector3 rA = trans.getBasis() * bConstraint->getFrameOffsetA().getOrigin();
-    velocity    += rbA.getLinearVelocity().dot( ax.cross(rA) ) / rA.length2(); // linear from A
 
     rbB.getMotionState()->getWorldTransform(trans);
     btVector3 rB = trans.getBasis() * bConstraint->getFrameOffsetB().getOrigin();
-    velocity    += rbB.getLinearVelocity().dot( ax.cross(rB) ) / rB.length2(); // linear from B
+    
+    // position
+    position = btAdjustAngleToLimits(bConstraint->getAngle(axis), motor->m_loLimit, motor->m_hiLimit);
+
+    // convert angular to linear
+    btVector3 ax   = bConstraint->getAxis(axis);
+    btVector3 velA = rA.cross( rbA.getAngularVelocity() );
+    btVector3 velB = rB.cross( rbB.getAngularVelocity() );
+
+    // correct linear to angular
+    velocity  = (velA + rbA.getLinearVelocity()).dot( ax.cross(rA) ) / rA.length2();
+    velocity += (velB + rbB.getLinearVelocity()).dot( ax.cross(rB) ) / rB.length2();
 
     // force
     force = ax.dot( rbA.getTotalTorque() - rbB.getTotalTorque() );
