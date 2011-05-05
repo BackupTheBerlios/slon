@@ -53,6 +53,12 @@ public:
     /** Get gravity of our toy world. */
     virtual math::Vector3r getGravity() const = 0;
 
+    /** Set fixed time step for simulation */
+    virtual void setFixedTimeStep(const real dt) = 0;
+
+    /** Set fixed time step of the simulation */
+    virtual real getFixedTimeStep() const = 0;
+
     /** Get description of the world. */
     virtual const state_desc& getStateDesc() const = 0;
 

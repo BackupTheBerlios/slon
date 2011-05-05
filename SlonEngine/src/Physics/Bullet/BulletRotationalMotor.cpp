@@ -62,8 +62,8 @@ void BulletRotationalMotor<Base>::calculateAngleInfo()
 
     // convert angular to linear
     btVector3 ax   = bConstraint->getAxis(axis);
-    btVector3 velA = rA.cross( rbA.getAngularVelocity() );
-    btVector3 velB = rB.cross( rbB.getAngularVelocity() );
+    btVector3 velA(0,0,0);// = rA.cross( rbA.getAngularVelocity() );
+    btVector3 velB(0,0,0);// = rB.cross( rbB.getAngularVelocity() );
 
     // correct linear to angular
     velocity  = (velA + rbA.getLinearVelocity()).dot( ax.cross(rA) ) / rA.length2();

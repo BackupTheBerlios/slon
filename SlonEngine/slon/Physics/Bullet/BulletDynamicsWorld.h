@@ -74,6 +74,8 @@ public:
     // Override dynamics world
     void                setGravity(const math::Vector3r& gravity);
     math::Vector3r      getGravity() const;
+    void                setFixedTimeStep(const real dt)             { desc.fixedTimeStep = dt; }
+    real                getFixedTimeStep() const                    { return desc.fixedTimeStep; }
     const state_desc&   getStateDesc() const;
     real                stepSimulation(real dt);
     void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
