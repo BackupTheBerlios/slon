@@ -59,7 +59,7 @@ void GraphicsManager::setVideoMode( unsigned     width,
 
 graphics::Renderer* GraphicsManager::initRenderer(const ForwardRendererDesc& desc)
 {
-    for (int i = sgl::DV_OPENGL_3_2; i >= sgl::DV_OPENGL_2_1; --i)
+    for (int i = sgl::DV_OPENGL_3_2; i >= sgl::DV_OPENGL_2_0; --i)
     {
         device.reset( sglCreateDeviceFromCurrent(sgl::DEVICE_VERSION(i)) );
         if (device) {
