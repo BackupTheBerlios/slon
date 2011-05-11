@@ -42,6 +42,7 @@ public:
         math::Matrix4r  transform;          /// initial transformation matrix
         DYNAMICS_TYPE   type;
         real            mass;
+        math::Vector3r  inertia;
         real            margin;             /// collision margin
         real            relativeMargin;     /// collision margin relative to the lowest dimension of the collision shape (e.g. box side, sphere radius, cylinder height)
         math::Vector3r  linearVelocity;
@@ -55,6 +56,7 @@ public:
         state_desc(const std::string& _name = "") :
             transform( math::make_identity<float, 4>() ),
             mass(0),
+			inertia(0, 0, 0),
             margin(0),
             relativeMargin( real(0.02) ),
             linearVelocity(0, 0, 0),

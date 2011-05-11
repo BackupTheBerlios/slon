@@ -1096,6 +1096,16 @@ namespace {
                 desc.transform = math::make_identity<float, 4>();
             }
 
+            if (colladaRigidBodyInstance.inertia) {
+                desc.inertia = colladaRigidBodyInstance.inertia.value;
+            }
+            else if (colladaRigidBody.inertia) {
+                desc.inertia = colladaRigidBody.inertia.value;
+            }
+            else {
+                desc.inertia = math::Vector3f(0, 0, 0);
+            }
+
             math::Matrix4f invMassFrame = math::invert(desc.transform);
             if ( colladaRigidBody.shapes.size() > 1
                 || !math::equal(invMassFrame * colladaRigidBody.shapes[0]->transform, math::make_identity<float, 4>(), 0.01f) )

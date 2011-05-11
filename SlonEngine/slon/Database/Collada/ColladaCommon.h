@@ -386,7 +386,7 @@ struct text_serialization_policy< slon::database::collada_optional<T> >
         e.set_text( ss.str() );
     }
 
-    bool valid(const T& val, xmlpp::s_state s) const { return (val == true) || (s == xmlpp::LOAD); }
+    bool valid(const slon::database::collada_optional<T>& val, xmlpp::s_state s) const { return val.specified || (s == xmlpp::LOAD); }
 };
 
 template<typename T, typename A>

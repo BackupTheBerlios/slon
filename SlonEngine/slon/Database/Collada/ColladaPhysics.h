@@ -251,6 +251,7 @@ public:
 public:
     collada_optional<collada_mass_frame>    massFrame;
     collada_optional<float>                 mass;
+    collada_optional<math::Vector3f>		inertia;
     std::string                             sid;
     bool                                    dynamic;
     shape_vector                            shapes;
@@ -268,6 +269,7 @@ public:
 
 public:
     collada_optional<collada_mass_frame>    massFrame;
+    collada_optional<math::Vector3f>		inertia;
     collada_optional<float>                 mass;
     std::string                             target;
 

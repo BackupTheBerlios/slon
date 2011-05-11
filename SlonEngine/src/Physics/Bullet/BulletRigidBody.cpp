@@ -14,18 +14,20 @@ namespace {
 	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState, math::Matrix3r& inertia)
 	{
 		btCollisionShape* collisionShape = 0;
-        btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
+        btVector3         localInertia   = to_bt_vec(desc.inertia);
+		btTransform		  massFrame      = to_bt_mat(desc.transform);
+
         if (desc.collisionShape)
 		{
             real minDimension;
 		    collisionShape = createBtCollisionShape(*desc.collisionShape, minDimension);
 			collisionShape->setMargin(desc.relativeMargin * minDimension + desc.margin);
             
-            if ( desc.mass > real(0.0) ) {
+            if ( desc.mass > real(0.0) && (localInertia.x() == 0 && localInertia.y() == 0 && localInertia.z() == 0) ) {
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
             }
 		}
-		motionState.setWorldTransform( to_bt_mat(desc.transform) );
+		motionState.setWorldTransform(massFrame);
 
 		inertia       = math::Matrix3r(0);
 		inertia[0][0] = localInertia[0];
@@ -120,6 +122,7 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	   << "transform =\n{\n" << log::indent() << desc.transform << log::unindent() << "\n}\n"
 	   << "type = " << desc.type << std::endl
 	   << "mass = " << desc.mass << std::endl
+	   << "inertia = " << desc.inertia << std::endl
 	   << "margin = " << desc.margin << std::endl
 	   << "relativeMargin = " << desc.relativeMargin << std::endl
 	   << "linearVelocity = {" << desc.linearVelocity << "}\n"
