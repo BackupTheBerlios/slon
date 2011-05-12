@@ -88,7 +88,7 @@ public:
     virtual real getMass() const = 0;
 
 	/** Get local inertia tensor of rigid body */
-	virtual math::Matrix3r getInertiaTensor() const = 0;
+	virtual math::Vector3r getInertiaTensor() const = 0;
 
     /** Get activation/deactivation state/policy of the object */
     virtual ACTIVATION_STATE getActivationState() const = 0;

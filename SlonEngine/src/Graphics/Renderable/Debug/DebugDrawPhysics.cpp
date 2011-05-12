@@ -170,16 +170,17 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
 
 DebugMesh& operator << (DebugMesh& mesh, const constraint& c)
 {
-    math::Matrix4f trA( c.cons.getRigidBodyA()->getTransform() );
-    math::Matrix4f trB( c.cons.getRigidBodyB()->getTransform() );
-    math::Matrix4f trC( c.cons.getRigidBodyA()->getTransform() * c.cons.getStateDesc().frames[0] );
-    mesh << transform(trC)
-         << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trB[0][0], trB[1][0], trB[2][0]) )
-         << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trB[0][1], trB[1][1], trB[2][1]) )
-         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trB[0][2], trB[1][2], trB[2][2]) )
-         << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trA[0][0], trA[1][0], trA[2][0]) )
-         << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trA[0][1], trA[1][1], trA[2][1]) )
-         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(trA[0][2], trA[1][2], trA[2][2]) );
+    math::Matrix4f trA( c.cons.getRigidBodyA()->getTransform() * c.cons.getStateDesc().frames[0] );
+    math::Matrix4f trB( c.cons.getRigidBodyB()->getTransform() * c.cons.getStateDesc().frames[1] );
+
+    mesh << transform(trA)
+         << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(1.0f, 0.0f, 0.0f) )
+         << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 1.0f, 0.0f) )
+         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) )
+		 << transform(trB)
+         << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(1.0f, 0.0f, 0.0f) )
+         << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 1.0f, 0.0f) )
+         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) );
 
     if ( const physics::Motor* m = c.cons.getMotor(physics::Motor::MOTOR_X_ROT) ) {
         mesh << motor(*m, c.scale, c.forceScale, c.forceSectorScale);

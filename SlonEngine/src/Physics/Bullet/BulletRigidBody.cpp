@@ -11,7 +11,7 @@ __DEFINE_LOGGER__("physics.BulletRigidBody")
 
 namespace {
 
-	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState, math::Matrix3r& inertia)
+	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(RigidBody::state_desc& desc, btMotionState& motionState)
 	{
 		btCollisionShape* collisionShape = 0;
         btVector3         localInertia   = to_bt_vec(desc.inertia);
@@ -19,20 +19,14 @@ namespace {
 
         if (desc.collisionShape)
 		{
-            real minDimension;
-		    collisionShape = createBtCollisionShape(*desc.collisionShape, minDimension);
-			collisionShape->setMargin(desc.relativeMargin * minDimension + desc.margin);
-            
-            if ( desc.mass > real(0.0) && (localInertia.x() == 0 && localInertia.y() == 0 && localInertia.z() == 0) ) {
+		    collisionShape = createBtCollisionShape(*desc.collisionShape, desc.relativeMargin, desc.margin);
+            if ( desc.mass > real(0.0) && localInertia.isZero() ) 
+			{
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
-            }
+				desc.inertia = to_vec(localInertia);
+			}
 		}
 		motionState.setWorldTransform(massFrame);
-
-		inertia       = math::Matrix3r(0);
-		inertia[0][0] = localInertia[0];
-		inertia[1][1] = localInertia[1];
-		inertia[2][2] = localInertia[2];
 
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
@@ -240,9 +234,9 @@ real BulletRigidBody::getMass() const
 	return desc.type == DT_DYNAMIC ? 1.0f / rigidBody->getInvMass() : 0.0f;
 }
 
-math::Matrix3r BulletRigidBody::getInertiaTensor() const
+math::Vector3r BulletRigidBody::getInertiaTensor() const
 {
-	return localInertia;
+	return desc.inertia;
 }
 
 RigidBody::ACTIVATION_STATE BulletRigidBody::getActivationState() const
@@ -384,14 +378,15 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 
     // remove old rigid body
     destroy(false);
-
-	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc_, *motionState, localInertia) ) );
+	
+    desc = desc_;
+	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
     rigidBody->setUserPointer(this);
-	rigidBody->setLinearVelocity( to_bt_vec(desc_.linearVelocity) );
-	rigidBody->setAngularVelocity( to_bt_vec(desc_.angularVelocity) );
+	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
+	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );
 
     // static or dynamic rb
-    if (desc_.type != RigidBody::DT_DYNAMIC)
+    if (desc.type != RigidBody::DT_DYNAMIC)
     {
         int flags = desc_.type == RigidBody::DT_KINEMATIC ? btCollisionObject::CF_KINEMATIC_OBJECT : btCollisionObject::CF_STATIC_OBJECT;
         rigidBody->setCollisionFlags( rigidBody->getCollisionFlags() | flags );
@@ -404,7 +399,6 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     }
 
     // remember
-    desc = desc_;
     toggleSimulation(isInWorld);
 
     // call handlers
