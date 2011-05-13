@@ -59,6 +59,9 @@ public:
     /** Set fixed time step of the simulation */
     virtual real getFixedTimeStep() const = 0;
 
+	/** Get number of simulation steps performed */
+	virtual size_t getNumSimulatedSteps() const = 0;
+
     /** Get description of the world. */
     virtual const state_desc& getStateDesc() const = 0;
 

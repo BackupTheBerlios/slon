@@ -80,6 +80,7 @@ public:
     real                stepSimulation(real dt);
     void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
     unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
+	size_t				getNumSimulatedSteps() const				{ return numSimulatedSteps; }
 
     RigidBody*          createRigidBody(const RigidBody::state_desc& rigidBodyDesc);
     Constraint*         createConstraint(const Constraint::state_desc& constraintDesc);
@@ -110,6 +111,7 @@ private:
 
     // settings 
     unsigned                    maxSubSteps;
+	size_t						numSimulatedSteps;
 
     // for handling contact callbacks
     contact_vector              contacts;

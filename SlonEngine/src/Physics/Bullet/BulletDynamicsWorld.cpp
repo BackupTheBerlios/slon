@@ -11,7 +11,8 @@ using namespace slon;
 using namespace physics;
 
 BulletDynamicsWorld::BulletDynamicsWorld(const state_desc& _desc) :
-    maxSubSteps(3)
+    maxSubSteps(3),
+	numSimulatedSteps(0)
 {
     desc = _desc;
 
@@ -79,7 +80,7 @@ real BulletDynamicsWorld::stepSimulation(real dt)
 
     real t = 0;
     {
-        for (unsigned i = 0; i<maxSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep)
+        for (unsigned i = 0; i<maxSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
         {
             solverCollector.solve(desc.fixedTimeStep); // run proprietary solvers
             dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
