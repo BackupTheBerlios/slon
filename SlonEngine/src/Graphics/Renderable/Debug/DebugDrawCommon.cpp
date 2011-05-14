@@ -26,41 +26,56 @@ DebugMesh& operator << (DebugMesh& mesh, const debug::text& t)
 
 DebugMesh& operator << (DebugMesh& mesh, const debug::color& c)
 {
-    mesh.color        = c.colorVal;
-    mesh.stateChanged = true;
+    if (mesh.color != c.colorVal)
+    {
+        mesh.color        = c.colorVal;
+        mesh.stateChanged = true;
+    }
 
     return mesh;
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const debug::projection& p)
 {
-    mesh.useCameraProjection = p.useCameraProjection;
-    mesh.projection          = p.matrix;
-    mesh.stateChanged        = true;
+    if ( mesh.useCameraProjection != p.useCameraProjection || (!p.useCameraProjection && mesh.projection != p.matrix) )
+    {
+        mesh.useCameraProjection = p.useCameraProjection;
+        mesh.projection          = p.matrix;
+        mesh.stateChanged        = true;
+    }
 
     return mesh;
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const debug::transform& t)
 {
-    mesh.transform    = t.matrix;
-    mesh.stateChanged = true;
+    if (mesh.transform != t.matrix)
+    {
+        mesh.transform    = t.matrix;
+        mesh.stateChanged = true;
+    }
 
     return mesh;
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const debug::depth_test& d)
 {
-    mesh.depthTest    = d.toggle;
-    mesh.stateChanged = true;
+    if (mesh.depthTest != d.toggle)
+    {
+        mesh.depthTest    = d.toggle;
+        mesh.stateChanged = true;
+    }
 
     return mesh;
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const wireframe& w)
 {
-    mesh.wireframe      = w.toggle;
-    mesh.stateChanged   = true;
+    if (mesh.wireframe != w.toggle)
+    {
+        mesh.wireframe      = w.toggle;
+        mesh.stateChanged   = true;
+    }
 
     return mesh;
 }

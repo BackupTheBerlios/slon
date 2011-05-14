@@ -77,7 +77,7 @@ public:
     const math::AABBf& getBounds() const;
 
     /** Clear data in the mesh */
-    void clear();
+    void clear(bool clearBuffers = false);
 
     virtual ~DebugMesh() {}
 
