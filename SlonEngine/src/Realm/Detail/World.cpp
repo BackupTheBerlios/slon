@@ -129,8 +129,9 @@ bool World::update(realm::Object* object_)
 bool World::remove(realm::Object* object_)
 {
     detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
+    assert(object && object->world == this);
 
+    object->world = 0;
     if ( Location* location = object->getLocation() ) {
         return location->remove(object);
     }
@@ -142,8 +143,9 @@ bool World::remove(realm::Object* object_)
 void World::add(realm::Object* object_)
 {
     detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
+    assert(object && object->world == 0);
 
+    object->world = this;
     if ( object->getBounds() == bounds<math::AABBf>::infinite() ) {
         infiniteObjects.push_back( object_ptr(object) );
     }

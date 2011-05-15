@@ -29,7 +29,7 @@ public:
     const math::AABBf&  getBounds() const			{ return aabb; }
     scene::Node*        getRoot()					{ return root.get(); }
     const scene::Node*  getRoot() const				{ return root.get(); }
-    bool                isInWorld() const           { return location != 0; }
+    bool                isInWorld() const           { return world != 0; }
 
     void                traverse(scene::NodeVisitor& nv);
     void                traverse(scene::ConstNodeVisitor& nv) const;
@@ -50,6 +50,9 @@ public:
 
 	void*			getLocationData()					 { return locationData; }
 	void			setLocationData(void* locationData_) { locationData = locationData_; }
+
+public:
+    World*                      world;
 
 private:
     // spatial structure
