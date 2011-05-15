@@ -53,6 +53,7 @@ public:
 
 public:
     World*                      world;
+    bool                        infinite;
 
 private:
     // spatial structure

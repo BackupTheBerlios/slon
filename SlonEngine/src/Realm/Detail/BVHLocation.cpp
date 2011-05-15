@@ -102,17 +102,23 @@ namespace detail {
 #   define DEBUG_UPDATE_TREE(debugMesh, staticTree, dynamicTree)\
         {\
             using namespace graphics::debug;\
-            debugMesh.reset(new graphics::DebugMesh);\
+            if (!debugMesh) {\
+                debugMesh.reset(new graphics::DebugMesh);\
+            }\
+            debugMesh->clear();\
             graphics::debug_mesh_ptr staticDebugMesh( DebugAABBTree(staticTree) );\
             graphics::debug_mesh_ptr dynamicDebugMesh( DebugAABBTree(dynamicTree) );\
             *debugMesh << *staticDebugMesh << *dynamicDebugMesh;\
         }
 
-#   define DEBUG_TRAVERSE_TREE(debugTree, nv)\
-        nv.traverse(*debugTree);
+#   define DEBUG_VISIT_TREE(debugObject, debugMesh, cb)\
+        if (!debugObject) {\
+            debugObject.reset(new Object(debugMesh.get()));\
+        }\
+        cb(*debugObject);
 #else
 #   define DEBUG_UPDATE_TREE(debugMesh, staticTree, dynamicTree)
-#   define DEBUG_TRAVERSE_TREE(debugTree, nv)
+#   define DEBUG_VISIT_TREE(debugObject, debugMesh, cb)
 #endif
 	
 template<typename Location, typename Callback>
@@ -174,11 +180,13 @@ void BVHLocation::visit(const body_variant& body, object_const_callback& cb) con
 void BVHLocation::visitVisible(const math::Frustumf& frustum, object_callback& cb)
 {
 	visit(frustum, cb);
+    DEBUG_VISIT_TREE(debugObject, debugMesh, cb);
 }
 
 void BVHLocation::visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const
 {
 	visit(frustum, cb);
+    DEBUG_VISIT_TREE(debugObject, debugMesh, cb);
 }
 
 bool BVHLocation::update(realm::Object* object_)
@@ -200,7 +208,7 @@ bool BVHLocation::update(realm::Object* object_)
     }
     aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
 
-    DEBUG_UPDATE_TREE(aabbTreeDebugMesh, staticAABBTree, dynamicAABBTree)
+    DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
     return true;
 }
 
@@ -224,7 +232,7 @@ bool BVHLocation::remove(realm::Object* object_)
     }
     aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
 
-    DEBUG_UPDATE_TREE(aabbTreeDebugMesh, staticAABBTree, dynamicAABBTree)
+    DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
     return true;
 }
 
@@ -252,7 +260,7 @@ void BVHLocation::add(realm::Object* object_)
     }
     aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
 
-    DEBUG_UPDATE_TREE(aabbTreeDebugMesh, staticAABBTree, dynamicAABBTree)
+    DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
 }
 
 } // namespace detail

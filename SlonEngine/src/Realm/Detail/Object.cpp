@@ -59,6 +59,7 @@ Object::Object(scene::Node*             root_,
 #endif
                ) :
     world(0),
+    infinite(false),
 	location(0),
 	locationData(0),
     dynamic(dynamic_)

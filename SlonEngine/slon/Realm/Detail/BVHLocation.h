@@ -77,7 +77,8 @@ private:
 
     // debug
 #ifdef DEBUG_DBVT_LOCATION
-    graphics::debug_mesh_ptr  aabbTreeDebugMesh;
+    mutable graphics::debug_mesh_ptr    debugMesh;
+    mutable object_ptr                  debugObject;
 #endif
 };
 
