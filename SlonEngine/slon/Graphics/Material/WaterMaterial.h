@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_LIGHTING_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_LIGHTING_EFFECT_H__
 
-#include "../../Scene/Light.h"
-#include "../Effect.h"
 #include <boost/signal.hpp>
 #include <sgl/Texture2D.h>
+#include "../../Scene/Light.h"
+#include "../Effect.h"
 
 namespace slon {
 namespace graphics {

@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_CALLBACK_H__
 #define __SLON_ENGINE_CALLBACK_H__
 
-#include "referenced.hpp"
 #include <boost/function.hpp>
+#include "referenced.hpp"
 
 namespace slon {
 

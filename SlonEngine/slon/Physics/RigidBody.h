@@ -4,6 +4,9 @@
 #include "CollisionObject.h"
 #include "CollisionShape.h"
 #include "RigidBodyTransform.h"
+#ifdef SLON_ENGINE_USE_SSE
+#   include "../Utility/Memory/aligned.hpp"
+#endif
 
 namespace slon {
 namespace physics {
@@ -36,7 +39,7 @@ public:
 
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
-       : public sgl::Aligned16
+       : public aligned<0x10>
 #endif
     {
         math::Matrix4r  transform;          /// initial transformation matrix

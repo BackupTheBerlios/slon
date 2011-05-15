@@ -52,8 +52,8 @@ void GraphicsManager::setVideoMode( unsigned     width,
         throw slon_error(logger, (std::string("Couldn't set video mode: ") + SDL_GetError()).c_str() );
     }
 
-#ifdef _WIN32
-    FreeConsole();
+#if defined(_WIN32) && (WINVER <= _WIN32_WINNT_WINXP)
+    FreeConsole(); // due to some bug in XP console is not freed if application crashes
 #endif
 }
 

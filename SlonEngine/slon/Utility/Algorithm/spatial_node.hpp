@@ -2,14 +2,14 @@
 #define __SLON_ENGINE_REFERENCED_H__
 
 #include "../../Config.h"
-#include <sgl/Utility/Aligned.h>
+#include "../Memory/aligned.hpp"
 
 namespace slon {
 
 /** Base class for all spatial node structures */
 struct spatial_node
 #ifdef SLON_ENGINE_USE_SSE
-    : public sgl::Aligned16
+    : public aligned<0x10>
 #endif
 {
 private:

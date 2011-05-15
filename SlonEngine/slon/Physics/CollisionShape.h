@@ -1,13 +1,13 @@
 #ifndef __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
 #define __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
 
-#include "../Utility/Algorithm/algorithm.hpp"
-#include "../Utility/referenced.hpp"
-#include "Forward.h"
 #include <boost/intrusive_ptr.hpp>
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Plane.hpp>
 #include <vector>
+#include "../Utility/Algorithm/algorithm.hpp"
+#include "../Utility/referenced.hpp"
+#include "Forward.h"
 
 namespace slon {
 namespace physics {

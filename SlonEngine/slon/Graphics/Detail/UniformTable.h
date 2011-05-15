@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_DETAIL_UNIFORM_TABLE_H__
 #define __SLON_ENGINE_GRAPHICS_DETAIL_UNIFORM_TABLE_H__
 
-#include "ParameterTable.h"
 #include <sgl/Uniform.h>
+#include "ParameterTable.h"
 
 namespace slon {
 namespace graphics {
@@ -176,7 +176,7 @@ private:
         }
 
     private:
-        boost::intrusive_ptr<UniformTable> uniformTable;
+        UniformTable* uniformTable;
     };
 
     template<typename T>
@@ -202,7 +202,7 @@ private:
         }
 
     private:
-       boost::intrusive_ptr<UniformTable> uniformTable;
+       UniformTable* uniformTable;
     };
 
     typedef std::map<sgl::AbstractUniform*, abstract_uniform_binding*>  uniform_map;

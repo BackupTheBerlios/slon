@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_UTILITY_TIMER_H__
 #define __SLON_ENGINE_UTILITY_TIMER_H__
 
-#include "../Utility/referenced.hpp"
 #include <boost/intrusive_ptr.hpp>
+#include "../Utility/referenced.hpp"
 
 namespace slon {
 

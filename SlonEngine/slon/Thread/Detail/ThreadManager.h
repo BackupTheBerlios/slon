@@ -1,14 +1,14 @@
 #ifndef __SLON_ENGINE_THREAD_DETAIL_THREAD_MANAGER_H__
 #define __SLON_ENGINE_THREAD_DETAIL_THREAD_MANAGER_H__
 
-#include "../Lock.h"
-#include "../ThreadManager.h"
 #define NOMINMAX // thread may include windows.h
 #include <boost/function.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <vector>
+#include "../Lock.h"
+#include "../ThreadManager.h"
 
 namespace slon {
 

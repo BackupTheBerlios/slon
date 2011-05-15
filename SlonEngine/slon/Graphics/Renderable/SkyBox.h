@@ -1,13 +1,13 @@
 #ifndef SLON_ENGINE_RENDERABLE_SKY_BOX_H
 #define SLON_ENGINE_RENDERABLE_SKY_BOX_H
 
+#include <sgl/TextureCube.h>
 #include "../../Scene/Geode.h"
 #include "../../Scene/Visitors/CullVisitor.h"
 #include "../../Utility/math.hpp"
 #include "../Detail/AttributeTable.h"
 #include "../Effect/SkyBoxEffect.h"
 #include "../Renderable.h"
-#include <sgl/TextureCube.h>
 
 namespace slon {
 namespace graphics {

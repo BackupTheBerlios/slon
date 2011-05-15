@@ -38,12 +38,12 @@ void Directory::reload()
 	{
 		if ( boost::fs::is_directory( iter->status() ) ) 
 		{
-            Directory* directory = new Directory( manager.get(), iter->path(), virtualPath / iter->filename() );
+            Directory* directory = new Directory( manager, iter->path(), virtualPath / iter->filename() );
 			nodes.push_back(directory);
 		}
 		else if ( boost::fs::is_regular_file( iter->status() ) ) 
 		{
-            File* file = new File( manager.get(), iter->path(), virtualPath / iter->filename() );
+            File* file = new File( manager, iter->path(), virtualPath / iter->filename() );
 			nodes.push_back(file);
 		}
 	}

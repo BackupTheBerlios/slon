@@ -74,12 +74,12 @@ private:
     unsigned                    stencilBits;
     unsigned                    multisample;
 
-    // internal managers
-    renderer_ptr                renderer;
-    camera_vector               cameras;
+    // internal managers, order is important!
     detail::attribute_table_ptr attributeTable;
     detail::parameter_table_ptr parameterTable;
     detail::uniform_table_ptr   uniformTable;
+    renderer_ptr                renderer;
+    camera_vector               cameras;
 
     // signals
     pre_frame_render_signal     preFrameRenderSignal;

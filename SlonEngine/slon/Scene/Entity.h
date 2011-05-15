@@ -1,8 +1,8 @@
 #ifndef SLON_ENGINE_SCENE_GRAPH_ENTITY_H
 #define SLON_ENGINE_SCENE_GRAPH_ENTITY_H
 
-#include "Group.h"
 #include <sgl/Math/AABB.hpp>
+#include "Group.h"
 
 namespace slon {
 namespace scene {

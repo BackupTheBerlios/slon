@@ -359,7 +359,6 @@ Engine::~Engine()
 
 } // namespace detail
 
-/** Get singleton engine instance */
 Engine* Engine::Instance()
 {
     if (!detail::Engine::engineInstance) {
@@ -367,6 +366,16 @@ Engine* Engine::Instance()
     }
 
     return detail::Engine::engineInstance;
+}
+
+void Engine::Free()
+{
+    delete detail::Engine::engineInstance;
+#ifdef _DEBUG
+    freopen("leaks.txt", "w", stderr);
+    check_mem_corruption();
+    check_leaks();
+#endif
 }
 
 // Define manager get funcs

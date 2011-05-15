@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_ANIMATION_ANIMATION_TRACK_H__
 #define __SLON_ENGINE_ANIMATION_ANIMATION_TRACK_H__
 
+#include <sgl/Math/Matrix.hpp>
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
-#include <sgl/Math/Matrix.hpp>
 
 namespace slon {
 namespace animation {

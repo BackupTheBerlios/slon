@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_BFS_NODE_VISITOR_H__
 #define __SLON_ENGINE_SCENE_BFS_NODE_VISITOR_H__
 
-#include "NodeVisitor.h"
 #include <queue>
+#include "NodeVisitor.h"
 
 namespace slon {
 namespace scene {

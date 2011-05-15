@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_TRANSFORM_H__
 #define __SLON_ENGINE_SCENE_TRANSFORM_H__
 
-#include "Group.h"
 #include <sgl/Math/Matrix.hpp>
+#include "Group.h"
 
 namespace slon {
 namespace scene {

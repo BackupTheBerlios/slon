@@ -28,6 +28,7 @@ public:
 
 	// Override Engine
     void init();
+    void free();
     void run(const DESC& desc);
     void frame();
     void stop() { working = false; }

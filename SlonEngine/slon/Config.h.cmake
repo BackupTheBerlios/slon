@@ -35,4 +35,12 @@ namespace physics {
 #   define SLON_ENGINE_USE_SSE
 #endif
 
+#ifdef _DEBUG
+#	define SLON_ENGINE_FORCE_DEBUG_NEW
+#	define SLON_ENGINE_DISABLE_OBJECT_POOL
+#endif
+#ifdef SLON_ENGINE_FORCE_DEBUG_NEW
+#	include "Utility/Memory/debug_new.h"
+#endif
+
 #endif // __SLON_ENGINE_CONFIG_H__

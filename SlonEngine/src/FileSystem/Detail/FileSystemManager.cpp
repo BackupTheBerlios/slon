@@ -18,6 +18,10 @@ namespace slon {
 namespace filesystem {
 namespace detail {
 	
+FileSystemManager::~FileSystemManager()
+{
+}
+
 filesystem::Directory* FileSystemManager::setWorkingDirectory(const char* virtualPath)
 {
 	filesystem::Directory* dir = asDirectory( getNode(virtualPath) );

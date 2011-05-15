@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_EFFECT_SHADER_PROGRAM_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_EFFECT_SHADER_PROGRAM_H__
 
-#include "../../../Utility/error.hpp"
-#include "../../Detail/AttributeTable.h"
 #include <sgl/Program.h>
 #include <functional>
 #include <string>
+#include "../../../Utility/error.hpp"
+#include "../../Detail/AttributeTable.h"
 
 namespace slon {
 namespace graphics {

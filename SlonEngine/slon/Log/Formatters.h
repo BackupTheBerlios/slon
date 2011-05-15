@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_LOG_FORMATTERS_H__
 #define __SLON_ENGINE_LOG_FORMATTERS_H__
 
-#include "../Config.h"
-#include "Stream.h"
 #include <iomanip>
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Math/Vector.hpp>
+#include "../Config.h"
+#include "Stream.h"
 
 namespace slon {
 namespace log {

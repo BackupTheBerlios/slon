@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_RENDERER_FIXED_PIPELINE_RENDERER_H__
 #define __SLON_ENGINE_GRAPHICS_RENDERER_FIXED_PIPELINE_RENDERER_H__
 
+#include <vector>
 #include "../../Scene/Visitors/CullVisitor.h"
 #include "../Detail/Utility.h"
 #include "../Renderer.h"
-#include <vector>
 
 namespace slon {
 

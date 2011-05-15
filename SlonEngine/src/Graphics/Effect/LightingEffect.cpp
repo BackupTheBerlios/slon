@@ -30,6 +30,10 @@ LightingEffect::LightingEffect(const LightingMaterial*          material_,
     dirty(material_);
 }
 
+LightingEffect::~LightingEffect()
+{
+}
+
 // Override Effect
 int LightingEffect::present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** p)
 {

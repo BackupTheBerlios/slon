@@ -1,9 +1,12 @@
 #ifndef __SLON_ENGINE_ANIMATION_DETAIL_ANIMATION_TRACK_H__
 #define __SLON_ENGINE_ANIMATION_DETAIL_ANIMATION_TRACK_H__
 
-#include "../AnimationTrack.h"
 #include <sgl/Math/Quaternion.hpp>
 #include <boost/shared_array.hpp>
+#include "../AnimationTrack.h"
+#ifdef SLON_ENGINE_USE_SSE
+#   include "../../Utility/Memory/aligned.hpp"
+#endif
 
 namespace slon {
 namespace animation {
@@ -13,8 +16,10 @@ class AnimationTrack :
     public animation::AnimationTrack
 {
 public:
-    struct frame :
-        public sgl::Aligned16
+    struct frame 
+    #ifdef SLON_ENGINE_USE_SSE
+        : public aligned<0x10>
+    #endif
     {
         math::Quaternionf   rotation;
         math::Vector3f      translation;

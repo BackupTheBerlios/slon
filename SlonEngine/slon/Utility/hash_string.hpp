@@ -1,12 +1,12 @@
 #ifndef __SLON_ENGINE_ALGORITHM_HASH_STRING_H__
 #define __SLON_ENGINE_ALGORITHM_HASH_STRING_H__
 
-#include "referenced.hpp"
-#include "Memory/object_in_pool.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>
 #include <string>
+#include "Memory/object_in_pool.hpp"
+#include "referenced.hpp"
 
 namespace slon {
 
@@ -79,21 +79,26 @@ private:
             }
 
             parent = parent->root();
-            return parent.get();
+            return parent;
         }
 
         void merge(string_holder* other)
         {
              string_holder* xRoot = root();
              string_holder* yRoot = other->root();
-             if (xRoot->rank > yRoot->rank) {
+             if (xRoot->rank > yRoot->rank) 
+             {
                  yRoot->parent = xRoot;
+                 assert(yRoot->parent != yRoot);
+                 yRoot->parentHolder.reset(yRoot->parent);
              }
              else if (xRoot != yRoot)
              {
                  xRoot->parent = yRoot;
+                 assert(xRoot->parent != xRoot);
+                 xRoot->parentHolder.reset(xRoot->parent);
                  if (xRoot->rank == yRoot->rank) {
-                     yRoot->rank = yRoot->rank + 1;
+                     ++yRoot->rank;
                  }
              }
         }
@@ -105,7 +110,8 @@ private:
         bool            allocated;
 
         // DSU
-        mutable string_holder_ptr   parent; // can hold this pointer, but this is handled in ~basic_hash_string
+        mutable string_holder*      parent;
+        mutable string_holder_ptr   parentHolder;
         mutable size_t              rank;
     };
     
@@ -127,13 +133,6 @@ public:
     basic_hash_string(const string& str, allocator_type alloc = allocator_type())
     :   holder(new string_holder(str.c_str(), str.length() + 1, alloc))
     {
-    }
-
-    ~basic_hash_string()
-    {
-        if (holder->parent == holder && holder->use_count() == 2) {
-            holder->parent.reset(); // broke recurrent link
-        }
     }
 
     string  str() const   { return holder ? string(holder->str) : string(); }

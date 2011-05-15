@@ -240,6 +240,10 @@ Pass::Pass(const DESC& desc)
     }
 }
 
+Pass::~Pass()
+{
+}
+
 void Pass::begin() const
 {
     sgl::Device* device = currentDevice();

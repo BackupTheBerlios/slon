@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_DATABASE_CACHE_H__
 #define __SLON_ENGINE_DATABASE_CACHE_H__
 
+#include <vector>
 #include "../Utility/handle.hpp"
 #include "Loader.h"
 #include "Saver.h"
-#include <vector>
 
 namespace slon {
 namespace database {

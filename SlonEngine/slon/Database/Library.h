@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_DATABASE_LIBRARY_H__
 #define __SLON_ENGINE_DATABASE_LIBRARY_H__
 
+#include <vector>
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
-#include <vector>
 
 namespace slon {
 namespace database {

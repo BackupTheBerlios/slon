@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_CORE_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_CORE_H__
 
+#include <sgl/Program.h>
 #include "../../Scene/MatrixTransform.h"
 #include "../../Utility/Algorithm/prefix_tree.hpp"
 #include "../../Utility/error.hpp"
 #include "ColladaFX.h"
-#include <sgl/Program.h>
 
 namespace slon {
 
@@ -353,7 +353,7 @@ void collada_library<collada_geometry>::load(const ColladaDocument& document, co
 
 /** Represents <node> element */
 class collada_node :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	enum TYPE
@@ -471,7 +471,7 @@ public:
 
 /** Base class for control elements */
 class collada_control_element :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     enum CONTROLLER_TYPE

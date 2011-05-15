@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_GRAPH_GROUP_H__
 #define __SLON_ENGINE_SCENE_GRAPH_GROUP_H__
 
-#include "Node.h"
 #include <boost/intrusive_ptr.hpp>
+#include "Node.h"
 
 namespace slon {
 namespace scene {

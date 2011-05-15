@@ -1,12 +1,12 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_PASS_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_PASS_H__
 
-#include "../../Detail/UniformTable.h"
-#include "../Pass.h"
-#include "EffectShaderProgram.h"
 #include <sgl/BlendState.h>
 #include <sgl/DepthStencilState.h>
 #include <sgl/RasterizerState.h>
+#include "../../Detail/UniformTable.h"
+#include "../Pass.h"
+#include "EffectShaderProgram.h"
 
 namespace slon {
 namespace graphics {
@@ -184,6 +184,7 @@ public:
 public:
     Pass();
     Pass(const DESC& desc);
+    ~Pass();
 
     /** Setup program to the pass. */
     void setProgram(const sgl::Program* program);

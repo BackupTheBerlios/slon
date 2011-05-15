@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_GRAPHICS_MANAGER_H__
 #define __SLON_ENGINE_GRAPHICS_GRAPHICS_MANAGER_H__
 
-#include "Renderer.h"
 #include <boost/signal.hpp>
 #include <sgl/Device.h>
 #include <vector>
+#include "Renderer.h"
 
 #ifdef WIN32
 #   define NOMINMAX

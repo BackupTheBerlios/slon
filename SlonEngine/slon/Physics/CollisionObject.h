@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_PHYSICS_COLLISION_OBJECT_H__
 #define __SLON_ENGINE_PHYSICS_COLLISION_OBJECT_H__
 
-#include "../Utility/referenced.hpp"
-#include "Forward.h"
 #include <boost/signals.hpp>
 #include <sgl/Math/Matrix.hpp>
+#include "../Utility/referenced.hpp"
+#include "Forward.h"
 
 namespace slon {
 namespace physics {

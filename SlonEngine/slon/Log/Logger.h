@@ -1,14 +1,15 @@
 #ifndef __SLON_ENGINE_LOG_LOGGER__
 #define __SLON_ENGINE_LOG_LOGGER__
 
-#include "../Utility/referenced.hpp"
-#include "Stream.h"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <cassert>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include "../Utility/referenced.hpp"
+#include "Stream.h"
 
 #define __DEFINE_LOGGER__(name) namespace { slon::log::Logger logger(name); }
 

@@ -55,7 +55,7 @@ template<> struct library_elements<collada_physics_material>	{ static std::strin
 
 /** Represents shape element */
 class collada_shape :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     XMLPP_ELEMENT_SERIALIZATION(collada_shape, ColladaDocument);
@@ -66,7 +66,7 @@ public:
 };
 
 class collada_shape_geometry :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     enum SHAPE_TYPE
@@ -173,7 +173,7 @@ public:
 
 /** Represents <attachment> or <ref_attachment> element */
 class collada_attachment :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 friend class collada_instance<collada_physics_model>;
 public:
@@ -189,7 +189,7 @@ private:
 
 /** Represents <rigid_constraint> element */
 class collada_rigid_constraint :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     /** load <technique_common> */
@@ -236,7 +236,7 @@ public:
 
 /** Represents <rigid_body> element */
 class collada_rigid_body :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     typedef std::vector<collada_shape_ptr>  shape_vector;

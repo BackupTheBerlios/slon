@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_SCENE_CAMERA_H__
 #define __SLON_ENGINE_SCENE_CAMERA_H__
 
+#include <sgl/RenderTarget.h>
+#include <sgl/Math/Frustum.hpp>
 #include "../Graphics/Filter.h"
 #include "../Thread/Lock.h"
 #include "Entity.h"
-#include <sgl/RenderTarget.h>
-#include <sgl/Math/Frustum.hpp>
 
 namespace slon {
 

@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_DATABASE_LOADER_H__
 #define __SLON_ENGINE_DATABASE_LOADER_H__
 
+#include <istream>
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
-#include <istream>
 
 namespace slon {
 namespace database {

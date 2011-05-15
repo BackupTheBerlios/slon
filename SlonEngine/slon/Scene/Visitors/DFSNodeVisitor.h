@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_DFS_NODE_VISITOR_H__
 #define __SLON_ENGINE_SCENE_DFS_NODE_VISITOR_H__
 
-#include "NodeVisitor.h"
 #include <stack>
+#include "NodeVisitor.h"
 
 namespace slon {
 namespace scene {

@@ -1,8 +1,8 @@
 #ifndef __FILESYSTEM_NODE_H__
 #define __FILESYSTEM_NODE_H__
 
-#include "../Utility/referenced.hpp"
 #include <boost/intrusive_ptr.hpp>
+#include "../Utility/referenced.hpp"
 
 namespace slon {
 namespace filesystem {

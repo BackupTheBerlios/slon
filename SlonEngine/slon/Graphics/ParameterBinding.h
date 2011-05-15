@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_PARAMETER_BINDING_H__
 #define __SLON_ENGINE_GRAPHICS_PARAMETER_BINDING_H__
 
+#include <boost/intrusive_ptr.hpp>
+#include <sgl/Math/Matrix.hpp>
 #include "../Utility/referenced.hpp"
 #include "../Utility/Memory/object_in_pool.hpp"
 #include "Forward.h"
-#include <boost/intrusive_ptr.hpp>
-#include <sgl/Math/Matrix.hpp>
 
 namespace slon {
 namespace graphics {

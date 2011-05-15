@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_LOG_STREAM__
 #define __SLON_ENGINE_LOG_STREAM__
 
-#include "Forward.h"
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <iostream>
 #include <stack>
+#include "Forward.h"
 
 namespace slon {
 namespace log {

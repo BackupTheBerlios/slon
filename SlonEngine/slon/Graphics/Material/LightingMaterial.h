@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_MATERIAL_LIGHTING_MATERIAL_H__
 #define __SLON_ENGINE_GRAPHICS_MATERIAL_LIGHTING_MATERIAL_H__
 
-#include "../Material.h"
-#include "../ParameterBinding.h"
 #include <boost/signal.hpp>
 #include <sgl/Texture2D.h>
+#include "../Material.h"
+#include "../ParameterBinding.h"
 
 namespace slon {
 namespace graphics {

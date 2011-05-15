@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/PhysicsManager.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRotationalVelocityMotor.h"

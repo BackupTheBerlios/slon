@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_CACHED_VALUE_HPP__
 #define __SLON_ENGINE_CACHED_VALUE_HPP__
 
-#include "../Config.h"
 #include <sgl/Math/Frustum.hpp>
 #ifdef SLON_ENGINE_USE_SSE
 #include <sgl/Utility/Aligned.h>
 #endif
+#include "../Config.h"
 
 namespace slon {
 

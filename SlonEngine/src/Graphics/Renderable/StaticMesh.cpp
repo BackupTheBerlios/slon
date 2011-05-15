@@ -23,6 +23,10 @@ StaticMesh::StaticMesh(Mesh* _mesh) :
         (*iter)->getEffect()->bindParameter( hash_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&worldMatrix, 1, true) );
     }
 }
+    
+StaticMesh::~StaticMesh()
+{
+}
 
 // Override node
 void StaticMesh::accept(scene::CullVisitor& visitor) const

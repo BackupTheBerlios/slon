@@ -1,13 +1,11 @@
 #ifndef __SLON_ENGINE_DATABASE_DETAIL_CACHE_H__
 #define __SLON_ENGINE_DATABASE_DETAIL_CACHE_H__
 
-#include "../../Utility/Algorithm/algorithm.hpp"
-#include "../../Utility/Algorithm/prefix_tree.hpp"
-#include "../Cache.h"
 #include <boost/bind.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <map>
 #include <sgl/Utility/Aligned.h>
+#include "../Cache.h"
 
 namespace slon {
 namespace database {
@@ -36,7 +34,7 @@ private:
     typedef std::set<loader_ptr>                    loader_set;
     typedef std::set<saver_ptr>                     saver_set;
 
-    typedef prefix_tree<char, value_ptr>            storage_type;
+    typedef boost::unordered_map<std::string, value_ptr>   storage_type;
 
 #if BOOST_VERSION < 104200 && __GNUC__
     typedef sgl::vector<boost::xpressive::sregex>   regex_vector;

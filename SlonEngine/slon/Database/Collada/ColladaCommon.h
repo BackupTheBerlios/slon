@@ -1,9 +1,6 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__
 
-#include "../../Log/Logger.h"
-#include "../../Utility/error.hpp"
-#include "../Forward.h"
 #include <boost/shared_ptr.hpp>
 #include <functional>
 #include <sgl/Math/MatrixFunctions.hpp>
@@ -11,6 +8,9 @@
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
 #include <xml++/serialization/serialization.hpp>
+#include "../../Log/Logger.h"
+#include "../../Utility/error.hpp"
+#include "../Forward.h"
 
 namespace slon {
 namespace database {

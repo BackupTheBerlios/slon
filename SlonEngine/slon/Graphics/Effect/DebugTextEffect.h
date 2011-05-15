@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_TEXT_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DEBUG_TEXT_EFFECT_H__
 
+#include <sgl/Font.h>
 #include "../../Utility/Memory/aligned_allocator.hpp"
 #include "../../Utility/Memory/object_in_pool.hpp"
 #include "../Effect.h"
 #include "Pass.h"
-#include <sgl/Font.h>
 
 namespace slon {
 namespace graphics {

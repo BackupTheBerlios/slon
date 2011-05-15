@@ -1,11 +1,11 @@
 #ifndef __FILESYSTEM_DETAIL_FILESYSTEM_MANAGER_H__
 #define __FILESYSTEM_DETAIL_FILESYSTEM_MANAGER_H__
 
+#include <boost/filesystem.hpp>
+#include <list>
 #include "../../Utility/Algorithm/prefix_tree.hpp"
 #include "../Directory.h"
 #include "../FileSystemManager.h"
-#include <boost/filesystem.hpp>
-#include <list>
 
 namespace slon {
 namespace filesystem {
@@ -20,6 +20,8 @@ public:
     typedef prefix_tree<char, path_list>            path_list_prefix_tree;
 
 public:
+    ~FileSystemManager();
+
 	// Override FileSystemManager
 	filesystem::Directory*	setWorkingDirectory(const char* virtualPath);
     bool            		mount(const char* systemPath, const char* mountPoint);
@@ -35,9 +37,9 @@ public:
     void unregisterNode(const std::string& sysPath);
 
 private:
-    node_ptr                workingDir;
     path_list_prefix_tree	mountPoints;
     node_prefix_tree        activeNodes;
+    node_ptr                workingDir;
 };
 
 typedef boost::intrusive_ptr<FileSystemManager> file_system_manager_ptr;

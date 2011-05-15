@@ -5,11 +5,18 @@
 #include <memory>
 #include "block_allocator.h"
 
-// Fuck WinAPI
-#pragma push_macro("max")
-#pragma push_macro("min")
-#undef min
-#undef max
+// some libraries may define their own new/delete
+#ifdef new
+#   pragma push_macro("new")
+#   undef new
+#   define _POP_NEW_MACRO
+#endif
+
+#ifdef delete
+#   pragma push_macro("delete")
+#   undef delete
+#   define _POP_DELETE_MACRO
+#endif
 
 namespace slon {
 
@@ -214,8 +221,8 @@ public:
 	pointer allocate(size_type count, const_pointer hint = 0)
 	{
 #ifdef SMALL_OBJECT_ALLOCATOR_STATISTICS
-		minAllocationSize_ = std::min(minAllocationSize_, count);
-		maxAllocationSize_ = std::max(maxAllocationSize_, count);
+		minAllocationSize_ = (std::min)(minAllocationSize_, count);
+		maxAllocationSize_ = (std::max)(maxAllocationSize_, count);
 #endif 
 		// find allocator class
 		block_allocator_type* iter = std::lower_bound( begin_allocator(),
@@ -322,5 +329,9 @@ const allocation_desc small_object_allocator<T, UserAllocator, Traits>::base_cla
 
 } // namespace slon
 
-#pragma pop_macro("min")
-#pragma pop_macro("max")
+#ifdef _POP_NEW_MACRO
+#   pragma pop_macro("new")
+#endif
+#ifdef _POP_DELETE_MACRO
+#   pragma pop_macro("delete")
+#endif

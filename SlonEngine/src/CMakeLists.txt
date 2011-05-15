@@ -307,9 +307,13 @@ SET ( TARGET_UTILITY_ALGORITHM_HEADERS
 )
 
 SET ( TARGET_UTILITY_MEMORY_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/Memory/aligned.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/aligned_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/block_allocator.hpp
+    ${TARGET_HEADER_PATH}/Utility/Memory/debug_new.h
+    ${TARGET_HEADER_PATH}/Utility/Memory/fast_mutex.h
     ${TARGET_HEADER_PATH}/Utility/Memory/small_object_allocator.hpp
+    ${TARGET_HEADER_PATH}/Utility/Memory/static_assert.h
     ${TARGET_HEADER_PATH}/Utility/Memory/object_in_pool.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/object_pool.hpp
 )
@@ -652,6 +656,10 @@ SET ( TARGET_UTILITY_SOURCES
 	Utility/error.cpp
 )
 
+SET ( TARGET_UTILITY_MEMORY_SOURCES
+	Utility/Memory/debug_new.cpp
+)
+
 SET ( TARGET_UTILITY_PLOT_SOURCES
 	Utility/Plot/gnuplot.cpp
 )
@@ -694,6 +702,7 @@ SOURCE_GROUP( sources\\Scene\\Visitors FILES               ${TARGET_SCENE_VISITO
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
+SOURCE_GROUP( sources\\Utility\\Memory FILES               ${TARGET_UTILITY_MEMORY_SOURCES} )
 SOURCE_GROUP( sources\\Utility\\Plot FILES                 ${TARGET_UTILITY_PLOT_SOURCES} )
 
 SET ( TARGET_SOURCES
@@ -731,6 +740,7 @@ SET ( TARGET_SOURCES
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}
+	${TARGET_UTILITY_MEMORY_SOURCES}
 )
 
 IF (SLON_ENGINE_USE_BULLET)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #define NOMINMAX
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletMotionState.h"
 

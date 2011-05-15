@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_ERROR_H__
 #define __SLON_ENGINE_ERROR_H__
 
-#include "../Log/Logger.h"
 #include <stdexcept>
+#include "../Log/Logger.h"
 
 namespace slon {
 

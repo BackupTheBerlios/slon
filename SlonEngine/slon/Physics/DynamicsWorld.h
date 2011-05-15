@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 #define __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 
+#include <sgl/Math/AABB.hpp>
+#include <vector>
 #include "../Thread/Lock.h"
 #include "../Utility/referenced.hpp"
 #include "PhysicsModel.h"
-#include <sgl/Math/AABB.hpp>
-#include <vector>
 
 namespace slon {
 namespace physics {
@@ -26,7 +26,7 @@ public:
 
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
-       : public sgl::Aligned16
+       : public aligned<0x10>
 #endif
     {
         math::AABBr     worldSize;

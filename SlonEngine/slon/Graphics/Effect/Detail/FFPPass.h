@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_FFP_PASS_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_FFP_PASS_H__
 
-#include "../../ParameterBinding.h"
-#include "../Pass.h"
 #include <sgl/BlendState.h>
 #include <sgl/DepthStencilState.h>
 #include <sgl/RasterizerState.h>
+#include "../../ParameterBinding.h"
+#include "../Pass.h"
 
 namespace slon {
 namespace graphics {

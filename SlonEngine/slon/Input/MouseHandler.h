@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_INPUT_MOUSE_HANDLER_H__
 #define __SLON_ENGINE_INPUT_MOUSE_HANDLER_H__
 
-#include "InputHandler.h"
 #include <boost/signals.hpp>
+#include "InputHandler.h"
 
 namespace slon {
 namespace input {

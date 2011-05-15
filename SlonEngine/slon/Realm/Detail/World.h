@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 #define __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 
+#include <boost/thread/shared_mutex.hpp>
+#include <vector>
 #include "../Location.h"
 #include "../World.h"
 #include "Object.h"
-#include <boost/thread/shared_mutex.hpp>
-#include <vector>
 
 namespace slon {
 namespace realm {

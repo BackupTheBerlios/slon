@@ -1,12 +1,12 @@
 #ifndef __SLON_ENGINE_REALM_OBJECT_H__
 #define __SLON_ENGINE_REALM_OBJECT_H__
 
+#include <sgl/Math/AABB.hpp>
 #include "../Config.h"
 #include "../Physics/Forward.h"
 #include "../Scene/Forward.h"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
-#include <sgl/Math/AABB.hpp>
 
 namespace slon {
 namespace realm {

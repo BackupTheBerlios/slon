@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_CAMERA_REFLECT_CAMERA_H__
 #define __SLON_ENGINE_CAMERA_REFLECT_CAMERA_H__
 
-#include "SlaveCamera.h"
 #include <sgl/Math/Plane.hpp>
+#include "SlaveCamera.h"
 
 namespace slon {
 namespace scene {

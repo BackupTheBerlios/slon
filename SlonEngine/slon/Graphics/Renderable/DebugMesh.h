@@ -1,15 +1,15 @@
 #ifndef __SLON_ENGINE_GRAPHICS_RENDERABLE_DEBUG_MESH_H__
 #define __SLON_ENGINE_GRAPHICS_RENDERABLE_DEBUG_MESH_H__
 
-#include "../../Scene/Geode.h"
-#include "../Effect/DebugEffect.h"
-#include "../Effect/DebugTextEffect.h"
-#include "../Renderable.h"
 #include <sgl/Math/Containers.hpp>
 #include <sgl/Font.h>
 #include <sgl/IndexBuffer.h>
 #include <sgl/VertexBuffer.h>
 #include <sgl/Program.h>
+#include "../../Scene/Geode.h"
+#include "../Effect/DebugEffect.h"
+#include "../Effect/DebugTextEffect.h"
+#include "../Renderable.h"
 
 namespace slon {
 namespace graphics {
