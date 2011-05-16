@@ -22,6 +22,37 @@
 namespace slon {
 namespace log {
 
+class logger_output;
+typedef boost::intrusive_ptr<logger_output> logger_output_ptr;
+
+class logger_output :
+    public referenced
+{
+public:
+    typedef boost::shared_ptr<std::filebuf>     filebuf_ptr;
+    typedef boost::shared_ptr<ostream>			ostream_ptr;
+    typedef std::vector<logger_output_ptr>      logger_output_vector;
+
+public:
+    // construct output, redirect to cout
+    logger_output();
+
+    // construct output, redirect to parent output
+    logger_output(logger_output* _parent, const std::string& _name);
+
+    ~logger_output();
+
+public:
+    // tree
+    logger_output*			parent;
+    logger_output_vector    children;
+    std::string             name;
+
+    // io
+    filebuf_ptr fb;
+    ostream_ptr os;
+};
+
 /** Logger is simple ostream that redirects output
  * to the specified by LogManager destination. Loggers
  * are organized in tree structure. Id you redirect output
@@ -30,35 +61,6 @@ namespace log {
 class Logger
 {
 friend class LogManager;
-public:
-    struct  logger_output;
-    typedef boost::intrusive_ptr<logger_output> logger_output_ptr;
-    typedef boost::shared_ptr<std::filebuf>     filebuf_ptr;
-    typedef boost::shared_ptr<ostream>			ostream_ptr;
-
-    typedef std::vector<logger_output*>         logger_output_vector;
-
-    struct logger_output :
-        public referenced
-    {
-        // tree
-        logger_output_ptr       parent;
-        logger_output_vector    children;
-        std::string             name;
-
-        // io
-        filebuf_ptr fb;
-        ostream_ptr os;
-
-        // construct output, redirect to cout
-        logger_output();
-
-        // construct output, redirect to parent output
-        logger_output(const logger_output_ptr& _parent, const std::string& _name);
-
-        ~logger_output();
-    };
-
 private:
     // construct logger without registering it
     Logger();

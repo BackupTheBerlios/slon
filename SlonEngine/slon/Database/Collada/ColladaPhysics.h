@@ -45,9 +45,9 @@ typedef boost::shared_ptr<collada_shape>						collada_shape_ptr;
 typedef boost::shared_ptr<collada_shape_geometry>				collada_shape_geometry_ptr;
 
 // storage typedefs
-typedef prefix_tree<char, collada_physics_scene_ptr>			ColladaPhysicsSceneStorage;
-typedef prefix_tree<char, collada_physics_model_ptr>			ColladaPhysicsModelStorage;
-typedef prefix_tree<char, collada_physics_material_ptr>			ColladaPhysicsMaterialStorage;
+typedef boost::unordered_map<std::string, collada_physics_scene_ptr>		ColladaPhysicsSceneStorage;
+typedef boost::unordered_map<std::string, collada_physics_model_ptr>		ColladaPhysicsModelStorage;
+typedef boost::unordered_map<std::string, collada_physics_material_ptr>		ColladaPhysicsMaterialStorage;
 
 template<> struct library_elements<collada_physics_scene>		{ static std::string name() { return "library_physics_scenes"; } };
 template<> struct library_elements<collada_physics_model>		{ static std::string name() { return "library_physics_models"; } }; 

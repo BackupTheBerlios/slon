@@ -1,27 +1,45 @@
 #include "stdafx.h"
 #include "Engine.h"
 
+namespace {
+
+	using namespace slon::log;
+	
+    std::string extractNextLevel(const std::string& baseName, const std::string& fullName)
+    {
+        using namespace std;
+
+        size_t index = fullName.find_first_of( ".", baseName.length() + 1 );
+        if (index == string::npos) {
+            return fullName;
+        }
+
+        return fullName.substr(0, index);
+    }
+
+	logger_output* findNode(logger_output& loggerOutput, const std::string& name)
+	{
+		if (loggerOutput.name == name) {
+			return &loggerOutput;
+		}
+
+		for(size_t i = 0; i<loggerOutput.children.size(); ++i)
+		{
+			logger_output* childFound = findNode(*loggerOutput.children[i], name);
+			if (childFound) {
+				return childFound;
+			}
+		}
+
+		return 0;
+	}
+
+} // anonymous namespace
+
 namespace slon {
 namespace log {
 
-Logger::logger_output* findNode(Logger::logger_output& loggerOutput, const std::string& name)
-{
-	if (loggerOutput.name == name) {
-		return &loggerOutput;
-	}
-
-	for(size_t i = 0; i<loggerOutput.children.size(); ++i)
-	{
-		Logger::logger_output* childFound = findNode(*loggerOutput.children[i], name);
-		if (childFound) {
-			return childFound;
-		}
-	}
-
-	return 0;
-}
-
-void redirectChildrenOutput(Logger::logger_output& loggerOutput, const boost::shared_ptr<ostream>& os)
+void redirectChildrenOutput(logger_output& loggerOutput, const boost::shared_ptr<ostream>& os)
 {
     loggerOutput.os = os;
     for(size_t i = 0; i<loggerOutput.children.size(); ++i)
@@ -36,7 +54,7 @@ LogManager::LogManager()
 
 bool LogManager::redirectOutput(const std::string& loggerName, const std::string& fileName)
 {
-    Logger::logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
+    logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
     if (!loggerOutput)
     {
         mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
@@ -52,7 +70,7 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
         return false;
     }
 
-	Logger::ostream_ptr os( new ostream( logger_sink(loggerOutput->fb.get()) ) );
+	logger_output::ostream_ptr os( new ostream( logger_sink(loggerOutput->fb.get()) ) );
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
@@ -69,7 +87,7 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
 
 bool LogManager::redirectOutputToConsole(const std::string& loggerName)
 {
-    Logger::logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
+    logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
     if (!loggerOutput)
     {
         mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
@@ -79,7 +97,7 @@ bool LogManager::redirectOutputToConsole(const std::string& loggerName)
     // redirect output
     loggerOutput->fb.reset();
 	
-	Logger::ostream_ptr os( new ostream( logger_sink(std::cout.rdbuf())) );
+	logger_output::ostream_ptr os( new ostream( logger_sink(std::cout.rdbuf())) );
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
@@ -92,10 +110,42 @@ bool LogManager::redirectOutputToConsole(const std::string& loggerName)
     return true;
 }
 
+logger_output_ptr LogManager::getLoggerOutput(const std::string& name)
+{
+    logger_output_ptr mainOutput   = mainLogger.loggerOutput;
+    logger_output_ptr parentOutput = mainOutput;
+	logger_output_ptr loggerOutput;
+
+    // create hierarchy until requested logger
+    if ( logger_output* loggerOutputNode = findNode(*parentOutput, name) ) {
+        loggerOutput.reset(loggerOutputNode);
+    }
+    else
+    {
+        std::string baseLevel, nextLevel;
+        while ( ( nextLevel = extractNextLevel(baseLevel, name) ) != name )
+        {
+            logger_output* loggerOutput = findNode(*parentOutput, nextLevel);
+            if (!loggerOutput) {
+                parentOutput = logger_output_ptr( new logger_output(parentOutput.get(), nextLevel) );
+            }
+            else {
+                parentOutput = loggerOutput;
+            }
+
+            baseLevel = nextLevel;
+        }
+
+        loggerOutput.reset( new logger_output(parentOutput.get(), name) );
+    }
+
+	return loggerOutput;
+}
+
 LogManager& currentLogManager()
 {
     return Engine::Instance()->getLogManager();
 }
 
-} // namesapce slon
+} // namespace slon
 } // namespace log

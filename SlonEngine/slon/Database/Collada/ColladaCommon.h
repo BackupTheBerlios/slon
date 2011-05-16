@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__
 
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <functional>
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Quaternion.hpp>
@@ -160,9 +161,9 @@ class collada_library :
 	public boost::noncopyable
 {
 public:
-	typedef boost::shared_ptr<Element>			element_ptr;
-	typedef boost::shared_ptr<const Element>	const_element_ptr;
-	typedef prefix_tree<char, element_ptr>		element_set;
+	typedef boost::shared_ptr<Element>						element_ptr;
+	typedef boost::shared_ptr<const Element>				const_element_ptr;
+	typedef boost::unordered_map<std::string, element_ptr>	element_set;
 
 public:
 	collada_library() :

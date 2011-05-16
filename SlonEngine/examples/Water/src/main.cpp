@@ -1,3 +1,9 @@
+#define _DEBUG_NEW_REDEFINE_NEW 0
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
+#include <sgl/State.h>
+#include <sgl/Font.h>
+#include <sstream>
 #include "Engine.h"
 #include "Graphics/Common.h"
 #include "Database/Collada/Collada.h"
@@ -12,11 +18,6 @@
 #include "Input/KeyboardHandler.h"
 #include "Input/MouseHandler.h"
 #include "Scene/Group.h"
-#include <sgl/State.h>
-#include <sgl/Font.h>
-#include <sstream>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
 
 using namespace math;
 using namespace slon;
@@ -659,6 +660,7 @@ int main(int argc, char** argv)
             return 1;
         }
     }
+	Engine::Free();
 
 	return 0;
 }

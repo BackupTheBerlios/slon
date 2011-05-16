@@ -10,6 +10,7 @@ namespace log {
  */
 class LogManager
 {
+friend class Logger;
 public:
     LogManager();
 
@@ -34,6 +35,9 @@ public:
 
     /** Get root or main logger of the LogManager */
     Logger& getMainLogger() { return mainLogger; }
+
+private:
+	logger_output_ptr getLoggerOutput(const std::string& name);
 
 private:
     Logger mainLogger;

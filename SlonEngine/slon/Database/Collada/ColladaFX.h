@@ -44,9 +44,9 @@ typedef boost::shared_ptr<collada_param> 				collada_param_ptr;
 typedef boost::shared_ptr<collada_image> 				collada_image_ptr;
 
 // storage typedefs
-typedef prefix_tree<char, collada_material_ptr>			ColladaMaterialStorage;
-typedef prefix_tree<char, collada_effect_ptr>			ColladaEffectStorage;
-typedef prefix_tree<char, collada_image_ptr>			ColladaImageStorage;
+typedef boost::unordered_map<std::string, collada_material_ptr>	ColladaMaterialStorage;
+typedef boost::unordered_map<std::string, collada_effect_ptr>	ColladaEffectStorage;
+typedef boost::unordered_map<std::string, collada_image_ptr>	ColladaImageStorage;
 
 template<> struct library_elements<collada_image>		{ static std::string name() { return "library_images"; } };  
 template<> struct library_elements<collada_effect>		{ static std::string name() { return "library_effects"; } }; 

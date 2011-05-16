@@ -70,12 +70,12 @@ public:
     void addToUpdateQueue(realm::Object* object) { updateQueue.push_back(object); }
 
 private:
-    // manager
-    database::detail::DatabaseManager           databaseManager;
-    graphics::detail::GraphicsManager           graphicsManager;
-    input::detail::InputManager                 inputManager;
+    // managers, order is important!
     log::LogManager                             logManager;
     thread::detail::ThreadManager               threadManager;
+    input::detail::InputManager                 inputManager;
+    graphics::detail::GraphicsManager           graphicsManager;
+    database::detail::DatabaseManager           databaseManager;
     filesystem::detail::file_system_manager_ptr filesystemManager;
     realm::detail::World						world;
     start_stop_timer_ptr                        simulationTimer;
