@@ -47,6 +47,10 @@ DatabaseManager::DatabaseManager()
 {
 }
 
+DatabaseManager::~DatabaseManager()
+{
+}
+
 DatabaseManager::format_desc DatabaseManager::makeFormatDesc(format_id id, const string_array& regexps)
 {
     format_desc desc;

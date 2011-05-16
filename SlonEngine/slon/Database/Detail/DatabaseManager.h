@@ -48,6 +48,7 @@ private:
 
 public:
     DatabaseManager();
+	~DatabaseManager();
 
 	AnimationCache&		getAnimationCache()     { return animationCache; }
     EffectCache&        getEffectCache()        { return effectCache; }

@@ -12,6 +12,10 @@ BulletMotionState::BulletMotionState(RigidBody* rigidBody)
 ,	worldTransformTS(0)
 {
 }
+
+BulletMotionState::~BulletMotionState()
+{
+}
 	
 void BulletMotionState::getWorldTransform(btTransform &worldTrans) const
 {

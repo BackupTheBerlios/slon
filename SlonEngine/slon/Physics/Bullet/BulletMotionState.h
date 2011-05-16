@@ -13,6 +13,7 @@ class BulletMotionState :
 {
 public:
 	BulletMotionState(RigidBody* rigidBody);
+	~BulletMotionState();
 
 	// Override btMotionState
 	void getWorldTransform(btTransform &worldTrans) const;
