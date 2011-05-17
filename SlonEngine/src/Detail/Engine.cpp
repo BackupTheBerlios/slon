@@ -286,8 +286,11 @@ void Engine::run(const DESC& desc_)
             thread::lock_ptr lock = world.lockForWriting();
             for (size_t i = 0; i<updateQueue.size(); ++i) 
             {
-                updateQueue[i]->traverse(traverser);
-                world.update(updateQueue[i].get());
+                if ( updateQueue[i]->isInWorld() )
+                {
+                    updateQueue[i]->traverse(traverser);
+                    world.update(updateQueue[i].get());
+                }
             }
             updateQueue.clear();
         }
@@ -339,8 +342,11 @@ void Engine::frame()
         thread::lock_ptr lock = world.lockForWriting();
         for (size_t i = 0; i<updateQueue.size(); ++i) 
         {
-            updateQueue[i]->traverse(traverser);
-            world.update(updateQueue[i].get());
+            if ( updateQueue[i]->isInWorld() )
+            {
+                updateQueue[i]->traverse(traverser);
+                world.update(updateQueue[i].get());
+            }
         }
         updateQueue.clear();
     }
