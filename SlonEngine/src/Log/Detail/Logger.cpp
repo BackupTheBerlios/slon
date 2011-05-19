@@ -1,13 +1,15 @@
 #include "stdafx.h"
-#include "Log/LogManager.h"
+#include "Log/Detail/Logger.h"
+#include "Log/Detail/Stream.h"
 
 namespace slon {
 namespace log {
-	
+namespace detail {
+
 // construct output, redirect to cout
 logger_output::logger_output()
 :   parent(0)
-,	os( new ostream( logger_sink( std::cout.rdbuf() ) ) )
+,	os( new log::ostream( logger_sink( std::cout.rdbuf() ) ) )
 {
     os->setf(std::ios_base::unitbuf);
 }
@@ -31,17 +33,12 @@ logger_output::~logger_output()
 	}
 }
 
-Logger::Logger() :
-    loggerOutput(new logger_output)
+Logger::Logger(const logger_output_ptr& loggerOutput_) :
+    loggerOutput(loggerOutput_)
 {
 }
 
-Logger::Logger(const std::string& name)
-{
-	loggerOutput = currentLogManager().getLoggerOutput(name);
-}
-
-log::ostream& Logger::operator << (SEVERITY severity)
+std::ostream& Logger::operator << (SEVERITY severity)
 {
     using namespace slon::log;
 
@@ -80,5 +77,6 @@ log::ostream& Logger::operator << (SEVERITY severity)
     return *(loggerOutput->os);
 }
 
-} // namesapce slon
+} // namespace detail
+} // namespace slon
 } // namespace log

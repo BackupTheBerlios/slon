@@ -6,7 +6,7 @@
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
 
-__DEFINE_LOGGER__("database.COLLADA")
+DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace slon {
 namespace database {
@@ -18,7 +18,7 @@ void collada_source::loadTechniqueCommon( const ColladaDocument&   /*document*/,
 
     xmlpp::const_element_iterator accessorIter = techniqueElem.first_child_element("accessor");
     if ( !accessorIter ) {
-        throw collada_error(logger, "technique_common doesn't have accessor elem", techniqueElem);
+        throw collada_error(AUTO_LOGGER, "technique_common doesn't have accessor elem", techniqueElem);
     }
 
     stride = xmlpp::read_attribute<size_t>("stride", *accessorIter);
@@ -192,7 +192,7 @@ void collada_primitives::save(ColladaDocument& document, xmlpp::element& elem) c
 		break;
 
 	default:
-		throw slon_error(logger, "collada_primitives::save failed. Unsupported primitives type for saving.");
+		throw slon_error(AUTO_LOGGER, "collada_primitives::save failed. Unsupported primitives type for saving.");
 	}
 	
 	std::vector<size_t> vcount( inputIndices.size() );
@@ -242,7 +242,7 @@ void collada_instance_geometry::load(const ColladaDocument& document,
 {
     // load geometry
     if ( !elem.has_attribute("url") ) {
-        throw collada_error(logger, "Missing url in the <instance_geometry> element", elem);
+        throw collada_error(AUTO_LOGGER, "Missing url in the <instance_geometry> element", elem);
     }
     geometry = document.libraryGeometries.get_element( elem.get_attribute("url").substr(1) );
 
@@ -286,11 +286,11 @@ void collada_mesh::serialize( ColladaDocument& document,
 	{
 		// check mesh validness
 		if ( sources.empty() ) {
-			throw collada_error(logger, "Mesh must have at least one source element: " + id, element);
+			throw collada_error(AUTO_LOGGER, "Mesh must have at least one source element: " + id, element);
 		}
 
 		if ( vertices.inputs.empty() ) {
-			throw collada_error(logger, "Mesh must have <vertices> element with at least one input: " + id, element);
+			throw collada_error(AUTO_LOGGER, "Mesh must have <vertices> element with at least one input: " + id, element);
 		}
 
 		// find primitives input sources
@@ -305,7 +305,7 @@ void collada_mesh::serialize( ColladaDocument& document,
     			{
     				input.source = getSourceById(input.sourceId);
 					if (!input.source) {
-						throw collada_error(logger, "Couldn't find mesh source element: " + input.sourceId, element);
+						throw collada_error(AUTO_LOGGER, "Couldn't find mesh source element: " + input.sourceId, element);
 					}
     			}
     		}
@@ -318,7 +318,7 @@ void collada_mesh::serialize( ColladaDocument& document,
 
 			input.source = getSourceById(input.sourceId);
 			if (!input.source) {
-				throw collada_error(logger, "Couldn't find mesh source element: " + input.sourceId, element);
+				throw collada_error(AUTO_LOGGER, "Couldn't find mesh source element: " + input.sourceId, element);
 			}
 		}
 	}
@@ -338,7 +338,7 @@ void collada_convex_mesh::load( const ColladaDocument& document,
         mesh = boost::shared_dynamic_cast<collada_mesh>( document.libraryGeometries.get_element(target) );
 
         if (!mesh) {
-            throw collada_error(logger, "Unable to load mesh to build convex hull: " + target);
+            throw collada_error(AUTO_LOGGER, "Unable to load mesh to build convex hull: " + target);
         }
     }
     else
@@ -471,7 +471,7 @@ void collada_skin::serialize( ColladaDocument&           document,
 	    {
 		    weights.inputs[j].source = getSourceById(weights.inputs[j].sourceId);
 		    if (!weights.inputs[j].source) {
-			    throw collada_error(logger, "Couldn't find mesh source element: " + weights.inputs[j].sourceId, elem);
+			    throw collada_error(AUTO_LOGGER, "Couldn't find mesh source element: " + weights.inputs[j].sourceId, elem);
 		    }
 	    }
 
@@ -479,7 +479,7 @@ void collada_skin::serialize( ColladaDocument&           document,
 	    {
 		    joints.inputs[j].source = getSourceById(joints.inputs[j].sourceId);
 		    if (!joints.inputs[j].source) {
-			    throw collada_error(logger, "Couldn't find mesh source element: " + joints.inputs[j].sourceId, elem);
+			    throw collada_error(AUTO_LOGGER, "Couldn't find mesh source element: " + joints.inputs[j].sourceId, elem);
 		    }
 	    }
     }

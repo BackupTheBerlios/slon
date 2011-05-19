@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
 
-__DEFINE_LOGGER__("database.COLLADA")
+DECLARE_AUTO_LOGGER("database.COLLADA")
 
 using namespace slon;
 using namespace database;
@@ -236,7 +236,7 @@ void collada_phong_technique::load( const ColladaDocument&  document,
 				collada_param_ptr samplerParam = parentEffect->getParameterBySid(maps[i]->texture.samplerSid);
 				maps[i]->texture.sampler = boost::shared_dynamic_cast<collada_sampler2D_param>(samplerParam);
                 if (!maps[i]->texture.sampler) {
-                    throw collada_error(logger, "Couldn't find sampler parameter: " + maps[i]->texture.samplerSid);
+                    throw collada_error(AUTO_LOGGER, "Couldn't find sampler parameter: " + maps[i]->texture.samplerSid);
                 }
 			}
 		}
@@ -413,7 +413,7 @@ void collada_effect::load_profile_COMMON( const ColladaDocument&  document,
 			collada_sampler2D_param& samplerParam = static_cast<collada_sampler2D_param&>(*params[i]);
 			samplerParam.surface = boost::shared_dynamic_cast<collada_surface_param>( getParameterBySid(samplerParam.surfaceSid) );
             if (!samplerParam.surface) {
-                throw collada_error(logger, "Couldn't find surface parameter: " + samplerParam.surfaceSid);
+                throw collada_error(AUTO_LOGGER, "Couldn't find surface parameter: " + samplerParam.surfaceSid);
             }
 		}
 	}
@@ -421,12 +421,12 @@ void collada_effect::load_profile_COMMON( const ColladaDocument&  document,
 	// find technique node
 	xmlpp::const_element_iterator techniqueIter = element.first_child_element("technique");
 	if (!techniqueIter) {
-		throw collada_error(logger, "effect profile doesn't have any technique.", element);
+		throw collada_error(AUTO_LOGGER, "effect profile doesn't have any technique.", element);
 	}
 
     techniqueIter = techniqueIter->first_child_element();
 	if (!techniqueIter) {
-		throw collada_error(logger, "invalid common profile <technique> element.", element);
+		throw collada_error(AUTO_LOGGER, "invalid common profile <technique> element.", element);
 	}
 
 	// read technique according to type
@@ -442,7 +442,7 @@ void collada_effect::load_profile_COMMON( const ColladaDocument&  document,
 	}
 	else
 	{
-		logger << log::S_WARNING << "Unknown common profile technique: " << techniqueIter->get_value() << std::endl;
+		AUTO_LOGGER_MESSAGE(log::S_WARNING, "Unknown common profile technique: " << techniqueIter->get_value() << std::endl);
 		return;
 	}
 
@@ -484,7 +484,7 @@ void collada_effect::load_profile_GLSL( const ColladaDocument&  document,
 			collada_sampler2D_param& samplerParam = static_cast<collada_sampler2D_param&>(*params[i]);
 			samplerParam.surface = boost::shared_dynamic_cast<collada_surface_param>( getParameterBySid(samplerParam.surfaceSid) );
             if (!samplerParam.surface) {
-                throw collada_error(logger, "Couldn't find surface parameter: " + samplerParam.surfaceSid);
+                throw collada_error(AUTO_LOGGER, "Couldn't find surface parameter: " + samplerParam.surfaceSid);
             }
 		}
 	}
@@ -515,10 +515,10 @@ void collada_instance_material::load(const ColladaDocument& document,
 {
 	// load material
 	if ( !elem.has_attribute("symbol") ) {
-		throw collada_error(logger, "Missing 'symbol' attribute in the <instance_material> element", elem);
+		throw collada_error(AUTO_LOGGER, "Missing 'symbol' attribute in the <instance_material> element", elem);
 	}
 	if ( !elem.has_attribute("target") ) {
-		throw collada_error(logger, "Missing 'target' attribute in the <instance_material> element", elem);
+		throw collada_error(AUTO_LOGGER, "Missing 'target' attribute in the <instance_material> element", elem);
 	}
     symbol  = elem.get_attribute("symbol");
 	target  = elem.get_attribute("target");

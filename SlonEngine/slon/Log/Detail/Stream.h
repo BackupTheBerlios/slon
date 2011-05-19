@@ -1,39 +1,14 @@
-#ifndef __SLON_ENGINE_LOG_STREAM__
-#define __SLON_ENGINE_LOG_STREAM__
+#ifndef __SLON_ENGINE_LOG_DETAIL_STREAM__
+#define __SLON_ENGINE_LOG_DETAIL_STREAM__
 
+#include "../Formatters.h"
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <iostream>
 #include <stack>
-#include "Forward.h"
 
 namespace slon {
 namespace log {
-	
-/** Setup indent filter to the ostream */
-struct indent
-{
-	indent(int n_ = 4, char ch_ = ' ')
-	:	n(n_)
-	,	ch(ch_)
-	{}
-
-	int  n;
-	char ch;
-};
-
-/** Remove previous indent manipulator */
-struct unindent
-{};
-
-struct skip_info
-{
-    explicit skip_info(bool skip_)
-    :   skip(skip_)
-    {}
-
-    bool skip;
-};
 
 class logger_sink : 
 	public boost::iostreams::sink 
@@ -134,60 +109,7 @@ private:
 
 typedef boost::iostreams::stream<logger_sink> ostream;
 
-inline log::ostream& operator << (log::ostream& os, const indent& it)
-{
-	os.flush();
-	(*os).set_indent(it);
-	return os;
-}
-
-inline std::ostream& operator << (std::ostream& os, const indent& it)
-{
-	if ( log::ostream* fos = dynamic_cast<log::ostream*>(&os) ) {
-		*fos << it;
-	}
-
-	return os;
-}
-
-inline log::ostream& operator << (log::ostream& os, const unindent&)
-{
-	os.flush();
-	(*os).unindent();	
-	return os;
-}
-
-inline std::ostream& operator << (std::ostream& os, const unindent& uit)
-{
-	if ( log::ostream* fos = dynamic_cast<log::ostream*>(&os) ) {
-		*fos << uit;
-	}
-
-	return os;
-}
-
-inline log::ostream& operator << (log::ostream& os, const skip_info& si)
-{
-	os.flush();
-    if (si.skip) {
-        os->set_flags(os->get_flags() | logger_sink::SKIP_INFO);
-    }
-    else {
-        os->set_flags(os->get_flags() & ~logger_sink::SKIP_INFO);
-    }
-	return os;
-}
-
-inline std::ostream& operator << (std::ostream& os, const skip_info& si)
-{
-	if ( log::ostream* fos = dynamic_cast<log::ostream*>(&os) ) {
-		*fos << si;
-	}
-
-	return os;
-}
-
 } // namespace log
 } // namespace slon
 
-#endif // __SLON_ENGINE_LOG_STREAM__
+#endif // __SLON_ENGINE_LOG_DETAIL_STREAM__

@@ -1,20 +1,22 @@
 #include "stdafx.h"
+#include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Physics/RigidBodyTransform.h"
 
 namespace slon {
 namespace log {
 
-LogVisitor::LogVisitor(log::Logger*  logger_, 
-                       log::SEVERITY severity_)
+LogVisitor::LogVisitor(const log::logger_ptr&	logger_, 
+                       log::SEVERITY			severity_)
 :   logger(logger_)
 ,   severity(severity_)
 {
+	assert(logger);
 }
 
-LogVisitor::LogVisitor(log::Logger*  logger_, 
-                       log::SEVERITY severity_, 
-                       scene::Node&  node)
+LogVisitor::LogVisitor(const log::logger_ptr&	logger_, 
+                       log::SEVERITY			severity_, 
+                       scene::Node&				node)
 :   logger(logger_)
 ,   severity(severity_)
 {

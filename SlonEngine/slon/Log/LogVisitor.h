@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_LOG_LOG_VISITOR_H__
 
 #include "../Scene/Visitors/NodeVisitor.h"
-#include "Logger.h"
+#include "Log/Logger.h"
 
 namespace slon {
 namespace log {
@@ -12,8 +12,8 @@ class LogVisitor :
     public scene::ConstNodeVisitor
 {
 public:
-    LogVisitor(log::Logger* logger = 0, log::SEVERITY severity = log::S_FLOOD);
-    LogVisitor(log::Logger* logger, log::SEVERITY severity, scene::Node& node);
+    LogVisitor(const log::logger_ptr& logger = 0, log::SEVERITY severity = log::S_FLOOD);
+    LogVisitor(const log::logger_ptr& logger, log::SEVERITY severity, scene::Node& node);
 
     /** Traverse scene graph using DFS and native recursion. */
     void traverse(const scene::Node& node);
@@ -22,10 +22,10 @@ public:
     void visitGroup(const scene::Group& group);
 
     /** Get logger */
-    log::Logger* getLogger() { return logger; }
+    log::Logger* getLogger() { return logger.get(); }
 
     /** Get logger */
-    log::Logger* getLogger() const { return logger; }
+    log::Logger* getLogger() const { return logger.get(); }
 
     /** Get logging severity */
     log::SEVERITY getSeverity() const { return severity; }
@@ -41,8 +41,8 @@ public:
     }
 
 protected:
-    log::Logger*   logger;
-    log::SEVERITY  severity;
+    log::logger_ptr	logger;
+    log::SEVERITY	severity;
 };
 
 } // namespace log

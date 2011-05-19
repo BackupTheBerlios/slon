@@ -11,7 +11,7 @@
 #include "Scene/Visitors/CullVisitor.h"
 #include "Utility/error.hpp"
 
-__DEFINE_LOGGER__("graphics.ForwardRenderer")
+DECLARE_AUTO_LOGGER("graphics.ForwardRenderer")
 
 namespace {
 
@@ -51,7 +51,7 @@ namespace {
 
                 attachments[i] = device->CreateTexture2D(desc);
                 if (!attachments[i]) {
-                    throw gl_error(logger, "Can't create color attachment for post process render target.");
+                    throw gl_error(AUTO_LOGGER, "Can't create color attachment for post process render target.");
                 }
                 dirty = true;
 
@@ -72,7 +72,7 @@ namespace {
 
                 depthTexture = device->CreateTexture2D(desc);
                 if (!depthTexture) {
-                    throw gl_error(logger, "Can't create depth texture for post process render target.");
+                    throw gl_error(AUTO_LOGGER, "Can't create depth texture for post process render target.");
                 }
 
                 // bind sampler state
@@ -108,7 +108,7 @@ namespace {
             attachments[1]->BindSamplerState(samplerState);
 
             if (sgl::SGL_OK != renderTarget->Dirty() ) {
-                throw gl_error(logger, "Can't create render target for post processing.");
+                throw gl_error(AUTO_LOGGER, "Can't create render target for post processing.");
             }
         }
 
@@ -321,7 +321,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
 
         if (renderTarget && sgl::SGL_OK != renderTarget->Bind())
         {
-            logger << log::S_ERROR << "Can't bind cameras render target\n";
+            AUTO_LOGGER_MESSAGE(log::S_ERROR, "Can't bind cameras render target\n");
             return;
         }
 

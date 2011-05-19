@@ -5,7 +5,7 @@
 #include "Utility/error.hpp"
 #include "Utility/math.hpp"
 
-__DEFINE_LOGGER__("graphics.Mesh")
+DECLARE_AUTO_LOGGER("graphics.Mesh")
 
 namespace 
 {
@@ -122,7 +122,7 @@ Mesh::buffer_lock_impl::buffer_lock_impl(sgl::Buffer* buffer_,
 {
     assert( buffer && !buffer->Mapped() );
     if ( sgl::SGL_OK != buffer->Map(mask, &ptr) ) {
-        throw slon_error(logger, "Can't lock buffer");
+        throw slon_error(AUTO_LOGGER, "Can't lock buffer");
     }
 }
 

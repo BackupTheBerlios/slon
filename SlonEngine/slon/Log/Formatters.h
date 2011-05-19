@@ -5,10 +5,35 @@
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Math/Vector.hpp>
 #include "../Config.h"
-#include "Stream.h"
 
 namespace slon {
 namespace log {
+	
+/** Setup indent filter to the ostream. */
+struct indent
+{
+	indent(int n_ = 4, char ch_ = ' ')
+	:	n(n_)
+	,	ch(ch_)
+	{}
+
+	int  n;
+	char ch;
+};
+
+/** Remove previous indent manipulator. */
+struct unindent
+{};
+
+/** Skip logger name and severity message. */
+struct skip_info
+{
+    explicit skip_info(bool skip_)
+    :   skip(skip_)
+    {}
+
+    bool skip;
+};
 
 template<typename T>
 struct detailed_fmt;
@@ -163,6 +188,10 @@ detailed_fmt< math::Matrix<T, n, m> > detailed(const math::Matrix<T, n, m>& mat,
 {
     return detailed_fmt< math::Matrix<T, n, m> >(mat, decorated, fixed, width);
 }
+
+std::ostream& operator << (std::ostream& os, const indent& it);
+std::ostream& operator << (std::ostream& os, const unindent& uit);
+std::ostream& operator << (std::ostream& os, const skip_info& si);
 
 } // namespace log
 } // namespace slon

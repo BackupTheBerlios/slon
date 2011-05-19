@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Group.h"
 

@@ -8,7 +8,7 @@
 using namespace slon;
 using namespace graphics;
 
-__DEFINE_LOGGER__("graphics.SkyBox")
+DECLARE_AUTO_LOGGER("graphics.SkyBox")
 
 SkyBox::SkyBox()
 {
@@ -111,9 +111,8 @@ void SkyBox::MakeFromSideTextures(const std::string maps[6])
 	    for(int i = 0; i<6; ++i)
         {
             sideImages[i].reset( device->CreateImage() );
-            if ( SGL_OK != sideImages[i]->LoadFromFile( maps[i].c_str() ) )
-            {
-                logger << log::S_WARNING << "Unable to load image form file: " + maps[i] << std::endl;
+            if ( SGL_OK != sideImages[i]->LoadFromFile( maps[i].c_str() ) ) {
+                AUTO_LOGGER_MESSAGE(log::S_WARNING, "Unable to load image form file: " + maps[i] << std::endl);
             }
 
             desc.sides[i].format = sideImages[i]->Format();
@@ -125,13 +124,13 @@ void SkyBox::MakeFromSideTextures(const std::string maps[6])
         cubemap.reset( device->CreateTextureCube(desc) );
         if (!cubemap) 
         {
-            logger << log::S_WARNING << "Unable to create cubemap image\n";
+            AUTO_LOGGER_MESSAGE(log::S_WARNING, "Unable to create cubemap image\n");
             return;
         }
         
         bool haveMipmaps = false;
         if ( sgl::SGL_OK != cubemap->GenerateMipmap() ) {
-            logger << log::S_WARNING << "Unable to generate cubemap mipmaps\n";
+            AUTO_LOGGER_MESSAGE(log::S_WARNING, "Unable to generate cubemap mipmaps\n");
         }
         else {
             haveMipmaps = true;

@@ -10,7 +10,7 @@
 #include <boost/bind.hpp>
 #include <sgl/Math/MatrixFunctions.hpp>
 
-__DEFINE_LOGGER__("graphics.LightingEffect")
+DECLARE_AUTO_LOGGER("graphics.LightingEffect")
 
 namespace slon {
 namespace graphics {
@@ -255,7 +255,7 @@ void LightingEffect::dirty(const LightingMaterial* material_)
                 }
 
                 // create passes
-                EffectShaderProgram baseProgram(logger);
+                EffectShaderProgram baseProgram(autoLogger);
 				if (boneMatricesBinder || (boneRotationsBinder && boneTranslationsBinder)) {
 					baseProgram.addShader("Data/Shaders/skinned.vert");
 				}
@@ -366,13 +366,13 @@ void LightingEffect::dirty(const LightingMaterial* material_)
         }
 
         case Renderer::DEFERRED_SHADING:
-            logger << log::S_ERROR << "Deferred renderer is not supported by lighting effect." << std::endl;
+            AUTO_LOGGER_MESSAGE(log::S_ERROR, "Deferred renderer is not supported by lighting effect." << std::endl);
             break;
         }
     }
     catch(slon_error&)
     {
-        logger << log::S_ERROR << "Can't create lighting effect." << std::endl;
+        AUTO_LOGGER_MESSAGE(log::S_ERROR, "Can't create lighting effect." << std::endl);
     }
 
 	TransformEffect::dirty();

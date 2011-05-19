@@ -12,7 +12,7 @@
 #   include "Database/Bullet/Bullet.h"
 #endif
 
-__DEFINE_LOGGER__("engine")
+DECLARE_AUTO_LOGGER("Engine")
 
 namespace {
 
@@ -79,7 +79,7 @@ namespace {
     {
     public:
         LogErrorHandler(const std::string& logName, bool breakOnError_)
-        :   logger(logName)
+        :   logger( log::currentLogManager().createLogger(logName) )
 		,	breakOnError(breakOnError_)
         {}
 
@@ -93,30 +93,30 @@ namespace {
 		    switch(result)
 		    {
 		    case SGLERR_INVALID_CALL:
-			    logger << log::S_ERROR << "Invalid call: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Invalid call: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_OUT_OF_MEMORY:
-			    logger << log::S_ERROR << "Out of memory: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Out of memory: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_FILE_NOT_FOUND:
-			    logger << log::S_ERROR << "File not found: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "File not found: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_UNSUPPORTED:
-			    logger << log::S_ERROR << "Unsupported function: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Unsupported function: " << msg << std::endl;
 			    break;
 
 		    default:
-			    logger << log::S_ERROR << "Unknown error: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Unknown error: " << msg << std::endl;
 			    break;
 		    }
 	    }
 
     private:
-        log::Logger logger;
-		bool		breakOnError;
+        log::logger_ptr logger;
+		bool			breakOnError;
     };
 
     sgl::ref_ptr<LogErrorHandler> logErrorHandler;
@@ -231,7 +231,7 @@ void Engine::init()
 
     // init SDL
     if ( SDL_Init(SDL_INIT_VIDEO) < 0 && !SDL_GetVideoInfo() ) {
-        throw slon_error(logger, "Can't init SDL");
+        throw slon_error(AUTO_LOGGER, "Can't init SDL");
     }
 
     // setup timer for PhysicsManager

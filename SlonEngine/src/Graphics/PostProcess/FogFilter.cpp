@@ -8,13 +8,13 @@
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
 
-__DEFINE_LOGGER__("graphics.FogFilter");
+DECLARE_AUTO_LOGGER("graphics.FogFilter");
 
 namespace slon {
 namespace graphics {
 
 FogShaderProgram::FogShaderProgram(bool useAlphaBlend) :
-    EffectShaderProgram(logger)
+    EffectShaderProgram(AUTO_LOGGER)
 {
     addShader("Data/Shaders/PostProcess/fog.vert");
     addShader("Data/Shaders/PostProcess/fog.frag");

@@ -1,17 +1,58 @@
 #ifndef __SLON_ENGINE_LOG_LOGGER__
 #define __SLON_ENGINE_LOG_LOGGER__
 
-#include <boost/intrusive_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <cassert>
-#include <fstream>
-#include <string>
-#include <vector>
-
 #include "../Utility/referenced.hpp"
-#include "Stream.h"
+#include "LogManager.h"
+#include "Forward.h"
+#include <cassert>
+#include <string>
+#include <ostream>
 
-#define __DEFINE_LOGGER__(name) namespace { slon::log::Logger logger(name); }
+/** Declare logger variable (use only in *.cpp file) with some stuff */
+#ifdef DISABLE_LOGGING
+#	define DECLARE_AUTO_LOGGER
+#else // !DISABLE_LOGGING
+#	define DECLARE_AUTO_LOGGER(Name)\
+namespace\
+{\
+	const char*             autoLoggerName = Name;\
+	slon::log::logger_ptr   autoLogger;\
+	bool					autoLoggerReleased = false;\
+	void ReleaseAutoLogger(slon::log::LogManager&)\
+	{\
+		autoLogger.reset();\
+		autoLoggerReleased = true;\
+	}\
+}
+#endif // !DISABLE_LOGGING
+
+#ifndef DISABLE_LOGGING
+#	define AUTO_LOGGER autoLogger
+#else
+#	define AUTO_LOGGER slon::log::logger_ptr()
+#endif
+
+/** Log message with specified severity. You this if you used DECLARE_AUTO_LOGGER("<name>") in your *.cpp file.
+ * Example:
+ * \code
+ * AUTO_LOG_MESSAGE(S_FLOOD, "Hello world!");
+ * AUTO_LOG_MESSAGE(S_NOTICE, "This is my " << 2 << " log message!");
+ * \uncode
+ */
+#ifdef DISABLE_LOGGING
+#	define AUTO_LOGGER_MESSAGE
+#else // !DISABLE_LOGGING
+#	define AUTO_LOGGER_MESSAGE(Severity, Message)\
+{\
+	assert( !autoLoggerReleased && "Trying to log message, but engine with log manager are released" );\
+	if (!autoLogger && !autoLoggerReleased)\
+	{\
+		autoLogger = slon::log::currentLogManager().createLogger(autoLoggerName);\
+		slon::log::currentLogManager().connectReleaseHandler(ReleaseAutoLogger);\
+	}\
+	(*autoLogger) << Severity << Message;\
+}
+#endif // !DISABLE_LOGGING
 
 #ifdef _DEBUG
 #   define LOG_FILE_AND_LINE "; in" << __FILE__ << " at " << __LINE__ << " line\n"
@@ -22,67 +63,25 @@
 namespace slon {
 namespace log {
 
-class logger_output;
-typedef boost::intrusive_ptr<logger_output> logger_output_ptr;
-
-class logger_output :
-    public referenced
-{
-public:
-    typedef boost::shared_ptr<std::filebuf>     filebuf_ptr;
-    typedef boost::shared_ptr<ostream>			ostream_ptr;
-    typedef std::vector<logger_output_ptr>      logger_output_vector;
-
-public:
-    // construct output, redirect to cout
-    logger_output();
-
-    // construct output, redirect to parent output
-    logger_output(logger_output* _parent, const std::string& _name);
-
-    ~logger_output();
-
-public:
-    // tree
-    logger_output*			parent;
-    logger_output_vector    children;
-    std::string             name;
-
-    // io
-    filebuf_ptr fb;
-    ostream_ptr os;
-};
-
 /** Logger is simple ostream that redirects output
  * to the specified by LogManager destination. Loggers
  * are organized in tree structure. Id you redirect output
  * of the parent logger, all childs will be redirected too.
  */
-class Logger
+class Logger :
+	public Referenced
 {
-friend class LogManager;
-private:
-    // construct logger without registering it
-    Logger();
-
 public:
-    /** Create logger.
-     * @param name - name of the logger. Log manager uses it
-     * to define logger output.
-     */
-    Logger(const std::string& name);
-
     /** Get name of the logger. */
-    std::string getName() const { return loggerOutput->name; }
+    virtual const std::string& getName() const = 0;
 
-    /** Write warning level and log name. */
-    log::ostream& operator << (SEVERITY severity);
+    /** Write warning level and log name, get ostream to write message */
+    virtual std::ostream& operator << (SEVERITY severity) = 0;
 
-    /** Flush as ostream. */
-    void flush() { loggerOutput->os->flush(); }
+    /** Flush ostream. */
+    virtual void flush() = 0;
 
-private:
-    logger_output_ptr loggerOutput;
+	virtual ~Logger() {}
 };
 
 } // namespace log
