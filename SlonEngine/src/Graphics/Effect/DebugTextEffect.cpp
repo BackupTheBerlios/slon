@@ -4,7 +4,7 @@
 #include "Graphics/Renderer/FixedPipelineRenderer.h"
 #include "Log/Logger.h"
 
-__DEFINE_LOGGER__("graphics.DebugTextEffect")
+DECLARE_AUTO_LOGGER("graphics.DebugTextEffect")
 
 namespace {
 

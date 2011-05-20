@@ -13,7 +13,7 @@ namespace slon {
 namespace graphics {
 namespace detail {
 
-__DEFINE_LOGGER__("graphics")
+DECLARE_AUTO_LOGGER("graphics")
 
 GraphicsManager::GraphicsManager() :
     attributeTable(new detail::AttributeTable),
@@ -49,7 +49,7 @@ void GraphicsManager::setVideoMode( unsigned     width,
     flags |= fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE;
 
     if ( !SDL_SetVideoMode(width, height, bpp, flags) ) {
-        throw slon_error(logger, (std::string("Couldn't set video mode: ") + SDL_GetError()).c_str() );
+        throw slon_error(AUTO_LOGGER, (std::string("Couldn't set video mode: ") + SDL_GetError()).c_str() );
     }
 
 #if defined(_WIN32) && (WINVER <= _WIN32_WINNT_WINXP)
@@ -68,7 +68,7 @@ graphics::Renderer* GraphicsManager::initRenderer(const ForwardRendererDesc& des
     }
 
     if (!device) {
-        throw slon_error(logger, "Can't initialize necessary device");
+        throw slon_error(AUTO_LOGGER, "Can't initialize necessary device");
     }
 
     bitsPerPixel = desc.bitsPerPixel;
@@ -92,7 +92,7 @@ graphics::Renderer* GraphicsManager::initRenderer(const FFPRendererDesc& desc)
     }
 
     if (!device) {
-        throw slon_error(logger, "Can't initialize necessary device");
+        throw slon_error(AUTO_LOGGER, "Can't initialize necessary device");
     }
 
     bitsPerPixel = desc.bitsPerPixel;
@@ -127,11 +127,11 @@ void GraphicsManager::setRenderingSurface(Surface& surface)
 
         int iFormat = ChoosePixelFormat(surface.hDC, &pfd);
         if (iFormat == 0) {
-            throw system_error( logger, "GraphicsManager::setRenderingSurface - ChoosePixelFormat failed: ", GetLastError() );
+            throw system_error( AUTO_LOGGER, "GraphicsManager::setRenderingSurface - ChoosePixelFormat failed: ", GetLastError() );
         }
 
         if ( !SetPixelFormat( surface.hDC, iFormat, &pfd ) ) {
-            throw system_error( logger, "GraphicsManager::setRenderingSurface - SetPixelFormat failed: ", GetLastError() );
+            throw system_error( AUTO_LOGGER, "GraphicsManager::setRenderingSurface - SetPixelFormat failed: ", GetLastError() );
         }
     }
 
@@ -139,12 +139,12 @@ void GraphicsManager::setRenderingSurface(Surface& surface)
     {
         surface.hRC = wglCreateContext(surface.hDC);
         if (!surface.hRC) {
-            throw system_error( logger, "GraphicsManager::setRenderingSurface - wglCreateContext failed:", GetLastError() ); 
+            throw system_error( AUTO_LOGGER, "GraphicsManager::setRenderingSurface - wglCreateContext failed:", GetLastError() ); 
         }
     }
 
     if ( !wglMakeCurrent(surface.hDC, surface.hRC) ) {
-        throw system_error( logger, "GraphicsManager::setRenderingSurface - wglMakeCurrent failed: ", GetLastError() ); 
+        throw system_error( AUTO_LOGGER, "GraphicsManager::setRenderingSurface - wglMakeCurrent failed: ", GetLastError() ); 
     }
 #elif defined(__linux__)
     assert(surface.drawable && "GraphicsManager::setRenderingSurface - surface.drawable may not be NULL");
@@ -163,19 +163,19 @@ void GraphicsManager::setRenderingSurface(Surface& surface)
 
         XVisualInfo* xvVisualInfo = glXChooseVisual(surface.display, DefaultScreen(surface.display), Attr);
         if (!xvVisualInfo) {
-            throw slon_error(logger, "GraphicsManager::setRenderingSurface failed. Failed to choose visual info.");
+            throw slon_error(AUTO_LOGGER, "GraphicsManager::setRenderingSurface failed. Failed to choose visual info.");
         }
 
         surface.context = glXCreateContext(surface.display, xvVisualInfo, None, True);
         if (!surface.context) {
-            throw slon_error(logger, "GraphicsManager::setRenderingSurface failed. Failed to create glx context");
+            throw slon_error(AUTO_LOGGER, "GraphicsManager::setRenderingSurface failed. Failed to create glx context");
         }
     }
 
     if ( !glXMakeCurrent(surface.display, surface.drawable, surface.context) )
     {
         // TODO: error report
-        throw slon::slon_error(logger, "GraphicsManager::setRenderingSurface failed. glxMakeCurrent failed: ");
+        throw slon::slon_error(AUTO_LOGGER, "GraphicsManager::setRenderingSurface failed. glxMakeCurrent failed: ");
     }
 #endif
     // create device
@@ -191,7 +191,7 @@ void GraphicsManager::setRenderingSurface(Surface& surface)
     }
 
     if (!device) {
-        throw slon_error(logger, "GraphicsManager::setRenderingSurface failed. Failed to create sgl device");
+        throw slon_error(AUTO_LOGGER, "GraphicsManager::setRenderingSurface failed. Failed to create sgl device");
     }
 }
 

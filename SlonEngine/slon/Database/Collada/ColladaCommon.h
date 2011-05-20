@@ -31,16 +31,16 @@ class collada_error :
     public slon_error
 {
 public:
-    collada_error( log::Logger&          logger,
-                   const std::string&    message,
-                   log::SEVERITY    severity = log::S_ERROR ) :
+    collada_error( const log::logger_ptr&   logger,
+                   const std::string&		message,
+                   log::SEVERITY			severity = log::S_ERROR ) :
         slon_error(logger, message, severity)
     {}
 
-    collada_error( log::Logger&          logger,
-                   const std::string&    message,
-                   const xmlpp::node&    _node,
-                   log::SEVERITY    severity = log::S_ERROR ) :
+    collada_error( const log::logger_ptr&	logger,
+                   const std::string&		message,
+                   const xmlpp::node&		_node,
+                   log::SEVERITY			severity = log::S_ERROR ) :
         slon_error(logger, message, severity),
         node(_node)
     {}
@@ -103,9 +103,9 @@ class construct_scene_error :
 	public slon_error
 {
 public:
-	construct_scene_error( log::Logger&    	  logger,
-					       const std::string& message,
-					       log::SEVERITY severity = log::S_ERROR ) :
+	construct_scene_error( const log::logger_ptr&   logger,
+					       const std::string&		message,
+					       log::SEVERITY			severity = log::S_ERROR ) :
 		slon_error(logger, message, severity)
 	{}
 };
@@ -142,14 +142,14 @@ public:
 
 public:
 	collada_instance() :
-		logger("database.COLLADA")
+		logger( log::currentLogManager().createLogger("database.COLLADA") )
 	{}
 
     XMLPP_ELEMENT_SERIALIZATION(collada_instance, ColladaDocument);
 
 public:
-	log::Logger	logger;
-    std::string target;
+	log::logger_ptr	logger;
+    std::string		target;
 };
 
 template<typename Element>
@@ -167,7 +167,7 @@ public:
 
 public:
 	collada_library() :
-		logger("database.COLLADA")
+		logger( log::currentLogManager().createLogger("database.COLLADA") )
 	{}
 
 	void load(const ColladaDocument& document, const xmlpp::element& elem)
@@ -212,9 +212,9 @@ public:
 	XMLPP_SERIALIZATION_SPLIT_MEMBER(ColladaDocument, xmlpp::element);
 
 public:
-	log::Logger	logger;
-    std::string target;
-	element_set elements;
+	log::logger_ptr	logger;
+    std::string		target;
+	element_set		elements;
 };
 
 template<typename value_type>

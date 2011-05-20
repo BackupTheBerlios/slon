@@ -25,9 +25,9 @@ class slon_error :
 public:
     slon_error( const std::string&   message);
 
-    slon_error( log::Logger&         logger,
-                const std::string&   message,
-                log::SEVERITY   severity = log::S_ERROR );
+    slon_error( const log::logger_ptr&  logger,
+                const std::string&		message,
+                log::SEVERITY			severity = log::S_ERROR );
 
 	~slon_error() throw() {} 
 };
@@ -37,14 +37,14 @@ class system_error :
     public slon_error
 {
 public:
-    system_error( log::Logger&         logger,
-                  const std::string&   message,
-                  log::SEVERITY   severity = log::S_ERROR );
+    system_error( const log::logger_ptr&    logger,
+                  const std::string&		message,
+                  log::SEVERITY				severity = log::S_ERROR );
 
-    system_error( log::Logger&         logger,
-                  const std::string&   message,
-                  int                  errorCode,
-                  log::SEVERITY   severity = log::S_ERROR );
+    system_error( const log::logger_ptr&    logger,
+                  const std::string&		message,
+                  int						errorCode,
+                  log::SEVERITY				severity = log::S_ERROR );
 
 	~system_error() throw() {} 
 };
@@ -54,9 +54,9 @@ class file_not_found_error :
     public slon_error
 {
 public:
-    file_not_found_error( log::Logger&         logger,
-                          const std::string&   message,
-                          log::SEVERITY   severity = log::S_ERROR );
+    file_not_found_error( const log::logger_ptr&	logger,
+                          const std::string&		message,
+                          log::SEVERITY				severity = log::S_ERROR );
 
 	~file_not_found_error() throw() {} 
 };
@@ -66,9 +66,9 @@ class io_error :
     public slon_error
 {
 public:
-    io_error( log::Logger&         logger,
-              const std::string&   message,
-              log::SEVERITY   severity = log::S_ERROR );
+    io_error( const log::logger_ptr&    logger,
+              const std::string&		message,
+              log::SEVERITY				severity = log::S_ERROR );
 
 	~io_error() throw() {} 
 };
@@ -80,9 +80,9 @@ namespace graphics {
         public slon_error
     {
     public:
-        shader_error( log::Logger&          logger,
-                      const std::string&    message,
-                      log::SEVERITY    severity = log::S_ERROR );
+        shader_error( const log::logger_ptr&    logger,
+                      const std::string&		message,
+                      log::SEVERITY				severity = log::S_ERROR );
 		
 		~shader_error() throw() {} 
     };
@@ -92,9 +92,9 @@ namespace graphics {
         public slon_error
     {
     public:
-        unsupported_error( log::Logger&         logger,
-                           const std::string&   message,
-                           log::SEVERITY   severity = log::S_ERROR );
+        unsupported_error( const log::logger_ptr&   logger,
+                           const std::string&		message,
+                           log::SEVERITY			severity = log::S_ERROR );
 
 		~unsupported_error() throw() {} 
     };
@@ -104,9 +104,9 @@ namespace graphics {
         public slon_error
     {
     public:
-        gl_error( log::Logger&         logger,
-                  const std::string&   message,
-                  log::SEVERITY   severity = log::S_ERROR );
+        gl_error( const log::logger_ptr&    logger,
+                  const std::string&		message,
+                  log::SEVERITY				severity = log::S_ERROR );
 
 		~gl_error() throw() {} 
     };

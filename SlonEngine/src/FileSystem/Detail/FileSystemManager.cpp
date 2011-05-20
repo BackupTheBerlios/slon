@@ -8,7 +8,7 @@
 #include <cstring>
 #include <stack>
 
-__DEFINE_LOGGER__("filesystem.FileSystemManager")
+DECLARE_AUTO_LOGGER("filesystem.FileSystemManager")
 
 namespace boost {
 	namespace fs = filesystem;

@@ -5,6 +5,7 @@
 #include "../Database/Detail/DatabaseManager.h"
 #include "../Graphics/Detail/GraphicsManager.h"
 #include "../Input/Detail/InputManager.h"
+#include "../Log/Detail/LogManager.h"
 #include "../FileSystem/Detail/FileSystemManager.h"
 #include "../Realm/Detail/World.h"
 #include "../Thread/Detail/ThreadManager.h"
@@ -71,7 +72,7 @@ public:
 
 private:
     // managers, order is important!
-    log::LogManager                             logManager;
+    log::detail::LogManager                     logManager;
     thread::detail::ThreadManager               threadManager;
     input::detail::InputManager                 inputManager;
     graphics::detail::GraphicsManager           graphicsManager;
