@@ -16,9 +16,9 @@ class logger_output :
     public referenced
 {
 public:
-    typedef boost::shared_ptr<std::filebuf>     filebuf_ptr;
-    typedef boost::shared_ptr<ostream>			ostream_ptr;
-    typedef std::vector<logger_output_ptr>      logger_output_vector;
+    typedef boost::shared_ptr<std::filebuf> filebuf_ptr;
+    typedef boost::shared_ptr<ostream>      ostream_ptr;
+    typedef std::vector<logger_output*>	    logger_output_vector;
 
 public:
     // construct output, redirect to cout
@@ -31,7 +31,7 @@ public:
 
 public:
     // tree
-    logger_output*			parent;
+    logger_output_ptr		parent;
     logger_output_vector    children;
     std::string             name;
 
@@ -56,9 +56,11 @@ public:
 	logger_output_ptr getLoggerOutput() { return loggerOutput; }
 
 private:
-    logger_output_ptr	loggerOutput;
-	Logger*				parent;
+    logger_output_ptr loggerOutput;
 };
+
+typedef boost::intrusive_ptr<Logger>		logger_ptr;
+typedef boost::intrusive_ptr<const Logger>	const_logger_ptr;
 
 } // namespace detail
 } // namespace log

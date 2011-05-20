@@ -20,18 +20,15 @@ public:
 	// Override LogManager
 	bool			redirectOutput(const std::string& loggerName, const std::string& fileName);
 	bool			redirectOutputToConsole(const std::string& loggerName);
-	logger_ptr		createLogger(const std::string& name); 
+	log::logger_ptr	createLogger(const std::string& name); 
     connection_type connectReleaseHandler(signal_type::slot_type slot) { return releaseSignal.connect(slot); }
 
-    /** Get root or main logger of the LogManager */
-    Logger& getMainLogger() { return mainLogger; }
-	
     /** Get root or main logger of the LogManager */
 	logger_output_ptr getLoggerOutput(const std::string& name);
 
 private:
-    Logger		mainLogger;
-	signal_type	releaseSignal;
+    detail::logger_ptr	mainLogger;
+	signal_type			releaseSignal;
 };
 
 /** Get current input manager used by engine. */

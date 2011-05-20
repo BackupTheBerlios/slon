@@ -75,7 +75,7 @@ namespace {
 
     // handler for sgl errors
     class LogErrorHandler :
-        public sgl::ReferencedImpl<sgl::ErrorHandler>
+		public sgl::ErrorHandler
     {
     public:
         LogErrorHandler(const std::string& logName, bool breakOnError_)
@@ -119,7 +119,7 @@ namespace {
 		bool			breakOnError;
     };
 
-    sgl::ref_ptr<LogErrorHandler> logErrorHandler;
+    LogErrorHandler* logErrorHandler;
 
     template<sgl::Image::FILE_TYPE format>
     class ImageLoader :
@@ -176,8 +176,8 @@ void Engine::init()
     filesystemManager->mount( fs::system_complete( fs::current_path() ).file_string().c_str(), "/" );
 
     // Setup error logger
-    logErrorHandler.reset( new LogErrorHandler("graphics.sgl", true) );
-    sglSetErrorHandler( logErrorHandler.get() );
+    logErrorHandler = new LogErrorHandler("graphics.sgl", true);
+    sglSetErrorHandler(logErrorHandler);
 
     // redirect loggers
     logManager.redirectOutput("", "log.txt");
@@ -361,6 +361,8 @@ void Engine::frame()
 
 Engine::~Engine()
 {
+	sglSetErrorHandler(0);
+	delete logErrorHandler;
 }
 
 } // namespace detail

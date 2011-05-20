@@ -28,9 +28,6 @@ logger_output::~logger_output()
     if (parent) {
 		std::remove(parent->children.begin(), parent->children.end(), this);
     }
-	for (size_t i = 0; i<children.size(); ++i) {
-		children[i]->parent = 0;
-	}
 }
 
 Logger::Logger(const logger_output_ptr& loggerOutput_) :
