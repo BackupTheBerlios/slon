@@ -255,7 +255,7 @@ void LightingEffect::dirty(const LightingMaterial* material_)
                 }
 
                 // create passes
-                EffectShaderProgram baseProgram(autoLogger);
+                EffectShaderProgram baseProgram(AUTO_LOGGER);
 				if (boneMatricesBinder || (boneRotationsBinder && boneTranslationsBinder)) {
 					baseProgram.addShader("Data/Shaders/skinned.vert");
 				}

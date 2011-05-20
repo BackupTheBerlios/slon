@@ -20,8 +20,9 @@ LogVisitor::LogVisitor(const log::logger_ptr&	logger_,
 :   logger(logger_)
 ,   severity(severity_)
 {
-    assert(logger);
-    traverse(node);
+    if (logger) {
+		traverse(node);
+	}
 }
 
 void LogVisitor::traverse(const scene::Node& node)

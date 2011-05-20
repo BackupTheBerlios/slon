@@ -9,9 +9,9 @@
 #include <ostream>
 
 /** Declare logger variable (use only in *.cpp file) with some stuff */
-#ifdef DISABLE_LOGGING
-#	define DECLARE_AUTO_LOGGER
-#else // !DISABLE_LOGGING
+#ifdef SLON_ENGINE_DISABLE_AUTO_LOGGING
+#	define DECLARE_AUTO_LOGGER(Name)
+#else // !SLON_ENGINE_DISABLE_AUTO_LOGGING
 #	define DECLARE_AUTO_LOGGER(Name)\
 namespace\
 {\
@@ -24,12 +24,12 @@ namespace\
 		autoLoggerReleased = true;\
 	}\
 }
-#endif // !DISABLE_LOGGING
+#endif // !SLON_ENGINE_DISABLE_AUTO_LOGGING
 
-#ifndef DISABLE_LOGGING
-#	define AUTO_LOGGER autoLogger
+#ifdef SLON_ENGINE_DISABLE_AUTO_LOGGING
+#	define AUTO_LOGGER (slon::log::logger_ptr())
 #else
-#	define AUTO_LOGGER slon::log::logger_ptr()
+#	define AUTO_LOGGER autoLogger 
 #endif
 
 /** Log message with specified severity. You this if you used DECLARE_AUTO_LOGGER("<name>") in your *.cpp file.
@@ -39,9 +39,9 @@ namespace\
  * AUTO_LOG_MESSAGE(S_NOTICE, "This is my " << 2 << " log message!");
  * \uncode
  */
-#ifdef DISABLE_LOGGING
-#	define AUTO_LOGGER_MESSAGE
-#else // !DISABLE_LOGGING
+#ifdef SLON_ENGINE_DISABLE_AUTO_LOGGING
+#	define AUTO_LOGGER_MESSAGE(Severity, Message)
+#else // !SLON_ENGINE_DISABLE_AUTO_LOGGING
 #	define AUTO_LOGGER_MESSAGE(Severity, Message)\
 {\
 	assert( !autoLoggerReleased && "Trying to log message, but engine with log manager are released" );\
@@ -52,7 +52,7 @@ namespace\
 	}\
 	(*autoLogger) << Severity << Message;\
 }
-#endif // !DISABLE_LOGGING
+#endif // !SLON_ENGINE_DISABLE_AUTO_LOGGING
 
 #ifdef _DEBUG
 #   define LOG_FILE_AND_LINE "; in" << __FILE__ << " at " << __LINE__ << " line\n"
