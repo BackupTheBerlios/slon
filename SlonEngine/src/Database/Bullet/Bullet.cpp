@@ -32,7 +32,7 @@ physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
 
     std::auto_ptr<btBulletWorldImporter> fileLoader( new btBulletWorldImporter( &world.getBtDynamicsWorld() ) );
     if ( !fileLoader->loadFileFromMemory( (char*)fileContent.data(), fileContent.length() ) ) {
-        throw file_not_found_error(logger, "Can't load bullet physics file");
+        throw file_error(AUTO_LOGGER, "Can't load bullet physics file");
     }
 
     // enumerate objects and add them to the scene model

@@ -16,6 +16,9 @@ public:
     typedef std::vector<physics::physics_model_ptr> physics_scene_vector;
 #endif
 
+    SXMLSerializer(xmlpp::document& doc,
+                   xmlpp::s_state   state);
+
 public:
     virtual void serialize(xmlpp::document& doc, 
                            xmlpp::element&  elem, 

@@ -59,9 +59,9 @@ system_error::system_error( const log::logger_ptr&  logger,
 {
 }
 
-file_not_found_error::file_not_found_error( const log::logger_ptr&  logger,
-                                            const std::string&		message,
-                                            log::SEVERITY			severity )
+file_error::file_error( const log::logger_ptr&  logger,
+                        const std::string&      message,
+                        log::SEVERITY           severity )
 :   slon_error(logger, message, severity)
 {
 }

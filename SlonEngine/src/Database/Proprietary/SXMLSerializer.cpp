@@ -9,7 +9,7 @@
 #   include "Physics/PhysicsModel.h"
 #endif
 
-__DEFINE_LOGGER__("database.SXML")
+DECLARE_AUTO_LOGGER("database.SXML");
 
 namespace 
 {
@@ -89,6 +89,15 @@ namespace
 
 namespace slon {
 namespace database {
+
+SXMLSerializer::SXMLSerializer(xmlpp::document& doc,
+                               xmlpp::s_state   state)
+{
+    /*if ( state == xmlpp::SAVE && !doc.first_child_element() ) {
+        doc.add_child
+    }*/
+    serialize(doc, *doc.first_child_element(), state);
+}
 
 void SXMLSerializer::serialize(xmlpp::document& doc, 
                                xmlpp::element&  elem, 

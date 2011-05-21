@@ -1,7 +1,13 @@
 #include "stdafx.h"
 #include "Database/Detail/Library.h"
 #include "Database/Proprietary/SXMLLoader.h"
+#include "Database/Proprietary/SXMLSerializer.h"
+#include "Log/Logger.h"
 #include "FileSystem/File.h"
+#include <xml++/document.h>
+#include <xml++/serialization/helpers.hpp>
+
+DECLARE_AUTO_LOGGER("database.SXML")
 
 namespace slon {
 namespace database {
@@ -10,7 +16,7 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 {    
     // read file content
     if ( !file->open(filesystem::File::in) ) {
-        throw file_error(logger, "Can't open *.sxml file for reading");
+        throw file_error(AUTO_LOGGER, "Can't open *.sxml file for reading");
     }
 
 	std::string fileContent(file->size(), ' ');
@@ -24,7 +30,7 @@ library_ptr SXMLLoader::load(filesystem::File* file)
     SXMLSerializer serializer(document, xmlpp::LOAD);
 
     // construct library
-    library_ptr library(new detail::Library);
+    detail::library_ptr library(new detail::Library);
     library->visualScenes = serializer.visualScenes;
 #ifdef SLON_ENGINE_USE_PHYSICS
     library->physicsScenes = serializer.physicsScenes;
