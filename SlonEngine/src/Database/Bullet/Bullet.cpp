@@ -12,7 +12,7 @@
 #include <bullet/Extras/Serialize/BulletWorldImporter/btBulletWorldImporter.h>
 #include <bullet/LinearMath/btSerializer.h>
 
-__DEFINE_LOGGER__("Database.Bullet")
+DECLARE_AUTO_LOGGER("Database.Bullet")
 
 namespace slon {
 namespace database {
@@ -29,7 +29,7 @@ physics::physics_model_ptr BulletLoader::load(std::istream& stream)
 
     std::auto_ptr<btBulletWorldImporter> fileLoader( new btBulletWorldImporter( &world.getBtDynamicsWorld() ) );
     if ( !fileLoader->loadFileFromMemory( (char*)buffer.str().data(), buffer.str().length() ) ) {
-        throw file_not_found_error(logger, "Can't load bullet physics file");
+        throw file_not_found_error(AUTO_LOGGER, "Can't load bullet physics file");
     }
 
     // enumerate objects and add them to the scene model
@@ -98,7 +98,7 @@ physics::physics_model_ptr BulletLoader::load(std::istream& stream)
             }
 
             default:
-                logger << log::S_ERROR << "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'";
+                AUTO_LOGGER_MESSAGE(log::S_ERROR, "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'");
                 btWorld->removeConstraint( constraint.get() );
                 break;
         };

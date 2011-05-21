@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Engine.h"
+#include "Log/Formatters.h"
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 
+DECLARE_AUTO_LOGGER("physics.BulletRigidBody")
+
 namespace slon {
 namespace physics {
-
-__DEFINE_LOGGER__("physics.BulletRigidBody")
 
 namespace {
 
@@ -176,7 +177,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     }
     desc.collisionShape.reset(collisionShape);
 
-	logger << log::S_FLOOD << "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE;
+	AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE);
 }
 
 BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWorld* dynamicsWorld_) :
@@ -369,7 +370,7 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         }
         rigidBody.reset();
 
-		logger << log::S_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
+		AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Destroying rigid body" << LOG_FILE_AND_LINE);
     }
 }
 
@@ -405,7 +406,7 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     // call handlers
     onResetSignal(*this);
 
-	logger << log::S_FLOOD << "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE;
+    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE);
 }
 
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)
