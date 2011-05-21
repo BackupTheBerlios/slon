@@ -6,13 +6,13 @@
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
 
-__DEFINE_LOGGER__("graphics.FFTFilter")
+DECLARE_AUTO_LOGGER("graphics.FFTFilter")
 
 namespace slon {
 namespace graphics {
 
 FFTFilterShaderProgram::FFTFilterShaderProgram() :
-    EffectShaderProgram(logger)
+    EffectShaderProgram(AUTO_LOGGER)
 {
     addShader("Data/Shaders/PostProcess/FFT/FFT.vert");
     addShader("Data/Shaders/PostProcess/FFT/FFT.frag");

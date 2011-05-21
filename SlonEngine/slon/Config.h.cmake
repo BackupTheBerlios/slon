@@ -43,4 +43,8 @@ namespace physics {
 #	include "Utility/Memory/debug_new.h"
 #endif
 
+#ifdef FINAL_RELEASE
+#   define SLON_ENGINE_DISABLE_AUTO_LOGGING
+#endif
+
 #endif // __SLON_ENGINE_CONFIG_H__

@@ -5,7 +5,7 @@
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/bind.hpp>
 
-__DEFINE_LOGGER__("graphics.detail.Pass")
+DECLARE_AUTO_LOGGER("graphics.detail.Pass")
 
 namespace {
 
@@ -208,34 +208,30 @@ Pass::Pass(const DESC& desc)
                     break;
                 }
                 default:
-                    logger << log::S_WARNING 
-						   << "Uniform '" 
-						   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
-						   << "' have unsupported type.\n";
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Uniform '" 
+														<< (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
+														<< "' have unsupported type.\n");
                     break;
             }
         }
 
         if (!uniform) 
 		{
-            logger << log::S_WARNING 
-				   << "Uniform '" 
-				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
-				   << "' was not loaded.\n";
+            AUTO_LOGGER_MESSAGE(log::S_WARNING, "Uniform '" 
+												<< (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
+												<< "' was not loaded.\n");
         }
         else if (!parameter) 
 		{
-            logger << log::S_WARNING 
-				   << "Parameter for uniform '" 
-				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
-				   << "' not specified.\n";
+            AUTO_LOGGER_MESSAGE(log::S_WARNING, "Parameter for uniform '" 
+												<< (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName) 
+												<< "' not specified.\n");
         }
         else if (!compatible) 
 		{
-            logger << log::S_WARNING 
-				   << "Parameter and uniform '" 
-				   << (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
-				   << "' have incompatible types.\n";
+            AUTO_LOGGER_MESSAGE(log::S_WARNING, "Parameter and uniform '" 
+												<< (desc.uniforms[i].uniform ? "..." : desc.uniforms[i].uniformName)
+												<< "' have incompatible types.\n");
         }
     }
 }

@@ -14,7 +14,7 @@
 
 //#define DEBUG_WATER_PERFORMANCE
 
-__DEFINE_LOGGER__("graphics.WaterEffect")
+DECLARE_AUTO_LOGGER("graphics.WaterEffect")
 
 namespace slon {
 namespace graphics {
@@ -25,7 +25,7 @@ namespace graphics {
     {
     public:
         inline FrequenciesProgram() :
-            EffectShaderProgram(logger)
+            EffectShaderProgram(AUTO_LOGGER)
         {
             addShader("Data/Shaders/Water/Frequencies.vert");
             addShader("Data/Shaders/Water/Frequencies.frag");
@@ -58,7 +58,7 @@ namespace graphics {
     {
     public:
         inline MapsProgram() :
-            EffectShaderProgram(logger)
+            EffectShaderProgram(AUTO_LOGGER)
         {
             addShader("Data/Shaders/Water/Transform.vert");
             addShader("Data/Shaders/Water/OceanMaps.frag");
@@ -132,7 +132,7 @@ namespace graphics {
                 {
                     fftTexture[i] = device->CreateTexture2D(desc);
                     if (!fftTexture[i]) {
-                        throw gl_error(logger, "Can't create texture for performing fft.");
+                        throw gl_error(AUTO_LOGGER, "Can't create texture for performing fft.");
                     }
 
                     sgl::SamplerState::DESC ssDesc;
@@ -153,7 +153,7 @@ namespace graphics {
             fftRenderTarget->SetColorAttachment(0, fftTexture[0], 0);
             fftRenderTarget->SetColorAttachment(1, fftTexture[1], 0);
             if ( SGL_OK != fftRenderTarget->Dirty() ) {
-                throw gl_error(logger, "Can't create render taget for rendering fft.");
+                throw gl_error(AUTO_LOGGER, "Can't create render taget for rendering fft.");
             }
 
             // create ocean normal map
@@ -176,7 +176,7 @@ namespace graphics {
             mapsRenderTarget->SetColorAttachment(0, normalMap.get(), 0);
             mapsRenderTarget->SetDrawBuffer(0);
             if ( sgl::SGL_OK != mapsRenderTarget->Dirty() ) {
-                throw gl_error(logger, "Can't create render taget for rendering ocean normal map.");
+                throw gl_error(AUTO_LOGGER, "Can't create render taget for rendering ocean normal map.");
             }
 
             // set uniform values
@@ -361,7 +361,7 @@ void WaterEffect::dirtyShaderTechniques()
                 }
 
                 // create passes
-                EffectShaderProgram baseProgram(logger);
+                EffectShaderProgram baseProgram(AUTO_LOGGER);
                 baseProgram.addShader("Data/Shaders/Water/Ocean.vert");
                 baseProgram.addShader("Data/Shaders/Water/Ocean.frag");
                 baseProgram.addShader("Data/Shaders/depth.frag");
@@ -390,17 +390,17 @@ void WaterEffect::dirtyShaderTechniques()
             }
 
         case Renderer::FIXED_PIPELINE:
-            logger << log::S_ERROR << "Fixed pipeline renderer is not supported by water effect." << std::endl;
+            AUTO_LOGGER_MESSAGE(log::S_ERROR, "Fixed pipeline renderer is not supported by water effect." << std::endl);
             break;
 
         case Renderer::DEFERRED_SHADING:
-            logger << log::S_ERROR << "Deferred renderer is not supported by water effect." << std::endl;
+            AUTO_LOGGER_MESSAGE(log::S_ERROR, "Deferred renderer is not supported by water effect." << std::endl);
             break;
         }
     }
     catch(slon_error&)
     {
-        logger << log::S_ERROR << "Can't create lighting effect." << std::endl;
+        AUTO_LOGGER_MESSAGE(log::S_ERROR, "Can't create lighting effect." << std::endl);
     }
 }
 

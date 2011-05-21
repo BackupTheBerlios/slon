@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "Engine.h"
+#include "Detail/Engine.h"
 
 namespace {
 
-	using namespace slon::log;
+	using namespace slon::log::detail;
 	
     std::string extractNextLevel(const std::string& baseName, const std::string& fullName)
     {
@@ -34,30 +34,37 @@ namespace {
 		return 0;
 	}
 
+	void redirectChildrenOutput(logger_output& loggerOutput, const logger_output::ostream_ptr& os)
+	{
+		loggerOutput.os = os;
+		for (size_t i = 0; i<loggerOutput.children.size(); ++i) {
+			redirectChildrenOutput(*loggerOutput.children[i], os);
+		}
+	}
+
+
 } // anonymous namespace
 
 namespace slon {
 namespace log {
-
-void redirectChildrenOutput(logger_output& loggerOutput, const boost::shared_ptr<ostream>& os)
-{
-    loggerOutput.os = os;
-    for(size_t i = 0; i<loggerOutput.children.size(); ++i)
-    {
-        redirectChildrenOutput(*loggerOutput.children[i], os);
-    }
-}
+namespace detail {
 
 LogManager::LogManager()
+:	mainLogger( new detail::Logger(logger_output_ptr(new logger_output)) )
 {
+}
+
+LogManager::~LogManager()
+{
+	releaseSignal(*this);
 }
 
 bool LogManager::redirectOutput(const std::string& loggerName, const std::string& fileName)
 {
-    logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
+    logger_output_ptr loggerOutput = findNode(*mainLogger->getLoggerOutput(), loggerName);
     if (!loggerOutput)
     {
-        mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
+        (*mainLogger) << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
         return false;
     }
 
@@ -66,7 +73,7 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
     loggerOutput->fb->open( fileName.c_str(), std::ios::out );
     if ( !loggerOutput->fb->is_open() )
     {
-        mainLogger << log::S_ERROR << "Can't open output for logger: " << fileName << std::endl;
+        (*mainLogger) << log::S_ERROR << "Can't open output for logger: " << fileName << std::endl;
         return false;
     }
 
@@ -74,12 +81,12 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
-        mainLogger << log::S_NOTICE << "Output for loggers redirected to file '"
-                                     << fileName << "'" << std::endl;
+        (*mainLogger) << log::S_NOTICE << "Output for loggers redirected to file '"
+                                       << fileName << "'" << std::endl;
     }
     else {
-        mainLogger << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to file '"
-                                     << fileName << "'" << std::endl;
+        (*mainLogger) << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to file '"
+                                       << fileName << "'" << std::endl;
     }
 
     return true;
@@ -87,10 +94,10 @@ bool LogManager::redirectOutput(const std::string& loggerName, const std::string
 
 bool LogManager::redirectOutputToConsole(const std::string& loggerName)
 {
-    logger_output* loggerOutput = findNode(*mainLogger.loggerOutput, loggerName);
+    logger_output_ptr loggerOutput = findNode(*mainLogger->getLoggerOutput(), loggerName);
     if (!loggerOutput)
     {
-        mainLogger << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
+        (*mainLogger) << log::S_ERROR << "Can't find requested logger: " << loggerName << std::endl;
         return false;
     }
 
@@ -101,18 +108,23 @@ bool LogManager::redirectOutputToConsole(const std::string& loggerName)
     redirectChildrenOutput(*loggerOutput, os);
 
     if ( loggerName.empty() ) {
-        mainLogger << log::S_NOTICE << "Output for loggers redirected to console" << std::endl;
+        (*mainLogger) << log::S_NOTICE << "Output for loggers redirected to console" << std::endl;
     }
     else {
-        mainLogger << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to console" << std::endl;
+        (*mainLogger) << log::S_NOTICE << "Output for loggers '" << loggerName << "' redirected to console" << std::endl;
     }
 
     return true;
 }
 
+log::logger_ptr LogManager::createLogger(const std::string& name)
+{
+	return logger_ptr( new detail::Logger( getLoggerOutput(name) ) );
+}
+
 logger_output_ptr LogManager::getLoggerOutput(const std::string& name)
 {
-    logger_output_ptr mainOutput   = mainLogger.loggerOutput;
+    logger_output_ptr mainOutput   = mainLogger->getLoggerOutput();
     logger_output_ptr parentOutput = mainOutput;
 	logger_output_ptr loggerOutput;
 
@@ -141,6 +153,8 @@ logger_output_ptr LogManager::getLoggerOutput(const std::string& name)
 
 	return loggerOutput;
 }
+
+} // namespace detail
 
 LogManager& currentLogManager()
 {

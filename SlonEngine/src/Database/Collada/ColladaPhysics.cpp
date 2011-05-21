@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
 
-__DEFINE_LOGGER__("database.COLLADA")
+DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace {
 
@@ -294,7 +294,7 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
         }
 
         if (!iter->element) {
-            throw collada_error(logger, "Can't find rigid body: " + iter->body + "\n for the model: " + url);
+            throw collada_error(AUTO_LOGGER, "Can't find rigid body: " + iter->body + "\n for the model: " + url);
         }
     }
 
@@ -313,7 +313,7 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
         }
 
         if (!iter->element) {
-            throw collada_error(logger, "Can't find constraint: " + iter->constraintStr + "\n for the model: " + url);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint: " + iter->constraintStr + "\n for the model: " + url);
         }
 
         // resolve constraints attachments
@@ -329,13 +329,13 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
 
         if (!iter->element->attachment.rigidBody)
         {
-            throw collada_error(logger, "Can't find constraint attachment: "
-                                        + iter->element->attachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint attachment: "
+                                             + iter->element->attachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
         }
         else if (!iter->element->refAttachment.rigidBody)
         {
-            throw collada_error(logger, "Can't find constraint attachment: "
-                                        + iter->element->refAttachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint attachment: "
+                                             + iter->element->refAttachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
         }
     }
 }

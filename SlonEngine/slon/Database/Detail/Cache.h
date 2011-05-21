@@ -67,7 +67,7 @@ private:
                    saver_type&        saver );
 
 public:
-    Cache(log::Logger* logger_ = 0) 
+    Cache( log::logger_ptr logger_ = log::logger_ptr() ) 
     :   logger(logger_) 
     {}
 
@@ -112,7 +112,7 @@ public:
 	void         clearSavers();
 
 private:
-    log::Logger*                logger;
+    log::logger_ptr             logger;
     storage_type                storage;
     mutable format_desc_list    formatDescs;
 };

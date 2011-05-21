@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Detail/Engine.h"
 
-__DEFINE_LOGGER__("database.DatabaseManager")
+DECLARE_AUTO_LOGGER("database.DatabaseManager")
 
 namespace slon {
 namespace database {
@@ -25,10 +25,10 @@ namespace {
                 cache.add(key, container[i].second);
             }
             else if ( !ignoreDuplicates ) {
-                throw loader_error(logger, "Duplicate item in the cache: " + key);
+                throw loader_error(AUTO_LOGGER, "Duplicate item in the cache: " + key);
             }
             else {
-                logger << log::S_WARNING << "Duplicate item in the cache: " << key << LOG_FILE_AND_LINE; 
+                AUTO_LOGGER_MESSAGE(log::S_WARNING, "Duplicate item in the cache: " << key << LOG_FILE_AND_LINE); 
             }
         }
     }
@@ -36,13 +36,13 @@ namespace {
 } // anonymous namespace
    
 DatabaseManager::DatabaseManager()
-:   libraryCache(&logger)
-,   animationCache(&logger)
-,   effectCache(&logger)
-,   textureCache(&logger)
-,   visualSceneCache(&logger)
+:   libraryCache(AUTO_LOGGER)
+,   animationCache(AUTO_LOGGER)
+,   effectCache(AUTO_LOGGER)
+,   textureCache(AUTO_LOGGER)
+,   visualSceneCache(AUTO_LOGGER)
 #ifdef SLON_ENGINE_USE_PHYSICS
-,   physicsSceneCache(&logger)
+,   physicsSceneCache(AUTO_LOGGER)
 #endif
 {
 }

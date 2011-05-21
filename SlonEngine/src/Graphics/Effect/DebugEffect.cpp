@@ -9,7 +9,7 @@
 #include "Log/Logger.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
-__DEFINE_LOGGER__("graphics.DebugEffect")
+DECLARE_AUTO_LOGGER("graphics.DebugEffect")
 
 namespace {
 
@@ -64,7 +64,7 @@ DebugEffect::DebugEffect(const DESC& desc_)
         {
             using detail::ForwardRenderer;
 
-			EffectShaderProgram program(logger);
+			EffectShaderProgram program(AUTO_LOGGER);
 			program.addShader("Data/Shaders/debug.vert");
 			program.addShader("Data/Shaders/debug.frag");
 
@@ -104,7 +104,7 @@ DebugEffect::DebugEffect(const DESC& desc_)
         }
 
         default:
-            throw slon_error(logger, "Debug effect doesn't support provided renderer type");
+            throw slon_error(AUTO_LOGGER, "Debug effect doesn't support provided renderer type");
     }
 }
 
@@ -158,7 +158,7 @@ DebugEffect::DebugEffect(const DebugEffect& effect)
         }
 
         default:
-            throw slon_error(logger, "Debug effect doesn't support provided renderer type");
+            throw slon_error(AUTO_LOGGER, "Debug effect doesn't support provided renderer type");
     }
 }
 
@@ -216,7 +216,7 @@ void DebugEffect::reset(const DESC& desc_)
         }
 
         default:
-            throw slon_error(logger, "Debug effect doesn't support provided renderer type");
+            throw slon_error(AUTO_LOGGER, "Debug effect doesn't support provided renderer type");
     }
 
 	desc = desc_;

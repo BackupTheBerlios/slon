@@ -8,7 +8,7 @@
 #include "Utility/error.hpp"
 #include "Utility/math.hpp"
 
-__DEFINE_LOGGER__("graphics.SkinnedMesh")
+DECLARE_AUTO_LOGGER("graphics.SkinnedMesh")
 
 namespace {
 
@@ -39,14 +39,14 @@ namespace {
 				}
 				else
 				{
-					logger << log::S_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
-						                    << "'. Joint '" << joint.getName() << "' has invalid id: " << id << std::endl;
+					AUTO_LOGGER_MESSAGE(log::S_ERROR, "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
+													  << "'. Joint '" << joint.getName() << "' has invalid id: " << id << std::endl);
 				}
             }
             else if ( joints[id] ) 
             {
-                logger << log::S_ERROR << "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
-                                        << "'. Joint '" << joint.getName() << "' overrides another joint '" << joints[id]->getName() << "'\n";
+                AUTO_LOGGER_MESSAGE(log::S_ERROR, "Error gathering joints for skinned mesh '" << skinnedMesh.getName() 
+												  << "'. Joint '" << joint.getName() << "' overrides another joint '" << joints[id]->getName() << "'\n");
             }
             else 
             {
@@ -231,13 +231,13 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 		}
 
 		if ( boneIndexIter == mesh->endAttribute() ) {
-			throw slon_error(logger, "Skinned mesh doesn't have bone index attribute.");
+			throw slon_error(AUTO_LOGGER, "Skinned mesh doesn't have bone index attribute.");
 		}
 		else if ( boneWeightIter == mesh->endAttribute() ) {
-			throw slon_error(logger, "Skinned mesh doesn't have bone weight attribute.");
+			throw slon_error(AUTO_LOGGER, "Skinned mesh doesn't have bone weight attribute.");
 		}
 		else if ( boneIndexIter->size != boneWeightIter->size ) {
-			throw slon_error(logger, "Skinned mesh bone_weight and bone_index attributes have different sizes.");
+			throw slon_error(AUTO_LOGGER, "Skinned mesh bone_weight and bone_index attributes have different sizes.");
 		}
 
 		Mesh::buffer_lock lock = mesh->lockVertexBuffer(Mesh::LOCK_READ);
@@ -264,14 +264,14 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 							std::copy( positionAccessor.begin(), positionAccessor.end(), positions.begin() );
 						}
 						else {
-							throw slon_error(logger, "Skinned mesh position attribute have invalid size. Must be either 3 or 4.");
+							throw slon_error(AUTO_LOGGER, "Skinned mesh position attribute have invalid size. Must be either 3 or 4.");
 						}
                     
 						break;
 					}
 
 					default:
-						throw slon_error(logger, "Skinned mesh position attribute has invalid type. Must be FLOAT.");
+						throw slon_error(AUTO_LOGGER, "Skinned mesh position attribute has invalid type. Must be FLOAT.");
 						break;
 				}
 			}
@@ -290,14 +290,14 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 							std::copy( normalAccessor.begin(), normalAccessor.end(), normals.begin() );
 						}
 						else {
-							throw slon_error(logger, "Skinned mesh normal attribute have invalid size. Must be 3.");
+							throw slon_error(AUTO_LOGGER, "Skinned mesh normal attribute have invalid size. Must be 3.");
 						}
                     
 						break;
 					}
 
 					default:
-						throw slon_error(logger, "Skinned mesh position attribute has invalid type. Must be FLOAT.");
+						throw slon_error(AUTO_LOGGER, "Skinned mesh position attribute has invalid type. Must be FLOAT.");
 						break;
 				}
 			}
@@ -316,14 +316,14 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 							std::copy( tangentAccessor.begin(), tangentAccessor.end(), tangents.begin() );
 						}
 						else {
-							throw slon_error(logger, "Skinned mesh tangent attribute have invalid size. Must be 3.");
+							throw slon_error(AUTO_LOGGER, "Skinned mesh tangent attribute have invalid size. Must be 3.");
 						}
 
 						break;
 					}
 
 					default:
-						throw slon_error(logger, "Skinned mesh tangent attribute has invalid type. Must be FLOAT.");
+						throw slon_error(AUTO_LOGGER, "Skinned mesh tangent attribute has invalid type. Must be FLOAT.");
 						break;
 				}
 			}
@@ -377,7 +377,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 					}
 
 					default:
-						throw slon_error(logger, "Skinned mesh bone_weight attribute has invalid type. Must be FLOAT.");
+						throw slon_error(AUTO_LOGGER, "Skinned mesh bone_weight attribute has invalid type. Must be FLOAT.");
 						break;
 				}
 
@@ -414,7 +414,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 						break;
 
 					default:
-						throw slon_error(logger, "Skinned mesh bone_index attribute has invalid type. Must be either FLOAT, UINT, INT, USHORT, SHORT, UBYTE, BYTE.");
+						throw slon_error(AUTO_LOGGER, "Skinned mesh bone_index attribute has invalid type. Must be either FLOAT, UINT, INT, USHORT, SHORT, UBYTE, BYTE.");
 						break;
 				}
 
@@ -479,7 +479,7 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
             {
                 std::ostringstream errorMsg;
                 errorMsg << "SkinnedMesh '" << getName() << "doesn't have " << i << " joint" << std::endl;
-                throw slon_error( logger, errorMsg.str() );
+                throw slon_error( AUTO_LOGGER, errorMsg.str() );
             }
         }
 
@@ -522,7 +522,7 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
     }
     else 
     {
-        logger << log::S_WARNING << "SkinnedMesh '" << getName() << "have no skeleton" << std::endl;
+        AUTO_LOGGER_MESSAGE(log::S_WARNING, "SkinnedMesh '" << getName() << "have no skeleton" << std::endl);
     }
 }
 
