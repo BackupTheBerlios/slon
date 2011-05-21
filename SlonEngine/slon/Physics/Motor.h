@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_PHYSICS_MOTOR_H__
 #define __SLON_ENGINE_PHYSICS_MOTOR_H__
 
-#include "Forward.h"
 #include <sgl/Math/Vector.hpp>
+#include "Forward.h"
 
 namespace slon {
 namespace physics {

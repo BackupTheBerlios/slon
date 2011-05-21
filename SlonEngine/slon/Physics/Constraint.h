@@ -1,11 +1,12 @@
 #ifndef __SLON_ENGINE_PHYSICS_CONSTRAINT_H__
 #define __SLON_ENGINE_PHYSICS_CONSTRAINT_H__
 
-#include "../Utility/referenced.hpp"
-#include "Forward.h"
-#include "Motor.h"
 #include <string>
 #include <sgl/Math/MatrixFunctions.hpp>
+#include "../Utility/referenced.hpp"
+#include "../Utility/Memory/aligned.hpp"
+#include "Forward.h"
+#include "Motor.h"
 
 namespace slon {
 namespace physics {
@@ -22,7 +23,7 @@ class Constraint :
 public:
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
-       : public sgl::Aligned16
+       : public aligned<0x10>
 #endif
     {
         RigidBody*      rigidBodies[2];

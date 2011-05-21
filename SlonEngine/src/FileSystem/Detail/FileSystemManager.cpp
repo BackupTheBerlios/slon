@@ -8,7 +8,7 @@
 #include <cstring>
 #include <stack>
 
-__DEFINE_LOGGER__("filesystem.FileSystemManager")
+DECLARE_AUTO_LOGGER("filesystem.FileSystemManager")
 
 namespace boost {
 	namespace fs = filesystem;
@@ -18,6 +18,10 @@ namespace slon {
 namespace filesystem {
 namespace detail {
 	
+FileSystemManager::~FileSystemManager()
+{
+}
+
 filesystem::Directory* FileSystemManager::setWorkingDirectory(const char* virtualPath)
 {
 	filesystem::Directory* dir = asDirectory( getNode(virtualPath) );

@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_PARAMETER_TABLE_H__
 #define __SLON_ENGINE_GRAPHICS_PARAMETER_TABLE_H__
 
+#include <boost/unordered_map.hpp>
 #include "../../Utility/referenced.hpp"
 #include "../../Utility/hash_string.hpp"
 #include "../ParameterBinding.h"
-#include <boost/unordered_map.hpp>
 
 namespace slon {
 namespace graphics {
@@ -44,8 +44,8 @@ private:
         }
 
     private:
-        hash_string                             name;
-        boost::intrusive_ptr<ParameterTable>    parameterTable;
+        hash_string     name;
+        ParameterTable* parameterTable;
     };
 
     typedef boost::unordered_map<std::string, abstract_parameter_binding*>  parameter_map;

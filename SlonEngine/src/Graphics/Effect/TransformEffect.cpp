@@ -5,7 +5,7 @@
 #include "Graphics/Effect/Detail/Pass.h"
 #include "Graphics/Renderer/ForwardRenderer.h"
 
-__DEFINE_LOGGER__("graphics.TransformEffect")
+DECLARE_AUTO_LOGGER("graphics.TransformEffect")
 
 namespace slon {
 namespace graphics {
@@ -29,7 +29,7 @@ void TransformEffect::dirty()
     // create pass
     if ( isDirty && currentRenderer()->getRenderTechnique() != Renderer::FIXED_PIPELINE ) 
     {
-        EffectShaderProgram program(logger);
+        EffectShaderProgram program(AUTO_LOGGER);
 		if (boneMatricesBinder || (boneRotationsBinder && boneTranslationsBinder)) {
 			program.addShader("Data/Shaders/skinned.vert");
 		}

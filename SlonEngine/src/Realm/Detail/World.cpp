@@ -97,12 +97,40 @@ void World::visit(const body_variant& body, object_const_callback& cb) const
 
 void World::visitVisible(const math::Frustumf& frustum, object_callback& cb)
 {
-	visit(frustum, cb);
+	// visit infinite objects
+	for (size_t i = 0; i<infiniteObjects.size(); ++i) 
+	{
+		if ( cb(*infiniteObjects[i]) ) {
+			return;
+		}
+	}
+
+	// visit others
+	for (size_t i = 0; i<locations.size(); ++i)
+	{
+		if ( test_intersection(locations[i]->getBounds(), frustum) ) {
+			locations[i]->visitVisible(frustum, cb);
+		}
+	}
 }
 
 void World::visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const
 {
-	visit(frustum, cb);
+	// visit infinite objects
+	for (size_t i = 0; i<infiniteObjects.size(); ++i) 
+	{
+		if ( cb(*infiniteObjects[i]) ) {
+			return;
+		}
+	}
+
+	// visit others
+	for (size_t i = 0; i<locations.size(); ++i)
+	{
+		if ( test_intersection(locations[i]->getBounds(), frustum) ) {
+			locations[i]->visitVisible(frustum, cb);
+		}
+	}
 }
 
 realm::Object* World::createObject() const
@@ -112,15 +140,18 @@ realm::Object* World::createObject() const
 
 bool World::update(realm::Object* object_)
 {
-	detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
+	detail::object_ptr object( static_cast<detail::Object*>(object_) );
+    assert(object && object->world == this);
 
-    if ( object->getBounds() == bounds<math::AABBf>::infinite() ) {
+    if ( (object->getBounds() == bounds<math::AABBf>::infinite() && !object->infinite)
+         || (object->getBounds() != bounds<math::AABBf>::infinite() && object->infinite) )
+    {
+        remove(object_);
+        add(object_);
         return true;
     }
-
-    if ( Location* location = object->getLocation() ) {
-        return location->update(object);
+    else if ( Location* location = object->getLocation() ) {
+        return location->update(object_);
     }
 
     return false;
@@ -129,8 +160,9 @@ bool World::update(realm::Object* object_)
 bool World::remove(realm::Object* object_)
 {
     detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
+    assert(object && object->world == this);
 
+    object->world = 0;
     if ( Location* location = object->getLocation() ) {
         return location->remove(object);
     }
@@ -142,10 +174,13 @@ bool World::remove(realm::Object* object_)
 void World::add(realm::Object* object_)
 {
     detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
+    assert(object && object->world == 0);
 
-    if ( object->getBounds() == bounds<math::AABBf>::infinite() ) {
+    object->world = this;
+    if ( object->getBounds() == bounds<math::AABBf>::infinite() ) 
+    {
         infiniteObjects.push_back( object_ptr(object) );
+        object->infinite = true;
     }
     else
     {

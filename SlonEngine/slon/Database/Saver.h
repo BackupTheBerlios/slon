@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_DATABASE_SAVER_H__
 #define __SLON_ENGINE_DATABASE_SAVER_H__
 
+#include <ostream>
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
-#include <ostream>
 
 namespace slon {
 namespace database {
@@ -14,9 +14,9 @@ class saver_error :
     public slon_error
 {
 public:
-    saver_error( log::Logger&         logger,
-                 const std::string&   message,
-                 log::SEVERITY   severity = log::S_ERROR )
+    saver_error( const log::logger_ptr& logger,
+                 const std::string&		message,
+                 log::SEVERITY			severity = log::S_ERROR )
     :   slon_error(logger, message, severity)
     {}
 

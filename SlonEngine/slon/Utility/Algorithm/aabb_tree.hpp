@@ -1,10 +1,10 @@
-#include "../referenced.hpp"
-#include "../math.hpp"
-#include "spatial_node.hpp"
 #include <sgl/Math/AABB.hpp>
 #include <sgl/Math/Intersection.hpp>
 #include <functional>
 #include <queue>
+#include "../referenced.hpp"
+#include "../math.hpp"
+#include "spatial_node.hpp"
 
 namespace slon {
 

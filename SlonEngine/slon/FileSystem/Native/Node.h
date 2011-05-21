@@ -1,11 +1,11 @@
 #ifndef __FILESYSTEM_NATIVE_NODE_H__
 #define __FILESYSTEM_NATIVE_NODE_H__
 
+#include <boost/filesystem.hpp>
 #include "../../Utility/Algorithm/prefix_tree.hpp"
 #include "../Detail/FileSystemManager.h"
 #include "../Directory.h"
 #include "../File.h"
-#include <boost/filesystem.hpp>
 
 namespace slon {
 namespace filesystem {
@@ -35,11 +35,11 @@ public:
 	const char*	getName() const { return name.c_str(); }
 
 protected:
-    detail::file_system_manager_ptr manager;
-    boost::filesystem::path         virtualPath;	// vfs path
-    boost::filesystem::path         systemPath;     // system path
-    std::string                     vpath;
-    std::string                     name;
+    detail::FileSystemManager*  manager;
+    boost::filesystem::path     virtualPath;	// vfs path
+    boost::filesystem::path     systemPath;     // system path
+    std::string                 vpath;
+    std::string                 name;
 };
 
 } // namespace native

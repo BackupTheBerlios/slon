@@ -1,10 +1,5 @@
 #pragma once
 
-#include <malloc.h>
-#ifdef __GNUC__
-#include <mm_malloc.h>
-#endif
-
 namespace slon {
 
 /** Allocate aligned data.

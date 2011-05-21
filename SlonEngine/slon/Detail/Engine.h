@@ -5,6 +5,7 @@
 #include "../Database/Detail/DatabaseManager.h"
 #include "../Graphics/Detail/GraphicsManager.h"
 #include "../Input/Detail/InputManager.h"
+#include "../Log/Detail/LogManager.h"
 #include "../FileSystem/Detail/FileSystemManager.h"
 #include "../Realm/Detail/World.h"
 #include "../Thread/Detail/ThreadManager.h"
@@ -28,6 +29,7 @@ public:
 
 	// Override Engine
     void init();
+    void free();
     void run(const DESC& desc);
     void frame();
     void stop() { working = false; }
@@ -69,12 +71,12 @@ public:
     void addToUpdateQueue(realm::Object* object) { updateQueue.push_back(object); }
 
 private:
-    // manager
-    database::detail::DatabaseManager           databaseManager;
-    graphics::detail::GraphicsManager           graphicsManager;
-    input::detail::InputManager                 inputManager;
-    log::LogManager                             logManager;
+    // managers, order is important!
+    log::detail::LogManager                     logManager;
     thread::detail::ThreadManager               threadManager;
+    input::detail::InputManager                 inputManager;
+    graphics::detail::GraphicsManager           graphicsManager;
+    database::detail::DatabaseManager           databaseManager;
     filesystem::detail::file_system_manager_ptr filesystemManager;
     realm::detail::World						world;
     start_stop_timer_ptr                        simulationTimer;

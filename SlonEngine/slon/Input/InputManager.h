@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_INPUT_INPUT_MANAGER__
 #define __SLON_ENGINE_INPUT_INPUT_MANAGER__
 
-#include "InputHandler.h"
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
+#include "InputHandler.h"
 
 namespace slon {
 namespace input {

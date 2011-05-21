@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_INPUT_DETAIL_INPUT_MANAGER__
 #define __SLON_ENGINE_INPUT_DETAIL_INPUT_MANAGER__
 
-#include "../InputManager.h"
 #include <sgl/Math/Matrix.hpp>
+#include "../InputManager.h"
 
 // Forward decl
 union SDL_Event;

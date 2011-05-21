@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_ATTRIBUTE_TABLE_H__
 #define __SLON_ENGINE_GRAPHICS_ATTRIBUTE_TABLE_H__
 
-#include "../../Utility/referenced.hpp"
-#include "../../Utility/hash_string.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <vector>
+#include "../../Utility/referenced.hpp"
+#include "../../Utility/hash_string.hpp"
 
 namespace slon {
 namespace graphics {
@@ -49,7 +49,7 @@ public:
         const unsigned      index;
 
     private:
-        boost::intrusive_ptr<AttributeTable> table;
+        AttributeTable* table;
     };
     typedef boost::intrusive_ptr<binding> binding_ptr;
 

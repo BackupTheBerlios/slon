@@ -1,8 +1,8 @@
 #ifndef __FILESYSTEM_FILE_H__
 #define __FILESYSTEM_FILE_H__
 
-#include "Node.h"
 #include <boost/iostreams/categories.hpp>
+#include "Node.h"
 
 namespace slon {
 namespace filesystem {

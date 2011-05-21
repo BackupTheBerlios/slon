@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_PHYSICS_PHYSICS_MANAGER_H__
 #define __SLON_ENGINE_PHYSICS_PHYSICS_MANAGER_H__
 
+#include <boost/signal.hpp>
 #include "../Thread/Timer.h"
 #include "DynamicsWorld.h"
-#include <boost/signal.hpp>
 
 namespace slon {
 namespace physics {

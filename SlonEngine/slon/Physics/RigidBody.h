@@ -4,6 +4,9 @@
 #include "CollisionObject.h"
 #include "CollisionShape.h"
 #include "RigidBodyTransform.h"
+#ifdef SLON_ENGINE_USE_SSE
+#   include "../Utility/Memory/aligned.hpp"
+#endif
 
 namespace slon {
 namespace physics {
@@ -36,12 +39,13 @@ public:
 
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
-       : public sgl::Aligned16
+       : public aligned<0x10>
 #endif
     {
         math::Matrix4r  transform;          /// initial transformation matrix
         DYNAMICS_TYPE   type;
         real            mass;
+        math::Vector3r  inertia;
         real            margin;             /// collision margin
         real            relativeMargin;     /// collision margin relative to the lowest dimension of the collision shape (e.g. box side, sphere radius, cylinder height)
         math::Vector3r  linearVelocity;
@@ -55,6 +59,7 @@ public:
         state_desc(const std::string& _name = "") :
             transform( math::make_identity<float, 4>() ),
             mass(0),
+			inertia(0, 0, 0),
             margin(0),
             relativeMargin( real(0.02) ),
             linearVelocity(0, 0, 0),
@@ -84,6 +89,9 @@ public:
 
     /** Get mass of the rigid body */
     virtual real getMass() const = 0;
+
+	/** Get local inertia tensor of rigid body */
+	virtual math::Vector3r getInertiaTensor() const = 0;
 
     /** Get activation/deactivation state/policy of the object */
     virtual ACTIVATION_STATE getActivationState() const = 0;

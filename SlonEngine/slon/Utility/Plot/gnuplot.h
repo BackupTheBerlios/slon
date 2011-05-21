@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_UTILITY_GNUPLOT_H__
 #define __SLON_ENGINE_UTILITY_GNUPLOT_H__
 
-#include "Config.h"
 #include <boost/unordered_map.hpp>
 #include <map>
+#include "Config.h"
 
 namespace slon {
 

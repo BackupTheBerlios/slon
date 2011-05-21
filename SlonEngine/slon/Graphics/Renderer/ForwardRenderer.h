@@ -1,12 +1,12 @@
 #ifndef __SLON_ENGINE_FORWARD_RENDERER_H__
 #define __SLON_ENGINE_FORWARD_RENDERER_H__
 
+#include <sgl/Device.h>
+#include <vector>
 #include "../../Scene/Visitors/CullVisitor.h"
 #include "../Detail/Utility.h"
 #include "../Effect/Pass.h"
 #include "../Renderer.h"
-#include <sgl/Device.h>
-#include <vector>
 
 namespace slon {
 

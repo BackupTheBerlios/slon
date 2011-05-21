@@ -22,14 +22,14 @@ public:
     void setAbsolute(bool absolute_) { absolute = absolute_; }
 
     /** Get rigid body which handles transformation for this node. */
-    physics::RigidBody* getRigidBody() { return rigidBody.get(); }
+    physics::RigidBody* getRigidBody() { return rigidBody; }
 
     /** Get rigid body which handles transformation for this node. */
-    const physics::RigidBody* getRigidBody() const { return rigidBody.get(); }
+    const physics::RigidBody* getRigidBody() const { return rigidBody; }
 
 protected:
-    bool                    absolute;
-    physics::rigid_body_ptr rigidBody;
+    bool                absolute;
+    physics::RigidBody*	rigidBody;
 };
 
 } // namespace physics

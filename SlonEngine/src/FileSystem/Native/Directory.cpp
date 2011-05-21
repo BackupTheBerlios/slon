@@ -3,7 +3,7 @@
 #include "FileSystem/Native/File.h"
 #include "Utility/error.hpp"
 
-__DEFINE_LOGGER__("filesystem.FileSystemManager")
+DECLARE_AUTO_LOGGER("filesystem.FileSystemManager")
 
 namespace boost {
 	namespace fs = filesystem;
@@ -20,7 +20,7 @@ Directory::Directory(detail::FileSystemManager*     manager,
 :   native::Node<filesystem::Directory>(manager, systemPath, virtualPath)
 {
     if ( !boost::fs::is_directory(systemPath) ) {
-        throw slon_error(logger, "Directory::Directory failed. Can't initialized directory from non-directory path");
+        throw slon_error(AUTO_LOGGER, "Directory::Directory failed. Can't initialized directory from non-directory path");
     }
 
     if (initialize) {
@@ -38,12 +38,12 @@ void Directory::reload()
 	{
 		if ( boost::fs::is_directory( iter->status() ) ) 
 		{
-            Directory* directory = new Directory( manager.get(), iter->path(), virtualPath / iter->filename() );
+            Directory* directory = new Directory( manager, iter->path(), virtualPath / iter->filename() );
 			nodes.push_back(directory);
 		}
 		else if ( boost::fs::is_regular_file( iter->status() ) ) 
 		{
-            File* file = new File( manager.get(), iter->path(), virtualPath / iter->filename() );
+            File* file = new File( manager, iter->path(), virtualPath / iter->filename() );
 			nodes.push_back(file);
 		}
 	}

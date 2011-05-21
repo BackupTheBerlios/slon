@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_EFFECT_SHADER_PROGRAM_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_EFFECT_SHADER_PROGRAM_H__
 
-#include "../../../Utility/error.hpp"
-#include "../../Detail/AttributeTable.h"
 #include <sgl/Program.h>
 #include <functional>
 #include <string>
+#include "../../../Utility/error.hpp"
+#include "../../Detail/AttributeTable.h"
 
 namespace slon {
 namespace graphics {
@@ -116,7 +116,7 @@ public:
 
 public:
     /** Can throw shader_error, file_not_found_error. Log compilation status if it is not empty. */
-    EffectShaderProgram(log::Logger& effectLogger);
+    EffectShaderProgram(const log::logger_ptr& effectLogger);
     virtual ~EffectShaderProgram() {}
 
     /** Add preprocessor definition to the program. */
@@ -207,7 +207,7 @@ protected:
 
 protected:
     // error logging
-    mutable log::Logger&        effectLogger;
+    mutable log::logger_ptr     effectLogger;
     bool                        dirty;
 
     // shader

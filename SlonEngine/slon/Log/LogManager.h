@@ -1,18 +1,21 @@
 #ifndef __SLON_ENGINE_LOG_LOG_MANAGER__
 #define __SLON_ENGINE_LOG_LOG_MANAGER__
 
-#include "Logger.h"
+#include "Forward.h"
+#include <boost/signals.hpp>
+#include <string>
 
 namespace slon {
 namespace log {
 
-/** Manages output for logs.
- */
+/** Manages output for loggers. */
 class LogManager
 {
 public:
-    LogManager();
+    typedef boost::signal<void (LogManager&)>	signal_type;
+    typedef boost::signals::connection			connection_type;
 
+public:
     /** Redirect output for the logger.
      * @param loggerName - name of the logger or group of loggers to redirect output.
      * If the name is "some_log", then all loggers with the names "some_log.log1",
@@ -21,7 +24,7 @@ public:
      * @return result of the operation.
      * @see redirectOutputToConsole
      */
-    bool redirectOutput(const std::string& loggerName, const std::string& fileName);
+    virtual bool redirectOutput(const std::string& loggerName, const std::string& fileName) = 0;
 
     /** Redirect output for logger into the console.
      * @param loggerName - name of the logger or group of loggers to redirect output.
@@ -30,13 +33,17 @@ public:
      * @return result of the operation.
      * @see redirectOutput
      */
-    bool redirectOutputToConsole(const std::string& loggerName);
+    virtual bool redirectOutputToConsole(const std::string& loggerName) = 0;
 
-    /** Get root or main logger of the LogManager */
-    Logger& getMainLogger() { return mainLogger; }
+	/** Create logger with specified name. Loggers are organized in tree structure.
+	 * @see Logger
+	 */
+	virtual logger_ptr createLogger(const std::string& name) = 0;
+	
+	/** Attach handler for LogManager::Release event. */
+    virtual connection_type connectReleaseHandler(signal_type::slot_type slot) = 0;
 
-private:
-    Logger mainLogger;
+	virtual ~LogManager() {}
 };
 
 /** Get current input manager used by engine. */

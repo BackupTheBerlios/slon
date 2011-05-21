@@ -45,9 +45,9 @@ typedef boost::shared_ptr<collada_shape>						collada_shape_ptr;
 typedef boost::shared_ptr<collada_shape_geometry>				collada_shape_geometry_ptr;
 
 // storage typedefs
-typedef prefix_tree<char, collada_physics_scene_ptr>			ColladaPhysicsSceneStorage;
-typedef prefix_tree<char, collada_physics_model_ptr>			ColladaPhysicsModelStorage;
-typedef prefix_tree<char, collada_physics_material_ptr>			ColladaPhysicsMaterialStorage;
+typedef boost::unordered_map<std::string, collada_physics_scene_ptr>		ColladaPhysicsSceneStorage;
+typedef boost::unordered_map<std::string, collada_physics_model_ptr>		ColladaPhysicsModelStorage;
+typedef boost::unordered_map<std::string, collada_physics_material_ptr>		ColladaPhysicsMaterialStorage;
 
 template<> struct library_elements<collada_physics_scene>		{ static std::string name() { return "library_physics_scenes"; } };
 template<> struct library_elements<collada_physics_model>		{ static std::string name() { return "library_physics_models"; } }; 
@@ -55,7 +55,7 @@ template<> struct library_elements<collada_physics_material>	{ static std::strin
 
 /** Represents shape element */
 class collada_shape :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     XMLPP_ELEMENT_SERIALIZATION(collada_shape, ColladaDocument);
@@ -66,7 +66,7 @@ public:
 };
 
 class collada_shape_geometry :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     enum SHAPE_TYPE
@@ -173,7 +173,7 @@ public:
 
 /** Represents <attachment> or <ref_attachment> element */
 class collada_attachment :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 friend class collada_instance<collada_physics_model>;
 public:
@@ -189,7 +189,7 @@ private:
 
 /** Represents <rigid_constraint> element */
 class collada_rigid_constraint :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     /** load <technique_common> */
@@ -236,7 +236,7 @@ public:
 
 /** Represents <rigid_body> element */
 class collada_rigid_body :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     typedef std::vector<collada_shape_ptr>  shape_vector;
@@ -251,6 +251,7 @@ public:
 public:
     collada_optional<collada_mass_frame>    massFrame;
     collada_optional<float>                 mass;
+    collada_optional<math::Vector3f>		inertia;
     std::string                             sid;
     bool                                    dynamic;
     shape_vector                            shapes;
@@ -268,6 +269,7 @@ public:
 
 public:
     collada_optional<collada_mass_frame>    massFrame;
+    collada_optional<math::Vector3f>		inertia;
     collada_optional<float>                 mass;
     std::string                             target;
 

@@ -227,7 +227,12 @@ SET ( TARGET_LOG_HEADERS
     ${TARGET_HEADER_PATH}/Log/Logger.h
     ${TARGET_HEADER_PATH}/Log/LogManager.h
     ${TARGET_HEADER_PATH}/Log/LogVisitor.h
-    ${TARGET_HEADER_PATH}/Log/Stream.h
+)
+
+SET ( TARGET_LOG_DETAIL_HEADERS
+    ${TARGET_HEADER_PATH}/Log/Detail/Logger.h
+    ${TARGET_HEADER_PATH}/Log/Detail/LogManager.h
+    ${TARGET_HEADER_PATH}/Log/Detail/Stream.h
 )
 
 SET ( TARGET_REALM_HEADERS
@@ -314,9 +319,13 @@ SET ( TARGET_UTILITY_ALGORITHM_HEADERS
 )
 
 SET ( TARGET_UTILITY_MEMORY_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/Memory/aligned.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/aligned_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/block_allocator.hpp
+    ${TARGET_HEADER_PATH}/Utility/Memory/debug_new.h
+    ${TARGET_HEADER_PATH}/Utility/Memory/fast_mutex.h
     ${TARGET_HEADER_PATH}/Utility/Memory/small_object_allocator.hpp
+    ${TARGET_HEADER_PATH}/Utility/Memory/static_assert.h
     ${TARGET_HEADER_PATH}/Utility/Memory/object_in_pool.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/object_pool.hpp
 )
@@ -358,6 +367,7 @@ SOURCE_GROUP( headers\\Graphics\\Log FILES                 ${TARGET_GRAPHICS_LOG
 SOURCE_GROUP( headers\\Input FILES                         ${TARGET_INPUT_HEADERS} )
 SOURCE_GROUP( headers\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Log FILES                           ${TARGET_LOG_HEADERS} )
+SOURCE_GROUP( headers\\Log\\Detail FILES                   ${TARGET_LOG_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Physics FILES                       ${TARGET_PHYSICS_HEADERS} )
 SOURCE_GROUP( headers\\Physics\\Bullet FILES               ${TARGET_PHYSICS_BULLET_HEADERS} )
 SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETAIL_HEADERS} )
@@ -403,6 +413,7 @@ SET ( TARGET_HEADERS
     ${TARGET_INPUT_HEADERS}
     ${TARGET_INPUT_DETAIL_HEADERS}
     ${TARGET_LOG_HEADERS}
+    ${TARGET_LOG_DETAIL_HEADERS}
     ${TARGET_REALM_HEADERS}
     ${TARGET_REALM_DETAIL_HEADERS}
     ${TARGET_SCENE_LIGHT_HEADERS}
@@ -581,9 +592,13 @@ SET ( TARGET_GRAPHICS_RENDERER_SOURCES
 )
 
 SET ( TARGET_LOG_SOURCES
-    Log/Logger.cpp
-    Log/LogManager.cpp
     Log/LogVisitor.cpp
+)
+
+SET ( TARGET_LOG_DETAIL_SOURCES
+    Log/Detail/Logger.cpp
+    Log/Detail/LogManager.cpp
+    Log/Detail/Stream.cpp
 )
 
 SET ( TARGET_PHYSICS_SOURCES
@@ -667,6 +682,10 @@ SET ( TARGET_UTILITY_SOURCES
 	Utility/error.cpp
 )
 
+SET ( TARGET_UTILITY_MEMORY_SOURCES
+	Utility/Memory/debug_new.cpp
+)
+
 SET ( TARGET_UTILITY_PLOT_SOURCES
 	Utility/Plot/gnuplot.cpp
 )
@@ -698,6 +717,7 @@ SOURCE_GROUP( sources\\Graphics\\Renderable FILES          ${TARGET_GRAPHICS_REN
 SOURCE_GROUP( sources\\Graphics\\Renderable\\Debug FILES   ${TARGET_GRAPHICS_RENDERABLE_DEBUG_SOURCES} )
 SOURCE_GROUP( sources\\Graphics\\Renderer FILES            ${TARGET_GRAPHICS_RENDERER_SOURCES} )
 SOURCE_GROUP( sources\\Log FILES                           ${TARGET_LOG_SOURCES} )
+SOURCE_GROUP( sources\\Log\\Detail FILES                   ${TARGET_LOG_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Physics FILES                       ${TARGET_PHYSICS_SOURCES} )
 SOURCE_GROUP( sources\\Physics\\Bullet FILES               ${TARGET_PHYSICS_BULLET_SOURCES} )
 SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETAIL_SOURCES} )
@@ -710,6 +730,7 @@ SOURCE_GROUP( sources\\Scene\\Visitors FILES               ${TARGET_SCENE_VISITO
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
+SOURCE_GROUP( sources\\Utility\\Memory FILES               ${TARGET_UTILITY_MEMORY_SOURCES} )
 SOURCE_GROUP( sources\\Utility\\Plot FILES                 ${TARGET_UTILITY_PLOT_SOURCES} )
 
 SET ( TARGET_SOURCES
@@ -739,6 +760,7 @@ SET ( TARGET_SOURCES
     ${TARGET_GRAPHICS_RENDERER_SOURCES}
     ${TARGET_GRAPHICS_WATER_SOURCES}
     ${TARGET_LOG_SOURCES}
+    ${TARGET_LOG_DETAIL_SOURCES}
     ${TARGET_REALM_SOURCES}
     ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
@@ -748,6 +770,7 @@ SET ( TARGET_SOURCES
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}
+	${TARGET_UTILITY_MEMORY_SOURCES}
 )
 
 IF (SLON_ENGINE_USE_BULLET)

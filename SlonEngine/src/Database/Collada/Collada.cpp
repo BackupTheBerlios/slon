@@ -23,7 +23,7 @@
 #   include "Physics/PhysicsModel.h"
 #endif
 
-__DEFINE_LOGGER__("database.COLLADA")
+DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace {
 
@@ -160,7 +160,7 @@ namespace {
                 texture = dynamic_cast<graphics::Texture2D*>( database::loadTexture(fileName).get() );
 				if (!texture)
 				{
-					logger << log::S_WARNING << "Failed to load texture from file: " << fileName << std::endl;
+					AUTO_LOGGER_MESSAGE(log::S_WARNING, "Failed to load texture from file: " << fileName << std::endl);
 					return texture;
 				}
 			}
@@ -220,14 +220,14 @@ namespace {
 		{
 			assert(material.effect && "Material must have valid effect. Overwise it is COLLADA error.");
 
-			logger << log::S_NOTICE << "Creating material: " << material.id << std::endl;
+			AUTO_LOGGER_MESSAGE(log::S_NOTICE, "Creating material: " << material.id << std::endl);
 			if (collada_effect* colladaEffect = material.effect)
 			{
-				logger << log::S_NOTICE << "Found effect: " << colladaEffect->id << std::endl;
+				AUTO_LOGGER_MESSAGE(log::S_NOTICE, "Found effect: " << colladaEffect->id << std::endl);
 
 				collada_technique_ptr colladaTechnique = colladaEffect->techniques[0];
 				if (colladaEffect->techniques.size() > 1) {
-					logger << log::S_WARNING << "Effect has more than one technique. SlonEngine will use first." << std::endl;
+					AUTO_LOGGER_MESSAGE(log::S_WARNING, "Effect has more than one technique. SlonEngine will use first." << std::endl);
 				}
 
 				graphics::Material* material = 0;
@@ -245,14 +245,14 @@ namespace {
 				}
 
 				if (material) {
-					logger << log::S_NOTICE << "Material succesfully created." << std::endl;
+					AUTO_LOGGER_MESSAGE(log::S_NOTICE, "Material succesfully created." << std::endl);
 				}
 
                 return graphics::material_ptr(material);
 			}
 			else
 			{
-				logger << log::S_ERROR << "Material doesn't have attached effect." << std::endl;
+				AUTO_LOGGER_MESSAGE(log::S_ERROR, "Material doesn't have attached effect." << std::endl);
 			}
 
 			return graphics::material_ptr();
@@ -306,15 +306,15 @@ namespace {
 				        }
 				        else if ( inputIter->source != input.source )
 				        {
-					        throw construct_scene_error(logger, "Geometry primitives have inputs with similar semantic and different source. \
-							 					                 SlonEngine doesn't know what to do in this situation.");
+					        throw construct_scene_error(AUTO_LOGGER, "Geometry primitives have inputs with similar semantic and different source. \
+							 										  SlonEngine doesn't know what to do in this situation.");
 				        }
 			        }
 		        }
 
 		        // can't construct mesh from unknown primitives
 		        if ( inputs.empty() ) {
-			        throw construct_scene_error(logger, "Couldn't construct mesh from invalid inputs.");
+			        throw construct_scene_error(AUTO_LOGGER, "Couldn't construct mesh from invalid inputs.");
 		        }
 
 		        // merge indices
@@ -392,7 +392,7 @@ namespace {
                                 }
                             }
                             else {
-                                logger << log::S_WARNING << "Skinned mesh have non 3 or 4-component positions, ignoring bind shape matrix transformation\n";
+                                AUTO_LOGGER_MESSAGE(log::S_WARNING, "Skinned mesh have non 3 or 4-component positions, ignoring bind shape matrix transformation\n");
                             }
                         }
 
@@ -419,14 +419,14 @@ namespace {
 										                                                        skin->weights.inputs.end(),
 										                                                        boost::bind(&collada_input::attributeName, _1) == "joint" );
                         if ( jointInputIter == skin->weights.inputs.end() ) {
-					        throw construct_scene_error(logger, "Skinned mesh doesn't have joint indices.");
+					        throw construct_scene_error(AUTO_LOGGER, "Skinned mesh doesn't have joint indices.");
                         }
 
 				        collada_primitives::const_input_iterator weightInputIter = std::find_if( skin->weights.inputs.begin(),
 										                                                         skin->weights.inputs.end(),
 										                                                         boost::bind(&collada_input::attributeName, _1) == "weight" );
                         if ( weightInputIter == skin->weights.inputs.end() ) {
-					        throw construct_scene_error(logger, "Skinned mesh doesn't have joint weights.");
+					        throw construct_scene_error(AUTO_LOGGER, "Skinned mesh doesn't have joint weights.");
                         }
 
                         math::vector_of_vector4f boneIndices( skin->weights.vcount.size() );
@@ -449,7 +449,7 @@ namespace {
                                 {
                                     if (k == 4)
                                     {
-                                        logger << log::S_WARNING << "SlonEngine doesn't support more than 4 bones per vertex, ignoring exceeded" << std::endl;
+                                        AUTO_LOGGER_MESSAGE(log::S_WARNING, "SlonEngine doesn't support more than 4 bones per vertex, ignoring exceeded\n");
                                         index  += (vc - j - 1) * skin->weights.inputs.size();
                                         vc      = 4;
                                     }
@@ -545,7 +545,7 @@ namespace {
 							}
 						}
 						else {
-							logger << log::S_ERROR << "Couldn't find material by symbol: " << prims.material << std::endl;
+							AUTO_LOGGER_MESSAGE(log::S_ERROR, "Couldn't find material by symbol: " << prims.material << std::endl);
 						}
                     }
 				}
@@ -557,7 +557,7 @@ namespace {
                 for(size_t i = 0; i<colladaMesh.primitives.size(); ++i) {
                     mesh->getSubset(i).setEffect( defaultMaterial->createEffect() );
                 }
-                logger << log::S_WARNING << "Mesh subset doesn't have any material, using default." << std::endl;
+                AUTO_LOGGER_MESSAGE(log::S_WARNING, "Mesh subset doesn't have any material, using default." << std::endl);
             }
 
 			return mesh;
@@ -576,7 +576,7 @@ namespace {
             }
             else 
             {
-			    logger << log::S_WARNING << "Mesh is empty." << std::endl;
+			    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Mesh is empty." << std::endl);
                 return 0;
             }
 		}
@@ -656,7 +656,7 @@ namespace {
 
 			    // create hierarchy
                 if ( !node.geometries.empty() || !node.controllers.empty() ) {
-                    logger << log::S_WARNING << "Joint node '" << node.id << "' can't have entities children, skipping.";
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Joint node '" << node.id << "' can't have entities children, skipping.");
                 }
 
 			    for (size_t i = 0; i<node.children.size(); ++i)
@@ -726,14 +726,14 @@ namespace {
                                                                                                 skin.joints.inputs.end(),
                                                                                                 boost::bind(&collada_input::semantic, _1) == "JOINT" );
                             if ( jointInputIter == skin.joints.inputs.end() ) {
-                                throw collada_error(logger, "Unable to find joint name array for skinned mesh");
+                                throw collada_error(AUTO_LOGGER, "Unable to find joint name array for skinned mesh");
                             }
 
                             collada_joints::const_input_iterator invBindInputIter = std::find_if( skin.joints.inputs.begin(),   
                                                                                                   skin.joints.inputs.end(),
                                                                                                   boost::bind(&collada_input::semantic, _1) == "INV_BIND_MATRIX" );
                             if ( invBindInputIter == skin.joints.inputs.end() ) {
-                                throw collada_error(logger, "Unable to find inv bind matrix array for skinned mesh");
+                                throw collada_error(AUTO_LOGGER, "Unable to find inv bind matrix array for skinned mesh");
                             }
 
                             skin.numJoints = jointInputIter->source->nameArray.size();
@@ -751,7 +751,7 @@ namespace {
                                     joint->setInverseBindMatrix(pose);
                                 }
                                 else {
-                                    throw collada_error(logger, "Unable to find joint '" + name + "' for skinned mesh");
+                                    throw collada_error(AUTO_LOGGER, "Unable to find joint '" + name + "' for skinned mesh");
                                 }
                             }
 
@@ -768,14 +768,14 @@ namespace {
                             skinnedMesh->setSkeleton(skeleton);
                         }
                         else {
-                            throw collada_error(logger, "Skinned mesh have no root joint or it has not a joint type.");
+                            throw collada_error(AUTO_LOGGER, "Skinned mesh have no root joint or it has not a joint type.");
                         }
 
                         break;
                     }
 
                     default:
-                        throw collada_error(logger, "Unsupported controller type");
+                        throw collada_error(AUTO_LOGGER, "Unsupported controller type");
                 }
             }
 			
@@ -794,7 +794,7 @@ namespace {
                                                      ++iter)
             {
                 if ( iter->get_target_transform() != "matrix" ) {
-                    throw collada_error(logger, "SlonEngine doesn't support non matrix animation targets");
+                    throw collada_error(AUTO_LOGGER, "SlonEngine doesn't support non matrix animation targets");
                 }
 
                 // try to find transformation node
@@ -802,14 +802,14 @@ namespace {
                 visitor.traverse(graphicsModel);
 
                 if (!visitor.found) {
-                    throw collada_error(logger, "Can't find animation target transformation node");
+                    throw collada_error(AUTO_LOGGER, "Can't find animation target transformation node");
                 }
 
                 animation::detail::AnimationTrack* track = 0;
                 {
                     collada_animation::sampler_iterator samplerIt = colladaAnimation.get_sampler( iter->source.substr(1) );
                     if ( samplerIt == colladaAnimation.samplers.end() ) {
-                        throw collada_error(logger, "Can't find animation sampler '" + iter->source.substr(1) + "'");
+                        throw collada_error(AUTO_LOGGER, "Can't find animation sampler '" + iter->source.substr(1) + "'");
                     }
 
                     collada_animation::source_iterator inputSourceIt  = colladaAnimation.sources.end();
@@ -827,10 +827,10 @@ namespace {
                     }
 
                     if ( inputSourceIt == colladaAnimation.sources.end() || outputSourceIt == colladaAnimation.sources.end() ) {
-                        throw collada_error(logger, "Can't find animation input or output source");
+                        throw collada_error(AUTO_LOGGER, "Can't find animation input or output source");
                     }
                     else if ( inputSourceIt->floatArray.size() * 16 != outputSourceIt->floatArray.size() ) {
-                        throw collada_error(logger, "Animation input and output sources are incompatible");
+                        throw collada_error(AUTO_LOGGER, "Animation input and output sources are incompatible");
                     }
 
                     typedef animation::detail::AnimationTrack::frame            frame;
@@ -919,7 +919,7 @@ namespace {
                         if ( colladaInput.attributeIndex == sgl::VertexLayout::VERTEX )
                         {
                             if (colladaSource.stride < 3) {
-                                throw collada_error(logger, "Unable to build collision shape using 2-dimensional vertices");
+                                throw collada_error(AUTO_LOGGER, "Unable to build collision shape using 2-dimensional vertices");
                             }
 
                             collisionShape->buildConvexHull( vector_composer<physics::real, 3>( colladaSource.floatArray.begin(), colladaSource.stride ),
@@ -929,7 +929,7 @@ namespace {
                     }
 
                     if ( collisionShape->vertices.empty() ) {
-                        throw collada_error(logger, "Unable to build convex hull");
+                        throw collada_error(AUTO_LOGGER, "Unable to build convex hull");
                     }
 
                     return collisionShape;
@@ -950,7 +950,7 @@ namespace {
                         if ( colladaInput.attributeIndex == sgl::VertexLayout::VERTEX )
                         {
                             if (colladaSource.stride < 3) {
-                                throw collada_error(logger, "Unable to build collision shape using 2-dimensional vertices");
+                                throw collada_error(AUTO_LOGGER, "Unable to build collision shape using 2-dimensional vertices");
                             }
 
                             std::copy( vector_composer<physics::real, 3>( colladaSource.floatArray.begin(), colladaSource.stride ),
@@ -967,7 +967,7 @@ namespace {
                     {
                         const collada_primitives& colladaPrimitives = colladaMesh.primitives[i];
                         if (colladaPrimitives.primType != sgl::TRIANGLES) {
-                            throw collada_error(logger, "Unable to build collision shape. Only triangle meshes are supported");
+                            throw collada_error(AUTO_LOGGER, "Unable to build collision shape. Only triangle meshes are supported");
                         }
 
                         std::copy( colladaPrimitives.inputIndices[vertexInput].begin(),
@@ -979,7 +979,7 @@ namespace {
                 }
 
                 default:
-                    throw collada_error(logger, "Unable to create collision shape. Invalid geometry type");
+                    throw collada_error(AUTO_LOGGER, "Unable to create collision shape. Invalid geometry type");
                     break;
             }
 
@@ -1026,12 +1026,12 @@ namespace {
                         return new physics::CapsuleShape(colladaCylShape.lowerRadius[0], colladaCylShape.height * 2.0f);
                     }
                     else {
-                        throw collada_error(logger, "Unable to create collision shape. Unsupported geometry type.");
+                        throw collada_error(AUTO_LOGGER, "Unable to create collision shape. Unsupported geometry type.");
                     }
                 }
 
                 default:
-                    throw collada_error(logger, "Unable to create collision shape. Invalid geometry type.");
+                    throw collada_error(AUTO_LOGGER, "Unable to create collision shape. Invalid geometry type.");
                     break;
             }
         }
@@ -1096,6 +1096,16 @@ namespace {
                 desc.transform = math::make_identity<float, 4>();
             }
 
+            if (colladaRigidBodyInstance.inertia) {
+                desc.inertia = colladaRigidBodyInstance.inertia.value;
+            }
+            else if (colladaRigidBody.inertia) {
+                desc.inertia = colladaRigidBody.inertia.value;
+            }
+            else {
+                desc.inertia = math::Vector3f(0, 0, 0);
+            }
+
             math::Matrix4f invMassFrame = math::invert(desc.transform);
             if ( colladaRigidBody.shapes.size() > 1
                 || !math::equal(invMassFrame * colladaRigidBody.shapes[0]->transform, math::make_identity<float, 4>(), 0.01f) )
@@ -1142,7 +1152,7 @@ namespace {
 					catch(collada_error&)
 					{
 						std::string sid = colladaModel.rigidBodyInstances[i].element->sid;
-						logger << log::S_ERROR << "Unable to create rigid body: " + sid << std::endl;
+						AUTO_LOGGER_MESSAGE(log::S_ERROR, "Unable to create rigid body: " + sid << std::endl);
 					}
 				}
 
@@ -1384,7 +1394,7 @@ namespace {
 				break;
 
 			default:
-				logger << log::S_WARNING << "Node '" << entity->getName() << "' will not be exported. Unsupported type.";
+				AUTO_LOGGER_MESSAGE(log::S_WARNING, "Node '" << entity->getName() << "' will not be exported. Unsupported type.");
 				break;
 			}
 		}
@@ -1483,7 +1493,7 @@ void collada_scene::serialize( ColladaDocument&  document,
 void ColladaDocument::set_file_source(const std::string& fileName)
 {
 	using namespace filesystem;
-	logger << log::S_NOTICE << "Loading COLLADA file: " << fileName << std::endl;
+	AUTO_LOGGER_MESSAGE(log::S_NOTICE, "Loading COLLADA file: " << fileName << std::endl);
 
     filesystem::file_ptr file( asFile( currentFileSystemManager().getNode(fileName.c_str()) ) );
 	if ( file && file->open(filesystem::File::in) ) 
@@ -1494,7 +1504,7 @@ void ColladaDocument::set_file_source(const std::string& fileName)
 		base_type::set_source( source.size(), source.c_str() );
 	}
 	else {
-		throw slon_error(logger, "Can't open file: " + fileName);
+		throw slon_error(AUTO_LOGGER, "Can't open file: " + fileName);
 	}
 }
 
@@ -1556,7 +1566,7 @@ void ColladaDocument::on_load()
 {
     xmlpp::element_iterator colladaIter = first_child_element("COLLADA");
     if ( !colladaIter ) {
-        throw collada_error(logger, "Couldn't find <COLLADA> xmlpp::element in the collada file");
+        throw collada_error(AUTO_LOGGER, "Couldn't find <COLLADA> xmlpp::element in the collada file");
     }
 
 	// wee need 

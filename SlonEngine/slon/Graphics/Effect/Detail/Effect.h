@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_DETAIL_EFFECT_H__
 
+#include <map>
 #include "../../Effect.h"
 #include "Pass.h"
-#include <map>
 
 namespace slon {
 namespace graphics {

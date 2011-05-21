@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_ANIMATION_DETAIL_ANIMATION_H__
 #define __SLON_ENGINE_ANIMATION_DETAIL_ANIMATION_H__
 
-#include "../Animation.h"
 #include <vector>
+#include "../Animation.h"
 
 namespace slon {
 namespace animation {

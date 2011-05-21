@@ -1,16 +1,17 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_COLLADA_COMMON_H__
 
-#include "../../Log/Logger.h"
-#include "../../Utility/error.hpp"
-#include "../Forward.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 #include <functional>
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Quaternion.hpp>
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
 #include <xml++/serialization/serialization.hpp>
+#include "../../Log/Logger.h"
+#include "../../Utility/error.hpp"
+#include "../Forward.h"
 
 namespace slon {
 namespace database {
@@ -30,16 +31,16 @@ class collada_error :
     public slon_error
 {
 public:
-    collada_error( log::Logger&          logger,
-                   const std::string&    message,
-                   log::SEVERITY    severity = log::S_ERROR ) :
+    collada_error( const log::logger_ptr&   logger,
+                   const std::string&		message,
+                   log::SEVERITY			severity = log::S_ERROR ) :
         slon_error(logger, message, severity)
     {}
 
-    collada_error( log::Logger&          logger,
-                   const std::string&    message,
-                   const xmlpp::node&    _node,
-                   log::SEVERITY    severity = log::S_ERROR ) :
+    collada_error( const log::logger_ptr&	logger,
+                   const std::string&		message,
+                   const xmlpp::node&		_node,
+                   log::SEVERITY			severity = log::S_ERROR ) :
         slon_error(logger, message, severity),
         node(_node)
     {}
@@ -102,9 +103,9 @@ class construct_scene_error :
 	public slon_error
 {
 public:
-	construct_scene_error( log::Logger&    	  logger,
-					       const std::string& message,
-					       log::SEVERITY severity = log::S_ERROR ) :
+	construct_scene_error( const log::logger_ptr&   logger,
+					       const std::string&		message,
+					       log::SEVERITY			severity = log::S_ERROR ) :
 		slon_error(logger, message, severity)
 	{}
 };
@@ -141,14 +142,14 @@ public:
 
 public:
 	collada_instance() :
-		logger("database.COLLADA")
+		logger( log::currentLogManager().createLogger("database.COLLADA") )
 	{}
 
     XMLPP_ELEMENT_SERIALIZATION(collada_instance, ColladaDocument);
 
 public:
-	log::Logger	logger;
-    std::string target;
+	log::logger_ptr	logger;
+    std::string		target;
 };
 
 template<typename Element>
@@ -160,13 +161,13 @@ class collada_library :
 	public boost::noncopyable
 {
 public:
-	typedef boost::shared_ptr<Element>			element_ptr;
-	typedef boost::shared_ptr<const Element>	const_element_ptr;
-	typedef prefix_tree<char, element_ptr>		element_set;
+	typedef boost::shared_ptr<Element>						element_ptr;
+	typedef boost::shared_ptr<const Element>				const_element_ptr;
+	typedef boost::unordered_map<std::string, element_ptr>	element_set;
 
 public:
 	collada_library() :
-		logger("database.COLLADA")
+		logger( log::currentLogManager().createLogger("database.COLLADA") )
 	{}
 
 	void load(const ColladaDocument& document, const xmlpp::element& elem)
@@ -211,9 +212,9 @@ public:
 	XMLPP_SERIALIZATION_SPLIT_MEMBER(ColladaDocument, xmlpp::element);
 
 public:
-	log::Logger	logger;
-    std::string target;
-	element_set elements;
+	log::logger_ptr	logger;
+    std::string		target;
+	element_set		elements;
 };
 
 template<typename value_type>
@@ -386,7 +387,7 @@ struct text_serialization_policy< slon::database::collada_optional<T> >
         e.set_text( ss.str() );
     }
 
-    bool valid(const T& val, xmlpp::s_state s) const { return (val == true) || (s == xmlpp::LOAD); }
+    bool valid(const slon::database::collada_optional<T>& val, xmlpp::s_state s) const { return val.specified || (s == xmlpp::LOAD); }
 };
 
 template<typename T, typename A>

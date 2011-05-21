@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_DATABASE_DETAIL_LIBRARY_H__
 #define __SLON_ENGINE_DATABASE_DETAIL_LIBRARY_H__
 
+#include <sgl/Texture.h>
 #include "../../Animation/Animation.h"
 #include "../../Graphics/Effect.h"
 #include "../../Scene/Node.h"
@@ -8,7 +9,6 @@
 #ifdef SLON_ENGINE_USE_PHYSICS
 #   include "../../Physics/PhysicsModel.h"
 #endif
-#include <sgl/Texture.h>
 
 namespace slon {
 namespace database {

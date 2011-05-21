@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_GRAPHICS_POST_PROCESS_FFT_FILTER_H__
 #define __SLON_ENGINE_GRAPHICS_POST_PROCESS_FFT_FILTER_H__
 
-#include "../Effect/Detail/EffectShaderProgram.h"
-#include "../Filter.h"
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Program.h>
 #include <sgl/State.h>
+#include "../Effect/Detail/EffectShaderProgram.h"
+#include "../Filter.h"
 
 namespace slon {
 namespace graphics {

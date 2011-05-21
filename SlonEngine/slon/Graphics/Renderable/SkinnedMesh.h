@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_GRAPHICS_RENDERABLE_SKINNED_MESH_H__
 #define __SLON_ENGINE_GRAPHICS_RENDERABLE_SKINNED_MESH_H__
 
+#include <sgl/Math/Containers.hpp>
 #include "../../Scene/Geode.h"
 #include "Mesh.h"
-#include <sgl/Math/Containers.hpp>
 
 namespace slon {
 

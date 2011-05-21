@@ -87,12 +87,26 @@ void DebugMesh::dirty()
         indexBuffer.reset( currentDevice()->CreateIndexBuffer() );
     }
 
-    vertexBuffer->SetData( vertices.size() * sizeof(math::Vector3f), &vertices[0] );
-    indexBuffer->SetData( indices.size() * sizeof(unsigned int), &indices[0] );
+    size_t size = vertices.size() * sizeof(math::Vector3f);
+    if (vertexBuffer->Size() >= size) {
+        vertexBuffer->SetSubData(0, size, &vertices[0]);
+    }
+    else {
+        vertexBuffer->SetData(size, &vertices[0], sgl::Buffer::STREAM_DRAW);
+    }
+
+    size = indices.size() * sizeof(unsigned int);
+    if (indexBuffer->Size() >= size) {
+        indexBuffer->SetSubData(0, size, &indices[0]);
+    }
+    else {
+        indexBuffer->SetData(size, &indices[0], sgl::Buffer::STREAM_DRAW);
+    }
+
     geometryDirty = false;
 }
 
-void DebugMesh::clear() 
+void DebugMesh::clear(bool clearBuffers) 
 {
     aabb.reset_max();
     totalNumVertices = 0;
@@ -101,8 +115,12 @@ void DebugMesh::clear()
     textSubsets.clear();
     subsets.clear();
     indices.clear();
-    vertexBuffer.reset();
-    indexBuffer.reset();
+    
+    if (clearBuffers)
+    {
+        vertexBuffer.reset();
+        indexBuffer.reset();
+    }
 }
 
 void DebugMesh::pushPrimitive( sgl::PRIMITIVE_TYPE primType,

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0 // disable debug new due to conflict with sgl::Aligned allocator
 #include "Graphics/Common.h"
 #include "Graphics/Effect/Pass.h"
 #include "Graphics/Detail/ParameterTable.h"

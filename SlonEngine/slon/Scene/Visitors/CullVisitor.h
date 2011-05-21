@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_SCENE_GRAPH_CULL_VISITOR_H__
 
 #include "NodeVisitor.h"
+#include <stack>
 
 namespace slon {
 

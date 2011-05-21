@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_GRAPHICS_POST_PROCESS_FILTER_H__
 #define __SLON_ENGINE_GRAPHICS_POST_PROCESS_FILTER_H__
 
-#include "../Utility/referenced.hpp"
 #include <boost/intrusive_ptr.hpp>
 #include <list>
 #include <sgl/RenderTarget.h>
+#include "../Utility/referenced.hpp"
 
 namespace slon {
 namespace graphics {

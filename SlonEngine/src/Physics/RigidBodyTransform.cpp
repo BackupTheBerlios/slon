@@ -31,7 +31,7 @@ void RigidBodyTransform::accept(log::LogVisitor& visitor) const
             visitor << "'" << rigidBody->getName() << "'";
         }
         else {
-            visitor << "unnamed(" << rigidBody.get() << ")";
+            visitor << "unnamed(" << rigidBody << ")";
         }
     }
     else {

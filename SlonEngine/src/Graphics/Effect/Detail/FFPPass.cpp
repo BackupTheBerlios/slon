@@ -4,7 +4,7 @@
 #include "Graphics/Effect/Detail/FFPPass.h"
 #include "Log/Logger.h"
 
-__DEFINE_LOGGER__("graphics.detail.FFPPass")
+DECLARE_AUTO_LOGGER("graphics.detail.FFPPass")
 
 namespace {
 

@@ -8,7 +8,7 @@
 #include "Graphics/Renderer/FixedPipelineRenderer.h"
 #include "Log/Logger.h"
 
-__DEFINE_LOGGER__("graphics.SkyBoxEffect")
+DECLARE_AUTO_LOGGER("graphics.SkyBoxEffect")
 
 namespace {
 
@@ -39,7 +39,7 @@ void SkyBoxEffect::dirtyShaderTechniques()
                 viewProjectionMatrixBinder.reset( new parameter_binding<math::Matrix4f>(&viewProjectionMatrix, 1, false) );
                 environmentMapBinder.reset( new parameter_binding<sgl::TextureCube>(0, 1, false) );
 
-                EffectShaderProgram program(logger);
+                EffectShaderProgram program(AUTO_LOGGER);
                 program.addShader("Data/Shaders/skybox.vert");
                 program.addShader("Data/Shaders/skybox.frag");
 
@@ -81,7 +81,7 @@ void SkyBoxEffect::dirtyShaderTechniques()
 
             case Renderer::DEFERRED_SHADING:
                 pass.reset();
-                logger << log::S_ERROR << "Deferred renderer is not supported by sky box effect." << std::endl;
+                AUTO_LOGGER_MESSAGE(log::S_ERROR, "Deferred renderer is not supported by sky box effect." << std::endl);
                 break;
         }
     }

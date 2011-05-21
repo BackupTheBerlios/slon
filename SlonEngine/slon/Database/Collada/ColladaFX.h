@@ -1,13 +1,16 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_COLLADA_FX_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_COLLADA_FX_H__
 
-#include "ColladaCommon.h"
 #include <sgl/Image.h>
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Math/Containers.hpp>
 #include <sgl/BlendState.h>
 #include <sgl/DepthStencilState.h>
 #include <sgl/SamplerState.h>
+#include "ColladaCommon.h"
+#ifdef SLON_ENGINE_USE_SSE
+#   include "../../Utility/Memory/aligned.hpp"
+#endif
 
 namespace slon {
 namespace database {
@@ -41,9 +44,9 @@ typedef boost::shared_ptr<collada_param> 				collada_param_ptr;
 typedef boost::shared_ptr<collada_image> 				collada_image_ptr;
 
 // storage typedefs
-typedef prefix_tree<char, collada_material_ptr>			ColladaMaterialStorage;
-typedef prefix_tree<char, collada_effect_ptr>			ColladaEffectStorage;
-typedef prefix_tree<char, collada_image_ptr>			ColladaImageStorage;
+typedef boost::unordered_map<std::string, collada_material_ptr>	ColladaMaterialStorage;
+typedef boost::unordered_map<std::string, collada_effect_ptr>	ColladaEffectStorage;
+typedef boost::unordered_map<std::string, collada_image_ptr>	ColladaImageStorage;
 
 template<> struct library_elements<collada_image>		{ static std::string name() { return "library_images"; } };  
 template<> struct library_elements<collada_effect>		{ static std::string name() { return "library_effects"; } }; 
@@ -74,7 +77,7 @@ public:
 
 /** Represents <newparam> element */
 class collada_param :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	enum PARAM_TYPE
@@ -183,7 +186,7 @@ private:
 
 /** Represents color or texture map parameter */
 class collada_color_or_texture :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	enum TYPE
@@ -256,7 +259,7 @@ public:
 
 /** Represents <states> COLLADA element */
 class collada_states :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     collada_states();
@@ -282,7 +285,7 @@ public:
 
 /** Represents <pass> COLLADA element */
 class collada_pass :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	XMLPP_ELEMENT_SERIALIZATION(collada_pass, ColladaDocument);
@@ -295,7 +298,7 @@ public:
 
 /** Base class for collada technique elements: <phong>, <blinn>, etc. */
 class collada_technique :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	enum TECHNIQUE_TYPE

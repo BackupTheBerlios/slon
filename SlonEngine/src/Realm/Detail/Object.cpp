@@ -8,7 +8,7 @@
 #include "Scene/Visitors/FilterVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
 
-__DEFINE_LOGGER__("realm.Object")
+DECLARE_AUTO_LOGGER("realm.Object")
 
 namespace {
 
@@ -28,17 +28,16 @@ namespace {
 			math::Matrix4f T( rbTransform.getLocalToWorld() );
 			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
 
+			rbTransform.setTransform( math::invert(R) * T ); // physics -> graphics 
 			switch ( rbTransform.getRigidBody()->getDynamicsType() )
 			{
+			case physics::RigidBody::DT_STATIC:
 			case physics::RigidBody::DT_DYNAMIC:
                 rbTransform.setAbsolute(true);
-				rbTransform.setTransform( math::invert(R) * T );
 				break;
 				
-			case physics::RigidBody::DT_STATIC:
 			case physics::RigidBody::DT_KINEMATIC:
                 rbTransform.setAbsolute(false);
-				rbTransform.setTransform( math::invert(T) * R );
 				break;
 
 			default:
@@ -59,11 +58,13 @@ Object::Object(scene::Node*             root_,
                , physics::PhysicsModel* physicsModel_
 #endif
                ) :
+    world(0),
+    infinite(false),
 	location(0),
 	locationData(0),
     dynamic(dynamic_)
 {
-    logger << log::S_FLOOD << "Creating compound object" << LOG_FILE_AND_LINE;
+    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Creating compound object" << LOG_FILE_AND_LINE);
     setRoot(root_);
 #ifdef SLON_ENGINE_USE_PHYSICS
     setPhysicsModel(physicsModel_);
@@ -112,7 +113,7 @@ void Object::setRoot(scene::Node* root_)
     #endif
     }
 
-    logger << log::S_FLOOD << "Resetting root for compound object" << LOG_FILE_AND_LINE;
+    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Resetting root for compound object" << LOG_FILE_AND_LINE);
     root.reset(root_);
     if (root)
     {
@@ -122,7 +123,7 @@ void Object::setRoot(scene::Node* root_)
         aabb = visitor.getBounds();
     
         // print scene graph
-        log::LogVisitor v(&logger, log::S_FLOOD, *root);
+        log::LogVisitor v(AUTO_LOGGER, log::S_FLOOD, *root);
 
     #ifdef SLON_ENGINE_USE_PHYSICS
         if (physicsModel) {
@@ -181,7 +182,7 @@ void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
     physicsModel.reset(physicsModel_);
     if (root)
     {
-        logger << log::S_FLOOD << "Setting physics model for compound object" << LOG_FILE_AND_LINE; 
+        AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Setting physics model for compound object" << LOG_FILE_AND_LINE); 
         
         // set transforms
         if (physicsModel)
@@ -216,7 +217,7 @@ void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
                     }
                 }
                 else {
-                    logger << log::S_WARNING << "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl;
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl);
                 }
             }
 
@@ -228,7 +229,7 @@ void Object::setPhysicsModel(physics::PhysicsModel* physicsModel_)
             DecomposeTransformVisitor dv(*root);
         
             // print scene graph
-            log::LogVisitor lv(&logger, log::S_FLOOD, *root);
+            log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);
         }
     }
 }

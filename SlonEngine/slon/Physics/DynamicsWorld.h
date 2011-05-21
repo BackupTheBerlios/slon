@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 #define __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 
+#include <sgl/Math/AABB.hpp>
+#include <vector>
 #include "../Thread/Lock.h"
 #include "../Utility/referenced.hpp"
 #include "PhysicsModel.h"
-#include <sgl/Math/AABB.hpp>
-#include <vector>
 
 namespace slon {
 namespace physics {
@@ -26,7 +26,7 @@ public:
 
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
-       : public sgl::Aligned16
+       : public aligned<0x10>
 #endif
     {
         math::AABBr     worldSize;
@@ -52,6 +52,15 @@ public:
 
     /** Get gravity of our toy world. */
     virtual math::Vector3r getGravity() const = 0;
+
+    /** Set fixed time step for simulation */
+    virtual void setFixedTimeStep(const real dt) = 0;
+
+    /** Set fixed time step of the simulation */
+    virtual real getFixedTimeStep() const = 0;
+
+	/** Get number of simulation steps performed */
+	virtual size_t getNumSimulatedSteps() const = 0;
 
     /** Get description of the world. */
     virtual const state_desc& getStateDesc() const = 0;

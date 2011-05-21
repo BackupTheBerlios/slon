@@ -30,7 +30,7 @@ namespace {
         return fileNames;
     }
 
-    inline std::string readFile(log::Logger& logger, const std::string& fileName)
+    inline std::string readFile(const log::logger_ptr& logger, const std::string& fileName)
 	{
 		std::string source;
 
@@ -44,7 +44,7 @@ namespace {
 		return source;
     }
 
-    inline sgl::Shader::TYPE getShaderType(log::Logger& logger, const std::string& fileName)
+    inline sgl::Shader::TYPE getShaderType(const log::logger_ptr& logger, const std::string& fileName)
     {
         size_t length = fileName.length();
         if (length >= 4)
@@ -67,7 +67,7 @@ namespace {
     struct make_uber_program :
         public std::unary_function<void, EffectShaderProgram::program_ptr>
     {
-        make_uber_program(log::Logger& _logger, const EffectShaderProgram::uber_program_hash& _hash) :
+        make_uber_program(const log::logger_ptr& _logger, const EffectShaderProgram::uber_program_hash& _hash) :
             logger(_logger),
             hash(_hash)
         {}
@@ -108,8 +108,12 @@ namespace {
                         std::string errorMsg( sglGetErrorMsg() );
                         throw shader_error(logger, "Can't create shader(" + *iter + "):" + errorMsg);
                     }
-                    logger << log::S_NOTICE << "Shader compilation log(" + *iter + "):\n"
-                                             << shader->CompilationLog() << std::endl;
+
+					if (logger)
+					{
+						(*logger) << log::S_NOTICE << "Shader compilation log(" + *iter + "):\n"
+							                       << shader->CompilationLog() << std::endl;
+					}
 
                     program->AddShader(shader);
                     shaderNames += *iter + ",";
@@ -124,8 +128,12 @@ namespace {
                 if ( sgl::SGL_OK != program->Dirty() ) {
                     throw shader_error(logger, "Can't link shader program(" + shaderNames + "):\n" + program->CompilationLog() );
                 }
-                logger << log::S_NOTICE << "Program compilation log(" + shaderNames + "):\n"
-                                         << program->CompilationLog() << std::endl;
+				
+				if (logger)
+				{
+					(*logger) << log::S_NOTICE << "Program compilation log(" + shaderNames + "):\n"
+						                       << program->CompilationLog() << std::endl;
+				}
 
                 // bind all attributes to the default slots
                 for (size_t i = 0; i<program->NumAttributes(); ++i)
@@ -147,7 +155,7 @@ namespace {
         }
 
     private:
-        log::Logger&                                    logger;
+        const log::logger_ptr&                          logger;
         const EffectShaderProgram::uber_program_hash&   hash;
 
     public:
@@ -174,7 +182,7 @@ namespace {
 
 } // anonymous namesapce
 
-EffectShaderProgram::EffectShaderProgram(log::Logger& _effectLogger) :
+EffectShaderProgram::EffectShaderProgram(const log::logger_ptr& _effectLogger) :
     effectLogger(_effectLogger),
     dirty(true)
 {

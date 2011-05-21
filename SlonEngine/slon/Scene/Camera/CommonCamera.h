@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_SCENE_COMMON_CAMERA__
 #define __SLON_ENGINE_SCENE_COMMON_CAMERA__
 
-#include "../../Scene/Camera.h"
-#include "../../Utility/math.hpp"
 #define NOMINMAX // thread may include windows.h
 #include <boost/thread/shared_mutex.hpp>
+#include "../../Scene/Camera.h"
+#include "../../Utility/math.hpp"
 
 namespace slon {
 namespace scene {

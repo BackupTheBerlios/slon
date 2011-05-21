@@ -16,6 +16,7 @@ public:
 
 public:
     StaticMesh(Mesh* mesh);
+    ~StaticMesh();
 
     // Override Entity
     using Entity::accept;

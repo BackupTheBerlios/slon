@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../if_then_else.hpp"
-#include "block_allocator.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/type_traits/has_trivial_constructor.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>
+#include "../if_then_else.hpp"
+#include "block_allocator.hpp"
 
 namespace slon {
 
@@ -55,16 +55,16 @@ public:
 		return p;
 	}
 
+	void destroy(T* p)
+	{
+		my_destroy(p, boost::has_trivial_destructor<T>::type());
+		deallocate(p);
+	}
+
     T* allocate()
     {
         return (T*)blockAllocator.allocate();
     }
-	
-	void destroy(T* p)
-	{
-		my_destroy(p, boost::has_trivial_destructor<T>::type());
-		blockAllocator.deallocate(p);
-	}
 
     void deallocate(T* p)
     {
@@ -76,4 +76,5 @@ public:
 private:
 	block_allocator_type blockAllocator;
 };
+
 } // namespace slon

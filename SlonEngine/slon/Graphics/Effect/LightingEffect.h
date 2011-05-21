@@ -23,6 +23,7 @@ public:
 public:
     LightingEffect(const LightingMaterial*          material,
                    LightingMaterial::dirty_signal&  dirtySignal);
+    ~LightingEffect();
 
     // Override Effect
     int                               present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);

@@ -1,10 +1,10 @@
 #ifndef SLON_ENGINE_SCENE_GRAPH_TRAVERSE_VISITOR_H
 #define SLON_ENGINE_SCENE_GRAPH_TRAVERSE_VISITOR_H
 
-#include "NodeVisitor.h"
 #include <sgl/Math/AABB.hpp>
 #include <stack>
 #include <vector>
+#include "NodeVisitor.h"
 
 namespace slon {
 namespace scene {

@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_PASS_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_PASS_H__
 
-#include "../../Utility/referenced.hpp"
 #include <boost/intrusive_ptr.hpp>
+#include "../../Utility/referenced.hpp"
 
 namespace slon {
 namespace graphics {

@@ -1,11 +1,10 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_CORE_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_CORE_H__
 
+#include <sgl/Program.h>
 #include "../../Scene/MatrixTransform.h"
-#include "../../Utility/Algorithm/prefix_tree.hpp"
 #include "../../Utility/error.hpp"
 #include "ColladaFX.h"
-#include <sgl/Program.h>
 
 namespace slon {
 
@@ -55,9 +54,9 @@ typedef boost::shared_ptr<collada_channel>					collada_channel_ptr;
 typedef boost::shared_ptr<collada_sampler>					collada_sampler_ptr;
 
 // storage typedefs
-typedef prefix_tree<char, collada_visual_scene_ptr>			ColladaVisualSceneStorage;
-typedef prefix_tree<char, collada_geometry_ptr>				ColladaGeometryStorage;
-typedef prefix_tree<char, collada_controller_ptr>			ColladaControllerStorage;
+typedef boost::unordered_map<std::string, collada_visual_scene_ptr>	ColladaVisualSceneStorage;
+typedef boost::unordered_map<std::string, collada_geometry_ptr>		ColladaGeometryStorage;
+typedef boost::unordered_map<std::string, collada_controller_ptr>	ColladaControllerStorage;
 
 template<> struct library_elements<collada_geometry>		{ static std::string name() { return "library_geometries"; } }; 
 template<> struct library_elements<collada_visual_scene>	{ static std::string name() { return "library_visual_scenes"; } };
@@ -353,7 +352,7 @@ void collada_library<collada_geometry>::load(const ColladaDocument& document, co
 
 /** Represents <node> element */
 class collada_node :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
 	enum TYPE
@@ -471,7 +470,7 @@ public:
 
 /** Base class for control elements */
 class collada_control_element :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
 public:
     enum CONTROLLER_TYPE

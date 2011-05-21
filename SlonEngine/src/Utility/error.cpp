@@ -30,63 +30,68 @@ slon_error::slon_error(const std::string& message)
 {
 }
 
-slon_error::slon_error( log::Logger&         logger,
-                        const std::string&   message,
-                        log::SEVERITY   severity )
+slon_error::slon_error( const log::logger_ptr&  logger,
+                        const std::string&		message,
+                        log::SEVERITY			severity )
 :   std::runtime_error(message)
 {
-    logger << severity << message << std::endl;
-    logger.flush(); // need immediate result
+#ifndef DISABLE_LOGGING
+	if (logger)
+	{
+		(*logger) << severity << message << std::endl;
+		logger->flush(); // need immediate result
+	}
+#endif
 }
 
-system_error::system_error( log::Logger&         logger,
-                            const std::string&   message,
-                            log::SEVERITY   severity )
+system_error::system_error( const log::logger_ptr&  logger,
+                            const std::string&		message,
+                            log::SEVERITY			severity )
 :   slon_error(logger, message, severity)
 {
 }
 
-system_error::system_error( log::Logger&         logger,
-                            const std::string&   message,
-                            int                  errorCode,
-                            log::SEVERITY   severity )
+system_error::system_error( const log::logger_ptr&  logger,
+                            const std::string&		message,
+                            int						errorCode,
+                            log::SEVERITY			severity )
 :   slon_error(logger, formatSystemError(message, errorCode), severity)
 {
 }
 
-file_not_found_error::file_not_found_error( log::Logger&         logger,
-                                            const std::string&   message,
-                                            log::SEVERITY   severity )
+file_not_found_error::file_not_found_error( const log::logger_ptr&  logger,
+                                            const std::string&		message,
+                                            log::SEVERITY			severity )
 :   slon_error(logger, message, severity)
 {
 }
 
-io_error::io_error( log::Logger&         logger,
-                    const std::string&   message,
-                    log::SEVERITY   severity )
+io_error::io_error( const log::logger_ptr&  logger,
+                    const std::string&		message,
+                    log::SEVERITY			severity )
 :   slon_error(logger, message, severity)
 {
 }
 
 namespace graphics {
 
-shader_error::shader_error( log::Logger&          logger,
-                            const std::string&    message,
-                            log::SEVERITY    severity )
+shader_error::shader_error( const log::logger_ptr&  logger,
+                            const std::string&		message,
+                            log::SEVERITY			severity )
 :   slon_error(logger, message, severity)
 {
 }
 
-unsupported_error::unsupported_error( log::Logger&         logger,
-                                      const std::string&   message,
-                                      log::SEVERITY   severity )
+unsupported_error::unsupported_error( const log::logger_ptr&    logger,
+                                      const std::string&		message,
+                                      log::SEVERITY				severity )
 :   slon_error(logger, message, severity)
 {
 }
 
-gl_error::gl_error( log::Logger&         logger,
-                    const std::string&   message,
-                    log::SEVERITY   severity )
+gl_error::gl_error( const log::logger_ptr&	logger,
+                    const std::string&		message,
+                    log::SEVERITY			severity )
 :   slon_error(logger, message, severity)
 {
 }

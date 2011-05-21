@@ -1,8 +1,9 @@
 #ifndef __SLON_ENGINE_GRAPHICS_RENDERABLE_DEBUG_MESH_COMMON_H__
 #define __SLON_ENGINE_GRAPHICS_RENDERABLE_DEBUG_MESH_COMMON_H__
 
-#include "../DebugMesh.h"
 #include <cstring>
+#include "../../../Utility/Memory/aligned.hpp"
+#include "../DebugMesh.h"
 
 namespace slon {
 namespace graphics {
@@ -10,7 +11,7 @@ namespace debug {
 
 /** Debug primitive to setup font for the debug text */
 struct font :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     explicit font(const sgl::Font* textFont_ = 0) :
         textFont(textFont_)
@@ -21,7 +22,7 @@ struct font :
 
 /** Debug primitive to setup debug text size */
 struct text_size :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     text_size(int width, int height) :
         size(width, height)
@@ -36,7 +37,7 @@ struct text_size :
 
 /** Debug primitive to print debug text */
 struct text :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     explicit text(const std::string& str_) :
         str(str_)
@@ -77,7 +78,7 @@ struct text :
 
 /** Debug primitive to setup color of the polygons */
 struct color :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     color(float r, float g, float b, float a = 1.0f) :
         colorVal(r, g, b, a)
@@ -92,7 +93,7 @@ struct color :
 
 /** Debug primitive to setup projection transform */
 struct projection :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     projection() :
         useCameraProjection(true)
@@ -109,7 +110,7 @@ struct projection :
 
 /** Debug primitive to setup model transform */
 struct transform :
-    public sgl::Aligned16
+    public aligned<0x10>
 {
     explicit transform(const math::Matrix4f& _matrix) :
         matrix(_matrix)

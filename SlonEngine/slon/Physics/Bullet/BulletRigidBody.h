@@ -54,6 +54,7 @@ public:
     math::Vector3r      getTotalTorque() const;
     math::Matrix4r      getTransform() const;
     real 		        getMass() const;
+	math::Vector3r		getInertiaTensor() const;
     ACTIVATION_STATE    getActivationState() const;
     math::Vector3r      getLinearVelocity() const;
     math::Vector3r      getAngularVelocity() const;

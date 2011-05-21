@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/ServoMotor.h"
 #include "Physics/SpringMotor.h"
 #include "Physics/VelocityMotor.h"
@@ -21,10 +22,10 @@ BulletRotationalMotorBase::BulletRotationalMotorBase(BulletConstraint* constrain
 
 void BulletRotationalMotorBase::reset(BulletConstraint* constraint_, int axis_)
 {
-    constraint = constraint_;
+	assert(constraint_ && axis_ >= 0 && axis_ < 3);
+	constraint = constraint_;
     axis       = axis_;
     motor      = constraint->getBtConstraint()->getRotationalLimitMotor(axis);
-    assert(constraint && axis >= 0 && axis < 3);
 }
 
 template<typename Base>
@@ -38,29 +39,39 @@ template<typename Base>
 void BulletRotationalMotor<Base>::reset(BulletConstraint* constraint, int axis)
 {
     BulletRotationalMotorBase::reset(constraint, axis);
-    velocity = 0.0f;
-    force    = 0.0f;
+	calculateAngleInfo();
 }
 
 template<typename Base>
 void BulletRotationalMotor<Base>::calculateAngleInfo()
 {
-    btRigidBody& bodyA = constraint->getBtConstraint()->getRigidBodyA();
-    btRigidBody& bodyB = constraint->getBtConstraint()->getRigidBodyB();
+    btGeneric6DofConstraint* bConstraint = constraint->getBtConstraint();
 
+    btRigidBody& rbA = constraint->getBtConstraint()->getRigidBodyA();
+    btRigidBody& rbB = constraint->getBtConstraint()->getRigidBodyB();
+    btTransform  trans;
+    
+    // get offset from rigid body CM to joint
+    rbA.getMotionState()->getWorldTransform(trans);
+    btVector3 rA = trans.getBasis() * bConstraint->getFrameOffsetA().getOrigin();
+
+    rbB.getMotionState()->getWorldTransform(trans);
+    btVector3 rB = trans.getBasis() * bConstraint->getFrameOffsetB().getOrigin();
+    
     // position
-    position     = btAdjustAngleToLimits(constraint->getBtConstraint()->getAngle(axis),motor->m_loLimit, motor->m_hiLimit);
+    position = btAdjustAngleToLimits(bConstraint->getAngle(axis), motor->m_loLimit, motor->m_hiLimit);
 
-    // velocity
-    btVector3 ax = constraint->getBtConstraint()->getAxis(axis);
-    btVector3 a  = bodyA.getAngularVelocity();
-    btVector3 b  = bodyB.getAngularVelocity();
-    velocity     = ax.dot(a - b);
+    // convert angular to linear
+    btVector3 ax   = bConstraint->getAxis(axis);
+    btVector3 velA(0,0,0);// = rA.cross( rbA.getAngularVelocity() );
+    btVector3 velB(0,0,0);// = rB.cross( rbB.getAngularVelocity() );
+
+    // correct linear to angular
+    velocity  = (velA + rbA.getLinearVelocity()).dot( ax.cross(rA) ) / rA.length2();
+    velocity += (velB + rbB.getLinearVelocity()).dot( ax.cross(rB) ) / rB.length2();
 
     // force
-    a     = bodyA.getTotalTorque();
-    b     = bodyB.getTotalTorque();
-    force = ax.dot(a - b);
+    force = ax.dot( rbA.getTotalTorque() - rbB.getTotalTorque() );
 }
 
 template<typename Base>

@@ -2,7 +2,7 @@
 #include "FileSystem/Native/File.h"
 #include "Utility/error.hpp"
 
-__DEFINE_LOGGER__("filesystem.File")
+DECLARE_AUTO_LOGGER("filesystem.File")
 
 namespace boost {
 	namespace fs = filesystem;
@@ -18,7 +18,7 @@ File::File(detail::FileSystemManager*       manager,
 :   native::Node<filesystem::File>(manager, systemPath, virtualPath)
 {
    if ( !boost::fs::is_regular_file(systemPath) ) {
-       throw slon_error(logger, "File::File failed. Can't initialized file from non-file path");
+       throw slon_error(AUTO_LOGGER, "File::File failed. Can't initialized file from non-file path");
    }
 }
 

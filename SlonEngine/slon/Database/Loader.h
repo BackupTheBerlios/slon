@@ -1,11 +1,11 @@
 #ifndef __SLON_ENGINE_DATABASE_LOADER_H__
 #define __SLON_ENGINE_DATABASE_LOADER_H__
 
+#include <istream>
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "../Filesystem/Forward.h"
 #include "Forward.h"
-#include <istream>
 
 namespace slon {
 namespace database {
@@ -15,9 +15,9 @@ class loader_error :
     public slon_error
 {
 public:
-    loader_error( log::Logger&         logger,
-                  const std::string&   message,
-                  log::SEVERITY   severity = log::S_ERROR )
+    loader_error( const log::logger_ptr&    logger,
+                  const std::string&		message,
+                  log::SEVERITY				severity = log::S_ERROR )
     :   slon_error(logger, message, severity)
     {}
 

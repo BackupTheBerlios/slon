@@ -1,9 +1,6 @@
 #ifndef SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_SUBSET
 #define SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_SUBSET
 
-#include "../Detail/AttributeTable.h"
-#include "../Effect.h"
-#include "../Renderable.h"
 #include <boost/shared_array.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <sgl/IndexBuffer.h>
@@ -11,6 +8,9 @@
 #include <sgl/Program.h>
 #include <sgl/VertexBuffer.h>
 #include <vector>
+#include "../Detail/AttributeTable.h"
+#include "../Effect.h"
+#include "../Renderable.h"
 
 namespace slon {
 namespace graphics {

@@ -74,10 +74,13 @@ public:
     // Override dynamics world
     void                setGravity(const math::Vector3r& gravity);
     math::Vector3r      getGravity() const;
+    void                setFixedTimeStep(const real dt)             { desc.fixedTimeStep = dt; }
+    real                getFixedTimeStep() const                    { return desc.fixedTimeStep; }
     const state_desc&   getStateDesc() const;
     real                stepSimulation(real dt);
     void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
     unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
+	size_t				getNumSimulatedSteps() const				{ return numSimulatedSteps; }
 
     RigidBody*          createRigidBody(const RigidBody::state_desc& rigidBodyDesc);
     Constraint*         createConstraint(const Constraint::state_desc& constraintDesc);
@@ -108,6 +111,7 @@ private:
 
     // settings 
     unsigned                    maxSubSteps;
+	size_t						numSimulatedSteps;
 
     // for handling contact callbacks
     contact_vector              contacts;

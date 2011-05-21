@@ -1,12 +1,12 @@
 #ifndef __SLON_ENGINE_GRAPHICS_RENDERER_H__
 #define __SLON_ENGINE_GRAPHICS_RENDERER_H__
 
+#include <boost/signals.hpp>
 #include "../Realm/World.h"
 #include "../Scene/Camera.h"
 #include "../Scene/Light.h"
 #include "../Scene/Visitors/NodeVisitor.h"
 #include "Effect.h"
-#include <boost/signals.hpp>
 
 namespace slon {
 namespace graphics {

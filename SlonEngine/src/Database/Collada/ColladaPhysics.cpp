@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
 
-__DEFINE_LOGGER__("database.COLLADA")
+DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace {
 
@@ -226,6 +226,7 @@ void collada_rigid_body::load_technique_common( const ColladaDocument& document,
     collada_serializer serializer;
     serializer  &= xmlpp::make_nvp( "mass",          xmlpp::as_text(mass) );
     serializer  &= xmlpp::make_nvp( "mass_frame",    xmlpp::as_element(massFrame) );
+    serializer  &= xmlpp::make_nvp( "inertia",       xmlpp::as_text(inertia) );
     serializer >>= xmlpp::make_nvp( "dynamic",       xmlpp::make_elem_loader( read_bool(dynamic) ) );
     //serializer &= xmlpp::make_nvp( "instance_physics_material", boost::ref(materialInstance) );
     //serializer &= xmlpp::make_nvp( "physics_material",          read_ptr(materialInstance.element) );
@@ -252,6 +253,7 @@ void collada_instance_rigid_body::serialize( ColladaDocument&  document,
 	serializer &= xmlpp::make_nvp( "target",	    xmlpp::as_attribute(target) );
     serializer &= xmlpp::make_nvp( "mass",          xmlpp::as_text(mass) );
     serializer &= xmlpp::make_nvp( "mass_frame",    xmlpp::as_element(massFrame) );
+    serializer &= xmlpp::make_nvp( "inertia",       xmlpp::as_text(inertia) );
 	serializer.serialize(document, elem, state);
 }
 
@@ -292,7 +294,7 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
         }
 
         if (!iter->element) {
-            throw collada_error(logger, "Can't find rigid body: " + iter->body + "\n for the model: " + url);
+            throw collada_error(AUTO_LOGGER, "Can't find rigid body: " + iter->body + "\n for the model: " + url);
         }
     }
 
@@ -311,7 +313,7 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
         }
 
         if (!iter->element) {
-            throw collada_error(logger, "Can't find constraint: " + iter->constraintStr + "\n for the model: " + url);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint: " + iter->constraintStr + "\n for the model: " + url);
         }
 
         // resolve constraints attachments
@@ -327,13 +329,13 @@ void collada_instance_physics_model::load( const ColladaDocument&   document,
 
         if (!iter->element->attachment.rigidBody)
         {
-            throw collada_error(logger, "Can't find constraint attachment: "
-                                        + iter->element->attachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint attachment: "
+                                             + iter->element->attachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
         }
         else if (!iter->element->refAttachment.rigidBody)
         {
-            throw collada_error(logger, "Can't find constraint attachment: "
-                                        + iter->element->refAttachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
+            throw collada_error(AUTO_LOGGER, "Can't find constraint attachment: "
+                                             + iter->element->refAttachment.rigidBodyStr + "\n for the constraint: " + iter->element->sid);
         }
     }
 }

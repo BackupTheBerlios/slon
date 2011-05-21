@@ -1,11 +1,12 @@
 #include "stdafx.h"
+#include "Log/Formatters.h"
 #include "Log/Logger.h"
 #include "Filesystem/File.h"
 #include "Filesystem/FileSystemManager.h"
 #include "Utility/tmp_file.hpp"
 #include "Utility/Plot/gnuplot.h"
 
-__DEFINE_LOGGER__("utility.gnuplot")
+DECLARE_AUTO_LOGGER("utility.gnuplot")
 
 namespace {
 
@@ -145,13 +146,12 @@ int gnuplot::execute_source(const std::string& source) const
 
     std::ifstream inScript( script.name().c_str() );
     std::ifstream inLog( gnuplotLog.name().c_str() );
-    logger << log::S_FLOOD << "Executing gnuplot script:\n" 
-                           << log::indent() 
-                           << std::string( std::istreambuf_iterator<char>(inScript), std::istreambuf_iterator<char>() )
-                           << "\n=============================================================\n"
-                           << std::string( std::istreambuf_iterator<char>(inLog), std::istreambuf_iterator<char>() )
-                           << log::unindent();
-    logger.flush();
+    AUTO_LOGGER_MESSAGE( log::S_FLOOD, "Executing gnuplot script:\n" 
+                                       << log::indent() 
+                                       << std::string( std::istreambuf_iterator<char>(inScript), std::istreambuf_iterator<char>() )
+                                       << "\n=============================================================\n"
+                                       << std::string( std::istreambuf_iterator<char>(inLog), std::istreambuf_iterator<char>() )
+                                       << log::unindent() );
 
 	return result;
 }

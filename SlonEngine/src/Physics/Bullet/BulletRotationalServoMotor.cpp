@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 #include "Physics/Bullet/BulletRotationalServoMotor.h"
@@ -26,11 +27,35 @@ void BulletRotationalServoMotor::solve(real dt)
     btRigidBody& rbA = constraint->getRigidBodyA();
     btRigidBody& rbB = constraint->getRigidBodyB();
 
+    btTransform  trans;
+		   /*
+    rbA.getMotionState()->getWorldTransform(trans);
+    btVector3 rA     = trans.getBasis() * constraint->getFrameOffsetA().getOrigin();
+    btVector3 forceA = targetForce * constraint->getAxis(axis).cross(rA) / rA.length2();
+    rbA.applyCentralForce(forceA);
+    rbA.activate(true);
+
+    rbB.getMotionState()->getWorldTransform(trans);
+    btVector3 rB     = trans.getBasis() * constraint->getFrameOffsetB().getOrigin();
+    btVector3 forceB = targetForce * constraint->getAxis(axis).cross(rB) / rB.length2();
+    rbB.applyCentralForce(forceB);
+    rbB.activate(true);
+		*/
     btVector3 torque = constraint->getAxis(axis) * targetForce;
     rbA.applyTorque( torque);
     rbA.activate(true);
     rbB.applyTorque(-torque);
     rbB.activate(true);
+	/*
+    btVector3 torque = constraint->getAxis(axis) * targetForce;
+	btScalar  lA     = constraint->getFrameOffsetA().getOrigin().length2();
+	btScalar  lB     = constraint->getFrameOffsetB().getOrigin().length2();
+
+    rbA.applyTorque(  torque * lB / (lA + lB) );
+    rbA.activate(true);
+    rbB.applyTorque( -torque * lA / (lA + lB) );
+    rbB.activate(true);
+	*/
 }
 
 void BulletRotationalServoMotor::accept(BulletSolverCollector& collector)

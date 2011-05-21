@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_JOINT_H__
 #define __SLON_ENGINE_SCENE_JOINT_H__
 
-#include "MatrixTransform.h"
 #include <sgl/Math/Quaternion.hpp>
+#include "MatrixTransform.h"
 
 namespace slon {
 namespace scene {

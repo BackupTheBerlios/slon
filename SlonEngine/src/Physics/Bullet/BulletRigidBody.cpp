@@ -1,32 +1,35 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Engine.h"
+#include "Log/Formatters.h"
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 
+DECLARE_AUTO_LOGGER("physics.BulletRigidBody")
+
 namespace slon {
 namespace physics {
 
-__DEFINE_LOGGER__("physics.BulletRigidBody")
-
 namespace {
 
-	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(const RigidBody::state_desc& desc, btMotionState& motionState)
+	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(RigidBody::state_desc& desc, btMotionState& motionState)
 	{
 		btCollisionShape* collisionShape = 0;
-        btVector3         localInertia   = btVector3(0.0, 0.0, 0.0);
+        btVector3         localInertia   = to_bt_vec(desc.inertia);
+		btTransform		  massFrame      = to_bt_mat(desc.transform);
+
         if (desc.collisionShape)
 		{
-            real minDimension;
-		    collisionShape = createBtCollisionShape(*desc.collisionShape, minDimension);
-			collisionShape->setMargin(desc.relativeMargin * minDimension + desc.margin);
-            
-            if ( desc.mass > real(0.0) ) {
+		    collisionShape = createBtCollisionShape(*desc.collisionShape, desc.relativeMargin, desc.margin);
+            if ( desc.mass > real(0.0) && localInertia.isZero() ) 
+			{
                 collisionShape->calculateLocalInertia(desc.mass, localInertia);
-            }
+				desc.inertia = to_vec(localInertia);
+			}
 		}
-		motionState.setWorldTransform( to_bt_mat(desc.transform) );
-		
+		motionState.setWorldTransform(massFrame);
+
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}
@@ -115,6 +118,7 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	   << "transform =\n{\n" << log::indent() << desc.transform << log::unindent() << "\n}\n"
 	   << "type = " << desc.type << std::endl
 	   << "mass = " << desc.mass << std::endl
+	   << "inertia = " << desc.inertia << std::endl
 	   << "margin = " << desc.margin << std::endl
 	   << "relativeMargin = " << desc.relativeMargin << std::endl
 	   << "linearVelocity = {" << desc.linearVelocity << "}\n"
@@ -173,7 +177,7 @@ BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
     }
     desc.collisionShape.reset(collisionShape);
 
-	logger << log::S_FLOOD << "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE;
+	AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Creating rigid body from btRigidBody:\n" << desc << LOG_FILE_AND_LINE);
 }
 
 BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWorld* dynamicsWorld_) :
@@ -230,6 +234,11 @@ math::Matrix4r BulletRigidBody::getTransform() const
 real BulletRigidBody::getMass() const
 {
 	return desc.type == DT_DYNAMIC ? 1.0f / rigidBody->getInvMass() : 0.0f;
+}
+
+math::Vector3r BulletRigidBody::getInertiaTensor() const
+{
+	return desc.inertia;
 }
 
 RigidBody::ACTIVATION_STATE BulletRigidBody::getActivationState() const
@@ -361,7 +370,7 @@ void BulletRigidBody::destroy(bool unlinkConstraints)
         }
         rigidBody.reset();
 
-		logger << log::S_FLOOD << "Destroying rigid body" << LOG_FILE_AND_LINE;
+		AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Destroying rigid body" << LOG_FILE_AND_LINE);
     }
 }
 
@@ -371,14 +380,15 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
 
     // remove old rigid body
     destroy(false);
-
-	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc_, *motionState) ) );
+	
+    desc = desc_;
+	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
     rigidBody->setUserPointer(this);
-	rigidBody->setLinearVelocity( to_bt_vec(desc_.linearVelocity) );
-	rigidBody->setAngularVelocity( to_bt_vec(desc_.angularVelocity) );
+	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
+	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );
 
     // static or dynamic rb
-    if (desc_.type != RigidBody::DT_DYNAMIC)
+    if (desc.type != RigidBody::DT_DYNAMIC)
     {
         int flags = desc_.type == RigidBody::DT_KINEMATIC ? btCollisionObject::CF_KINEMATIC_OBJECT : btCollisionObject::CF_STATIC_OBJECT;
         rigidBody->setCollisionFlags( rigidBody->getCollisionFlags() | flags );
@@ -391,13 +401,12 @@ void BulletRigidBody::reset(const RigidBody::state_desc& desc_)
     }
 
     // remember
-    desc = desc_;
     toggleSimulation(isInWorld);
 
     // call handlers
     onResetSignal(*this);
 
-	logger << log::S_FLOOD << "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE;
+    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE);
 }
 
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)

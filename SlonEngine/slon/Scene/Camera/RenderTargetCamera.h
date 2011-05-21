@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_CAMERA_RENDER_TARGET_CAMERA__
 #define __SLON_ENGINE_CAMERA_RENDER_TARGET_CAMERA__
 
-#include "../../Scene/Camera.h"
 #include <sgl/RenderTarget.h>
+#include "../../Scene/Camera.h"
 
 namespace slon {
 namespace scene {

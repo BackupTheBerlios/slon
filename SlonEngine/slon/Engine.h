@@ -85,6 +85,9 @@ public:
     /** Get singleton engine instance */
     static Engine* Instance();
 
+    /** Free engine */
+    static void Free();
+
     virtual ~Engine() {}
 };
 

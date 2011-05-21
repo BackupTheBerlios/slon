@@ -1,9 +1,10 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Detail/PhysicsManager.h"
 #include "Thread/Utility.h"
 
 #ifdef SLON_ENGINE_USE_BULLET
-#include "Physics/Bullet/BulletDynamicsWorld.h"
+#   include "Physics/Bullet/BulletDynamicsWorld.h"
 #endif
 
 namespace slon {

@@ -12,7 +12,7 @@
 #   include "Database/Bullet/Bullet.h"
 #endif
 
-__DEFINE_LOGGER__("engine")
+DECLARE_AUTO_LOGGER("Engine")
 
 namespace {
 
@@ -75,45 +75,51 @@ namespace {
 
     // handler for sgl errors
     class LogErrorHandler :
-        public sgl::ReferencedImpl<sgl::ErrorHandler>
+		public sgl::ErrorHandler
     {
     public:
-        LogErrorHandler(const std::string& logName) :
-            logger(logName)
+        LogErrorHandler(const std::string& logName, bool breakOnError_)
+        :   logger( log::currentLogManager().createLogger(logName) )
+		,	breakOnError(breakOnError_)
         {}
 
         // Override error handler
 	    void HandleError(SGL_HRESULT result, const char* msg)
 	    {
+			if (breakOnError) {
+				debug_break();
+			}
+
 		    switch(result)
 		    {
 		    case SGLERR_INVALID_CALL:
-			    logger << log::S_ERROR << "Invalid call: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Invalid call: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_OUT_OF_MEMORY:
-			    logger << log::S_ERROR << "Out of memory: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Out of memory: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_FILE_NOT_FOUND:
-			    logger << log::S_ERROR << "File not found: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "File not found: " << msg << std::endl;
 			    break;
 
 		    case SGLERR_UNSUPPORTED:
-			    logger << log::S_ERROR << "Unsupported function: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Unsupported function: " << msg << std::endl;
 			    break;
 
 		    default:
-			    logger << log::S_ERROR << "Unknown error: " << msg << std::endl;
+			    (*logger) << log::S_ERROR << "Unknown error: " << msg << std::endl;
 			    break;
 		    }
 	    }
 
     private:
-        log::Logger logger;
+        log::logger_ptr logger;
+		bool			breakOnError;
     };
 
-    sgl::ref_ptr<LogErrorHandler> logErrorHandler;
+    LogErrorHandler* logErrorHandler;
 
     template<sgl::Image::FILE_TYPE format>
     class ImageLoader :
@@ -171,8 +177,8 @@ void Engine::init()
     filesystemManager->mount( fs::system_complete( fs::current_path() ).file_string().c_str(), "/" );
 
     // Setup error logger
-    logErrorHandler.reset( new LogErrorHandler("graphics.sgl") );
-    sglSetErrorHandler( logErrorHandler.get() );
+    logErrorHandler = new LogErrorHandler("graphics.sgl", true);
+    sglSetErrorHandler(logErrorHandler);
 
     // redirect loggers
     logManager.redirectOutput("", "log.txt");
@@ -226,7 +232,7 @@ void Engine::init()
 
     // init SDL
     if ( SDL_Init(SDL_INIT_VIDEO) < 0 && !SDL_GetVideoInfo() ) {
-        throw slon_error(logger, "Can't init SDL");
+        throw slon_error(AUTO_LOGGER, "Can't init SDL");
     }
 
     // setup timer for PhysicsManager
@@ -281,8 +287,11 @@ void Engine::run(const DESC& desc_)
             thread::lock_ptr lock = world.lockForWriting();
             for (size_t i = 0; i<updateQueue.size(); ++i) 
             {
-                updateQueue[i]->traverse(traverser);
-                world.update(updateQueue[i].get());
+                if ( updateQueue[i]->isInWorld() )
+                {
+                    updateQueue[i]->traverse(traverser);
+                    world.update(updateQueue[i].get());
+                }
             }
             updateQueue.clear();
         }
@@ -334,8 +343,11 @@ void Engine::frame()
         thread::lock_ptr lock = world.lockForWriting();
         for (size_t i = 0; i<updateQueue.size(); ++i) 
         {
-            updateQueue[i]->traverse(traverser);
-            world.update(updateQueue[i].get());
+            if ( updateQueue[i]->isInWorld() )
+            {
+                updateQueue[i]->traverse(traverser);
+                world.update(updateQueue[i].get());
+            }
         }
         updateQueue.clear();
     }
@@ -350,11 +362,12 @@ void Engine::frame()
 
 Engine::~Engine()
 {
+	sglSetErrorHandler(0);
+	delete logErrorHandler;
 }
 
 } // namespace detail
 
-/** Get singleton engine instance */
 Engine* Engine::Instance()
 {
     if (!detail::Engine::engineInstance) {
@@ -362,6 +375,16 @@ Engine* Engine::Instance()
     }
 
     return detail::Engine::engineInstance;
+}
+
+void Engine::Free()
+{
+    delete detail::Engine::engineInstance;
+#ifdef _DEBUG
+    freopen("leaks.txt", "w", stderr);
+    check_mem_corruption();
+    check_leaks();
+#endif
 }
 
 // Define manager get funcs

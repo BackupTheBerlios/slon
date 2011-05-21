@@ -1,3 +1,4 @@
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Engine.h"
 #include "Animation/Animation.h"
 #include "Database/Collada/Collada.h"

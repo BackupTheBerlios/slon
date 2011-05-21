@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Database/Bullet/Bullet.h"
 #include "Filesystem/File.h"
 #include "Physics/PhysicsManager.h"
@@ -12,7 +13,7 @@
 #include <bullet/Extras/Serialize/BulletWorldImporter/btBulletWorldImporter.h>
 #include <bullet/LinearMath/btSerializer.h>
 
-__DEFINE_LOGGER__("database.Bullet")
+DECLARE_AUTO_LOGGER("Database.Bullet")
 
 namespace slon {
 namespace database {
@@ -100,7 +101,7 @@ physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
             }
 
             default:
-                logger << log::S_ERROR << "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'";
+                AUTO_LOGGER_MESSAGE(log::S_ERROR, "Unsupported constraint type. Skipping '" << fileLoader->getNameForPointer(constraint.get()) << "'");
                 btWorld->removeConstraint( constraint.get() );
                 break;
         };
