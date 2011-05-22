@@ -1,6 +1,10 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Group.h"
+#include "Utility/error.hpp"
+
+DECLARE_AUTO_LOGGER("scene.Node");
 
 namespace slon {
 namespace scene {
@@ -32,6 +36,39 @@ void Node::accept(log::LogVisitor& visitor) const
             visitor << " '" << getName() << "'";
         }
         visitor << " {}\n";
+    }
+}
+
+const char* Node::getSerializableName() const    
+{ 
+    return "scene::Node";
+}
+
+void Node::serialize(database::OArchive& ar) const
+{
+    if ( ar.getVersion() < database::getVersion(1, 0, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+    ar.writeStringChunk( "name", name.str().data(), name.str().length() );
+}
+
+void Node::deserialize(database::IArchive& ar)
+{
+    if ( ar.getVersion() < database::getVersion(1, 0, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+    database::IArchive::chunk_info info;
+    if ( ar.openChunk("name", info) )
+    {
+        if (!info.isLeaf) {
+            throw database::serialization_error(AUTO_LOGGER, "Chunk is not leaf");
+        }
+
+        std::string str(info.size, ' ');
+        ar.readString(&str[0]);
+        name = str;
     }
 }
 

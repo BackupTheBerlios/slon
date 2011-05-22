@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_SCENE_NODE_H__
 #define __SLON_ENGINE_SCENE_NODE_H__
 
+#include "../Database/Serializable.h"
 #include "../Log/Forward.h"
 #include "../Realm/Forward.h"
 #include "../Utility/hash_string.hpp"
@@ -12,8 +13,9 @@ namespace scene {
 /** Tree Node class. Stores hierarchy. Use intrusive ptr
  * on scene graph structures. You can't construct nodes on the stack.
  */
-class Node :
-    public Referenced
+class Node
+:   public Referenced
+,   public database::Serializable
 {
 friend class Group;
 public:
@@ -52,6 +54,11 @@ private:
 public:
     Node();
     explicit Node(hash_string name);
+
+    // Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     /** Get type of the node */
     virtual TYPE getNodeType() const { return NODE; }
@@ -97,12 +104,6 @@ public:
 
 	/** Set object which holds this node */
 	void setObject(realm::Object* object_) { object = object_; }
-    
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
-    {
-        ar & BOOST_SERIALIZATION_NVP(name);
-    }
 
     virtual ~Node() {}
 

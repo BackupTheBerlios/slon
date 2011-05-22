@@ -25,12 +25,15 @@ SET ( TARGET_ANIMATION_DETAIL_HEADERS
 )
 
 SET ( TARGET_DATABASE_HEADERS
+    ${TARGET_HEADER_PATH}/Database/Archive.h
     ${TARGET_HEADER_PATH}/Database/Cache.h
     ${TARGET_HEADER_PATH}/Database/DatabaseManager.h
     ${TARGET_HEADER_PATH}/Database/Forward.h
     ${TARGET_HEADER_PATH}/Database/Library.h
     ${TARGET_HEADER_PATH}/Database/Loader.h
+    ${TARGET_HEADER_PATH}/Database/NVP.h
     ${TARGET_HEADER_PATH}/Database/Saver.h
+    ${TARGET_HEADER_PATH}/Database/Serializable.h
     ${TARGET_HEADER_PATH}/Database/Storage.h
 )
 
@@ -41,7 +44,7 @@ SET ( TARGET_DATABASE_BULLET_HEADERS
 SET ( TARGET_DATABASE_PROPRIETARY_HEADERS
     ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLLoader.h
     ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLSaver.h
-    ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLSerializer.h
+    ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLArchive.h
 )
 
 SET ( TARGET_DATABASE_COLLADA_HEADERS
@@ -468,9 +471,9 @@ SET ( TARGET_DATABASE_BULLET_SOURCES
 )
 
 SET ( TARGET_DATABASE_PROPRIETARY_SOURCES
+    Database/Proprietary/SXMLArchive.cpp
     Database/Proprietary/SXMLLoader.cpp
     Database/Proprietary/SXMLSaver.cpp
-    Database/Proprietary/SXMLSerializer.cpp
 )
 
 SET ( TARGET_DATABASE_COLLADA_SOURCES

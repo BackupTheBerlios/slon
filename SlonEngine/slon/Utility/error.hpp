@@ -73,6 +73,21 @@ public:
 	~io_error() throw() {} 
 };
 
+namespace database {
+
+    class serialization_error :
+        public slon_error
+    {
+    public:
+        serialization_error( const log::logger_ptr&	logger,
+                             const std::string&		message,
+                             log::SEVERITY          severity = log::S_ERROR );
+
+	    ~serialization_error() throw() {} 
+    };
+
+} // namespace database
+
 namespace graphics {
 
     /** Error occured during loading, compiling or linking shaders. */

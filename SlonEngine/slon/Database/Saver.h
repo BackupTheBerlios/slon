@@ -1,10 +1,11 @@
 #ifndef __SLON_ENGINE_DATABASE_SAVER_H__
 #define __SLON_ENGINE_DATABASE_SAVER_H__
 
-#include <ostream>
+#include "../FileSystem/Forward.h"
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
+#include <ostream>
 
 namespace slon {
 namespace database {

@@ -73,28 +73,39 @@ io_error::io_error( const log::logger_ptr&  logger,
 {
 }
 
+namespace database {
+
+    serialization_error::serialization_error( const log::logger_ptr&	logger,
+                                              const std::string&		message,
+                                              log::SEVERITY             severity = log::S_ERROR )
+    :   slon_error(logger, message, severity)
+    {
+    }
+
+} // namespace database
+
 namespace graphics {
 
-shader_error::shader_error( const log::logger_ptr&  logger,
-                            const std::string&		message,
-                            log::SEVERITY			severity )
-:   slon_error(logger, message, severity)
-{
-}
+    shader_error::shader_error( const log::logger_ptr&  logger,
+                                const std::string&		message,
+                                log::SEVERITY			severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
-unsupported_error::unsupported_error( const log::logger_ptr&    logger,
-                                      const std::string&		message,
-                                      log::SEVERITY				severity )
-:   slon_error(logger, message, severity)
-{
-}
+    unsupported_error::unsupported_error( const log::logger_ptr&    logger,
+                                          const std::string&		message,
+                                          log::SEVERITY				severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
-gl_error::gl_error( const log::logger_ptr&	logger,
-                    const std::string&		message,
-                    log::SEVERITY			severity )
-:   slon_error(logger, message, severity)
-{
-}
+    gl_error::gl_error( const log::logger_ptr&	logger,
+                        const std::string&		message,
+                        log::SEVERITY			severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
 } // namespace graphics
 } // namespace slon

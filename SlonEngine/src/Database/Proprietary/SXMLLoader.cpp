@@ -13,7 +13,7 @@ namespace slon {
 namespace database {
 
 library_ptr SXMLLoader::load(filesystem::File* file)
-{    
+{    /*
     // read file content
     if ( !file->open(filesystem::File::in) ) {
         throw file_error(AUTO_LOGGER, "Can't open *.sxml file for reading");
@@ -36,6 +36,8 @@ library_ptr SXMLLoader::load(filesystem::File* file)
     library->physicsScenes = serializer.physicsScenes;
 #endif
     return library;
+    */
+    return library_ptr();
 }
 
 } // namespace database
