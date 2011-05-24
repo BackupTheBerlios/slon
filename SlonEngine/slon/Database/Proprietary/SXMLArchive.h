@@ -56,7 +56,7 @@ public:
             ss << values[i] << " ";
         }
 
-        child.set_text(ss);
+        child.set_text( ss.str().c_str() );
         currentElement.add_child(child);
     }
 

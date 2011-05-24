@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Detail/Library.h"
 #include "Database/Proprietary/SXMLLoader.h"
-#include "Database/Proprietary/SXMLSerializer.h"
+#include "Database/Proprietary/SXMLArchive.h"
 #include "Log/Logger.h"
 #include "FileSystem/File.h"
 #include <xml++/document.h>

@@ -244,7 +244,7 @@ void collada_instance_geometry::load(const ColladaDocument& document,
     if ( !elem.has_attribute("url") ) {
         throw collada_error(AUTO_LOGGER, "Missing url in the <instance_geometry> element", elem);
     }
-    geometry = document.libraryGeometries.get_element( elem.get_attribute("url").substr(1) );
+    geometry = document.libraryGeometries.get_element( std::string(elem.get_attribute("url")).substr(1) );
 
     xmlpp::const_element_iterator bindMaterialIter = elem.first_child_element("bind_material");
     if (bindMaterialIter)

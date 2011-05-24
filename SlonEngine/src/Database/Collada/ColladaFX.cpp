@@ -431,13 +431,13 @@ void collada_effect::load_profile_COMMON( const ColladaDocument&  document,
 
 	// read technique according to type
 	collada_technique_ptr technique;
-	if ( techniqueIter->get_value() == "phong" ) {
+	if ( techniqueIter->get_value() == std::string("phong") ) {
 		technique.reset( new collada_phong_technique(this) );
 	}
-	else if ( techniqueIter->get_value() == "blinn" ) {
+	else if ( techniqueIter->get_value() == std::string("blinn") ) {
 		technique.reset( new collada_phong_technique(this) );
 	}
-	else if ( techniqueIter->get_value() == "lambert" ) {
+	else if ( techniqueIter->get_value() == std::string("lambert") ) {
 		technique.reset( new collada_phong_technique(this) );
 	}
 	else

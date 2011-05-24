@@ -384,7 +384,7 @@ struct text_serialization_policy< slon::database::collada_optional<T> >
         if ( ss.fail() ) {
             throw dom_error("Can't read element value.");
         }
-        e.set_text( ss.str() );
+        e.set_text( ss.str().c_str() );
     }
 
     bool valid(const slon::database::collada_optional<T>& val, xmlpp::s_state s) const { return val.specified || (s == xmlpp::LOAD); }

@@ -77,7 +77,7 @@ namespace database {
 
     serialization_error::serialization_error( const log::logger_ptr&	logger,
                                               const std::string&		message,
-                                              log::SEVERITY             severity = log::S_ERROR )
+                                              log::SEVERITY             severity )
     :   slon_error(logger, message, severity)
     {
     }
