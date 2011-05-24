@@ -9,7 +9,7 @@
 #ifdef SLON_ENGINE_USE_PHYSICS
 #   include "../../Physics/PhysicsModel.h"
 #endif
-
+/*
 namespace slon {
 namespace database {
 namespace detail {
@@ -43,5 +43,5 @@ typedef boost::intrusive_ptr<const Library>	const_library_ptr;
 }
 }
 }
-
+*/
 #endif // __SLON_ENGINE_DATABASE_DETAIL_LIBRARY_H__

@@ -1525,7 +1525,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 	ColladaDocument document;
 	document.set_source( fileContent.length(), fileContent.data() );
 
-	detail::library_ptr library(new detail::Library);
+	library_ptr			library(new Library);
 	scene::group_ptr	root(new scene::Group);
 	SceneBuilder	    visualBuilder(document);
 	for ( visual_scene_set::iterator iter  = document.libraryVisualScenes.elements.begin();

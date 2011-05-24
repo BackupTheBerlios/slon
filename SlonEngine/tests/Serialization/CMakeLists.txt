@@ -7,5 +7,6 @@ TARGET_LINK_LIBRARIES( ${TEST_NAME}
 )
 
 SET_TARGET_PROPERTIES( ${TEST_NAME} PROPERTIES
-    FOLDER "Test"
+                       RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"
+                       FOLDER                   "Test"
 )

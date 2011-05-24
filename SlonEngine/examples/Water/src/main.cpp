@@ -270,7 +270,7 @@ public:
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/castle.DAE");
-                world.add(library->getVisualScenes().front().second.get());
+                world.add(library->visualScenes[0].second.get());
 
                 // create light
                 scene::DirectionalLight* light = new DirectionalLight();

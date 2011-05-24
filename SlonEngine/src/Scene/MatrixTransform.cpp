@@ -15,6 +15,15 @@ MatrixTransform::MatrixTransform() :
 	localToWorld = transform    = math::make_identity<float, 4>();
     worldToLocal = invTransform = math::make_identity<float, 4>();
 }
+	
+MatrixTransform::MatrixTransform(const math::Matrix4f& transform_) :
+	transform(transform_),
+    transformDirty(false),
+    invTransformDirty(true)
+{
+	localToWorld = math::make_identity<float, 4>();
+    worldToLocal = math::make_identity<float, 4>();
+}
 
 // Override transform
 const math::Matrix4f& MatrixTransform::getTransform() const

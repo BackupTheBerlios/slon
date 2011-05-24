@@ -117,9 +117,9 @@ public:
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
-                world.add(library->getVisualScenes().front().second.get());
+                world.add(library->visualScenes[0].second.get());
 
-				database::Library::key_animation_array animations = library->getAnimations();
+				database::Library::key_animation_array animations = library->animations;
 				if ( !animations.empty() )
 				{
 					StartStopTimer* timer = new StartStopTimer();

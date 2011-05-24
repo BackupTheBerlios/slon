@@ -15,6 +15,7 @@ class MatrixTransform :
 {
 public:
     MatrixTransform();
+    MatrixTransform(const math::Matrix4f& transform);
 
     // Override Node
     void accept(log::LogVisitor& visitor) const;

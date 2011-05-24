@@ -49,7 +49,8 @@ private:
 public:
     DatabaseManager();
 	~DatabaseManager();
-
+	
+    LibraryCache&		getLibraryCache()		{ return libraryCache; }
 	AnimationCache&		getAnimationCache()     { return animationCache; }
     EffectCache&        getEffectCache()        { return effectCache; }
     TextureCache&       getTextureCache()       { return textureCache; }
@@ -87,6 +88,9 @@ public:
     void                 unregisterLibrarySaver(format_id format, LibrarySaver* saver)			{ libraryCache.unregisterSaver(format, saver); }
     size_t               unregisterLibrarySaver(LibrarySaver* saver)							{ return libraryCache.unregisterSaver(saver); }
     void                 clearLibrarySavers()													{ libraryCache.clearSavers(); }
+
+private:
+	format_desc* unwrap(format_id format) const;
 
 private:
     LibraryCache        libraryCache;
@@ -165,6 +169,19 @@ inline void registerSavers(size_t numSavers, fmt_saver<T>* savers)
         
         format_id fmtId = cache.registerFormat(fmtExpr);
         cache.registerSaver(fmtId, typename fmt_saver<T>::saver_ptr(savers[i].fmtSaver));
+    }
+}
+
+template<>
+inline void registerSavers<database::Library>(size_t numSavers, fmt_saver<database::Library>* savers)
+{
+    database::DatabaseManager& manager = currentDatabaseManager();
+    for (size_t i = 0; i<numSavers; ++i)
+    {
+        std::vector<std::string> fmtExpr(savers[i].fmtExpr, savers[i].fmtExpr + savers[i].numExpr);
+        
+        format_id fmtId = manager.registerLibraryFormat(fmtExpr);
+        manager.registerLibrarySaver(fmtId, fmt_saver<database::Library>::saver_ptr(savers[i].fmtSaver));
     }
 }
 

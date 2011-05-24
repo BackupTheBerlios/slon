@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
+#include "Database/Proprietary/SXMLSaver.h"
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
@@ -185,7 +186,7 @@ void Engine::init()
     logManager.redirectOutputToConsole("database");
     logManager.redirectOutputToConsole("graphics");
 
-    // initialize loaders
+    // initialize loaders & savers
     {
         using namespace database::detail;
 
@@ -195,6 +196,13 @@ void Engine::init()
             {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader}
         };
         database::detail::registerLoaders<database::Library>(numLibraryLoaders, libraryLoaders);
+
+        const size_t                    numLibrarySavers = 1;
+        fmt_saver<database::Library>    librarySavers[numLibrarySavers] = 
+        {
+            {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLSaver}
+        };
+        database::detail::registerSavers<database::Library>(numLibrarySavers, librarySavers);
     
         const size_t                    numImageFormats = 11;
         fmt_loader<graphics::Texture>   imageLoaders[numImageFormats] =

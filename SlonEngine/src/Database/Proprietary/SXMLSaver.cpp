@@ -21,8 +21,8 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
     {
         typedef Library::key_visual_scene_array::const_iterator const_scene_iterator;
 
-        for (const_scene_iterator it  = library->getVisualScenes().begin();
-                                  it != library->getVisualScenes().end();
+        for (const_scene_iterator it  = library->visualScenes.begin();
+                                  it != library->visualScenes.end();
                                    ++it)
         {
             ar.openChunk("VisualScene");

@@ -34,26 +34,15 @@ public:
 #ifdef SLON_ENGINE_USE_PHYSICS
     typedef storage_type<physics::PhysicsModel>::type  key_physics_scene_array;
 #endif
-
+	
 public:
-    /** Enumerate loaded effects */
-    virtual key_animation_array getAnimations() const = 0;
-
-    /** Enumerate loaded effects */
-    virtual key_effect_array getEffects() const = 0;
-
-    /** Enumerate loaded textures */
-    virtual key_texture_array getTextures() const = 0;
-
-    /** Enumerate loaded visual scenes */
-    virtual key_visual_scene_array getVisualScenes() const = 0;
-
+	key_animation_array		animations;
+    key_effect_array        effects;
+    key_texture_array       textures;
+    key_visual_scene_array  visualScenes;
 #ifdef SLON_ENGINE_USE_PHYSICS
-    /** Enumerate loaded physics scenes */
-    virtual key_physics_scene_array getPhysicsScenes() const = 0;
+    key_physics_scene_array physicsScenes;
 #endif
-
-    virtual ~Library() {}
 };
 
 } // namespace database

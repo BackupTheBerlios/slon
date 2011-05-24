@@ -51,6 +51,17 @@ DatabaseManager::~DatabaseManager()
 {
 }
 
+DatabaseManager::format_desc* DatabaseManager::unwrap(format_id format) const
+{
+    if (format.pObj)
+    {
+        format_desc* fdesc = reinterpret_cast<format_desc*>(format.pObj);
+        return fdesc;
+    }
+
+    return 0;
+}
+
 DatabaseManager::format_desc DatabaseManager::makeFormatDesc(format_id id, const string_array& regexps)
 {
     format_desc desc;
@@ -75,11 +86,11 @@ void DatabaseManager::addLibraryObjects(const database::Library& library,
                                         const std::string&       keyPrefix,
                                         bool                     ignoreDuplicates)
 {
-    addObjects(effectCache, library.getEffects(), keyPrefix, ignoreDuplicates);
-    addObjects(textureCache, library.getTextures(), keyPrefix, ignoreDuplicates);
-    addObjects(visualSceneCache, library.getVisualScenes(), keyPrefix, ignoreDuplicates);
+    addObjects(effectCache, library.effects, keyPrefix, ignoreDuplicates);
+    addObjects(textureCache, library.textures, keyPrefix, ignoreDuplicates);
+    addObjects(visualSceneCache, library.visualScenes, keyPrefix, ignoreDuplicates);
 #ifdef SLON_ENGINE_USE_PHYSICS
-    addObjects(physicsSceneCache, library.getPhysicsScenes(), keyPrefix, ignoreDuplicates);
+    addObjects(physicsSceneCache, library.physicsScenes, keyPrefix, ignoreDuplicates);
 #endif
 }
 
@@ -157,6 +168,13 @@ library_ptr loadLibrary(const std::string& path,
                         bool               ignoreDuplicates)
 {
     return currentDatabaseManager().loadLibrary(path, path, format, ignoreDuplicates);
+}
+
+bool saveLibrary(const std::string& path,
+				 const library_ptr& library,
+                 format_id          format)
+{
+	return static_cast<detail::DatabaseManager&>(currentDatabaseManager()).getLibraryCache().save(path, library, format);
 }
 
 graphics::texture_ptr loadTexture(const std::string& path,
