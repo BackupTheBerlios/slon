@@ -13,10 +13,15 @@ class Group :
     public Node
 {
 public:
+    // Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Get type of the node */
     TYPE getNodeType() const { return GROUP; }
     void accept(log::LogVisitor& visitor) const;
-    
+
     /** Add child to the group.
      * @param child - new subnode of this group. If node has parent it will be removed from it.
 	 * @param left - left node for the child.

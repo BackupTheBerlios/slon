@@ -71,7 +71,7 @@ bool FileSystemManager::unmount(const char* systemPath, const char* virtualPath)
 filesystem::Node* FileSystemManager::getNode(const char* path)
 {
     std::string pathStr(path);
-    if (pathStr[0] == '.' && pathStr[1] == '/') {
+    if (pathStr.length() >= 2 && pathStr[0] == '.' && pathStr[1] == '/') {
         pathStr = workingDir->getPath() + pathStr.substr(2);
     }
     else if (pathStr[0] != '/') {
@@ -126,7 +126,7 @@ filesystem::File* FileSystemManager::createFile(const char* path)
     if ( filesystem::File* file = asFile( getNode(path) ) ) {
         return file;
     }
-
+	    
     boost::fs::path    vPath(path);
     native::Directory* parentDir = static_cast<native::Directory*>( asDirectory( getNode(vPath.parent_path().string().c_str()) ) );
     if (!parentDir) {

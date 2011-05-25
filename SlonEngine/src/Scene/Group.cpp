@@ -1,10 +1,63 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Group.h"
+#include "Utility/error.hpp"
+
+DECLARE_AUTO_LOGGER("scene.Group");
 
 namespace slon {
 namespace scene {
+	
+const char* Group::getSerializableName() const
+{
+	return "scene::Group";
+}
+
+void Group::serialize(database::OArchive& ar) const
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+	
+	// serialize base class
+	Node::serialize(ar);
+
+	// serialize children
+	node_ptr child(firstChild);
+	if (child)
+	{
+		ar.openChunk("children");
+		while (child) 
+		{
+			ar.writeSerializablOrReference( child.get() );
+			child = child->getRight();
+		}
+		ar.closeChunk();
+	}
+}
+
+void Group::deserialize(database::IArchive& ar)
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+	// deserialize base class
+	Node::deserialize(ar);
+
+	// deserialize children
+	database::IArchive::chunk_info info;
+	if ( ar.openChunk("children", info) )
+	{
+		//while ( ar.openChunk() ) 
+		{
+			//node_ptr child;
+		}
+		ar.closeChunk();
+	}
+}
 
 void Group::addChild(Node* child, Node* left)
 {

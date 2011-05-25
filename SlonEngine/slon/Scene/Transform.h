@@ -14,6 +14,11 @@ class Transform :
 friend class TransformVisitor;
 public:
     Transform();
+	    
+	// Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override Node
     TYPE getNodeType() const { return TRANSFORM; }

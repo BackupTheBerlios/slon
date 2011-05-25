@@ -46,7 +46,7 @@ const char* Node::getSerializableName() const
 
 void Node::serialize(database::OArchive& ar) const
 {
-    if ( ar.getVersion() < database::getVersion(1, 0, 0) ) {
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
     }
 
@@ -55,7 +55,7 @@ void Node::serialize(database::OArchive& ar) const
 
 void Node::deserialize(database::IArchive& ar)
 {
-    if ( ar.getVersion() < database::getVersion(1, 0, 0) ) {
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
     }
 

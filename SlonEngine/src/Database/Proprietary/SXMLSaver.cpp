@@ -27,7 +27,7 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
         {
             ar.openChunk("VisualScene");
             ar.writeStringChunk("name", it->first.c_str(), it->first.length());
-            it->second->serialize(ar);
+			ar.writeSerializablOrReference(it->second.get());
             ar.closeChunk();
         }
     }

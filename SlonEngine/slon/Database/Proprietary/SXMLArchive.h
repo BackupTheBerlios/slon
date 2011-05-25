@@ -31,10 +31,12 @@ public:
     void openChunk(const char* name);
     void closeChunk();
 
+	void writeSerializablOrReference(Serializable* serializable);
     void writeReferenceChunk(int refId);
     void writeStringChunk(const char* name, const char* str, size_t size);
     void writeStringChunk(const char* name, const wchar_t* str, size_t size);
-
+	
+    void writeChunk(const char* name, const boolean* values, size_t count = 1)	{ writeChunkImpl(name, values, count); }
     void writeChunk(const char* name, const int8* values, size_t count = 1)     { writeChunkImpl(name, values, count); }
     void writeChunk(const char* name, const uint8* values, size_t count = 1)    { writeChunkImpl(name, values, count); }
     void writeChunk(const char* name, const int16* values, size_t count = 1)    { writeChunkImpl(name, values, count); }

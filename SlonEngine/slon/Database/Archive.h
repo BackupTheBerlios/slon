@@ -13,6 +13,8 @@ class Archive :
 {
 public:
     // archive types
+	typedef bool				boolean;
+
     typedef char                int8;
     typedef unsigned char       uint8;
 
@@ -128,6 +130,9 @@ public:
     /** Close currently opened chunk. */
     virtual void closeChunk() = 0;
 
+	/** Write serializable, or reference if it already serialized. */
+	virtual void writeSerializablOrReference(Serializable* serializable) = 0;
+
     /** Write reference chunk. */
     virtual void writeReferenceChunk(int refId) = 0;
 
@@ -144,6 +149,13 @@ public:
      * @param size - length of the string.
      */
     virtual void writeStringChunk(const char* name, const wchar_t* str, size_t size) = 0;
+	
+    /** Make leaf chunk and write array into it.
+     * @param name - name of the chunk.
+     * @param values - array of the values for writing.
+     * @param count - number of elements in the array.
+     */
+    virtual void writeChunk(const char* name, const boolean* values, size_t count = 1) = 0;
 
     /** Make leaf chunk and write array into it.
      * @param name - name of the chunk.

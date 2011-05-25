@@ -1,8 +1,12 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Scene/MatrixTransform.h"
+#include "Utility/error.hpp"
 #include <sgl/Math/MatrixFunctions.hpp>
+
+DECLARE_AUTO_LOGGER("scene.MatrixTransform");
 
 using namespace slon;
 using namespace scene;
@@ -23,6 +27,40 @@ MatrixTransform::MatrixTransform(const math::Matrix4f& transform_) :
 {
 	localToWorld = math::make_identity<float, 4>();
     worldToLocal = math::make_identity<float, 4>();
+}
+
+// Override Serializable
+const char* MatrixTransform::getSerializableName() const
+{
+	return "scene::MatrixTransform";
+}
+
+void MatrixTransform::serialize(database::OArchive& ar) const
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+	
+	// serialize base class
+	Transform::serialize(ar);
+
+	// serialize data
+	ar.writeChunk("transform", transform.data(), transform.num_elements);
+	ar.writeChunk("invTransform", invTransform.data(), invTransform.num_elements);
+	ar.writeChunk("transformDirty", &transformDirty);
+	ar.writeChunk("invTransformDirty", &invTransformDirty);
+}
+
+void MatrixTransform::deserialize(database::IArchive& ar)
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+	// deserialize base class
+	Transform::deserialize(ar);
+
+	// deserialize data
 }
 
 // Override transform

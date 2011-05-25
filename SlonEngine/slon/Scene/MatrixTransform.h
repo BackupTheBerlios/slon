@@ -16,6 +16,11 @@ class MatrixTransform :
 public:
     MatrixTransform();
     MatrixTransform(const math::Matrix4f& transform);
+	
+    // Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override Node
     void accept(log::LogVisitor& visitor) const;

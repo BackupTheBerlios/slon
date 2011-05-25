@@ -25,5 +25,5 @@ BOOST_AUTO_TEST_CASE(scene_serialization)
 	database::library_ptr library(new database::Library);
 	library->visualScenes.push_back( std::make_pair("test", root) );
 
-	database::saveLibrary("test.sxml", library);
+	database::saveLibrary("./test.sxml", library);
 }

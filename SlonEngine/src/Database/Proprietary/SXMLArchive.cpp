@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Proprietary/SXMLArchive.h"
+#include "Database/Serializable.h"
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
 
@@ -10,7 +11,9 @@ namespace database {
 
 SXMLOArchive::SXMLOArchive(unsigned version_)
 :   version(version_)
+,	currentElement("sxml")
 {
+	document.add_child(currentElement);
 }
 
 // Override OArchive
@@ -48,6 +51,19 @@ void SXMLOArchive::closeChunk()
     }
 
     currentElement = *currentElement.get_parent();
+}
+
+void SXMLOArchive::writeSerializablOrReference(Serializable* serializable)
+{
+	if ( int refId = getReferenceId(serializable) ) {
+		writeReferenceChunk(refId);
+	}
+	else 
+	{
+		openChunk( serializable->getSerializableName() );
+		serializable->serialize(*this);
+		closeChunk();
+	}
 }
 
 void SXMLOArchive::writeReferenceChunk(int refId)
