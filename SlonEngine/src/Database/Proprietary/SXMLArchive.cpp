@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "Database/Proprietary/SXMLArchive.h"
 #include "Database/Serializable.h"
+#include "FileSystem/File.h"
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
+#include <boost/iostreams/stream_buffer.hpp>
 
 DECLARE_AUTO_LOGGER("database.SXML");
 
@@ -89,8 +91,9 @@ void SXMLOArchive::writeStringChunk(const char* name, const wchar_t* str, size_t
 
 void SXMLOArchive::writeToFile(filesystem::File& file) const
 {
-    // FIXME
-    document.print_file("test.xml");
+    boost::iostreams::stream_buffer<filesystem::file_device> buf(file);
+    std::ostream os(&buf);
+    os << document;
 }
 
 } // namespace database

@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_CASE(scene_serialization)
 	root->addChild( child.get() );
 	child->addChild( new Group/*( hash_string("grandchild") )*/ );
 	child->addChild( new MatrixTransform(math::make_scaling(2.0f, 2.0f, 2.0f)) );
+    //root->addChild( child.get() );
 
 	// Save it
 	database::library_ptr library(new database::Library);

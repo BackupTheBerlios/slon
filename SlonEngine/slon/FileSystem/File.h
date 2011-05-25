@@ -58,9 +58,10 @@ typedef boost::intrusive_ptr<const File> const_file_ptr;
 /** boost::iostreams compatible file device.
  * Example of constructing istream from filesystem::File:
  * \code
- * filesystem::file_ptr file( filesystem::asFile( currentFileSystemManager().getNode("Data/image.png") ) );
- * stream_buffer<filesystem::file_device> buf(file);
- * std::istream stream(&buf);
+ * filesystem::file_ptr file( filesystem::asFile( filesystem::currentFileSystemManager().getNode("Data/image.png") ) );
+ * boost::iostreams::stream_buffer<filesystem::file_device> buf(*file);
+ * std::istream is(&buf);
+ * std::ostream os(&buf);
  * \uncode
  */
 class file_device
@@ -71,31 +72,28 @@ public:
 
 public:
 	/** Aware! Implicit constructor */
-	file_device(const file_ptr& file_)
+	file_device(File& file_)
 	:	file(file_)
 	{}
 
 	// Implement device
 	std::streampos seek(std::streamoff off, std::ios_base::seekdir way) 
 	{ 
-		assert(file);
-		return file->seek(off, way);
+		return file.seek(off, way);
 	}
 
 	std::streamsize read(char* buffer, std::streamsize size)
 	{
-		assert(file);
-		return file->read(buffer, size);
+		return file.read(buffer, size);
 	}
 
 	std::streamsize write(const char* buffer, std::streamsize size)
 	{
-		assert(file);
-		return file->write(buffer, size);
+		return file.write(buffer, size);
 	}
 
 private:
-	file_ptr file;
+	File& file;
 };
 
 /** Try interpret node as file */
