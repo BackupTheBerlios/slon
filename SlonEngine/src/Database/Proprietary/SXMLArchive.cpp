@@ -78,7 +78,7 @@ void SXMLOArchive::writeReferenceChunk(int refId)
 void SXMLOArchive::writeStringChunk(const char* name, const char* str, size_t size)
 {
     xmlpp::element child(name);
-    child.set_text(str); // FIXME
+    child.set_text( str[size] ? str : std::string(str, str + size).c_str() );
     currentElement.add_child(child);
 }
 
@@ -93,7 +93,7 @@ void SXMLOArchive::writeToFile(filesystem::File& file) const
 {
     boost::iostreams::stream_buffer<filesystem::file_device> buf(file);
     std::ostream os(&buf);
-    os << document;
+    document.print_file(os);
 }
 
 } // namespace database

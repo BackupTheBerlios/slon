@@ -54,9 +54,13 @@ public:
         xmlpp::element child(name);
 
         std::ostringstream ss;
-        for (size_t i = 0; i<count; ++i) {
-            ss << values[i] << " ";
-        }
+        for (size_t i = 0; i<count; ++i) 
+		{
+            ss << values[i];
+			if (i < count - 1) {
+				ss << ' ';
+			}
+		}
 
         child.set_text( ss.str().c_str() );
         currentElement.add_child(child);
