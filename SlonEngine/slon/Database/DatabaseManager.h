@@ -18,7 +18,7 @@ public:
     typedef std::vector<library_loader_ptr>     library_loader_array;
     typedef std::vector<library_saver_ptr>      library_saver_array;
 
-    static const format_id                      library_format_auto;
+    static const format_id						library_format_auto;
 
     enum
     {
@@ -31,6 +31,8 @@ public:
     #endif
         , CLEAR_ALL                     = 0xFFFF
     };
+	
+	typedef boost::function<Serializable* ()>	serializable_create_func;
 
 public:
     /** Get animation cache */
@@ -177,8 +179,24 @@ public:
      */
 	virtual size_t unregisterLibrarySaver(LibrarySaver* saver) = 0;
 
-    /** Remove all savers from the cache */
+    /** Remove all savers from the cache. */
     virtual void clearLibrarySavers() = 0;
+
+	/** Create serializable using its name. */
+	virtual Serializable* createSerializableByName(const std::string& name) = 0;
+
+	/** Register serializable create func. Archive will use this function to create serializable using its name.
+	 * @param name - serializable name.
+	 * @param func - serializable create function.
+	 * @return true if succeeded, false if create func with specified name already exists.
+	 */
+	virtual bool registerSerializableCreateFunc(const std::string& name, const serializable_create_func& func) = 0;
+
+	/** Unregister serializable create func. Remove serializable create function for specified serializable name. 
+	 * @param name - serializable name.
+	 * @return true if succeeded, false if name was not found.
+	 */
+	virtual bool unregisterSerializableCreateFunc(const std::string& name) = 0;
 
     virtual ~DatabaseManager() {}
 };

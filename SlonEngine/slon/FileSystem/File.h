@@ -4,6 +4,13 @@
 #include <boost/iostreams/categories.hpp>
 #include "Node.h"
 
+// forward
+namespace boost 
+{
+	template <typename T, typename Tr, typename Alloc, typename Mode>
+	class stream_buffer;
+}
+
 namespace slon {
 namespace filesystem {
 
@@ -56,10 +63,10 @@ typedef boost::intrusive_ptr<File>       file_ptr;
 typedef boost::intrusive_ptr<const File> const_file_ptr;
 
 /** boost::iostreams compatible file device.
- * Example of constructing istream from filesystem::File:
+ * Example of constructing istream\ostream from filesystem::File:
  * \code
- * filesystem::file_ptr file( filesystem::asFile( filesystem::currentFileSystemManager().getNode("Data/image.png") ) );
- * boost::iostreams::stream_buffer<filesystem::file_device> buf(*file);
+ * file_ptr     file( asFile( currentFileSystemManager().getNode("Data/image.png") ) );
+ * file_buffer  buf(*file);
  * std::istream is(&buf);
  * std::ostream os(&buf);
  * \uncode
@@ -95,6 +102,8 @@ public:
 private:
 	File& file;
 };
+
+typedef boost::iostreams::stream_buffer<file_device> file_buffer;
 
 /** Try interpret node as file */
 inline File* asFile(Node* node) 

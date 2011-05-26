@@ -59,17 +59,7 @@ void Node::deserialize(database::IArchive& ar)
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
     }
 
-    database::IArchive::chunk_info info;
-    if ( ar.openChunk("name", info) )
-    {
-        if (!info.isLeaf) {
-            throw database::serialization_error(AUTO_LOGGER, "Chunk is not leaf");
-        }
-
-        std::string str(info.size, ' ');
-        ar.readString(&str[0]);
-        name = str;
-    }
+	name = hash_string( database::readStringChunk(ar, "name") );
 }
 
 Node* findNamedNode(Node& root, hash_string name)

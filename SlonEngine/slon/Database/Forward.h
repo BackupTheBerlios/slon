@@ -18,15 +18,13 @@ template<typename T> class Saver;
 
 class DatabaseManager;
 class Library;
-class Serializable;
 class Archive;
 class IArchive;
 class OArchive;
+class Serializable;
 
 typedef boost::intrusive_ptr<Library>               library_ptr;
 typedef boost::intrusive_ptr<const Library>         const_library_ptr;
-typedef boost::intrusive_ptr<Serializable>          serializable_ptr;
-typedef boost::intrusive_ptr<const Serializable>    const_serializable_ptr;
 typedef boost::intrusive_ptr<Archive>               archive_ptr;
 typedef boost::intrusive_ptr<const Archive>         const_archive_ptr;
 typedef boost::intrusive_ptr<IArchive>              iarchive_ptr;

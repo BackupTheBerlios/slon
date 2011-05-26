@@ -141,6 +141,28 @@ library_ptr DatabaseManager::loadLibrary(const std::string& path,
     return library;
 }
 
+Serializable* DatabaseManager::createSerializableByName(const std::string& name)
+{
+	// search for create func
+	serializable_create_func_map::iterator it = serializableCreateFuncs.find(name);
+	if ( it == serializableCreateFuncs.end() ) {
+		return 0;
+	}
+
+	return (it->second)(); // call create func
+}
+
+bool DatabaseManager::registerSerializableCreateFunc(const std::string&				 name, 
+													 const serializable_create_func& func)
+{
+	return serializableCreateFuncs.insert( std::make_pair(name, func) ).second;
+}
+
+bool DatabaseManager::unregisterSerializableCreateFunc(const std::string& name)
+{
+	return serializableCreateFuncs.erase(name) > 0;
+}
+
 } // namespace detail
 
 DatabaseManager& currentDatabaseManager() 

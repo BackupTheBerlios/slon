@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
+#include "Database/Proprietary/SXMLLoader.h"
 #include "Database/Proprietary/SXMLSaver.h"
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
@@ -190,10 +191,11 @@ void Engine::init()
     {
         using namespace database::detail;
 
-        const size_t                    numLibraryLoaders = 1;
+        const size_t                    numLibraryLoaders = 2;
         fmt_loader<database::Library>   libraryLoaders[numLibraryLoaders] = 
         {
-            {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader}
+            {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader},
+            {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLLoader}
         };
         database::detail::registerLoaders<database::Library>(numLibraryLoaders, libraryLoaders);
 

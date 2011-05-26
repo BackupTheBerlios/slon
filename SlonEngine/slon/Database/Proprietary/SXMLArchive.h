@@ -9,6 +9,74 @@
 namespace slon {
 namespace database {
 
+class SXMLIArchive :
+	public IArchive
+{
+private:
+    typedef std::map<int, xmlpp::element_iterator>	reference_element_map;
+    typedef std::map<int, Serializable*>			reference_serializable_map;
+
+public:
+	SXMLIArchive();
+	
+	/** Read archive content from file */
+	void readFromFile(filesystem::File& file);
+
+    // Override Archive
+    unsigned getVersion() const { return version; }
+
+    // Override IArchive
+    Serializable* readReference(int refId);
+	Serializable* readSerializableOrReference();
+
+    bool openChunk(const char* name, chunk_info& info);
+    void closeChunk();
+
+	void readString(char* str)		{ memcpy(str, openedElement->get_text(), chunkInfo.size); }
+    void readString(wchar_t* str)	{ /*memcpy(str, currentElement.get_text()); FIXME*/ }
+    void read(boolean* values)		{ readImpl(values); }
+    void read(int8* values)			{ readImpl(values); }
+    void read(uint8* values)		{ readImpl(values); }
+    void read(int16* values)		{ readImpl(values); }
+    void read(uint16* values)		{ readImpl(values); }
+    void read(int32* values)		{ readImpl(values); }
+    void read(uint32* values)		{ readImpl(values); }
+    void read(int64* values)		{ readImpl(values); }
+    void read(uint64* values)		{ readImpl(values); }
+    void read(float32* values)		{ readImpl(values); }
+	void read(float64* values)		{ readImpl(values); }
+	
+    template<typename T>
+    void readImpl(T* values)
+    {
+		if (!openedElement) {
+			throw serialization_error(log::logger_ptr(), "Trying to read raw data from unopened chunk.");
+		}
+        else if (!chunkInfo.isLeaf) {
+			throw serialization_error(log::logger_ptr(), "Trying to read raw data from not leaf chunk.");
+		}
+
+        std::istringstream ss( openedElement->get_text() );
+        for (size_t i = 0; i<chunkInfo.size; ++i) {
+            ss >> values[i];
+		}
+    }
+
+private:
+	void			readChunkInfo();
+	Serializable*	readSerializable(xmlpp::element& el);
+
+private:
+    unsigned					version;
+    reference_serializable_map  referenceSerializables;
+	reference_element_map		referenceElements;
+
+    xmlpp::document			document;
+	xmlpp::element_iterator openedElement;
+	xmlpp::element_iterator nextElement;
+	chunk_info				chunkInfo;
+};
+
 class SXMLOArchive :
     public OArchive
 {
@@ -17,9 +85,6 @@ private:
 
 public:
     SXMLOArchive(unsigned version);
-
-    /** Get output document */
-    xmlpp::document& getDocument() { return document; }
 
     // Override Archive
     unsigned getVersion() const { return version; }

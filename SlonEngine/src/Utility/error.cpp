@@ -74,6 +74,11 @@ io_error::io_error( const log::logger_ptr&  logger,
 }
 
 namespace database {
+	
+    serialization_error::serialization_error( const std::string&	message )
+	:	slon_error(message)
+	{
+	}
 
     serialization_error::serialization_error( const log::logger_ptr&	logger,
                                               const std::string&		message,

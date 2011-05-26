@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_DATABASE_ARCHIVE_H__
 #define __SLON_ENGINE_DATABASE_ARCHIVE_H__
 
+#include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
 
@@ -54,7 +55,10 @@ public:
      * @param refId - chunk reference id which we want to read from.
      * @return pointer serializable or NULL pointer if chunk with specified reference id was not found.
      */
-    virtual serializable_ptr readReference(int refId) = 0;
+    virtual Serializable* readReference(int refId) = 0;
+
+	/** Read serializable from the next chunk. */
+	virtual Serializable* readSerializableOrReference() = 0;
 
     /** Open sub chunk.
      * @param name - name of the sub chunk to open.
@@ -67,40 +71,43 @@ public:
     virtual void closeChunk() = 0;
 
     /** Read string from the chunk. */
-    virtual void readString(const char* str) = 0;
+    virtual void readString(char* str) = 0;
 
     /** Read string from the chunk. */
-    virtual void readString(const wchar_t* str) = 0;
+    virtual void readString(wchar_t* str) = 0;
+	
+    /** Read value array from the chunk. */
+    virtual void read(boolean* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const int8* values) = 0;
+    virtual void read(int8* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const uint8* values) = 0;
+    virtual void read(uint8* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const int16* values) = 0;
+    virtual void read(int16* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const uint16* values) = 0;
+    virtual void read(uint16* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const int32* values) = 0;
+    virtual void read(int32* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const uint32* values) = 0;
+    virtual void read(uint32* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const int64* values) = 0;
+    virtual void read(int64* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const uint64* values) = 0;
+    virtual void read(uint64* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const float32* values) = 0;
+    virtual void read(float32* values) = 0;
 
     /** Read value array from the chunk. */
-    virtual void read(const float64* values) = 0;
+    virtual void read(float64* values) = 0;
 
     virtual ~IArchive() {}
 };
@@ -229,6 +236,38 @@ public:
 
     virtual ~OArchive() {}
 };
+
+inline std::string readStringChunk(IArchive& ar, const std::string& name)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	
+	std::string str(info.size, ' ');
+	ar.readString(&str[0]);
+	
+	return str;
+}
+
+template<typename T>
+inline T readChunk(IArchive& ar, const std::string& name)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	else if (!info.size != 1) {
+		throw serialization_error("Trying to read single item from multi-item chunk");
+	}
+	
+	T value;
+	ar.read(&value);
+	
+	return value;
+}
 
 } // namespace database
 } // namespace slon

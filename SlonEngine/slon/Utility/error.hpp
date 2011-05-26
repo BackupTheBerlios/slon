@@ -23,7 +23,7 @@ class slon_error :
     public std::runtime_error
 {
 public:
-    slon_error( const std::string&   message);
+    slon_error( const std::string&		message);
 
     slon_error( const log::logger_ptr&  logger,
                 const std::string&		message,
@@ -79,6 +79,8 @@ namespace database {
         public slon_error
     {
     public:
+        serialization_error( const std::string&		message );
+
         serialization_error( const log::logger_ptr&	logger,
                              const std::string&		message,
                              log::SEVERITY          severity = log::S_ERROR );

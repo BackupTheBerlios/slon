@@ -51,9 +51,13 @@ void Group::deserialize(database::IArchive& ar)
 	database::IArchive::chunk_info info;
 	if ( ar.openChunk("children", info) )
 	{
-		//while ( ar.openChunk() ) 
+		while ( Serializable* s = ar.readSerializableOrReference() ) 
 		{
-			//node_ptr child;
+			scene::Node* n = dynamic_cast<scene::Node*>(s);
+			if (!n) {
+				throw database::serialization_error(AUTO_LOGGER, "Deserialized scene::Group child is not convertible to scene::Node.");
+			}
+			addChild(n);
 		}
 		ar.closeChunk();
 	}

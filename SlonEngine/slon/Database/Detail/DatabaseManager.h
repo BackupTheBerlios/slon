@@ -38,6 +38,8 @@ private:
     typedef std::map<format_id, library_loader_array>   format_loader_map;
     typedef std::map<format_id, library_saver_array>    format_saver_map;
 
+	typedef boost::unordered_map<std::string, serializable_create_func>	serializable_create_func_map;
+
 private:
     format_desc makeFormatDesc(format_id            id, 
                                const string_array&  regexps);
@@ -88,6 +90,10 @@ public:
     void                 unregisterLibrarySaver(format_id format, LibrarySaver* saver)			{ libraryCache.unregisterSaver(format, saver); }
     size_t               unregisterLibrarySaver(LibrarySaver* saver)							{ return libraryCache.unregisterSaver(saver); }
     void                 clearLibrarySavers()													{ libraryCache.clearSavers(); }
+	
+	Serializable*		createSerializableByName(const std::string& name);
+	bool				registerSerializableCreateFunc(const std::string& name, const serializable_create_func& func);
+	bool				unregisterSerializableCreateFunc(const std::string& name);
 
 private:
 	format_desc* unwrap(format_id format) const;
@@ -105,6 +111,8 @@ private:
     format_desc_vector  formatDescs;
     format_loader_map   formatLoaders;
     format_saver_map    formatSavers;
+
+	serializable_create_func_map serializableCreateFuncs;
 };
 
 template<typename T>
