@@ -18,11 +18,12 @@ namespace {
                     const std::string&                                keyPrefix,
                     bool                                              ignoreDuplicates)
     {
-        for (size_t i = 0; i<container.size(); ++i)
+        typedef database::Library::storage_type<T>::type::iterator iterator;
+        for (iterator it = container.begin(); it != container.end(); ++it)
         {
-            std::string key = keyPrefix + container[i].first;
+            std::string key = keyPrefix + it->first;
             if ( !cache.find(key) ) {
-                cache.add(key, container[i].second);
+                cache.add(key, it->second);
             }
             else if ( !ignoreDuplicates ) {
                 throw loader_error(AUTO_LOGGER, "Duplicate item in the cache: " + key);

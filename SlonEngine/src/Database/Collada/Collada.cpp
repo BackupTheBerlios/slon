@@ -1534,7 +1534,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 	{
 		scene::group_ptr visualScene = visualBuilder.createVisualScene(*iter->second);
 		root->addChild(visualScene.get());
-        library->visualScenes.push_back( Library::key_visual_scene_pair(visualScene->getName().str(), visualScene) );
+        library->visualScenes.insert( std::make_pair(visualScene->getName().str(), visualScene) );
 	}
 
 #ifdef SLON_ENGINE_USE_PHYSICS				
@@ -1544,7 +1544,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 										++iter )
 	{
 		physics::physics_model_ptr physicsScene = physicsBuilder.createPhysicsScene(*iter->second);
-		library->physicsScenes.push_back( Library::key_physics_scene_pair(physicsScene->getName(), physicsScene) );
+		library->physicsScenes.insert( std::make_pair(physicsScene->getName(), physicsScene) );
 	}
 #endif
 
@@ -1553,7 +1553,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 								  ++iter )
 	{
 		animation::animation_ptr animation = visualBuilder.createAnimation(*iter->second, *root);
-		library->animations.push_back( Library::key_animation_pair(animation->getName(), animation) );
+		library->animations.insert( std::make_pair(animation->getName(), animation) );
 	}
 
 	return library;

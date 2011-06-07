@@ -35,7 +35,7 @@ void SXMLIArchive::readFromFile(filesystem::File& file)
 		elements.pop_back();
 
 		// add children to queue
-		std::copy( document.first_child_element(), document.end_child_element(), std::back_inserter(elements) );
+		std::copy( top->first_child_element(), top->end_child_element(), std::back_inserter(elements) );
 
 		// check if element have reference id
 		if ( top->has_attribute("refId") ) 
@@ -133,6 +133,9 @@ bool SXMLIArchive::openChunk(const char* name, chunk_info& info)
 		if ( !document.first_child_element() ) {
 			return false;
 		}
+		else if ( strcmp(document.first_child_element()->get_value(), name) != 0 ) {
+			return false;
+		}
 
 		openedElement = document.first_child_element();
 		nextElement   = openedElement->first_child_element();
@@ -170,9 +173,7 @@ void SXMLIArchive::closeChunk()
 
 SXMLOArchive::SXMLOArchive(unsigned version_)
 :   version(version_)
-,	currentElement("sxml")
 {
-	document.add_child(currentElement);
 }
 
 // Override OArchive
@@ -199,17 +200,21 @@ int SXMLOArchive::getReferenceId(Serializable* serializable) const
 void SXMLOArchive::openChunk(const char* name)
 {
     xmlpp::element child(name);
-    currentElement.add_child(child);
-    currentElement = child;
-}
+    if (!currentElement) {
+		currentElement = xmlpp::element_iterator(document.add_child(child));
+	}
+	else {
+		currentElement = xmlpp::element_iterator(currentElement->add_child(child));
+	}
+}	
 
 void SXMLOArchive::closeChunk()
 {
-    if ( !currentElement.get_parent() ) {
+    if (!currentElement) {
         throw serialization_error(AUTO_LOGGER, "Trying to close root chunk");
     }
 
-    currentElement = *currentElement.get_parent();
+    currentElement = currentElement->get_parent();
 }
 
 void SXMLOArchive::writeSerializablOrReference(Serializable* serializable)
@@ -229,21 +234,21 @@ void SXMLOArchive::writeReferenceChunk(int refId)
 {
     xmlpp::element child("Reference");
     child.set_attribute("id", boost::lexical_cast<std::string>(refId));
-    currentElement.add_child(child);
+    currentElement->add_child(child);
 }
 
 void SXMLOArchive::writeStringChunk(const char* name, const char* str, size_t size)
 {
     xmlpp::element child(name);
     child.set_text( str[size] == '\0' ? str : std::string(str, str + size).c_str() );
-    currentElement.add_child(child);
+    currentElement->add_child(child);
 }
 
 void SXMLOArchive::writeStringChunk(const char* name, const wchar_t* str, size_t size)
 {
     xmlpp::element child(name);
     //child.set_text(str); // FIXME
-    currentElement.add_child(child);
+    currentElement->add_child(child);
 }
 
 void SXMLOArchive::writeToFile(filesystem::File& file) const

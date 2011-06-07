@@ -13,31 +13,48 @@ namespace slon {
 namespace database {
 
 library_ptr SXMLLoader::load(filesystem::File* file)
-{    /*
+{
+    library_ptr library(new Library);
+
     // read file content
     if ( !file->open(filesystem::File::in) ) {
         throw file_error(AUTO_LOGGER, "Can't open *.sxml file for reading");
     }
-
-	std::string fileContent(file->size(), ' ');
-    file->read( &fileContent[0], fileContent.size() );
-    file->close();
-
-    // construct xml
-    xmlpp::document document(fileContent.size(), fileContent.data());
-    
+	
     // serialize from xml
-    SXMLSerializer serializer(document, xmlpp::LOAD);
+    SXMLIArchive ar;
+	ar.readFromFile(*file);
+	
+	SXMLIArchive::chunk_info info;
+	if ( ar.openChunk("sxml", info) )
+	{
+		// read visual scenes
+		if ( ar.openChunk("VisualScenes", info) )
+		{
+			while ( ar.openChunk("VisualScene", info) )
+			{
+				std::string name = readStringChunk(ar, "name");
+				if ( !ar.openChunk("VisualScene", info) ) {
+					throw serialization_error(AUTO_LOGGER, "Can't open visual scene chunk.");
+				}
 
-    // construct library
-    detail::library_ptr library(new detail::Library);
-    library->visualScenes = serializer.visualScenes;
-#ifdef SLON_ENGINE_USE_PHYSICS
-    library->physicsScenes = serializer.physicsScenes;
-#endif
+				scene::node_ptr scene( dynamic_cast<scene::Node*>(ar.readSerializableOrReference()) );
+				if (!scene) {
+					throw serialization_error(AUTO_LOGGER, "Can't deserialize visual scene.");
+				}
+				ar.closeChunk();
+
+				library->visualScenes.insert( std::make_pair(name, scene) );
+				ar.closeChunk();
+			}
+
+			ar.closeChunk();
+		}
+
+		ar.closeChunk();
+	}
+
     return library;
-    */
-    return library_ptr();
 }
 
 } // namespace database

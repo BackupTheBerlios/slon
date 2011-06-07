@@ -128,17 +128,17 @@ public:
 		}
 
         child.set_text( ss.str().c_str() );
-        currentElement.add_child(child);
+        currentElement->add_child(child);
     }
 
     void writeToFile(filesystem::File& file) const;
 
 private:
-    unsigned        version;
-    reference_map   references;
+    unsigned				version;
+    reference_map			references;
 
-    xmlpp::document document;
-    xmlpp::element  currentElement;
+    xmlpp::document			document;
+    xmlpp::element_iterator currentElement;
 };
 
 } // namespace database

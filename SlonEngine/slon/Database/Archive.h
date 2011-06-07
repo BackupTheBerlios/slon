@@ -251,6 +251,35 @@ inline std::string readStringChunk(IArchive& ar, const std::string& name)
 	return str;
 }
 
+inline std::wstring readWStringChunk(IArchive& ar, const std::string& name)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	
+	std::wstring str(info.size, ' ');
+	ar.readString(&str[0]);
+	
+	return str;
+}
+
+template<typename Char, typename Traits>
+inline void readStringChunk(IArchive& ar, const std::string& name, std::basic_string<Char, Traits>& str)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	
+	str.resize(info.size);
+	ar.readString(&str[0]);
+	
+	return str;
+}
+
 template<typename T>
 inline T readChunk(IArchive& ar, const std::string& name)
 {
@@ -267,6 +296,36 @@ inline T readChunk(IArchive& ar, const std::string& name)
 	ar.read(&value);
 	
 	return value;
+}
+
+template<typename T>
+inline void readChunk(IArchive& ar, const std::string& name, T* value)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	else if (!info.size != 1) {
+		throw serialization_error("Trying to read single item from multi-item chunk");
+	}
+	
+	ar.read(value);
+}
+
+template<typename T>
+inline void readChunk(IArchive& ar, const std::string& name, T* data, size_t numElements)
+{
+	IArchive::chunk_info info;
+	ar.openChunk(name.c_str(), info);
+	if (!info.isLeaf) {
+		throw serialization_error("Trying to read raw data from non leaf chunk");
+	}
+	else if (!info.size != numElements) {
+		throw serialization_error("Number of elements in chunk is not equal to requested number of elements");
+	}
+	
+	ar.read(data);
 }
 
 } // namespace database

@@ -17,21 +17,26 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
     }
 
     SXMLOArchive ar( getVersion(1, 0, 0) );
-    ar.openChunk("VisualScenes");
-    {
-        typedef Library::key_visual_scene_array::const_iterator const_scene_iterator;
+	ar.openChunk("sxml");
+	{
+		// write visual scenes
+		ar.openChunk("VisualScenes");
+		{
+			typedef Library::key_visual_scene_map::const_iterator const_scene_iterator;
 
-        for (const_scene_iterator it  = library->visualScenes.begin();
-                                  it != library->visualScenes.end();
-                                   ++it)
-        {
-            ar.openChunk("VisualScene");
-            ar.writeStringChunk("name", it->first.c_str(), it->first.length());
-			ar.writeSerializablOrReference(it->second.get());
-            ar.closeChunk();
-        }
-    }
-    ar.closeChunk();
+			for (const_scene_iterator it  = library->visualScenes.begin();
+									  it != library->visualScenes.end();
+									   ++it)
+			{
+				ar.openChunk("VisualScene");
+				ar.writeStringChunk("name", it->first.c_str(), it->first.length());
+				ar.writeSerializablOrReference(it->second.get());
+				ar.closeChunk();
+			}
+		}
+		ar.closeChunk();
+	}
+	ar.closeChunk();
 
     ar.writeToFile(*file);
 }

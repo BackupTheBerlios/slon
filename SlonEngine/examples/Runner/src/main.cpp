@@ -119,7 +119,7 @@ public:
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
                 world.add(library->visualScenes[0].second.get());
 
-				database::Library::key_animation_array animations = library->animations;
+				database::Library::key_animation_map animations = library->animations;
 				if ( !animations.empty() )
 				{
 					StartStopTimer* timer = new StartStopTimer();

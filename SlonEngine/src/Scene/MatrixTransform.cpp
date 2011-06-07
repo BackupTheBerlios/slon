@@ -61,6 +61,10 @@ void MatrixTransform::deserialize(database::IArchive& ar)
 	Transform::deserialize(ar);
 
 	// deserialize data
+	readChunk(ar, "transform", transform.data(), transform.num_elements);
+	readChunk(ar, "invTransform", invTransform.data(), invTransform.num_elements);
+	readChunk(ar, "transformDirty", &transformDirty);
+	readChunk(ar, "invTransformDirty", &invTransformDirty);
 }
 
 // Override transform
