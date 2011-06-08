@@ -2,14 +2,8 @@
 #define __FILESYSTEM_FILE_H__
 
 #include <boost/iostreams/categories.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
 #include "Node.h"
-
-// forward
-namespace boost 
-{
-	template <typename T, typename Tr, typename Alloc, typename Mode>
-	class stream_buffer;
-}
 
 namespace slon {
 namespace filesystem {

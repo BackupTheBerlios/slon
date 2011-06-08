@@ -22,6 +22,19 @@ void SXMLIArchive::readFromFile(filesystem::File& file)
     filesystem::file_buffer buf(file);
     std::istream is(&buf);
     is >> document;
+	
+	openedElement = document.first_child_element();
+	if ( !openedElement ) {
+		throw serialization_error(AUTO_LOGGER, "Trying to deserialize from empty document");
+	}
+	else if ( strcmp("sxml", openedElement->get_value()) != 0 ) {
+		throw serialization_error(AUTO_LOGGER, "Root SXML element is not <sxml>");
+	}
+	else if ( !openedElement->has_attribute("version") ) {
+		throw serialization_error(AUTO_LOGGER, "SXML document doesn't have version attribute");
+	}
+	nextElement = openedElement->first_child_element();
+	version     = openedElement->get_attribute_value<unsigned>("version", version);
 
 	referenceSerializables.clear();
 	referenceElements.clear();
@@ -80,11 +93,12 @@ Serializable* SXMLIArchive::readSerializableOrReference()
 	return serializable;
 }
 
-void SXMLIArchive::readChunkInfo()
+const SXMLIArchive::chunk_info& SXMLIArchive::readChunkInfo()
 {
-	chunkInfo.size   =  openedElement->has_attribute("count") ? openedElement->get_attribute_value<size_t>("count") : 1;
+	chunkInfo.size   =  openedElement->has_attribute("size") ? openedElement->get_attribute_value<size_t>("size") : 1;
 	chunkInfo.refId  =  openedElement->has_attribute("refId") ? openedElement->get_attribute_value<size_t>("refId") : 0;
 	chunkInfo.isLeaf = !openedElement->first_child_element();
+	return chunkInfo;
 }
 
 Serializable* SXMLIArchive::readSerializable(xmlpp::element& el)
@@ -128,19 +142,8 @@ Serializable* SXMLIArchive::readSerializable(xmlpp::element& el)
 
 bool SXMLIArchive::openChunk(const char* name, chunk_info& info)
 {
-	if ( !openedElement )
-	{
-		if ( !document.first_child_element() ) {
-			return false;
-		}
-		else if ( strcmp(document.first_child_element()->get_value(), name) != 0 ) {
-			return false;
-		}
-
-		openedElement = document.first_child_element();
-		nextElement   = openedElement->first_child_element();
-	}
-	else if ( !nextElement ) {
+	assert(openedElement);
+	if (!nextElement) {
 		return false;
 	}
 	else if ( strcmp(nextElement->get_value(), name) != 0 ) {
@@ -149,15 +152,17 @@ bool SXMLIArchive::openChunk(const char* name, chunk_info& info)
 	else 
 	{
 		openedElement = nextElement;
-		nextElement   = openedElement->next_sibling_element();
+		nextElement   = openedElement->first_child_element();
 	}
 
-	readChunkInfo();
+	info = readChunkInfo();
 	return true;
 }
 
 void SXMLIArchive::closeChunk()
 {
+	assert( openedElement && openedElement->get_parent() && "trying to close root chunk" );
+
 	nextElement   = openedElement->next_sibling_element();
 	openedElement = openedElement->get_parent();
 	if (openedElement) {
@@ -174,6 +179,9 @@ void SXMLIArchive::closeChunk()
 SXMLOArchive::SXMLOArchive(unsigned version_)
 :   version(version_)
 {
+	xmlpp::element child("sxml");
+	child.set_attribute_value("version", version);
+	currentElement = xmlpp::element_iterator( document.add_child(child) );
 }
 
 // Override OArchive
@@ -200,17 +208,12 @@ int SXMLOArchive::getReferenceId(Serializable* serializable) const
 void SXMLOArchive::openChunk(const char* name)
 {
     xmlpp::element child(name);
-    if (!currentElement) {
-		currentElement = xmlpp::element_iterator(document.add_child(child));
-	}
-	else {
-		currentElement = xmlpp::element_iterator(currentElement->add_child(child));
-	}
+	currentElement = xmlpp::element_iterator(currentElement->add_child(child));
 }	
 
 void SXMLOArchive::closeChunk()
 {
-    if (!currentElement) {
+    if ( !currentElement || !currentElement->get_parent() ) {
         throw serialization_error(AUTO_LOGGER, "Trying to close root chunk");
     }
 
@@ -240,6 +243,9 @@ void SXMLOArchive::writeReferenceChunk(int refId)
 void SXMLOArchive::writeStringChunk(const char* name, const char* str, size_t size)
 {
     xmlpp::element child(name);
+	if (size > 1) {
+		child.set_attribute_value("size", size);
+	}
     child.set_text( str[size] == '\0' ? str : std::string(str, str + size).c_str() );
     currentElement->add_child(child);
 }

@@ -63,8 +63,8 @@ public:
     }
 
 private:
-	void			readChunkInfo();
-	Serializable*	readSerializable(xmlpp::element& el);
+	const chunk_info&	readChunkInfo();
+	Serializable*		readSerializable(xmlpp::element& el);
 
 private:
     unsigned					version;
@@ -127,6 +127,9 @@ public:
 			}
 		}
 
+		if (count > 1) {
+			child.set_attribute_value("size", count);
+		}
         child.set_text( ss.str().c_str() );
         currentElement->add_child(child);
     }

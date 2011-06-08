@@ -157,6 +157,12 @@ namespace {
         }
     };
 
+	template<typename T>
+	database::Serializable* createSerializable()
+	{
+		return new T();
+	}
+
 } // anonymous namespace
 
 namespace slon {
@@ -239,6 +245,13 @@ void Engine::init()
         database::detail::registerSavers<physics::PhysicsModel>(numPhysicsSceneSavers, physicsSceneSavers);
 #endif
     }
+
+	// register serializables
+	{
+		databaseManager.registerSerializableCreateFunc("scene::Node", createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("scene::Group", createSerializable<scene::Group>);
+		databaseManager.registerSerializableCreateFunc("scene::MatrixTransform", createSerializable<scene::MatrixTransform>);
+	}
 
     // init SDL
     if ( SDL_Init(SDL_INIT_VIDEO) < 0 && !SDL_GetVideoInfo() ) {

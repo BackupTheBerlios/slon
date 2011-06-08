@@ -13,7 +13,7 @@ class Transform :
 {
 friend class TransformVisitor;
 public:
-    Transform();
+    Transform( const hash_string& name = hash_string() );
 	    
 	// Override Serializable
     const char* getSerializableName() const;

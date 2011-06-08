@@ -17,7 +17,6 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
     }
 
     SXMLOArchive ar( getVersion(1, 0, 0) );
-	ar.openChunk("sxml");
 	{
 		// write visual scenes
 		ar.openChunk("VisualScenes");
@@ -26,7 +25,7 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
 
 			for (const_scene_iterator it  = library->visualScenes.begin();
 									  it != library->visualScenes.end();
-									   ++it)
+									  ++it)
 			{
 				ar.openChunk("VisualScene");
 				ar.writeStringChunk("name", it->first.c_str(), it->first.length());
@@ -36,7 +35,6 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
 		}
 		ar.closeChunk();
 	}
-	ar.closeChunk();
 
     ar.writeToFile(*file);
 }

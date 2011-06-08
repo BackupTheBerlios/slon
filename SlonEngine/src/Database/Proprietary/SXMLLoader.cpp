@@ -26,7 +26,6 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 	ar.readFromFile(*file);
 	
 	SXMLIArchive::chunk_info info;
-	if ( ar.openChunk("sxml", info) )
 	{
 		// read visual scenes
 		if ( ar.openChunk("VisualScenes", info) )
@@ -34,15 +33,10 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 			while ( ar.openChunk("VisualScene", info) )
 			{
 				std::string name = readStringChunk(ar, "name");
-				if ( !ar.openChunk("VisualScene", info) ) {
-					throw serialization_error(AUTO_LOGGER, "Can't open visual scene chunk.");
-				}
-
 				scene::node_ptr scene( dynamic_cast<scene::Node*>(ar.readSerializableOrReference()) );
 				if (!scene) {
 					throw serialization_error(AUTO_LOGGER, "Can't deserialize visual scene.");
 				}
-				ar.closeChunk();
 
 				library->visualScenes.insert( std::make_pair(name, scene) );
 				ar.closeChunk();
@@ -50,8 +44,6 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 
 			ar.closeChunk();
 		}
-
-		ar.closeChunk();
 	}
 
     return library;

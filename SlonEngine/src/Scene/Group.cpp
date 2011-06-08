@@ -10,6 +10,15 @@ DECLARE_AUTO_LOGGER("scene.Group");
 namespace slon {
 namespace scene {
 	
+Group::Group()
+{
+}
+
+Group::Group(const hash_string& name)
+:	Node(name)
+{
+}
+
 const char* Group::getSerializableName() const
 {
 	return "scene::Group";
@@ -51,13 +60,15 @@ void Group::deserialize(database::IArchive& ar)
 	database::IArchive::chunk_info info;
 	if ( ar.openChunk("children", info) )
 	{
+		scene::Node* left = 0;
 		while ( Serializable* s = ar.readSerializableOrReference() ) 
 		{
-			scene::Node* n = dynamic_cast<scene::Node*>(s);
-			if (!n) {
+			scene::Node* node = dynamic_cast<scene::Node*>(s);
+			if (!node) {
 				throw database::serialization_error(AUTO_LOGGER, "Deserialized scene::Group child is not convertible to scene::Node.");
 			}
-			addChild(n);
+			addChild(node, left);
+			left = node;
 		}
 		ar.closeChunk();
 	}

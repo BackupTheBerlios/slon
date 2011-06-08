@@ -14,8 +14,10 @@ class MatrixTransform :
     public Transform
 {
 public:
-    MatrixTransform();
+	MatrixTransform();
     MatrixTransform(const math::Matrix4f& transform);
+    MatrixTransform(const hash_string& name);
+    MatrixTransform(const hash_string& name, const math::Matrix4f& transform);
 	
     // Override Serializable
     const char* getSerializableName() const;

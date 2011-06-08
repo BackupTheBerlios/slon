@@ -12,9 +12,10 @@ DECLARE_AUTO_LOGGER("scene.Group");
 using namespace slon;
 using namespace scene;
 
-Transform::Transform() :
-    traverseStamp(0),
-	modifiedCount(0)
+Transform::Transform(const hash_string& name)
+:	Group(name)
+,	traverseStamp(0)
+,	modifiedCount(0)
 {
 }
 	
@@ -50,6 +51,10 @@ void Transform::deserialize(database::IArchive& ar)
 	Group::deserialize(ar);
 
 	// deserialize data
+	readChunk(ar, "worldToLocal", worldToLocal.data(), worldToLocal.num_elements);
+	readChunk(ar, "localToWorld", localToWorld.data(), localToWorld.num_elements);
+	readChunk(ar, "traverseStamp", &traverseStamp);
+	readChunk(ar, "modifiedCount", &modifiedCount);
 }
 
 void Transform::accept(log::LogVisitor& visitor) const

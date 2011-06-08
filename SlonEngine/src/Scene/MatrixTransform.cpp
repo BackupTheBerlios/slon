@@ -16,17 +16,32 @@ MatrixTransform::MatrixTransform() :
     transformDirty(false),
     invTransformDirty(false)
 {
-	localToWorld = transform    = math::make_identity<float, 4>();
-    worldToLocal = invTransform = math::make_identity<float, 4>();
+	transform    = math::make_identity<float, 4>();
+    invTransform = math::make_identity<float, 4>();
 }
 	
-MatrixTransform::MatrixTransform(const math::Matrix4f& transform_) :
-	transform(transform_),
-    transformDirty(false),
-    invTransformDirty(true)
+MatrixTransform::MatrixTransform(const math::Matrix4f& transform_)
+:	transform(transform_)
+,	transformDirty(false)
+,	invTransformDirty(true)
 {
-	localToWorld = math::make_identity<float, 4>();
-    worldToLocal = math::make_identity<float, 4>();
+}
+	
+MatrixTransform::MatrixTransform(const hash_string& name)
+:	Transform(name)
+,	transformDirty(false)
+,	invTransformDirty(false)
+{
+	transform    = math::make_identity<float, 4>();
+    invTransform = math::make_identity<float, 4>();
+}
+
+MatrixTransform::MatrixTransform(const hash_string& name, const math::Matrix4f& transform_)
+:	Transform(name)
+,	transform(transform_)
+,	transformDirty(false)
+,	invTransformDirty(true)
+{
 }
 
 // Override Serializable

@@ -240,13 +240,16 @@ public:
 inline std::string readStringChunk(IArchive& ar, const std::string& name)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
 	
 	std::string str(info.size, ' ');
 	ar.readString(&str[0]);
+	ar.closeChunk();
 	
 	return str;
 }
@@ -254,13 +257,16 @@ inline std::string readStringChunk(IArchive& ar, const std::string& name)
 inline std::wstring readWStringChunk(IArchive& ar, const std::string& name)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
 	
 	std::wstring str(info.size, ' ');
 	ar.readString(&str[0]);
+	ar.closeChunk();
 	
 	return str;
 }
@@ -269,13 +275,16 @@ template<typename Char, typename Traits>
 inline void readStringChunk(IArchive& ar, const std::string& name, std::basic_string<Char, Traits>& str)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
 	
 	str.resize(info.size);
 	ar.readString(&str[0]);
+	ar.closeChunk();
 	
 	return str;
 }
@@ -284,16 +293,19 @@ template<typename T>
 inline T readChunk(IArchive& ar, const std::string& name)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
-	else if (!info.size != 1) {
+	else if (info.size != 1) {
 		throw serialization_error("Trying to read single item from multi-item chunk");
 	}
 	
 	T value;
 	ar.read(&value);
+	ar.closeChunk();
 	
 	return value;
 }
@@ -302,30 +314,36 @@ template<typename T>
 inline void readChunk(IArchive& ar, const std::string& name, T* value)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
-	else if (!info.size != 1) {
+	else if (info.size != 1) {
 		throw serialization_error("Trying to read single item from multi-item chunk");
 	}
 	
 	ar.read(value);
+	ar.closeChunk();
 }
 
 template<typename T>
 inline void readChunk(IArchive& ar, const std::string& name, T* data, size_t numElements)
 {
 	IArchive::chunk_info info;
-	ar.openChunk(name.c_str(), info);
-	if (!info.isLeaf) {
+	if ( !ar.openChunk(name.c_str(), info) ) {
+		throw serialization_error("Can't open requested chunk");
+	}
+	else if (!info.isLeaf) {
 		throw serialization_error("Trying to read raw data from non leaf chunk");
 	}
-	else if (!info.size != numElements) {
+	else if (info.size != numElements) {
 		throw serialization_error("Number of elements in chunk is not equal to requested number of elements");
 	}
 	
 	ar.read(data);
+	ar.closeChunk();
 }
 
 } // namespace database

@@ -13,6 +13,9 @@ class Group :
     public Node
 {
 public:
+	Group();
+	Group(const hash_string& name);
+
     // Override Serializable
     const char* getSerializableName() const;
     void        serialize(database::OArchive& ar) const;
