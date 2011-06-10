@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/Mesh.h"
 #include "Graphics/Renderer.h"
@@ -355,6 +356,95 @@ Mesh::Mesh(const DESC& desc) :
     attributes(desc.attributes, desc.attributes + desc.numAttributes)
 {
     dirtyVertexLayout();
+}
+	
+const char* Mesh::getSerializableName() const
+{
+	return "Mesh";
+}
+
+void Mesh::serialize(database::OArchive& ar) const
+{
+	database::serialize( ar, "aabb", aabb );
+	ar.writeChunk( "indexType", &indexType );
+	ar.writeSerializablOrReference( "vertexLayout", SerializableWrapper(vertexLayout.get()) );
+	ar.writeSerializablOrReference( "vertexBuffer", vertexBuffer.get() );
+	ar.writeSerializablOrReference( "indexBuffer", indexBuffer.get() );
+	ar.writeChunk( "vertexSize", &vertexSize );
+	
+	ar.openChunk("subsets");
+	{
+		for (size_t i = 0; i<subsets.size(); ++i)
+		{
+			if ( indexed_subset* s = dynamic_cast<indexed_subset*>(subsets[i].get()) ) 
+			{
+				ar.openChunk( "indexed_subset" );
+				ar.writeSerializablOrReference( "effect", s->effect.get() );
+				ar.writeChunk( "primitiveType", &primitiveType );
+				ar.writeChunk( "startIndex", &startIndex );
+				ar.writeChunk( "numIndices", &numIndices );
+				ar.closeChunk();
+			}
+			else if ( plain_subset* s = dynamic_cast<plain_subset*>(subsets[i].get()) ) 
+			{
+				ar.openChunk( "plain_subset" );
+				ar.writeSerializablOrReference( "effect", s->effect.get() );
+				ar.writeChunk( "primitiveType", &primitiveType );
+				ar.writeChunk( "startVertex", &startVertex );
+				ar.writeChunk( "numVertices", &numVertices );
+				ar.closeChunk();
+			}
+			else {
+				assert(false);
+			}
+		}
+	}
+	ar.closeChunk();
+}
+
+void Mesh::deserialize(database::IArchive& ar)
+{
+	using namespace database;
+
+	deserialize( ar, "aabb", aabb );
+	readChunk( ar, "indexType", &indexType );
+	vertexLayout = deserialize(ar, "vertexLayout");
+	vertexBuffer = deserialize(ar, "vertexBuffer");
+	indexBuffer = deserialize(ar, "indexBuffer");
+	readChunk( ar, "vertexSize", &vertexSize );
+	
+	if ( ar.openChunk("subsets") )
+	{
+		while (true)
+		{
+			subset_ptr subset;
+			if ( ar.openChunk("indexed_subset") )
+			{
+				subset.reset(new indexed_subset);
+				subset->effect = ar.readSerializableOrReference("effect");
+				ar.readChunk("primitiveType", &subset->primitiveType);
+				ar.readChunk("startIndex", &subset->startIndex);
+				ar.readChunk("numIndices", &subset->numIndices);
+				ar.closeChunk();
+			}
+			else if ( ar.openChunk("plain_subset") ) 
+			{
+				subset.reset(new plain_subset);
+				subset->effect = ar.readSerializableOrReference("effect");
+				ar.readChunk("primitiveType", &subset->primitiveType);
+				ar.readChunk("startVertex", &subset->startIndex);
+				ar.readChunk("numVertices", &subset->numIndices);
+				ar.closeChunk();
+			}
+			else {
+				break;
+			}
+
+			subsets.push_back(subset);
+		}
+	
+		ar.closeChunk();
+	}
 }
 
 void Mesh::dirtyVertexLayout()

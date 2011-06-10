@@ -22,7 +22,7 @@ Transform::Transform(const hash_string& name)
 // Override Serializable
 const char* Transform::getSerializableName() const
 {
-	return "scene::Transform";
+	return "Transform";
 }
 
 void Transform::serialize(database::OArchive& ar) const
@@ -51,10 +51,10 @@ void Transform::deserialize(database::IArchive& ar)
 	Group::deserialize(ar);
 
 	// deserialize data
-	readChunk(ar, "worldToLocal", worldToLocal.data(), worldToLocal.num_elements);
-	readChunk(ar, "localToWorld", localToWorld.data(), localToWorld.num_elements);
-	readChunk(ar, "traverseStamp", &traverseStamp);
-	readChunk(ar, "modifiedCount", &modifiedCount);
+	ar.readChunk("worldToLocal", worldToLocal.data(), worldToLocal.num_elements);
+	ar.readChunk("localToWorld", localToWorld.data(), localToWorld.num_elements);
+	ar.readChunk("traverseStamp", &traverseStamp);
+	ar.readChunk("modifiedCount", &modifiedCount);
 }
 
 void Transform::accept(log::LogVisitor& visitor) const

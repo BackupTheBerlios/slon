@@ -8,6 +8,7 @@
 #include <sgl/Program.h>
 #include <sgl/VertexBuffer.h>
 #include <vector>
+#include "../../Database/Serializable.h"
 #include "../Detail/AttributeTable.h"
 #include "../Effect.h"
 #include "../Renderable.h"
@@ -101,7 +102,7 @@ typedef boost::intrusive_ptr<const MeshData>	mesh_data_const_ptr;
 
 /** Mesh representation convinient for rendering */
 class Mesh :
-    public Referenced
+	public database::Serializable
 {
 public:
     static const int LOCK_READ  = 1;
@@ -367,6 +368,11 @@ public:
     Mesh();
 	explicit Mesh(const MeshData* meshData);
     explicit Mesh(const DESC& desc);
+		
+	// Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     /** Add primitives subset to the mesh.
      * @param effect - effect for rendering subset.

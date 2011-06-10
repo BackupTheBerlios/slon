@@ -59,7 +59,7 @@ public:
 
 	/** Read serializable from the next chunk. */
 	virtual Serializable* readSerializableOrReference() = 0;
-
+	
     /** Open sub chunk.
      * @param name - name of the sub chunk to open.
      * @param info [out] - information about read chunk.
@@ -70,44 +70,89 @@ public:
     /** Close currently opened chunk. */
     virtual void closeChunk() = 0;
 
-    /** Read string from the chunk. */
+    /** Read string from the opened chunk. */
     virtual void readString(char* str) = 0;
 
-    /** Read string from the chunk. */
+    /** Read string from the opened chunk. */
     virtual void readString(wchar_t* str) = 0;
 	
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(boolean* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(int8* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(uint8* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(int16* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(uint16* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(int32* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(uint32* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(int64* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(uint64* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(float32* values) = 0;
 
-    /** Read value array from the chunk. */
+    /** Read value array from the opened chunk. */
     virtual void read(float64* values) = 0;
+
+	/** Read leaf string chunk from the Archive. 
+	 * @param name - name of the leaf chunk.
+	 * @param str[out] - where to store string.
+	 */
+	template<typename Char, typename Traits>
+	inline std::basic_string<Char, Traits>& readStringChunk(const char* name, std::basic_string<Char, Traits>& str)
+	{
+		chunk_info info;
+		if ( !openChunk(name.c_str(), info) ) {
+			throw serialization_error("Can't open requested chunk");
+		}
+		else if (!info.isLeaf) {
+			throw serialization_error("Trying to read raw data from non leaf chunk");
+		}
+	
+		str.resize(info.size);
+		readString(&str[0]);
+		closeChunk();
+	
+		return str;
+	}
+
+	/** Read leaf chunk from the Archive. 
+	 * @param name - name of the leaf chunk.
+	 * @param data[out] - where to store data.
+	 * @param numElements - number of elements to read
+	 */
+	template<typename T>
+	void readChunk(const char* name, T* data, size_t numElements = 1)
+	{
+		IArchive::chunk_info info;
+		if ( !ar.openChunk(name.c_str(), info) ) {
+			throw serialization_error("Can't open requested chunk");
+		}
+		else if (!info.isLeaf) {
+			throw serialization_error("Trying to read raw data from non leaf chunk");
+		}
+		else if (info.size != numElements) {
+			throw serialization_error("Number of elements in chunk is not equal to requested number of elements");
+		}
+	
+		read(data);
+		closeChunk();
+	}
 
     virtual ~IArchive() {}
 };
@@ -118,16 +163,16 @@ class OArchive :
 {
 public:
     /** Register serializable in the archive.
-     * @param serializable - serializable for registration.
-     * @return 0 - if serializable already registered, otherwise registers serializable and returns unique reference id.
+     * @param ptr - object pointer for registration.
+     * @return 0 - if pointer already registered, otherwise registers pointer and returns unique reference id.
      */
-    virtual int registerReference(Serializable* serializable) = 0;
+    virtual int registerReference(const void* ptr) = 0;
 
     /** Get reference id of the registered serializable.
-     * @param serializable - serializable which reference id we want to retrieve.
-     * @return reference id of the serializable or 0 if serializable id not registered.
+     * @param ptr - object pointer which reference id we want to retrieve.
+     * @return reference id of the pointer or 0 if pointer id not registered.
      */
-    virtual int getReferenceId(Serializable* serializable) const = 0;
+    virtual int getReferenceId(const void* ptr) const = 0;
 
     /** Open chunk for writing subchunks.
      * @param name - name of the chunk.
@@ -138,7 +183,35 @@ public:
     virtual void closeChunk() = 0;
 
 	/** Write serializable, or reference if it already serialized. */
-	virtual void writeSerializablOrReference(Serializable* serializable) = 0;
+	void writeSerializable(const Serializable* serializable)
+	{
+		if ( int refId = getReferenceId(serializable) ) {
+			writeReferenceChunk(refId);
+		}
+		else 
+		{
+			openChunk( serializable->getSerializableName() );
+			serializable->serialize(*this);
+			closeChunk();
+		}
+	}
+
+	/** Try to serialize object using serializable wrapper. 
+	 * @see SerializableWrapper
+	 */
+	template<typename T>
+	void writeCustomSerializable(const T* object)
+	{
+		if ( int refId = getReferenceId(object) ) {
+			writeReferenceChunk(refId);
+		}
+		else 
+		{
+			openChunk( getSerializableName<T>() );
+			serialize(*this, object);
+			closeChunk();
+		}
+	}
 
     /** Write reference chunk. */
     virtual void writeReferenceChunk(int refId) = 0;
@@ -236,115 +309,6 @@ public:
 
     virtual ~OArchive() {}
 };
-
-inline std::string readStringChunk(IArchive& ar, const std::string& name)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	
-	std::string str(info.size, ' ');
-	ar.readString(&str[0]);
-	ar.closeChunk();
-	
-	return str;
-}
-
-inline std::wstring readWStringChunk(IArchive& ar, const std::string& name)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	
-	std::wstring str(info.size, ' ');
-	ar.readString(&str[0]);
-	ar.closeChunk();
-	
-	return str;
-}
-
-template<typename Char, typename Traits>
-inline void readStringChunk(IArchive& ar, const std::string& name, std::basic_string<Char, Traits>& str)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	
-	str.resize(info.size);
-	ar.readString(&str[0]);
-	ar.closeChunk();
-	
-	return str;
-}
-
-template<typename T>
-inline T readChunk(IArchive& ar, const std::string& name)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	else if (info.size != 1) {
-		throw serialization_error("Trying to read single item from multi-item chunk");
-	}
-	
-	T value;
-	ar.read(&value);
-	ar.closeChunk();
-	
-	return value;
-}
-
-template<typename T>
-inline void readChunk(IArchive& ar, const std::string& name, T* value)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	else if (info.size != 1) {
-		throw serialization_error("Trying to read single item from multi-item chunk");
-	}
-	
-	ar.read(value);
-	ar.closeChunk();
-}
-
-template<typename T>
-inline void readChunk(IArchive& ar, const std::string& name, T* data, size_t numElements)
-{
-	IArchive::chunk_info info;
-	if ( !ar.openChunk(name.c_str(), info) ) {
-		throw serialization_error("Can't open requested chunk");
-	}
-	else if (!info.isLeaf) {
-		throw serialization_error("Trying to read raw data from non leaf chunk");
-	}
-	else if (info.size != numElements) {
-		throw serialization_error("Number of elements in chunk is not equal to requested number of elements");
-	}
-	
-	ar.read(data);
-	ar.closeChunk();
-}
 
 } // namespace database
 } // namespace slon

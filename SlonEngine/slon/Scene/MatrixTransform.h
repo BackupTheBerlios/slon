@@ -44,14 +44,6 @@ public:
 
     /** Set both transform and inverse transform, neither checks performed */
     void setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix);
-    
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
-    {
-        ar & boost::serialization::base_object<Group>(*this);
-        ar & BOOST_SERIALIZATION_NVP(transform);
-        invTransformDirty = true;
-    }
 
     virtual ~MatrixTransform() {}
 

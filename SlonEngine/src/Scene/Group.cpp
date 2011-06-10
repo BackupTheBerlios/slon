@@ -21,7 +21,7 @@ Group::Group(const hash_string& name)
 
 const char* Group::getSerializableName() const
 {
-	return "scene::Group";
+	return "Group";
 }
 
 void Group::serialize(database::OArchive& ar) const

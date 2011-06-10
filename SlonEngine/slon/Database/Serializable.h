@@ -38,9 +38,6 @@ inline unsigned getPatchVersion(unsigned version)
 class Serializable
 {
 public:
-    /** Get name of the class for serialization. */
-    virtual const char* getSerializableName() const = 0;
-
     /** Serialize object data using provided serializer.
      * @param ar - archive where to write data. 
      * @param version - file format version.
@@ -57,6 +54,68 @@ public:
 
     virtual ~Serializable() {}
 };
+
+class SerializableTraits
+{
+public:
+	/** Get name of the object for serialization. Specialize it if you want custom name for serializable. */
+	static const char* getName() { return typeid(T).name(); }
+};
+
+/** Wrapper to make object serializable. if you want serialize/deserialize object, which is not derived from Serializable
+ * provide partial specialization for this class template and use OArchive::writeCustomSerializable, IArchive::readCustomSerializable.
+ * Also you can specialize only serialize/deserialize functions of this class (see example below).
+ * You should also register wrapper create function in DatabaseManager.
+ * Example:
+ * \code
+ * void SerializableWrapper< std::pair<int,int> >::serialize(OArchive& ar) const
+ * {
+ *     ar.writeChunk("first", &obj->first);
+ *     ar.writeChunk("second", &obj->second);
+ * }
+ *     
+ * void SerializableWrapper< std::pair<int,int> >::deserialize(IArchive& ar)
+ * {
+ *     obj = new std::pair<int, int>();
+ *     ar.readChunk("first", &obj->first);
+ *     ar.readChunk("second", &obj->second);
+ * }
+ * 
+ * int main(void)
+ * {
+ *     REGISTER_SERIALIZABLE_WRAPPER(std::pair<int, int>);
+ * }
+ * \uncode
+ */
+template<typename T>
+class SerializableWrapper :
+	public Serializable
+{
+public:
+	SerializableWrapper(const T* obj_ = 0)
+	:	obj(const_cast<T*>(obj_))
+	{}
+	
+	// Override Serializable
+	void serialize(OArchive& ar) const;
+    void deserialize(IArchive& ar);
+
+	T* getObject() 
+	{ 
+		return obj; 
+	}
+		
+	static SerializableWrapper<T>* createWrapper()
+	{
+		return new SerializableWrapper<T>();
+	}
+
+private:
+	T* obj;
+};
+
+#define REGISTER_SERIALIZABLE_WRAPPER(Type)\
+slon::database::currentDatabaseManager().registerSerializableCreateFunc(SerializableTraits<Type >::getName(), slon::database::SerializableWrapper<Type >::createWrapper())
 
 } // namespace database
 } // namespace slon

@@ -47,7 +47,7 @@ MatrixTransform::MatrixTransform(const hash_string& name, const math::Matrix4f& 
 // Override Serializable
 const char* MatrixTransform::getSerializableName() const
 {
-	return "scene::MatrixTransform";
+	return "MatrixTransform";
 }
 
 void MatrixTransform::serialize(database::OArchive& ar) const
@@ -76,10 +76,10 @@ void MatrixTransform::deserialize(database::IArchive& ar)
 	Transform::deserialize(ar);
 
 	// deserialize data
-	readChunk(ar, "transform", transform.data(), transform.num_elements);
-	readChunk(ar, "invTransform", invTransform.data(), invTransform.num_elements);
-	readChunk(ar, "transformDirty", &transformDirty);
-	readChunk(ar, "invTransformDirty", &invTransformDirty);
+	ar.readChunk("transform", transform.data(), transform.num_elements);
+	ar.readChunk("invTransform", invTransform.data(), invTransform.num_elements);
+	ar.readChunk("transformDirty", &transformDirty);
+	ar.readChunk("invTransformDirty", &invTransformDirty);
 }
 
 // Override transform

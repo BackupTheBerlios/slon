@@ -1,0 +1,7 @@
+#ifndef __SLON_ENGINE_DATABASE_DETAIL_SGL_SERIALIZATION_H__
+#define __SLON_ENGINE_DATABASE_DETAIL_SGL_SERIALIZATION_H__
+
+#include <sgl/Device.h>
+#include "../Serializable.h"
+
+#endif // __SLON_ENGINE_DATABASE_DETAIL_SGL_SERIALIZATION_H__

@@ -41,7 +41,7 @@ void Node::accept(log::LogVisitor& visitor) const
 
 const char* Node::getSerializableName() const    
 { 
-    return "scene::Node";
+    return "Node";
 }
 
 void Node::serialize(database::OArchive& ar) const
@@ -59,7 +59,8 @@ void Node::deserialize(database::IArchive& ar)
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
     }
 
-	name = hash_string( database::readStringChunk(ar, "name") );
+	std::string tmp;
+	name = hash_string( database::readStringChunk(ar, "name", tmp) );
 }
 
 Node* findNamedNode(Node& root, hash_string name)

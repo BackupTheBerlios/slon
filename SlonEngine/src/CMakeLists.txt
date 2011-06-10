@@ -59,6 +59,7 @@ SET ( TARGET_DATABASE_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Database/Detail/Cache.h
     ${TARGET_HEADER_PATH}/Database/Detail/DatabaseManager.h
     ${TARGET_HEADER_PATH}/Database/Detail/Library.h
+    ${TARGET_HEADER_PATH}/Database/Detail/SGLSerialization.h
 )
 
 SET ( TARGET_INPUT_HEADERS
@@ -487,6 +488,7 @@ SET ( TARGET_DATABASE_DETAIL_SOURCES
     Database/Detail/Cache.cpp
     Database/Detail/DatabaseManager.cpp
     Database/Detail/Library.cpp
+    Database/Detail/SGLSerialization.cpp
 )
 
 SET ( TARGET_FILESYSTEM_SOURCES

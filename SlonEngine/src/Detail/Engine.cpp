@@ -248,9 +248,9 @@ void Engine::init()
 
 	// register serializables
 	{
-		databaseManager.registerSerializableCreateFunc("scene::Node", createSerializable<scene::Node>);
-		databaseManager.registerSerializableCreateFunc("scene::Group", createSerializable<scene::Group>);
-		databaseManager.registerSerializableCreateFunc("scene::MatrixTransform", createSerializable<scene::MatrixTransform>);
+		databaseManager.registerSerializableCreateFunc("Node", createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("Group", createSerializable<scene::Group>);
+		databaseManager.registerSerializableCreateFunc("MatrixTransform", createSerializable<scene::MatrixTransform>);
 	}
 
     // init SDL

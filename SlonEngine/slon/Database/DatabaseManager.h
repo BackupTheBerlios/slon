@@ -188,6 +188,7 @@ public:
 	/** Register serializable create func. Archive will use this function to create serializable using its name.
 	 * @param name - serializable name.
 	 * @param func - serializable create function.
+	 * @param useWrapper - use serializable wrapper for object serialization/deserialization.
 	 * @return true if succeeded, false if create func with specified name already exists.
 	 */
 	virtual bool registerSerializableCreateFunc(const std::string& name, const serializable_create_func& func) = 0;

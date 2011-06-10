@@ -81,7 +81,7 @@ class SXMLOArchive :
     public OArchive
 {
 private:
-    typedef std::map<Serializable*, int> reference_map;
+    typedef std::map<const void*, int> reference_map;
 
 public:
     SXMLOArchive(unsigned version);
@@ -90,13 +90,12 @@ public:
     unsigned getVersion() const { return version; }
 
     // Override OArchive
-    int registerReference(Serializable* serializable);
-    int getReferenceId(Serializable* serializable) const;
+    int registerReference(const void* ptr);
+    int getReferenceId(const void* ptr) const;
 
     void openChunk(const char* name);
     void closeChunk();
 
-	void writeSerializablOrReference(Serializable* serializable);
     void writeReferenceChunk(int refId);
     void writeStringChunk(const char* name, const char* str, size_t size);
     void writeStringChunk(const char* name, const wchar_t* str, size_t size);

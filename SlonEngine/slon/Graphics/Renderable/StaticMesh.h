@@ -18,6 +18,11 @@ public:
     StaticMesh(Mesh* mesh);
     ~StaticMesh();
 
+	// Override Serializable
+    const char* getSerializableName() const;
+    void        serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     // Override Entity
     using Entity::accept;
 

@@ -28,6 +28,23 @@ StaticMesh::~StaticMesh()
 {
 }
 
+const char* StaticMesh::getSerializableName() const
+{
+	return "StaticMesh";
+}
+
+void StaticMesh::serialize(database::OArchive& ar) const
+{
+	Node::serialize(ar);
+	ar.writeSerializablOrReference("mesh", mesh.get());
+}
+
+void StaticMesh::deserialize(database::IArchive& ar)
+{
+	Node::deserialize(ar);
+	mesh = ar.readSerializableOrReference();
+}
+
 // Override node
 void StaticMesh::accept(scene::CullVisitor& visitor) const
 {

@@ -32,7 +32,8 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 		{
 			while ( ar.openChunk("VisualScene", info) )
 			{
-				std::string name = readStringChunk(ar, "name");
+				std::string name;
+				ar.readStringChunk("name", name);
 				scene::node_ptr scene( dynamic_cast<scene::Node*>(ar.readSerializableOrReference()) );
 				if (!scene) {
 					throw serialization_error(AUTO_LOGGER, "Can't deserialize visual scene.");

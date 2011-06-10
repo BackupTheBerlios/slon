@@ -185,9 +185,9 @@ SXMLOArchive::SXMLOArchive(unsigned version_)
 }
 
 // Override OArchive
-int SXMLOArchive::registerReference(Serializable* serializable)
+int SXMLOArchive::registerReference(const void* ptr)
 {
-    std::pair<reference_map::iterator, bool> insPair = references.insert( std::make_pair(serializable, references.size()+1) );
+    std::pair<reference_map::iterator, bool> insPair = references.insert( std::make_pair(ptr, references.size()+1) );
     if (insPair.second) {
         return insPair.first->second;
     }
@@ -195,9 +195,9 @@ int SXMLOArchive::registerReference(Serializable* serializable)
     return 0;
 }
 
-int SXMLOArchive::getReferenceId(Serializable* serializable) const
+int SXMLOArchive::getReferenceId(const void* ptr) const
 {
-    reference_map::const_iterator it = references.find(serializable);
+    reference_map::const_iterator it = references.find(ptr);
     if (it != references.end()) {
         return it->second;
     }
@@ -218,19 +218,6 @@ void SXMLOArchive::closeChunk()
     }
 
     currentElement = currentElement->get_parent();
-}
-
-void SXMLOArchive::writeSerializablOrReference(Serializable* serializable)
-{
-	if ( int refId = getReferenceId(serializable) ) {
-		writeReferenceChunk(refId);
-	}
-	else 
-	{
-		openChunk( serializable->getSerializableName() );
-		serializable->serialize(*this);
-		closeChunk();
-	}
 }
 
 void SXMLOArchive::writeReferenceChunk(int refId)
