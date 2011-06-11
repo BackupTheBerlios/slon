@@ -93,10 +93,11 @@ public:
     int registerReference(const void* ptr);
     int getReferenceId(const void* ptr) const;
 
-    void openChunk(const char* name);
+    void openChunk(const char* name, const void* ptr = 0);
     void closeChunk();
 
     void writeReferenceChunk(int refId);
+	void writeSerializable(const Serializable* serializable);
     void writeStringChunk(const char* name, const char* str, size_t size);
     void writeStringChunk(const char* name, const wchar_t* str, size_t size);
 	

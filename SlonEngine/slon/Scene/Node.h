@@ -56,8 +56,7 @@ public:
     explicit Node(hash_string name);
 
     // Override Serializable
-    const char* getSerializableName() const;
-    void        serialize(database::OArchive& ar) const;
+    const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
     /** Get type of the node */

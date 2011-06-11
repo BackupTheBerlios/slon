@@ -367,9 +367,9 @@ void Mesh::serialize(database::OArchive& ar) const
 {
 	database::serialize( ar, "aabb", aabb );
 	ar.writeChunk( "indexType", &indexType );
-	ar.writeSerializablOrReference( "vertexLayout", SerializableWrapper(vertexLayout.get()) );
-	ar.writeSerializablOrReference( "vertexBuffer", vertexBuffer.get() );
-	ar.writeSerializablOrReference( "indexBuffer", indexBuffer.get() );
+	ar.writeCustomSerializable( vertexLayout.get() );
+	ar.writeCustomSerializable( vertexBuffer.get() );
+	ar.writeCustomSerializable( indexBuffer.get() );
 	ar.writeChunk( "vertexSize", &vertexSize );
 	
 	ar.openChunk("subsets");
@@ -379,7 +379,7 @@ void Mesh::serialize(database::OArchive& ar) const
 			if ( indexed_subset* s = dynamic_cast<indexed_subset*>(subsets[i].get()) ) 
 			{
 				ar.openChunk( "indexed_subset" );
-				ar.writeSerializablOrReference( "effect", s->effect.get() );
+				ar.writeSerializable( s->effect.get() );
 				ar.writeChunk( "primitiveType", &primitiveType );
 				ar.writeChunk( "startIndex", &startIndex );
 				ar.writeChunk( "numIndices", &numIndices );
@@ -388,7 +388,7 @@ void Mesh::serialize(database::OArchive& ar) const
 			else if ( plain_subset* s = dynamic_cast<plain_subset*>(subsets[i].get()) ) 
 			{
 				ar.openChunk( "plain_subset" );
-				ar.writeSerializablOrReference( "effect", s->effect.get() );
+				ar.writeSerializable( s->effect.get() );
 				ar.writeChunk( "primitiveType", &primitiveType );
 				ar.writeChunk( "startVertex", &startVertex );
 				ar.writeChunk( "numVertices", &numVertices );
@@ -406,12 +406,12 @@ void Mesh::deserialize(database::IArchive& ar)
 {
 	using namespace database;
 
-	deserialize( ar, "aabb", aabb );
-	readChunk( ar, "indexType", &indexType );
-	vertexLayout = deserialize(ar, "vertexLayout");
-	vertexBuffer = deserialize(ar, "vertexBuffer");
-	indexBuffer = deserialize(ar, "indexBuffer");
-	readChunk( ar, "vertexSize", &vertexSize );
+    deserialize( "aabb", aabb );
+	ar.readChunk( "indexType", &indexType );
+    vertexLayout = ar.readCustomSerializable<sgl::VertexLayout>("vertexLayout");
+	vertexBuffer = ar.readCustomSerializable<sgl::VertexBuffer>("vertexBuffer");
+	indexBuffer = ar.readCustomSerializable<sgl::IndexBuffer>("indexBuffer");
+	ar.readChunk( "vertexSize", &vertexSize );
 	
 	if ( ar.openChunk("subsets") )
 	{
@@ -421,7 +421,7 @@ void Mesh::deserialize(database::IArchive& ar)
 			if ( ar.openChunk("indexed_subset") )
 			{
 				subset.reset(new indexed_subset);
-				subset->effect = ar.readSerializableOrReference("effect");
+				subset->effect = ar.readSerializable("effect");
 				ar.readChunk("primitiveType", &subset->primitiveType);
 				ar.readChunk("startIndex", &subset->startIndex);
 				ar.readChunk("numIndices", &subset->numIndices);
@@ -430,7 +430,7 @@ void Mesh::deserialize(database::IArchive& ar)
 			else if ( ar.openChunk("plain_subset") ) 
 			{
 				subset.reset(new plain_subset);
-				subset->effect = ar.readSerializableOrReference("effect");
+				subset->effect = ar.readSerializable("effect");
 				ar.readChunk("primitiveType", &subset->primitiveType);
 				ar.readChunk("startVertex", &subset->startIndex);
 				ar.readChunk("numVertices", &subset->numIndices);

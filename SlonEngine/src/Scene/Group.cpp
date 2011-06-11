@@ -19,11 +19,6 @@ Group::Group(const hash_string& name)
 {
 }
 
-const char* Group::getSerializableName() const
-{
-	return "Group";
-}
-
 void Group::serialize(database::OArchive& ar) const
 {
     if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
@@ -40,11 +35,13 @@ void Group::serialize(database::OArchive& ar) const
 		ar.openChunk("children");
 		while (child) 
 		{
-			ar.writeSerializablOrReference( child.get() );
+			ar.writeSerializable( child.get() );
 			child = child->getRight();
 		}
 		ar.closeChunk();
 	}
+
+	return "Group";
 }
 
 void Group::deserialize(database::IArchive& ar)
@@ -61,7 +58,7 @@ void Group::deserialize(database::IArchive& ar)
 	if ( ar.openChunk("children", info) )
 	{
 		scene::Node* left = 0;
-		while ( Serializable* s = ar.readSerializableOrReference() ) 
+		while ( Serializable* s = ar.readSerializable() ) 
 		{
 			scene::Node* node = dynamic_cast<scene::Node*>(s);
 			if (!node) {

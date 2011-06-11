@@ -205,10 +205,19 @@ int SXMLOArchive::getReferenceId(const void* ptr) const
     return 0;
 }
 
-void SXMLOArchive::openChunk(const char* name)
+void SXMLOArchive::openChunk(const char* name, const void* ptr)
 {
     xmlpp::element child(name);
 	currentElement = xmlpp::element_iterator(currentElement->add_child(child));
+    if (ptr)
+    {
+        std::pair<reference_map::iterator, bool> insPair = references.insert( std::make_pair(ptr, references.size()+1) );
+        if (!insPair.second) {
+            throw serialization_error(AUTO_LOGGER, "Object already serialized.");
+        }
+
+        currentElement->set_attribute_value("id", insPair.first->second);
+    }
 }	
 
 void SXMLOArchive::closeChunk()
@@ -225,6 +234,19 @@ void SXMLOArchive::writeReferenceChunk(int refId)
     xmlpp::element child("Reference");
     child.set_attribute("id", boost::lexical_cast<std::string>(refId));
     currentElement->add_child(child);
+}
+
+void SXMLOArchive::writeSerializable(const Serializable* serializable)
+{
+	if ( int refId = getReferenceId(serializable) ) {
+		writeReferenceChunk(refId);
+	}
+	else 
+	{
+        openChunk("temp", serializable);
+        currentElement->set_value( serializable->serialize(*this) );
+        closeChunk();
+	}
 }
 
 void SXMLOArchive::writeStringChunk(const char* name, const char* str, size_t size)

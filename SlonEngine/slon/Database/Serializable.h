@@ -39,27 +39,19 @@ class Serializable
 {
 public:
     /** Serialize object data using provided serializer.
-     * @param ar - archive where to write data. 
-     * @param version - file format version.
+     * @param ar - archive where to write data.
+     * @return serializable name.
      * @throws serialization_error
      */
-    virtual void serialize(OArchive& ar) const = 0;
+    virtual const char* serialize(OArchive& ar) const = 0;
 
     /** Deserialize object data using provided deserializer.
      * @param ar - archieve to read the data from.
-     * @param version - file format version.
      * @throws serialization_error
      */
     virtual void deserialize(IArchive& ar) = 0;
 
     virtual ~Serializable() {}
-};
-
-class SerializableTraits
-{
-public:
-	/** Get name of the object for serialization. Specialize it if you want custom name for serializable. */
-	static const char* getName() { return typeid(T).name(); }
 };
 
 /** Wrapper to make object serializable. if you want serialize/deserialize object, which is not derived from Serializable
@@ -68,17 +60,19 @@ public:
  * You should also register wrapper create function in DatabaseManager.
  * Example:
  * \code
- * void SerializableWrapper< std::pair<int,int> >::serialize(OArchive& ar) const
+ * const char* SerializableWrapper< std::pair<int,int> >::serialize(const std::pair<int,int>& pair, OArchive& ar) const
  * {
- *     ar.writeChunk("first", &obj->first);
- *     ar.writeChunk("second", &obj->second);
+ *     ar.writeChunk("first", &pair->first);
+ *     ar.writeChunk("second", &pair->second);
+ *     return "int_pair";
  * }
  *     
- * void SerializableWrapper< std::pair<int,int> >::deserialize(IArchive& ar)
+ * T* SerializableWrapper< std::pair<int,int> >::deserialize(std::pair<int,int>*& pair, IArchive& ar)
  * {
- *     obj = new std::pair<int, int>();
- *     ar.readChunk("first", &obj->first);
- *     ar.readChunk("second", &obj->second);
+ *     pair = new std::pair<int, int>();
+ *     ar.readChunk("first", &pair->first);
+ *     ar.readChunk("second", &pair->second);
+ *     return pair;
  * }
  * 
  * int main(void)
@@ -92,26 +86,84 @@ class SerializableWrapper :
 	public Serializable
 {
 public:
-	SerializableWrapper(const T* obj_ = 0)
-	:	obj(const_cast<T*>(obj_))
-	{}
-	
-	// Override Serializable
-	void serialize(OArchive& ar) const;
-    void deserialize(IArchive& ar);
+    SerializableWrapper(T* object_)
+    :   object(object_)
+    {}
 
-	T* getObject() 
-	{ 
-		return obj; 
-	}
-		
+	// Override Serializable
+    const char* serialize(OArchive& ar) const
+    { 
+        if ( !serializeDerived(object, ar) ) 
+        {
+            serialize(*object, ar);
+            name = typeid(T).name();
+        }
+
+        return name;
+    }
+
+    void deserialize(IArchive& ar)      
+    { 
+        deserialize(object, ar);
+    }
+
+    /** Get serialized/deserialized object */
+    T* getObject() { return object; }
+
+    /** Serialize object. Implement this function.
+     * @param object - object for serialization.
+     * @param ar - archive where to write object.
+     * @return serializable name.
+     */
+	const char* serialize(const T& object, OArchive& ar) const;
+
+    /** Deserialize object. Implement this function.
+     * @param object[out] - where to store deserialized object.
+     * @param ar - archive where to read from.
+     * @return deserialized object.
+     */
+    void deserialize(T*& object, IArchive& ar) const;
+
+    /** Try to serialize derived object. Specialize this function if you
+     * are about to use SerializableWrapper for polymorphic object. Specialization
+     * for base SerializableWrapper should look like this:
+     * \code
+     * bool serializeDerived(Base* object, OArchive& ar) const
+     * {
+     *     return serializeDerived<Derived1>(object, ar)
+     *            || serializeDerived<Derived2>(object, ar)
+     *            || serializeDerived<Derived3>(object, ar);
+     * }
+     * \uncode
+     */
+    bool serializeDerived(T* object, OArchive& ar) const
+    {
+        return false;
+    }
+
+    /** Try to serialize using dervied object wrapper. */
+    template<typename Y>
+    bool serializeDerived(T* object, OArchive& ar) const
+    {
+        if ( Y* derived = dynamic_cast<Y*>(object) ) 
+        {
+            SerializableWrapper<Y> wrapper(derived);
+            name = wrapper.serialize(ar);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// Implement this if you want custom wrapper create function
 	static SerializableWrapper<T>* createWrapper()
 	{
 		return new SerializableWrapper<T>();
 	}
 
 private:
-	T* obj;
+    T* object;
+    const char* name;
 };
 
 #define REGISTER_SERIALIZABLE_WRAPPER(Type)\

@@ -3,7 +3,7 @@
 
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
-#include "Forward.h"
+#include "Serializable.h"
 
 namespace slon {
 namespace database {
@@ -58,8 +58,27 @@ public:
     virtual Serializable* readReference(int refId) = 0;
 
 	/** Read serializable from the next chunk. */
-	virtual Serializable* readSerializableOrReference() = 0;
+	virtual Serializable* readSerializable() = 0;
 	
+    /** Read serializable using serializable wrapper. */
+    template<typename T>
+    T* readCustomSerializable()
+    {
+        Serializable* serializable = readSerializable();
+        if (!serializable) {
+            return 0;
+        }
+
+        SerializableWrapper<T>* wrapper = dynamic_cast<SerializableWrapper<T>*>(serializable);
+        if (!wrapper) 
+        {
+            delete serializable;
+            return 0;
+        }
+
+        return wrapper->getObject();
+    }
+
     /** Open sub chunk.
      * @param name - name of the sub chunk to open.
      * @param info [out] - information about read chunk.
@@ -117,7 +136,7 @@ public:
 	inline std::basic_string<Char, Traits>& readStringChunk(const char* name, std::basic_string<Char, Traits>& str)
 	{
 		chunk_info info;
-		if ( !openChunk(name.c_str(), info) ) {
+		if ( !openChunk(name, info) ) {
 			throw serialization_error("Can't open requested chunk");
 		}
 		else if (!info.isLeaf) {
@@ -140,7 +159,7 @@ public:
 	void readChunk(const char* name, T* data, size_t numElements = 1)
 	{
 		IArchive::chunk_info info;
-		if ( !ar.openChunk(name.c_str(), info) ) {
+		if ( !ar.openChunk(name, info) ) {
 			throw serialization_error("Can't open requested chunk");
 		}
 		else if (!info.isLeaf) {
@@ -162,12 +181,6 @@ class OArchive :
     public Archive
 {
 public:
-    /** Register serializable in the archive.
-     * @param ptr - object pointer for registration.
-     * @return 0 - if pointer already registered, otherwise registers pointer and returns unique reference id.
-     */
-    virtual int registerReference(const void* ptr) = 0;
-
     /** Get reference id of the registered serializable.
      * @param ptr - object pointer which reference id we want to retrieve.
      * @return reference id of the pointer or 0 if pointer id not registered.
@@ -176,27 +189,31 @@ public:
 
     /** Open chunk for writing subchunks.
      * @param name - name of the chunk.
+     * @param ptr - pointer of the object for serialization into chunk, so we can reference to it later.
+     * @throws serialization_error if archive already have reference id for ptr.
      */
-    virtual void openChunk(const char* name) = 0;
+    virtual void openChunk(const char* name, const void* ptr = 0) = 0;
 
     /** Close currently opened chunk. */
     virtual void closeChunk() = 0;
 
-	/** Write serializable, or reference if it already serialized. */
-	void writeSerializable(const Serializable* serializable)
-	{
-		if ( int refId = getReferenceId(serializable) ) {
-			writeReferenceChunk(refId);
-		}
-		else 
-		{
-			openChunk( serializable->getSerializableName() );
-			serializable->serialize(*this);
-			closeChunk();
-		}
-	}
+	/** Write serializable, or reference if it already serialized. 
+     * Common implementation should look as follows:
+     * \code
+     * if ( int refId = getReferenceId(object) ) {
+	 *     writeReferenceChunk(refId);
+	 * }
+	 * else 
+	 * {
+     *     openChunk("temp_name", serializable);
+     *     renameCurrentChunk( serializable->serialize(*this) );
+     *     closeChunk();
+	 * }
+     * \uncode
+     */
+	virtual void writeSerializable(const Serializable* serializable) = 0;
 
-	/** Try to serialize object using serializable wrapper. 
+	/** Try to serialize object using serializable wrapper. Doesn't care about object polymorphism!
 	 * @see SerializableWrapper
 	 */
 	template<typename T>
@@ -207,9 +224,8 @@ public:
 		}
 		else 
 		{
-			openChunk( getSerializableName<T>() );
-			serialize(*this, object);
-			closeChunk();
+            SerializableWrapper<T> wrapper(object);
+            writeSerializable(&wrapper);
 		}
 	}
 
