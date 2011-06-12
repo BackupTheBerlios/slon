@@ -27,7 +27,7 @@ public:
 
     // Override IArchive
     Serializable* readReference(int refId);
-	Serializable* readSerializableOrReference();
+	Serializable* readSerializable();
 
     bool openChunk(const char* name, chunk_info& info);
     void closeChunk();

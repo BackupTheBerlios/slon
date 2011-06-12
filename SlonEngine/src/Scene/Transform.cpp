@@ -20,12 +20,7 @@ Transform::Transform(const hash_string& name)
 }
 	
 // Override Serializable
-const char* Transform::getSerializableName() const
-{
-	return "Transform";
-}
-
-void Transform::serialize(database::OArchive& ar) const
+const char* Transform::serialize(database::OArchive& ar) const
 {
     if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
@@ -39,6 +34,8 @@ void Transform::serialize(database::OArchive& ar) const
 	ar.writeChunk("localToWorld", localToWorld.data(), localToWorld.num_elements);
 	ar.writeChunk("traverseStamp", &traverseStamp);
 	ar.writeChunk("modifiedCount", &modifiedCount);
+
+    return "Transform";
 }
 
 void Transform::deserialize(database::IArchive& ar)

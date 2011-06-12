@@ -159,7 +159,7 @@ public:
 	void readChunk(const char* name, T* data, size_t numElements = 1)
 	{
 		IArchive::chunk_info info;
-		if ( !ar.openChunk(name, info) ) {
+		if ( !openChunk(name, info) ) {
 			throw serialization_error("Can't open requested chunk");
 		}
 		else if (!info.isLeaf) {

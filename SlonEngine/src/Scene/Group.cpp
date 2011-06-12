@@ -19,7 +19,7 @@ Group::Group(const hash_string& name)
 {
 }
 
-void Group::serialize(database::OArchive& ar) const
+const char* Group::serialize(database::OArchive& ar) const
 {
     if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");

@@ -76,7 +76,7 @@ Serializable* SXMLIArchive::readReference(int refId)
 	return readSerializable(*itE->second);
 }
 
-Serializable* SXMLIArchive::readSerializableOrReference()
+Serializable* SXMLIArchive::readSerializable()
 {
 	Serializable* serializable = 0;
 	if (!nextElement) {

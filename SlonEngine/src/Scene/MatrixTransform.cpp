@@ -45,12 +45,7 @@ MatrixTransform::MatrixTransform(const hash_string& name, const math::Matrix4f& 
 }
 
 // Override Serializable
-const char* MatrixTransform::getSerializableName() const
-{
-	return "MatrixTransform";
-}
-
-void MatrixTransform::serialize(database::OArchive& ar) const
+const char* MatrixTransform::serialize(database::OArchive& ar) const
 {
     if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
         throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
@@ -64,6 +59,8 @@ void MatrixTransform::serialize(database::OArchive& ar) const
 	ar.writeChunk("invTransform", invTransform.data(), invTransform.num_elements);
 	ar.writeChunk("transformDirty", &transformDirty);
 	ar.writeChunk("invTransformDirty", &invTransformDirty);
+
+	return "MatrixTransform";
 }
 
 void MatrixTransform::deserialize(database::IArchive& ar)

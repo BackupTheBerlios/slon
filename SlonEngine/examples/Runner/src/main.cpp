@@ -117,7 +117,7 @@ public:
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
-                world.add(library->visualScenes[0].second.get());
+                world.add(library->visualScenes.front().second.get());
 
 				database::Library::key_animation_map animations = library->animations;
 				if ( !animations.empty() )

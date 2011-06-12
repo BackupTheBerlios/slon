@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Graphics/Renderable/StaticMesh.h"
 #include "Scene/Visitors/CullVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
@@ -28,21 +29,17 @@ StaticMesh::~StaticMesh()
 {
 }
 
-const char* StaticMesh::getSerializableName() const
-{
-	return "StaticMesh";
-}
-
-void StaticMesh::serialize(database::OArchive& ar) const
+const char* StaticMesh::serialize(database::OArchive& ar) const
 {
 	Node::serialize(ar);
-	ar.writeSerializablOrReference("mesh", mesh.get());
+	ar.writeSerializable(mesh.get());
+    return "StaticMesh";
 }
 
 void StaticMesh::deserialize(database::IArchive& ar)
 {
 	Node::deserialize(ar);
-	mesh = ar.readSerializableOrReference();
+	mesh = static_cast<Mesh*>( ar.readSerializable() );
 }
 
 // Override node

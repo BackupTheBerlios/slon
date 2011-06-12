@@ -167,21 +167,23 @@ public:
     {
     friend class Mesh;
     protected:
+	    subset(Mesh* _mesh) :
+            mesh(_mesh)
+        {}
+
 	    subset( Mesh*   _mesh,
 			    Effect* _effect) :
             mesh(_mesh),
             effect(_effect)
         {}
+
         virtual ~subset() {}
 
     public:
         // Override Renderable
-        Effect* getEffect() const       { return effect.get(); }
+        Effect* getEffect() const { return effect.get(); }
 
-        /** Setup effect for rendering subset */
-        void setEffect(Effect* _effect) { effect.reset(_effect); }
-
-    protected:
+    public:
         Mesh*       mesh;
         effect_ptr  effect;
     };
@@ -197,6 +199,10 @@ public:
     {
     friend class Mesh;
     private:
+        plain_subset( Mesh* mesh )
+        :   subset(mesh)
+        {}
+
 	    plain_subset( Mesh*                 mesh,
 				      Effect*               effect,
                       sgl::PRIMITIVE_TYPE   _primitiveType,
@@ -212,9 +218,7 @@ public:
         // Override Renderable
         void render() const;
 
-		sgl::PRIMITIVE_TYPE getPrimitiveType() const { return primitiveType; }
-
-    private:
+    public:
         sgl::PRIMITIVE_TYPE primitiveType;
         unsigned            startVertex;
         unsigned            numVertices;
@@ -225,6 +229,10 @@ public:
     {
     friend class Mesh;
     private:
+        indexed_subset( Mesh* mesh )
+        :   subset(mesh)
+        {}
+
 	    indexed_subset( Mesh*               mesh,
 				        Effect*             effect,
                         sgl::PRIMITIVE_TYPE _primitiveType,
@@ -251,6 +259,9 @@ public:
         unsigned            startIndex;
         unsigned            numIndices;
     };
+
+    typedef boost::intrusive_ptr<plain_subset>    plain_subset_ptr;
+    typedef boost::intrusive_ptr<indexed_subset>  indexed_subset_ptr;
 
     template<typename T>
     class accessor
@@ -370,8 +381,7 @@ public:
     explicit Mesh(const DESC& desc);
 		
 	// Override Serializable
-    const char* getSerializableName() const;
-    void        serialize(database::OArchive& ar) const;
+    const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
     /** Add primitives subset to the mesh.

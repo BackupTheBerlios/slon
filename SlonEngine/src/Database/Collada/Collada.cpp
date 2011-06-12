@@ -533,13 +533,13 @@ namespace {
 							{
                                 // add sub subset
                                 size_t primIndex = std::distance( iter, primitiveMaterials.begin() );
-                                mesh->getSubset(i).setEffect( materials[primIndex]->createEffect() );
+                                mesh->getSubset(i).effect = materials[primIndex]->createEffect();
 							}
 							else
 							{
 								// add new subset
                                 graphics::material_ptr material = createMaterial(**materialInstanceIter);
-                                mesh->getSubset(i).setEffect( material->createEffect() );
+                                mesh->getSubset(i).effect = material->createEffect();
                                 primitiveMaterials.push_back(*materialInstanceIter);
                                 materials.push_back(material);
 							}
@@ -555,7 +555,7 @@ namespace {
                 // use default material
                 graphics::material_ptr defaultMaterial(new graphics::LightingMaterial);
                 for(size_t i = 0; i<colladaMesh.primitives.size(); ++i) {
-                    mesh->getSubset(i).setEffect( defaultMaterial->createEffect() );
+                    mesh->getSubset(i).effect = defaultMaterial->createEffect();
                 }
                 AUTO_LOGGER_MESSAGE(log::S_WARNING, "Mesh subset doesn't have any material, using default." << std::endl);
             }

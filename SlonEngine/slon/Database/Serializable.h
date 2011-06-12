@@ -115,14 +115,14 @@ public:
      * @param ar - archive where to write object.
      * @return serializable name.
      */
-	const char* serialize(const T& object, OArchive& ar) const;
+	static const char* serialize(const T& object, OArchive& ar);
 
     /** Deserialize object. Implement this function.
      * @param object[out] - where to store deserialized object.
      * @param ar - archive where to read from.
      * @return deserialized object.
      */
-    void deserialize(T*& object, IArchive& ar) const;
+    static void deserialize(T*& object, IArchive& ar);
 
     /** Try to serialize derived object. Specialize this function if you
      * are about to use SerializableWrapper for polymorphic object. Specialization
