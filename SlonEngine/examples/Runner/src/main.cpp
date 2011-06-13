@@ -117,14 +117,14 @@ public:
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
-                world.add(library->visualScenes.front().second.get());
+                world.add(library->visualScenes.begin()->second.get());
 
 				database::Library::key_animation_map animations = library->animations;
 				if ( !animations.empty() )
 				{
 					StartStopTimer* timer = new StartStopTimer();
 					timer->start();
-					animations.front().second->play(timer);
+					animations.begin()->second->play(timer);
 				}
 
                 // create light

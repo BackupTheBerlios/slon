@@ -86,8 +86,8 @@ class SerializableWrapper :
 	public Serializable
 {
 public:
-    SerializableWrapper(T* object_)
-    :   object(object_)
+    SerializableWrapper(const T* object_)
+    :   object( const_cast<T*>(object_) )
     {}
 
 	// Override Serializable
@@ -163,7 +163,7 @@ public:
 
 private:
     T* object;
-    const char* name;
+    mutable const char* name;
 };
 
 #define REGISTER_SERIALIZABLE_WRAPPER(Type)\

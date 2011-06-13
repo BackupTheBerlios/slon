@@ -51,7 +51,7 @@ void SXMLIArchive::readFromFile(filesystem::File& file)
 		std::copy( top->first_child_element(), top->end_child_element(), std::back_inserter(elements) );
 
 		// check if element have reference id
-		if ( top->has_attribute("refId") ) 
+		if ( top->has_attribute("id") ) 
 		{
 			std::pair<reference_element_map::iterator, bool> insPair = referenceElements.insert( std::make_pair(top->get_attribute_value<size_t>("id"), top) );
 			if (!insPair.second) {
@@ -82,8 +82,8 @@ Serializable* SXMLIArchive::readSerializable()
 	if (!nextElement) {
 		return 0;
 	}
-	else if ( nextElement->has_attribute("id") ) {
-		serializable = readReference( nextElement->get_attribute_value<size_t>("id") );
+	else if ( nextElement->has_attribute("refId") ) {
+		serializable = readReference( nextElement->get_attribute_value<size_t>("refId") );
 	}
 	else {
 		serializable = readSerializable(*nextElement);
@@ -232,7 +232,7 @@ void SXMLOArchive::closeChunk()
 void SXMLOArchive::writeReferenceChunk(int refId)
 {
     xmlpp::element child("Reference");
-    child.set_attribute("id", boost::lexical_cast<std::string>(refId));
+    child.set_attribute("refId", boost::lexical_cast<std::string>(refId));
     currentElement->add_child(child);
 }
 

@@ -102,6 +102,7 @@ typedef boost::intrusive_ptr<const MeshData>	mesh_data_const_ptr;
 
 /** Mesh representation convinient for rendering */
 class Mesh :
+    public Referenced,
 	public database::Serializable
 {
 public:

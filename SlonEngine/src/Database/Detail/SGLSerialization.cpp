@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
 #include "Database/Detail/SGLSerialization.h"
+#include "Graphics/Common.h"
 
 DECLARE_AUTO_LOGGER("database.SGLSerialization")
 
@@ -27,13 +28,15 @@ const char* SerializableWrapper<sgl::VertexLayout>::serialize(const sgl::VertexL
     return "VertexLayout";
 }
 
-void SerializableWrapper<sgl::VertexLayout>::deserialize(const sgl::VertexLayout*& vl, IArchive& ar)
+void SerializableWrapper<sgl::VertexLayout>::deserialize(sgl::VertexLayout*& vl, IArchive& ar)
 {
-	std::vector<sgl::VertexLayout::Element> elements;
-	if ( ar.openChunk("elements") )
+	std::vector<sgl::VertexLayout::ELEMENT> elements;
+
+    IArchive::chunk_info info;
+	if ( ar.openChunk("elements", info) )
 	{
-		sgl::VertexLayout::Element elem;
-		while ( ar.openChunk("element") )
+		sgl::VertexLayout::ELEMENT elem;
+		while ( ar.openChunk("element", info) )
 		{
 			ar.readChunk("index", &elem.index);
 			ar.readChunk("size", &elem.size);
@@ -50,12 +53,23 @@ void SerializableWrapper<sgl::VertexLayout>::deserialize(const sgl::VertexLayout
 	vl = graphics::currentDevice()->CreateVertexLayout(elements.size(), &elements[0]);
 }
 
-const char* SerializableWrapper<sgl::Buffer>::serialize(const sgl::VertexBuffer& buffer, OArchive& ar)
+const char* SerializableWrapper<sgl::Buffer>::serialize(const sgl::Buffer& buffer, OArchive& ar)
 {
-	char* data = 0;
-	obj->Map(STATIC_READ, &data);
-	ar.writeChunk( "data", data, obj->Size() );
-	obj->Unmap()
+	char* data = (char*)malloc( buffer.Size() );
+    if (!data) {
+        throw serialization_error(AUTO_LOGGER, "Can't allocate memory for buffer data.");
+    }
+
+    if ( sgl::SGL_OK != buffer.GetData( data, 0, buffer.Size() ) ) \
+    {
+        free(data);
+        throw serialization_error(AUTO_LOGGER, "Can't read data from buffer.");
+    }
+
+	ar.writeChunk( "data", data, buffer.Size() );
+    free(data);
+
+    return "Buffer";
 }
 
 void SerializableWrapper<sgl::Buffer>::deserialize(sgl::Buffer*& buffer, IArchive& ar)
@@ -66,7 +80,7 @@ void SerializableWrapper<sgl::Buffer>::deserialize(sgl::Buffer*& buffer, IArchiv
 	{
         char* data = (char*)malloc(info.size);
         if (!data) {
-            throw serialization_error(AUTO_LOGGER, "Can't allocate data for buffer");
+            throw serialization_error(AUTO_LOGGER, "Can't allocate memory for buffer data.");
         }
 
         ar.read(data);
@@ -84,7 +98,21 @@ const char* SerializableWrapper<sgl::VertexBuffer>::serialize(const sgl::VertexB
 void SerializableWrapper<sgl::VertexBuffer>::deserialize(sgl::VertexBuffer*& buffer, IArchive& ar)
 {
 	buffer = graphics::currentDevice()->CreateVertexBuffer();
-    SerializableWrapper<sgl::Buffer>::deserialize(buffer, ar);
+    sgl::Buffer* pBuf = buffer;
+    SerializableWrapper<sgl::Buffer>::deserialize(pBuf, ar);
+}
+
+const char* SerializableWrapper<sgl::IndexBuffer>::serialize(const sgl::IndexBuffer& buffer, OArchive& ar)
+{
+    SerializableWrapper<sgl::Buffer>::serialize(buffer, ar);
+    return "IndexBuffer";
+}
+
+void SerializableWrapper<sgl::IndexBuffer>::deserialize(sgl::IndexBuffer*& buffer, IArchive& ar)
+{
+	buffer = graphics::currentDevice()->CreateIndexBuffer();
+    sgl::Buffer* pBuf = buffer;
+    SerializableWrapper<sgl::Buffer>::deserialize(pBuf, ar);
 }
 
 } // namespace database

@@ -404,7 +404,7 @@ void Mesh::deserialize(database::IArchive& ar)
 {
 	using namespace database;
 
-    deserialize( ar, "aabb", aabb );
+    database::deserialize( ar, "aabb", aabb );
 	ar.readChunk( "indexType", reinterpret_cast<int*>(&indexType) );
     vertexLayout.reset( ar.readCustomSerializable<sgl::VertexLayout>() );
 	vertexBuffer.reset( ar.readCustomSerializable<sgl::VertexBuffer>() );
