@@ -86,17 +86,15 @@ class SerializableWrapper :
 	public Serializable
 {
 public:
-    SerializableWrapper(const T* object_)
+    SerializableWrapper(const T* object_ = 0)
     :   object( const_cast<T*>(object_) )
     {}
 
 	// Override Serializable
     const char* serialize(OArchive& ar) const
     { 
-        if ( !serializeDerived(object, ar) ) 
-        {
-            serialize(*object, ar);
-            name = typeid(T).name();
+        if ( !serializeDerived(object, ar) ) {
+            name = serialize(*object, ar);
         }
 
         return name;
@@ -166,8 +164,28 @@ private:
     mutable const char* name;
 };
 
-#define REGISTER_SERIALIZABLE_WRAPPER(Type)\
-slon::database::currentDatabaseManager().registerSerializableCreateFunc(SerializableTraits<Type >::getName(), slon::database::SerializableWrapper<Type >::createWrapper())
+
+/** Helper function for registering serializable. Example:
+ * \code
+ * database::currentDatabaseManager().registerSerializableCreateFunc("Node, createSerializable<scene::Node>);
+ * \uncode
+ */
+template<typename T>
+database::Serializable* createSerializable()
+{
+	return new T();
+}
+
+/** Helper function for registering serializable wrappers. Example:
+ * \code
+ * database::currentDatabaseManager().registerSerializableCreateFunc("int_pair, createSerializableWrapper< std::pair<int, int> >);
+ * \uncode
+ */
+template<typename T>
+inline SerializableWrapper<T>* createSerializableWrapper()
+{
+	return new SerializableWrapper<T>();
+}
 
 } // namespace database
 } // namespace slon

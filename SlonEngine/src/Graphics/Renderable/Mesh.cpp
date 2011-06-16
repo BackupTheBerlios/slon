@@ -166,7 +166,7 @@ void Mesh::indexed_subset::render() const
     currentDevice()->DrawIndexed(primitiveType, startIndex, numIndices);
 }
 
-Mesh::Mesh(const MeshData* data_)
+Mesh::Mesh(const const_mesh_data_ptr& data_)
 :	data(data_)
 {
     // attributes must have zero attribute
@@ -498,7 +498,6 @@ Mesh* Mesh::shallowCopy() const
 
     return copy;
 }
-
 
 } // namespace graphics
 } // namespace slon

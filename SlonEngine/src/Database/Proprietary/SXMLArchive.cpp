@@ -5,6 +5,7 @@
 #include "FileSystem/File.h"
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
+#include "Utility/base64.hpp"
 #include <boost/iostreams/stream_buffer.hpp>
 
 DECLARE_AUTO_LOGGER("database.SXML");
@@ -176,6 +177,19 @@ void SXMLIArchive::closeChunk()
 	}
 }
 
+void SXMLIArchive::read(void* data)
+{
+	if (!openedElement) {
+		throw serialization_error(log::logger_ptr(), "Trying to read raw data from unopened chunk.");
+	}
+    else if (!chunkInfo.isLeaf) {
+		throw serialization_error(log::logger_ptr(), "Trying to read raw data from not leaf chunk.");
+	}
+
+    std::string dataStr = base64_decode( openedElement->get_text() );
+	memcpy( data, dataStr.data(), dataStr.length() );
+}
+
 SXMLOArchive::SXMLOArchive(unsigned version_)
 :   version(version_)
 {
@@ -236,17 +250,28 @@ void SXMLOArchive::writeReferenceChunk(int refId)
     currentElement->add_child(child);
 }
 
-void SXMLOArchive::writeSerializable(const Serializable* serializable)
+void SXMLOArchive::writeSerializable(const Serializable* serializable, bool writeReferenceIfPossible, bool rememberReference)
 {
-	if ( int refId = getReferenceId(serializable) ) {
-		writeReferenceChunk(refId);
-	}
-	else 
+	if (writeReferenceIfPossible) 
 	{
-        openChunk("temp", serializable);
-        currentElement->set_value( serializable->serialize(*this) );
-        closeChunk();
+		if (int refId = getReferenceId(serializable)) 
+		{
+			writeReferenceChunk(refId);
+			return;
+		}
 	}
+
+    openChunk("temp", rememberReference ? serializable : 0);
+    currentElement->set_value( serializable->serialize(*this) );
+    closeChunk();
+}
+
+void SXMLOArchive::writeBinaryChunk(const char* name, const void* data, size_t size)
+{
+    xmlpp::element child(name);
+	child.set_attribute_value("size", size);
+    child.set_text( base64_encode(reinterpret_cast<const unsigned char*>(data), size).c_str() );
+    currentElement->add_child(child);
 }
 
 void SXMLOArchive::writeStringChunk(const char* name, const char* str, size_t size)

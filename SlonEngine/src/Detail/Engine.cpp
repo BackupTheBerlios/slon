@@ -5,6 +5,7 @@
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
+#include "Graphics/Renderable/StaticMesh.h"
 #include "Scene/Camera.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/error.hpp"
@@ -157,12 +158,6 @@ namespace {
         }
     };
 
-	template<typename T>
-	database::Serializable* createSerializable()
-	{
-		return new T();
-	}
-
 } // anonymous namespace
 
 namespace slon {
@@ -248,9 +243,17 @@ void Engine::init()
 
 	// register serializables
 	{
-		databaseManager.registerSerializableCreateFunc("Node", createSerializable<scene::Node>);
-		databaseManager.registerSerializableCreateFunc("Group", createSerializable<scene::Group>);
+		using namespace database;
+
+		databaseManager.registerSerializableCreateFunc("Node",            createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("Group",           createSerializable<scene::Group>);
 		databaseManager.registerSerializableCreateFunc("MatrixTransform", createSerializable<scene::MatrixTransform>);
+		databaseManager.registerSerializableCreateFunc("StaticMesh",      createSerializable<graphics::StaticMesh>);
+		databaseManager.registerSerializableCreateFunc("Mesh",            createSerializable<graphics::Mesh>);
+
+		databaseManager.registerSerializableCreateFunc("VertexLayout",    createSerializableWrapper<sgl::VertexLayout>);
+		databaseManager.registerSerializableCreateFunc("VertexBuffer",    createSerializableWrapper<sgl::VertexBuffer>);
+		databaseManager.registerSerializableCreateFunc("IndexBuffer",     createSerializableWrapper<sgl::IndexBuffer>);
 	}
 
     // init SDL

@@ -12,6 +12,7 @@
 #include "../Detail/AttributeTable.h"
 #include "../Effect.h"
 #include "../Renderable.h"
+#include "Forward.h"
 
 namespace slon {
 namespace graphics {
@@ -96,9 +97,6 @@ private:
     attribute_array     attributeArrays[MAX_NUM_ATTRIBUTES];
     indices_array       indicesArrays[MAX_NUM_ATTRIBUTES];
 };
-
-typedef boost::intrusive_ptr<MeshData>			mesh_data_ptr;
-typedef boost::intrusive_ptr<const MeshData>	mesh_data_const_ptr;
 
 /** Mesh representation convinient for rendering */
 class Mesh :
@@ -378,7 +376,7 @@ private:
 
 public:
     Mesh();
-	explicit Mesh(const MeshData* meshData);
+	explicit Mesh(const const_mesh_data_ptr& meshData);
     explicit Mesh(const DESC& desc);
 		
 	// Override Serializable
@@ -471,11 +469,8 @@ private:
     size_t                              vertexSize;
 	subset_vector                       subsets;
     attribute_vector                    attributes;
-	mesh_data_const_ptr					data;
+	const_mesh_data_ptr					data;
 };
-
-typedef boost::intrusive_ptr<Mesh>          mesh_ptr;
-typedef boost::intrusive_ptr<const Mesh>    const_mesh_ptr;
 
 } // namespace graphics
 } // namespace slon

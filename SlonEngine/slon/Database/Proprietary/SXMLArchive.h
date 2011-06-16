@@ -31,7 +31,8 @@ public:
 
     bool openChunk(const char* name, chunk_info& info);
     void closeChunk();
-
+	
+	void read(void* data);
 	void readString(char* str)		{ memcpy(str, openedElement->get_text(), chunkInfo.size); }
     void readString(wchar_t* str)	{ /*memcpy(str, currentElement.get_text()); FIXME*/ }
     void read(boolean* values)		{ readImpl(values); }
@@ -97,7 +98,8 @@ public:
     void closeChunk();
 
     void writeReferenceChunk(int refId);
-	void writeSerializable(const Serializable* serializable);
+	void writeSerializable(const Serializable* serializable, bool writeReferenceIfPossible = true, bool rememberReference = true);
+	void writeBinaryChunk(const char* name, const void* data, size_t size);
     void writeStringChunk(const char* name, const char* str, size_t size);
     void writeStringChunk(const char* name, const wchar_t* str, size_t size);
 	

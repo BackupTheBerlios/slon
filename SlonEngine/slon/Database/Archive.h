@@ -95,6 +95,9 @@ public:
     /** Read string from the opened chunk. */
     virtual void readString(wchar_t* str) = 0;
 	
+	/** Read binary chunk data. */
+	virtual void read(void* data) = 0;
+
     /** Read value array from the opened chunk. */
     virtual void read(boolean* values) = 0;
 
@@ -200,18 +203,26 @@ public:
 	/** Write serializable, or reference if it already serialized. 
      * Common implementation should look as follows:
      * \code
-     * if ( int refId = getReferenceId(object) ) {
-	 *     writeReferenceChunk(refId);
-	 * }
-	 * else 
+	 * if (writeReferenceIfPossible) 
 	 * {
-     *     openChunk("temp_name", serializable);
-     *     renameCurrentChunk( serializable->serialize(*this) );
-     *     closeChunk();
+	 *     if (int refId = getReferenceId(serializable)) 
+	 *     {
+	 *         writeReferenceChunk(refId);
+	 *         return;
+	 *     }
 	 * }
+	 *
+     * openChunk("temp", rememberReference ? serializable : 0);
+     * currentElement->set_value( serializable->serialize(*this) );
+     * closeChunk();
      * \uncode
+	 * @param serializable - serializable to write.
+	 * @param writeReferenceIfPossible - write reference if serializable already written.
+	 * @param rememberReference - mark serializaed fragment.
      */
-	virtual void writeSerializable(const Serializable* serializable) = 0;
+	virtual void writeSerializable(const Serializable* serializable, 
+                                   bool                writeReferenceIfPossible = true,
+								   bool                rememberReference = true) = 0;
 
 	/** Try to serialize object using serializable wrapper. Doesn't care about object polymorphism!
 	 * @see SerializableWrapper
@@ -225,12 +236,19 @@ public:
 		else 
 		{
             SerializableWrapper<T> wrapper(object);
-            writeSerializable(&wrapper);
+            writeSerializable(&wrapper, false, false);
 		}
 	}
 
     /** Write reference chunk. */
     virtual void writeReferenceChunk(int refId) = 0;
+
+	/** Write binary data chunk.
+	 * @param name - name of the chunk.
+	 * @param data - binary chunk.
+	 * @param size - size of the chunk in bytes.
+	 */
+	virtual void writeBinaryChunk(const char* name, const void* data, size_t size) = 0;
 
     /** Make leaf chunk and write string into it.
      * @param name - name of the chunk.

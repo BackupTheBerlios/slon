@@ -303,6 +303,7 @@ SET ( TARGET_THREAD_DETAIL_HEADERS
 )
 
 SET ( TARGET_UTILITY_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/base64.hpp
     ${TARGET_HEADER_PATH}/Utility/cached_value.hpp
     ${TARGET_HEADER_PATH}/Utility/callback.hpp
     ${TARGET_HEADER_PATH}/Utility/error.hpp

@@ -5,11 +5,14 @@
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
 
-using namespace slon;
-using namespace scene;
-using namespace graphics;
+namespace slon {
+namespace graphics {
 
-StaticMesh::StaticMesh(Mesh* _mesh) :
+StaticMesh::StaticMesh()
+{
+}
+
+StaticMesh::StaticMesh(const mesh_ptr& _mesh) :
 	mesh(_mesh),
 	shadowCaster(true),
 	shadowReceiver(true)
@@ -57,3 +60,6 @@ void StaticMesh::accept(scene::TransformVisitor& visitor)
 {
     worldMatrix = visitor.getLocalToWorldTransform();
 }
+
+} // namespace graphics
+} // namespace slon

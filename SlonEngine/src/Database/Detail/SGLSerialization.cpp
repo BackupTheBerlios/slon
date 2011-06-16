@@ -55,18 +55,18 @@ void SerializableWrapper<sgl::VertexLayout>::deserialize(sgl::VertexLayout*& vl,
 
 const char* SerializableWrapper<sgl::Buffer>::serialize(const sgl::Buffer& buffer, OArchive& ar)
 {
-	char* data = (char*)malloc( buffer.Size() );
+	void* data = malloc( buffer.Size() );
     if (!data) {
         throw serialization_error(AUTO_LOGGER, "Can't allocate memory for buffer data.");
     }
 
-    if ( sgl::SGL_OK != buffer.GetData( data, 0, buffer.Size() ) ) \
+    if ( sgl::SGL_OK != buffer.GetData( data, 0, buffer.Size() ) )
     {
         free(data);
         throw serialization_error(AUTO_LOGGER, "Can't read data from buffer.");
     }
 
-	ar.writeChunk( "data", data, buffer.Size() );
+	ar.writeBinaryChunk( "data", data, buffer.Size() );
     free(data);
 
     return "Buffer";
@@ -78,7 +78,7 @@ void SerializableWrapper<sgl::Buffer>::deserialize(sgl::Buffer*& buffer, IArchiv
 	IArchive::chunk_info info;
 	if ( ar.openChunk("data", info) )
 	{
-        char* data = (char*)malloc(info.size);
+        void* data = malloc(info.size);
         if (!data) {
             throw serialization_error(AUTO_LOGGER, "Can't allocate memory for buffer data.");
         }
