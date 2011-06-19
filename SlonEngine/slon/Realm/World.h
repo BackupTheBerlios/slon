@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_REALM_WORLD_H__
 #define __SLON_ENGINE_REALM_WORLD_H__
 
+#include "../Database/Serializable.h"
 #include "../Scene/Forward.h"
 #include "../Thread/Lock.h"
 #include "../Utility/callback.hpp"
@@ -21,7 +22,8 @@ namespace realm {
  * safety.
  */
 class World :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     /** Visit objects intersecting body.

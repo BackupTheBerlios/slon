@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Detail/UtilitySerialization.h"
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Realm/Detail/BVHLocation.h"
 #include "Realm/World.h"
@@ -162,6 +163,38 @@ LocationVisitor<Location, Callback> makeLocationVisitor(Location& location, Call
 	return LocationVisitor<Location, Callback>(location, cb);
 }
 
+const char* BVHLocation::serialize(database::OArchive& ar) const
+{
+    struct write_object
+    {
+        void operator () (database::OArchive& ar, const object_ptr& obj)
+        {
+            ar.writeSerializable(obj.get());
+        }
+    };
+
+    database::serialize(ar, "aabb", aabb);
+    database::serialize(ar, "staticAABBTree", staticAABBTree, write_object() );
+    database::serialize(ar, "dynamicAABBTree", dynamicAABBTree, write_object() );
+
+    return "BVHLocation";
+}
+
+void BVHLocation::deserialize(database::IArchive& ar)
+{
+    struct read_object
+    {
+        object_ptr operator () (database::IArchive& ar)
+        {
+            return object_ptr(static_cast<Object*>(ar.readSerializable()));
+        }
+    };
+
+    database::deserialize(ar, "aabb", aabb);
+    database::deserialize(ar, "staticAABBTree", staticAABBTree, read_object() );
+    database::deserialize(ar, "dynamicAABBTree", dynamicAABBTree, read_object() );
+}
+
 const math::AABBf& BVHLocation::getBounds() const
 {
     return aabb;
@@ -197,16 +230,16 @@ bool BVHLocation::update(realm::Object* object_)
         return false;
     }
 
-	object_tree_node* bvhNode = reinterpret_cast<object_tree_node*>( object->getLocationData() );
-    assert(bvhNode);
+    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( object->getLocationData() ) );
+    assert(bvhIter);
 
     if ( object->isDynamic() ) {
-        dynamicAABBTree.update(object->getBounds(), bvhNode);
+        dynamicAABBTree.update(bvhIter, object->getBounds());
     }
     else {
-        staticAABBTree.update(object->getBounds(), bvhNode);
+        staticAABBTree.update(bvhIter, object->getBounds());
     }
-    aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
     return true;
@@ -220,17 +253,17 @@ bool BVHLocation::remove(realm::Object* object_)
         return false;
     }
 
-	object_tree_node* bvhNode = reinterpret_cast<object_tree_node*>( object->getLocationData() );
-    assert(bvhNode);
+    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( object->getLocationData() ) );
+    assert(bvhIter);
 
     object->setLocation(0);
     if ( object->isDynamic() ) {
-        dynamicAABBTree.remove(bvhNode);
+        dynamicAABBTree.remove(bvhIter);
     }
     else {
-        staticAABBTree.remove(bvhNode);
+        staticAABBTree.remove(bvhIter);
     }
-    aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
     return true;
@@ -253,12 +286,12 @@ void BVHLocation::add(realm::Object* object_)
         object->traverse(visitor);
 
         // insert into tree
-        object->setLocationData( dynamicAABBTree.insert( object->getBounds(), object_ptr(object) ) );
+        object->setLocationData( dynamicAABBTree.insert( object->getBounds(), object_ptr(object) ).get_node() );
     }
     else {
-        object->setLocationData( staticAABBTree.insert( object->getBounds(), object_ptr(object) ) );
+        object->setLocationData( staticAABBTree.insert( object->getBounds(), object_ptr(object) ).get_node() );
     }
-    aabb = math::merge( staticAABBTree.getBounds(), dynamicAABBTree.getBounds() );
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
 }

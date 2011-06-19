@@ -47,6 +47,12 @@ public:
     /** Get visual scene cache */
     virtual VisualSceneCache& getVisualSceneCache() = 0;
 
+    /** Get object cache */
+    virtual ObjectCache& getObjectCache() = 0;
+
+    /** Get location cache */
+    virtual LocationCache& getLocationCache() = 0;
+
 #ifdef SLON_ENGINE_USE_PHYSICS
     /** Get physics scene cache */
     virtual PhysicsSceneCache& getPhysicsSceneCache() = 0;

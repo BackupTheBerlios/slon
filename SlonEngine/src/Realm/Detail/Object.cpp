@@ -1,9 +1,11 @@
 #include "stdafx.h"
+#include "Database/Detail/SGLSerialization.h"
 #include "Log/Logger.h"
 #include "Log/LogVisitor.h"
 #include "Physics/PhysicsModel.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Realm/Detail/Object.h"
+#include "Realm/Detail/World.h"
 #include "Scene/Visitors/DFSNodeVisitor.h"
 #include "Scene/Visitors/FilterVisitor.h"
 #include "Scene/Visitors/TransformVisitor.h"
@@ -134,6 +136,34 @@ void Object::setRoot(scene::Node* root_)
     else {
         aabb.reset_max();
     }
+}
+
+const char* Object::serialize(database::OArchive& ar) const
+{
+    ar.writeSerializable(world);
+    ar.writeChunk("infinite", &infinite);
+    database::serialize(ar, "aabb", aabb);
+    ar.writeSerializable(location);
+    ar.writeChunk("dynamic", &dynamic);
+    ar.writeSerializable(root.get());
+#ifdef SLON_ENGINE_USE_PHYSICS
+    ar.writeSerializable(physicsModel.get());
+#endif
+
+    return "Object";
+}
+
+void Object::deserialize(database::IArchive& ar)
+{
+    world = ar.readSerializable<realm::World>();
+    ar.readChunk("infinite", &infinite);
+    database::deserialize(ar, "aabb", aabb);
+    location = ar.readSerializable<realm::Location>();
+    ar.readChunk("dynamic", &dynamic);
+    root = ar.readSerializable<scene::Node>();
+#ifdef SLON_ENGINE_USE_PHYSICS
+    physicsModel = ar.readSerializable<physics::PhysicsModel>();
+#endif
 }
 
 #ifdef SLON_ENGINE_USE_PHYSICS

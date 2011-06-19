@@ -11,7 +11,8 @@ namespace physics {
 
 /** Set of rigid bodies, constraints and other physics models. */
 class PhysicsModel :
-	public Referenced
+	public Referenced,
+    public database::Serializable
 {
 public: 
     typedef std::set<rigid_body_ptr>    rigid_body_set;
@@ -23,6 +24,10 @@ public:
 public:
     PhysicsModel();
     ~PhysicsModel();
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
 	/** Get name of the physics model */
 	const std::string& getName() const { return name; }

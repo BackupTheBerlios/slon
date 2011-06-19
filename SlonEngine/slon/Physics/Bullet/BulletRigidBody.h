@@ -37,14 +37,18 @@ private:
     void removeConstraint(const Constraint& constraint);
 
 public:
+    BulletRigidBody();
     BulletRigidBody(const rigid_body_ptr rigidBody, 
                     const std::string&   name,
                     DynamicsWorld*       dynamicsWorld);
-
     BulletRigidBody(const RigidBody::state_desc& desc, 
                     DynamicsWorld*               dynamicsWorld);
 
-    // implement RigidBody
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
+    // Override RigidBody
     void applyForce(const math::Vector3r& force, const math::Vector3r& pos);
     void applyTorque(const math::Vector3r& torque);
     void applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos);

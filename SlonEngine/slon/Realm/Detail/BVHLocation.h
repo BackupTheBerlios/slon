@@ -44,6 +44,10 @@ public:
     typedef object_tree::volume_node    object_tree_node;
 
 public:
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     // Override Location
     const math::AABBf& getBounds() const;
 	

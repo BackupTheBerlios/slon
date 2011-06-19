@@ -81,9 +81,9 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
 		case CollisionShape::BOX:
 		{
 			const BoxShape& boxShape             = static_cast<const BoxShape&>(collisionShape);
-			btBoxShape*     bulletCollisionShape = new btBoxShape( to_bt_vec(boxShape.halfExtents) );
+			btBoxShape*     bulletCollisionShape = new btBoxShape( to_bt_vec(boxShape.halfExtent) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
-			bulletCollisionShape->setMargin(2*std::min(boxShape.halfExtents.x, std::min(boxShape.halfExtents.y, boxShape.halfExtents.z))*relativeMargin + margin);
+			bulletCollisionShape->setMargin(2*std::min(boxShape.halfExtent.x, std::min(boxShape.halfExtent.y, boxShape.halfExtent.z))*relativeMargin + margin);
             return bulletCollisionShape;
 		}
 

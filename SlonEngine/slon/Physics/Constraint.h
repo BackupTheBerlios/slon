@@ -1,12 +1,13 @@
 #ifndef __SLON_ENGINE_PHYSICS_CONSTRAINT_H__
 #define __SLON_ENGINE_PHYSICS_CONSTRAINT_H__
 
-#include <string>
-#include <sgl/Math/MatrixFunctions.hpp>
+#include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
 #include "../Utility/Memory/aligned.hpp"
 #include "Forward.h"
 #include "Motor.h"
+#include <sgl/Math/MatrixFunctions.hpp>
+#include <string>
 
 namespace slon {
 namespace physics {
@@ -18,7 +19,8 @@ class RigidBody;
  * suitable constraint for every case.
  */
 class Constraint :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     struct state_desc

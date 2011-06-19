@@ -26,6 +26,10 @@ public:
 public:
     World();
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Add location to the world */
     void addLocation(Location* location);
 

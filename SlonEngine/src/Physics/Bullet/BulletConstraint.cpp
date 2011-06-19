@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #define NOMINMAX
 #define _DEBUG_NEW_REDEFINE_NEW 0
+#include "Database/Archive.h"
 #include "Engine.h"
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
@@ -110,6 +111,34 @@ BulletConstraint::~BulletConstraint()
     // remove constraint references
     if (desc.rigidBodies[0]) unlink(*desc.rigidBodies[0]);
     if (desc.rigidBodies[1]) unlink(*desc.rigidBodies[1]);
+}
+
+const char* BulletConstraint::serialize(database::OArchive& ar) const
+{
+    ar.writeStringChunk("name", desc.name.data(), desc.name.length());
+    ar.writeSerializable(desc.rigidBodies[0]);
+    ar.writeSerializable(desc.rigidBodies[1]);
+    ar.writeChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
+    ar.writeChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
+    ar.writeChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
+    ar.writeChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
+    ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
+    ar.writeChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    return "BulletConstraint";
+}
+
+void BulletConstraint::deserialize(database::IArchive& ar)
+{
+    ar.readStringChunk("name", desc.name);
+    desc.rigidBodies[0] = ar.readSerializable<RigidBody>();
+    desc.rigidBodies[1] = ar.readSerializable<RigidBody>();
+    ar.readChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
+    ar.readChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
+    ar.readChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
+    ar.readChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
+    ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
+    ar.readChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    reset(desc);
 }
 
 void BulletConstraint::unlink(const RigidBody& rigidBody)

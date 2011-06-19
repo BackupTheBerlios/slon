@@ -3,7 +3,7 @@
 
 #include <sgl/Device.h>
 #include <sgl/Math/AABB.hpp>
-#include "../Serializable.h"
+#include "../Archive.h"
 
 namespace slon {
 namespace database {
@@ -23,7 +23,7 @@ void deserialize(IArchive& ar, const char* name, math::AABB<T,n>& aabb)
 {
     IArchive::chunk_info info;
     if (!ar.openChunk(name, info)) {
-        throw serialization_error(log::logger_ptr(), "Can't open AABB chunk");
+        throw serialization_error("Can't open AABB chunk");
     }
 
     ar.readChunk("minVec", aabb.minVec.arr, aabb.minVec.num_elements);

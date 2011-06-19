@@ -6,6 +6,8 @@
 #include "FileSystem/FileSystemManager.h"
 #include "Graphics/Effect.h"
 #include "Scene/Node.h"
+#include "Realm/Location.h"
+#include "Realm/Object.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
 #include "Physics/PhysicsModel.h"
 #endif
@@ -440,6 +442,8 @@ template class Cache<animation::Animation>;
 template class Cache<graphics::Effect>;
 template class Cache<graphics::Texture>;
 template class Cache<scene::Node>;
+template class Cache<realm::Object>;
+template class Cache<realm::Location>;
 #ifdef SLON_ENGINE_USE_PHYSICS
 template class Cache<physics::PhysicsModel>;
 #endif

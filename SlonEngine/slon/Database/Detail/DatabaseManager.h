@@ -13,6 +13,8 @@ typedef Cache<animation::Animation>     AnimationCache;
 typedef Cache<graphics::Effect>         EffectCache;
 typedef Cache<graphics::Texture>        TextureCache;
 typedef Cache<scene::Node>              VisualSceneCache;
+typedef Cache<realm::Object>            ObjectCache;
+typedef Cache<realm::Location>          LocationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Cache<physics::PhysicsModel>    PhysicsSceneCache;
 #endif
@@ -57,6 +59,8 @@ public:
     EffectCache&        getEffectCache()        { return effectCache; }
     TextureCache&       getTextureCache()       { return textureCache; }
     VisualSceneCache&   getVisualSceneCache()   { return visualSceneCache; }
+    ObjectCache&        getObjectCache()        { return objectCache; }
+    LocationCache&      getLocationCache()      { return locationCache; }
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache&  getPhysicsSceneCache()  { return physicsSceneCache; }
 #endif
@@ -104,6 +108,8 @@ private:
     EffectCache         effectCache;
     TextureCache        textureCache;
     VisualSceneCache    visualSceneCache;
+    ObjectCache         objectCache;
+    LocationCache       locationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache   physicsSceneCache;
 #endif

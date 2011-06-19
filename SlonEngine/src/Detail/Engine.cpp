@@ -245,15 +245,25 @@ void Engine::init()
 	{
 		using namespace database;
 
-		databaseManager.registerSerializableCreateFunc("Node",            createSerializable<scene::Node>);
-		databaseManager.registerSerializableCreateFunc("Group",           createSerializable<scene::Group>);
-		databaseManager.registerSerializableCreateFunc("MatrixTransform", createSerializable<scene::MatrixTransform>);
-		databaseManager.registerSerializableCreateFunc("StaticMesh",      createSerializable<graphics::StaticMesh>);
-		databaseManager.registerSerializableCreateFunc("Mesh",            createSerializable<graphics::Mesh>);
+        // scene
+		databaseManager.registerSerializableCreateFunc("Node",              createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("Group",             createSerializable<scene::Group>);
+		databaseManager.registerSerializableCreateFunc("MatrixTransform",   createSerializable<scene::MatrixTransform>);
+		databaseManager.registerSerializableCreateFunc("StaticMesh",        createSerializable<graphics::StaticMesh>);
+		databaseManager.registerSerializableCreateFunc("Mesh",              createSerializable<graphics::Mesh>);
 
-		databaseManager.registerSerializableCreateFunc("VertexLayout",    createSerializableWrapper<sgl::VertexLayout>);
-		databaseManager.registerSerializableCreateFunc("VertexBuffer",    createSerializableWrapper<sgl::VertexBuffer>);
-		databaseManager.registerSerializableCreateFunc("IndexBuffer",     createSerializableWrapper<sgl::IndexBuffer>);
+        // physics
+        databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::PhysicsManager::createRigidBody, &physicsManager));
+        databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::PhysicsManager::createConstraint, &physicsManager));
+
+        // realm
+        databaseManager.registerSerializableCreateFunc("Object",            boost::bind(&realm::World::createObject, &world));
+        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>());
+
+        // sgl
+		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);
+		databaseManager.registerSerializableCreateFunc("VertexBuffer",      createSerializableWrapper<sgl::VertexBuffer>);
+		databaseManager.registerSerializableCreateFunc("IndexBuffer",       createSerializableWrapper<sgl::IndexBuffer>);
 	}
 
     // init SDL

@@ -60,6 +60,7 @@ SET ( TARGET_DATABASE_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Database/Detail/DatabaseManager.h
     ${TARGET_HEADER_PATH}/Database/Detail/Library.h
     ${TARGET_HEADER_PATH}/Database/Detail/SGLSerialization.h
+    ${TARGET_HEADER_PATH}/Database/Detail/UtilitySerialization.h
 )
 
 SET ( TARGET_INPUT_HEADERS
@@ -490,6 +491,7 @@ SET ( TARGET_DATABASE_DETAIL_SOURCES
     Database/Detail/DatabaseManager.cpp
     Database/Detail/Library.cpp
     Database/Detail/SGLSerialization.cpp
+    Database/Detail/UtilitySerialization.cpp
 )
 
 SET ( TARGET_FILESYSTEM_SOURCES

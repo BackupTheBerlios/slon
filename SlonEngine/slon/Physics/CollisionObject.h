@@ -3,6 +3,7 @@
 
 #include <boost/signals.hpp>
 #include <sgl/Math/Matrix.hpp>
+#include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
 
@@ -40,7 +41,8 @@ struct Contact
 
 /** Rigid body in the phyics world */
 class CollisionObject :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     typedef boost::function<void (const Contact& c)>    contact_handler;

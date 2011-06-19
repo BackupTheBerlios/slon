@@ -60,6 +60,30 @@ public:
 	/** Read serializable from the next chunk. */
 	virtual Serializable* readSerializable() = 0;
 	
+    /** Read serializable and try to convert it to specified type. 
+     * @param requireNotNull - require serializable to be not NULL.
+     * @param requireConvertible - require serializable to be convertible to specified type if it is not NULL.
+     */
+    template<typename T>
+    T* readSerializable(bool requireNotNull = false, bool requireConvertible = true)
+    {
+        Serializable* serializable = readSerializable();
+        if (serializable)
+        {
+            T* obj = dynamic_cast<T*>(serializable);
+            if (requireConvertible && !obj) {
+                throw serialization_error("Can't convert serializable to requested type");
+            }
+
+            return obj;
+        }
+        else if (requireNotNull) {
+            throw serialization_error("Can't read requested serializable");
+        }
+
+        return 0;
+    }
+
     /** Read serializable using serializable wrapper. */
     template<typename T>
     T* readCustomSerializable()

@@ -4,6 +4,9 @@
 #include "Graphics/Effect/TransformEffect.h"
 #include "Graphics/Renderable/Mesh.h"
 #include "Graphics/Renderable/StaticMesh.h"
+#ifdef SLON_ENGINE_USE_PHYSICS
+#   include "Physics/PhysicsManager.h"
+#endif
 #include <boost/iostreams/stream_buffer.hpp>
 
 #define BOOST_TEST_MODULE SerializationTest
@@ -140,3 +143,67 @@ BOOST_AUTO_TEST_CASE(mesh_serialization)
 	// Clear cache for further tests
 	database::currentDatabaseManager().clear(database::DatabaseManager::CLEAR_ALL);
 }
+
+#ifdef SLON_ENGINE_USE_PHYSICS
+BOOST_AUTO_TEST_CASE(physics_serialization)
+{
+    using namespace physics;
+
+    // world
+    PhysicsManager& physManager = currentPhysicsManager();
+    DynamicsWorld*  dynWorld    = physManager.initDynamicsWorld();
+
+    // physics scene
+    rigid_body_ptr    rb0;
+    rigid_body_ptr    rb1;
+    physics_model_ptr model(new PhysicsModel);
+
+    // rigid bodies
+    {
+        RigidBody::state_desc desc;
+        desc.name           = "rb0";
+        desc.collisionShape = new ConeShape(1.0f, 2.0f);
+        desc.mass           = 1.0f;
+        desc.target         = "node0";
+        desc.transform      = math::make_translation(-1.0f, 0.0f, 0.0f);
+        rb0 = dynWorld->createRigidBody(desc);
+        model->addRigidBody(rb0.get());
+
+        desc.name           = "rb1";
+        desc.collisionShape = new BoxShape(0.5f, 0.5f, 0.5f);
+        desc.mass           = 2.0f;
+        desc.target         = "node1";
+        desc.transform      = math::make_translation(1.0f, 0.0f, 0.0f);
+        rb1 = dynWorld->createRigidBody(desc);
+        model->addRigidBody(rb1.get());
+    }
+
+    // constraint
+    {
+        Constraint::state_desc desc;
+        desc.name = "cons0";
+        desc.rigidBodies[0]     = rb0.get();
+        desc.rigidBodies[1]     = rb1.get();
+        desc.angularLimits[0].x = -0.5f;
+        desc.angularLimits[0].x =  0.5f;
+        desc.frames[0]          = math::make_translation(1.0f, 0.0f, 0.0f);
+        desc.frames[1]          = math::make_translation(-1.0f, 0.0f, 0.0f);
+        model->addConstraint( dynWorld->createConstraint(desc) );
+    }
+
+    // scene
+    scene::group_ptr root( new scene::MatrixTransform("node0") );
+    root->addChild( new scene::MatrixTransform("node1") );
+
+    realm::object_ptr object( realm::currentWorld().add(root.get(), true, model.get()) );
+
+	// check
+	database::library_ptr library(new database::Library);
+	library->visualScenes.insert( std::make_pair("scene_test", root) );
+    library->objects.insert( std::make_pair("obj_test", object) );
+	writeLoadWriteCompare(library);
+
+	// Clear cache for further tests
+	database::currentDatabaseManager().clear(database::DatabaseManager::CLEAR_ALL);
+}
+#endif

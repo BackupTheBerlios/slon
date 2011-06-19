@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_REALM_LOCATION_H__
 #define __SLON_ENGINE_REALM_LOCATION_H__
 
+#include "../Database/Serializable.h"
 #include "../Scene/Forward.h"
 #include "../Thread/Lock.h"
 #include "../Utility/callback.hpp"
@@ -12,7 +13,8 @@ namespace slon {
 namespace realm {
 	
 class Location :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     /** Get bounds of the hole location. */

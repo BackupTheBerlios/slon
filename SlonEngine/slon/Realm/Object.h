@@ -1,19 +1,21 @@
 #ifndef __SLON_ENGINE_REALM_OBJECT_H__
 #define __SLON_ENGINE_REALM_OBJECT_H__
 
-#include <sgl/Math/AABB.hpp>
+#include "../Database/Serializable.h"
 #include "../Config.h"
 #include "../Physics/Forward.h"
 #include "../Scene/Forward.h"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
+#include <sgl/Math/AABB.hpp>
 
 namespace slon {
 namespace realm {
 	
 /** Single scene object */
 class Object :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     /** Check whether object is dynamic. */

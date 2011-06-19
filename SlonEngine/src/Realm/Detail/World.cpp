@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Detail/Engine.h"
 #include "Realm/Detail/BVHLocation.h"
 #include "Scene/Visitors/NodeVisitor.h"
@@ -17,6 +18,8 @@ namespace {
     }
 
 }
+
+DECLARE_AUTO_LOGGER("realm.World")
 
 namespace slon {
 namespace realm {
@@ -67,6 +70,47 @@ World::World()
 {
     // create default location
     addLocation(new BVHLocation);
+}
+
+const char* World::serialize(database::OArchive& ar) const
+{
+    ar.openChunk("locations");
+    {
+        for (size_t i = 0; i<locations.size(); ++i) {
+            ar.writeSerializable(locations[i].get());
+        }
+    }
+    ar.closeChunk();
+
+    ar.openChunk("infiniteObjects");
+    {
+        for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+            ar.writeSerializable(infiniteObjects[i].get());
+        }
+    }
+    ar.closeChunk();
+
+    return "World";
+}
+
+void World::deserialize(database::IArchive& ar)
+{
+    database::IArchive::chunk_info info;
+    if ( !ar.openChunk("locations", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Missing locations chunk");
+    }
+    while ( realm::Location* location = ar.readSerializable<realm::Location>(false, true) ) {
+        locations.push_back( location_ptr(location) );
+    }
+    ar.closeChunk();
+
+    if ( !ar.openChunk("infiniteObjects", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Missing locations chunk");
+    }
+    while ( Object* object = ar.readSerializable<Object>(false, true) ) {
+        infiniteObjects.push_back( object_ptr(object) );
+    }
+    ar.closeChunk();
 }
 
 void World::addLocation(Location* location)

@@ -23,6 +23,10 @@ public:
     /** Setup graphics model for the object */
     void setRoot(scene::Node* root);
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     // Override Object
     bool                isDynamic() const			{ return dynamic; }
 	void				toggleDynamic(bool toggle)	{ dynamic = toggle; }
