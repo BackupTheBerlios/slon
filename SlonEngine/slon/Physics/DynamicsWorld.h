@@ -82,6 +82,12 @@ public:
     /** Get iterator end iterator for enumerating active contacts */
     virtual contact_const_iterator endActiveContact() const = 0;
 
+    /** Create rigid body and add it to the world. */
+    virtual RigidBody* createRigidBody(const RigidBody::state_desc& rigidBodyDesc) = 0;
+
+    /** Create constraint and add it to the world. */
+    virtual Constraint* createConstraint(const Constraint::state_desc& constraintDesc) = 0;
+
     /** Grant thread read access to the world.
      * @return lock object. Lock is freed whether object is deleted.
      */

@@ -6,6 +6,7 @@
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/StaticMesh.h"
+#include "Realm/Detail/BVHLocation.h"
 #include "Scene/Camera.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/error.hpp"
@@ -253,12 +254,12 @@ void Engine::init()
 		databaseManager.registerSerializableCreateFunc("Mesh",              createSerializable<graphics::Mesh>);
 
         // physics
-        databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::PhysicsManager::createRigidBody, &physicsManager));
-        databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::PhysicsManager::createConstraint, &physicsManager));
+        //databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, &physicsManager));
+        //databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, &physicsManager));
 
         // realm
         databaseManager.registerSerializableCreateFunc("Object",            boost::bind(&realm::World::createObject, &world));
-        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>());
+        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::detail::BVHLocation>());
 
         // sgl
 		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);

@@ -134,6 +134,7 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 }
 
 BulletRigidBody::BulletRigidBody()
+:   base_type( currentPhysicsManager().getDynamicsWorld() )
 {
 }
 

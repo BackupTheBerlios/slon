@@ -20,10 +20,10 @@ const char* PhysicsModel::serialize(database::OArchive& ar) const
 {
     ar.writeStringChunk("name", name.data(), name.length());
     ar.openChunk("rigidBodies");
-    std::for_each(rigidBodies.begin(), rigidBodies.end(), boost::bind(&database::OArchive::writeSerializable, &ar, _1, true, true));
+    std::for_each(rigidBodies.begin(), rigidBodies.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&rigid_body_ptr::get, _1), true, true));
     ar.closeChunk();
     ar.openChunk("constraints");
-    std::for_each(constraints.begin(), constraints.end(), boost::bind(&database::OArchive::writeSerializable, &ar, _1, true, true));
+    std::for_each(constraints.begin(), constraints.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&constraint_ptr::get, _1), true, true));
     ar.closeChunk();
 
     return "PhysicsModel";

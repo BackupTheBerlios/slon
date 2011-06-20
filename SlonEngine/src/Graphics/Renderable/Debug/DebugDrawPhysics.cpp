@@ -59,7 +59,7 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c)
 
 DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b)
 {
-    return mesh << math::AABBf( math::Vector3f(-b.halfExtents), math::Vector3f(b.halfExtents) );
+    return mesh << math::AABBf( math::Vector3f(-b.halfExtent), math::Vector3f(b.halfExtent) );
 }
 
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& coneShape)
