@@ -2,6 +2,7 @@
 #include "Database/Proprietary/SXMLArchive.h"
 #include "Database/Proprietary/SXMLSaver.h"
 #include "FileSystem/File.h"
+#include "Realm/Object.h"
 #include "Scene/Node.h"
 
 DECLARE_AUTO_LOGGER("database.SXML")
@@ -21,13 +22,30 @@ void SXMLSaver::save(library_ptr library, filesystem::File* file)
 		// write visual scenes
 		ar.openChunk("VisualScenes");
 		{
-			typedef Library::key_visual_scene_map::const_iterator const_scene_iterator;
+			typedef Library::key_visual_scene_map::const_iterator const_iterator;
 
-			for (const_scene_iterator it  = library->visualScenes.begin();
-									  it != library->visualScenes.end();
-									  ++it)
+			for (const_iterator it  = library->visualScenes.begin();
+								it != library->visualScenes.end();
+								++it)
 			{
 				ar.openChunk("VisualScene");
+				ar.writeStringChunk("name", it->first.c_str(), it->first.length());
+				ar.writeSerializable(it->second.get());
+				ar.closeChunk();
+			}
+		}
+		ar.closeChunk();
+
+		// write objects
+		ar.openChunk("Objects");
+		{
+			typedef Library::key_object_map::const_iterator const_iterator;
+
+			for (const_iterator it  = library->objects.begin();
+								it != library->objects.end();
+								++it)
+			{
+				ar.openChunk("Object");
 				ar.writeStringChunk("name", it->first.c_str(), it->first.length());
 				ar.writeSerializable(it->second.get());
 				ar.closeChunk();

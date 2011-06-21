@@ -1,7 +1,8 @@
 #ifndef __SLON_ENGINE_DATABASE_LIBRARY_H__
 #define __SLON_ENGINE_DATABASE_LIBRARY_H__
 
-#include "../Utility/referenced.hpp"
+#include "../Realm/Location.h"
+#include "../Realm/Object.h"
 #include "Forward.h"
 #include <boost/unordered_map.hpp>
 
@@ -40,7 +41,7 @@ public:
 #endif
 	
 public:
-	key_animation_map     animations;
+    key_animation_map     animations;
     key_effect_map        effects;
     key_texture_map       textures;
     key_visual_scene_map  visualScenes;

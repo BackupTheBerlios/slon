@@ -259,7 +259,7 @@ void Engine::init()
 
         // realm
         databaseManager.registerSerializableCreateFunc("Object",            boost::bind(&realm::World::createObject, &world));
-        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::detail::BVHLocation>());
+        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::detail::BVHLocation>);
 
         // sgl
 		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);

@@ -86,7 +86,7 @@ public:
 
     protected:
         /// Use destroy instead
-        ~volume_node();
+        ~volume_node() {}
 
     private:
         aabb_type       volume;
