@@ -107,6 +107,51 @@ void ConvexShape::deserialize(database::IArchive& ar)
     ar.closeChunk();
 }
 
+const char* TriangleMeshShape::serialize(database::OArchive& ar) const
+{
+    ar.writeChunk( "vertices", vertices[0].arr, 3 * vertices.size() );
+    ar.writeChunk( "indices", &indices[0], indices.size() );
+    return "TriangleMeshShape";
+}
+
+void TriangleMeshShape::deserialize(database::IArchive& ar)
+{
+    database::IArchive::chunk_info info;
+    if ( !ar.openChunk("vertices", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Can't read vertices chunk");
+    }
+    else if (!info.isLeaf) {
+        throw database::serialization_error(AUTO_LOGGER, "Vertices chunk is not leaf");
+    }
+
+    if (info.size > 0)
+    {
+        vertices.resize(info.size / 3);
+        ar.read(&vertices[0].arr);
+    }
+    else {
+        vertices.clear();
+    }
+	
+    if ( !ar.openChunk("indices", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Can't read indices chunk");
+    }
+    else if (!info.isLeaf) {
+        throw database::serialization_error(AUTO_LOGGER, "Indices chunk is not leaf");
+    }
+
+    if (info.size > 0)
+    {
+        indices.resize(info.size);
+        ar.read(&indices[0]);
+    }
+    else {
+        indices.clear();
+    }
+
+    ar.closeChunk();
+}
+
 const char* CompoundShape::serialize(database::OArchive& ar) const
 {
     ar.openChunk("shapes");

@@ -39,6 +39,9 @@ void serialize(OArchive& ar, const char* name, const aabb_tree<LeafData, RealTyp
             if (parent) {
                 node = parent->get_child(1);
             }
+			else {
+				node = 0;
+			}
         }
         else {
             node = node->get_child(0);
