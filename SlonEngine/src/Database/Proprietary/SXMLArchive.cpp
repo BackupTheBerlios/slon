@@ -83,6 +83,9 @@ Serializable* SXMLIArchive::readSerializable()
 	if (!nextElement) {
 		return 0;
 	}
+	else if ( strcmp(nextElement->get_value(), "Null") == 0 ) {
+		return 0;
+	}
 	else if ( nextElement->has_attribute("refId") ) {
 		serializable = readReference( nextElement->get_attribute_value<size_t>("refId") );
 	}
@@ -107,6 +110,14 @@ Serializable* SXMLIArchive::readSerializable(xmlpp::element& el)
 	Serializable* serializable = currentDatabaseManager().createSerializableByName( el.get_value() );
 	if (serializable)
 	{
+		unsigned id = 0;
+		if ( el.has_attribute("id") ) 
+		{
+			id = el.get_attribute_value<unsigned>("id");
+			bool res = referenceSerializables.insert( std::make_pair(id, serializable) ).second;
+			assert(res);
+		}
+
 		// remember state
 		xmlpp::element_iterator prevOpenedElement = openedElement;
 		xmlpp::element_iterator prevNextElement   = nextElement;
@@ -123,19 +134,15 @@ Serializable* SXMLIArchive::readSerializable(xmlpp::element& el)
 		catch (...)
 		{
 			delete serializable;
-			serializable = 0;
+			if (id) {
+				referenceSerializables.erase(id);
+			}
 		}
 		
 		// restore state
 		openedElement = prevOpenedElement;
 		nextElement   = prevNextElement;
 		chunkInfo     = prevChunkInfo;
-
-		if ( el.has_attribute("id") && serializable ) 
-		{
-			bool res = referenceSerializables.insert( std::make_pair(el.get_attribute_value<size_t>("id"), serializable) ).second;
-			assert(res);
-		}
 	}
 
 	return serializable;
@@ -261,9 +268,17 @@ void SXMLOArchive::writeSerializable(const Serializable* serializable, bool writ
 		}
 	}
 
-    openChunk("temp", rememberReference ? serializable : 0);
-    currentElement->set_value( serializable->serialize(*this) );
-    closeChunk();
+	if (serializable) 
+	{
+		openChunk("temp", rememberReference ? serializable : 0);
+		currentElement->set_value( serializable->serialize(*this) );
+		closeChunk();
+	}
+	else 
+	{
+		xmlpp::element child("Null");
+		currentElement->add_child(child);
+	}
 }
 
 void SXMLOArchive::writeBinaryChunk(const char* name, const void* data, size_t size)
