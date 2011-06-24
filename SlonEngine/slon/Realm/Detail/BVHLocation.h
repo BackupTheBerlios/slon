@@ -10,37 +10,40 @@
 #endif
 #include "../../Utility/Algorithm/aabb_tree.hpp"
 #include "../Location.h"
-#include "Object.h"
 
 namespace slon {
 namespace realm {
 namespace detail {
 
-template<typename Callback>
-class object_callback_wrapper
+template<typename Visitor>
+class visit_node_functor
 {
 public:
-	object_callback_wrapper(Callback& cb_)
-	:	cb(cb_)
+	visit_node_functor(Visitor& nv_)
+	:	nv(nv_)
 	{}
 
-	bool operator () (const object_ptr& object) { return cb(*object); }
+	bool operator () (const scene::node_ptr& node) 
+	{ 
+		nv.traverse(*node); 
+		return true;
+	}
 
 private:
-	Callback& cb;
+	Visitor& nv;
 };
 
-template<typename Callback>
-object_callback_wrapper<Callback> wrap_callback(Callback& cb)
+template<typename Visitor>
+visit_node_functor<Visitor> visit_node(Visitor& nv)
 {
-	return object_callback_wrapper<Callback>(cb);
+	return visit_node_functor<Visitor>(nv);
 }
 
 class BVHLocation :
     public Location
 {
 public:
-    typedef aabb_tree<object_ptr>       object_tree;
+    typedef aabb_tree<scene::node_ptr>  object_tree;
     typedef object_tree::volume_node    object_tree_node;
 
 public:
@@ -52,27 +55,27 @@ public:
     const math::AABBf& getBounds() const;
 	
 	template<typename Body>
-	void visit(const Body& body, object_callback& cb)
+	void visit(const Body& body, scene::NodeVisitor& nv)
 	{
-		perform_on_leaves(staticAABBTree, body, wrap_callback(cb));
-		perform_on_leaves(dynamicAABBTree, body, wrap_callback(cb));
+		perform_on_leaves(staticAABBTree, body, visit_node(nv));
+		perform_on_leaves(dynamicAABBTree, body, visit_node(nv));
 	}
 	
 	template<typename Body>
-	void visit(const Body& body, object_const_callback& cb) const
+	void visit(const Body& body, scene::ConstNodeVisitor& nv) const
 	{
-		perform_on_leaves(staticAABBTree, body, wrap_callback(cb));
-		perform_on_leaves(dynamicAABBTree, body, wrap_callback(cb));
+		perform_on_leaves(staticAABBTree, body, visit_node(nv));
+		perform_on_leaves(dynamicAABBTree, body, visit_node(nv));
 	}
 
-    void visit(const body_variant& body, object_callback& cb);
-    void visit(const body_variant& body, object_const_callback& cb) const;
-    void visitVisible(const math::Frustumf& frustum, object_callback& cb);
-    void visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const;
+    void visit(const body_variant& body, scene::NodeVisitor& nv);
+    void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
+    void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
+    void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
 
-    bool update(realm::Object* object);
-    bool remove(realm::Object* object);
-    void add(realm::Object* object);
+    bool update(const scene::Node& node);
+    bool remove(const scene::node_ptr& object);
+    void add(const scene::node_ptr& object, bool dynamic);
 
 private:
     math::AABBf     aabb;

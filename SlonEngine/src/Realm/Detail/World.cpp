@@ -25,19 +25,19 @@ namespace slon {
 namespace realm {
 namespace detail {
 		
-template<typename World, typename Callback>
+template<typename World, typename Visitor>
 class WorldVisitor : 
 	public boost::static_visitor<void>
 {
 public:
-	WorldVisitor(World& world_, Callback& cb_)
+	WorldVisitor(World& world_, Visitor& visitor_)
 	:	world(world_)
-	,	cb(cb_)
+	,	visitor(visitor_)
 	{}
 
 	void operator () (const math::Ray3f& body) const
 	{
-        world.visit(body, cb);
+        world.visit(body, visitor);
 	}
     
 	void operator () (const math::Sphere3f& body) const
@@ -47,17 +47,17 @@ public:
 
 	void operator () (const math::AABBf& body) const
 	{
-        world.visit(body, cb);
+        world.visit(body, visitor);
 	}
 		
 	void operator () (const math::Frustumf& body) const
 	{
-        world.visit(body, cb);
+        world.visit(body, visitor);
 	}
 
 private:
 	World&    world;
-	Callback& cb;
+	Visitor&  visitor;
 };
 
 template<typename World, typename Callback>
@@ -68,8 +68,6 @@ WorldVisitor<World, Callback> makeWorldVisitor(World& world, Callback& cb)
 
 World::World()
 {
-    // create default location
-    addLocation(new BVHLocation);
 }
 
 const char* World::serialize(database::OArchive& ar) const
@@ -129,138 +127,61 @@ bool World::haveLocation(Location* location) const
     return std::find( locations.begin(), locations.end(), location ) != locations.end();
 }
 
-void World::visit(const body_variant& body, object_callback& cb)
+void World::visit(const body_variant& body, scene::NodeVisitor& nv)
 {
-	boost::apply_visitor(makeWorldVisitor(*this, cb), body);
+	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void World::visit(const body_variant& body, object_const_callback& cb) const
+void World::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
 {
-	boost::apply_visitor(makeWorldVisitor(*this, cb), body);
+	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void World::visitVisible(const math::Frustumf& frustum, object_callback& cb)
+void World::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
 {
 	// visit infinite objects
-	for (size_t i = 0; i<infiniteObjects.size(); ++i) 
-	{
-		if ( cb(*infiniteObjects[i]) ) {
-			return;
-		}
+	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+		nv.traverse(*infiniteObjects[i]);
 	}
 
 	// visit others
 	for (size_t i = 0; i<locations.size(); ++i)
 	{
 		if ( test_intersection(locations[i]->getBounds(), frustum) ) {
-			locations[i]->visitVisible(frustum, cb);
+			locations[i]->visitVisible(frustum, nv);
 		}
 	}
 }
 
-void World::visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const
+void World::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
 {
 	// visit infinite objects
-	for (size_t i = 0; i<infiniteObjects.size(); ++i) 
-	{
-		if ( cb(*infiniteObjects[i]) ) {
-			return;
-		}
+	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+		nv.traverse(*infiniteObjects[i]);
 	}
 
 	// visit others
 	for (size_t i = 0; i<locations.size(); ++i)
 	{
 		if ( test_intersection(locations[i]->getBounds(), frustum) ) {
-			locations[i]->visitVisible(frustum, cb);
+			locations[i]->visitVisible(frustum, nv);
 		}
 	}
 }
 
-realm::Object* World::createObject() const
+bool World::removeInfiniteNode(const scene::node_ptr& node)
 {
-	return new detail::Object;
+	return quick_remove(infiniteObjects, node);
 }
 
-bool World::update(realm::Object* object_)
+void World::addInfiniteNode(const scene::node_ptr& node)
 {
-	detail::object_ptr object( static_cast<detail::Object*>(object_) );
-    assert(object && object->world == this);
-
-    if ( (object->getBounds() == bounds<math::AABBf>::infinite() && !object->infinite)
-         || (object->getBounds() != bounds<math::AABBf>::infinite() && object->infinite) )
-    {
-        remove(object_);
-        add(object_);
-        return true;
-    }
-    else if ( Location* location = object->getLocation() ) {
-        return location->update(object_);
-    }
-
-    return false;
+	infiniteObjects.push_back(node);
 }
 
-bool World::remove(realm::Object* object_)
+bool World::haveInfiniteNode(const scene::node_ptr& node) const
 {
-    detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object && object->world == this);
-
-    object->world = 0;
-    if ( Location* location = object->getLocation() ) {
-        return location->remove(object);
-    }
-    else {
-        return quick_remove( infiniteObjects, object_ptr(object) );
-    }
-}
-
-void World::add(realm::Object* object_)
-{
-    detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object && object->world == 0);
-
-    object->world = this;
-    if ( object->getBounds() == bounds<math::AABBf>::infinite() ) 
-    {
-        infiniteObjects.push_back( object_ptr(object) );
-        object->infinite = true;
-    }
-    else
-    {
-		assert( !locations.empty() );
-
-        // find nearest location
-        size_t nearestLoc = 0;
-        float  minDist    = proximity( object->getBounds(), locations[0]->getBounds() );
-        for (size_t i = 1; i<locations.size(); ++i)
-        {
-            float d = proximity( object->getBounds(), locations[i]->getBounds() );
-            if (d < minDist) 
-            {
-                minDist    = d;
-                nearestLoc = i;
-            }
-        }
-
-        locations[nearestLoc]->add(object);
-    }
-}
-
-realm::Object* World::add(scene::Node*				node,
-				          bool						dynamic
-#ifdef SLON_ENGINE_USE_PHYSICS
-				          , physics::PhysicsModel*	physicsModel
-#endif             
-				          )
-{
-#ifdef SLON_ENGINE_USE_PHYSICS
-	detail::Object* object = new detail::Object(node, dynamic, physicsModel);
-#else
-	detail::Object* object = new detail::Object(node, dynamic);
-#endif
-	add(object);
-	return object;
+    return std::find( infiniteObjects.begin(), infiniteObjects.end(), node ) != infiniteObjects.end();
 }
 
 thread::lock_ptr World::lockForReading() const

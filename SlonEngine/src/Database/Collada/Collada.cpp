@@ -11,6 +11,8 @@
 #include "Graphics/Renderable/SkinnedMesh.h"
 #include "Graphics/Renderable/StaticMesh.h"
 #include "Graphics/Effect/LightingEffect.h"
+#include "Log/LogVisitor.h"
+#include "Physics/RigidBodyTransform.h"
 #include "Scene/Skeleton.h"
 #include "Scene/Visitors/CullVisitor.h"
 #include "Scene/Visitors/DFSNodeVisitor.h"
@@ -886,7 +888,39 @@ namespace {
 	};
 
 #ifdef SLON_ENGINE_USE_PHYSICS
-    class PhysicsSceneBuilder
+    class DecomposeTransformVisitor :
+        public scene::FilterVisitor<scene::DFSNodeVisitor, physics::RigidBodyTransform>
+	{
+	public:
+        DecomposeTransformVisitor(scene::Node& node)
+        {
+            traverse(node);
+        }
+
+		void visit(physics::RigidBodyTransform& rbTransform)
+		{
+			math::Matrix4f T( rbTransform.getLocalToWorld() );
+			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
+
+			rbTransform.setTransform( math::invert(R) * T ); // physics -> graphics 
+			switch ( rbTransform.getRigidBody()->getDynamicsType() )
+			{
+			case physics::RigidBody::DT_STATIC:
+			case physics::RigidBody::DT_DYNAMIC:
+                rbTransform.setAbsolute(true);
+				break;
+				
+			case physics::RigidBody::DT_KINEMATIC:
+                rbTransform.setAbsolute(false);
+				break;
+
+			default:
+				assert(!"Can't get here");
+			}
+		}
+	};
+
+	class PhysicsSceneBuilder
     {
     public:
         PhysicsSceneBuilder( const ColladaDocument&     document_,
@@ -1135,7 +1169,9 @@ namespace {
 
         physics::physics_model_ptr createPhysicsScene(const collada_physics_scene& colladaScene)
         {
-			physics::physics_model_ptr physicsModel(new physics::PhysicsModel);
+			using namespace physics;
+
+			physics_model_ptr physicsModel(new PhysicsModel);
 			physicsModel->setName(colladaScene.id);
 
 			for (size_t k = 0; k<colladaScene.physicsModelInstances.size(); ++k)
@@ -1163,6 +1199,49 @@ namespace {
 				}
 			}
 
+            for (PhysicsModel::rigid_body_iterator iter  = physicsModel->firstRigidBody();
+                                                   iter != physicsModel->endRigidBody();
+                                                   ++iter)
+            {
+                // insert rigid body into scene graph
+                scene::node_ptr targetNode( findNamedNode( *root, hash_string((*iter)->getTarget()) ) );
+                if (targetNode)
+                {
+                    physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
+                    if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
+                    {
+                        // relink children
+                        while ( scene::Node* child = group->getChild() ) {
+                            rbTransform->addChild(child);
+                        }
+
+                        group->addChild(rbTransform);
+                    }
+                    else if ( targetNode->getParent() != 0 )
+                    {
+                        targetNode->getParent()->addChild(rbTransform);
+                        rbTransform->addChild(targetNode.get());
+                    }
+                    else 
+                    {
+                        rbTransform->addChild(targetNode.get());
+                        root.reset(rbTransform);
+                    }
+                }
+                else {
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl);
+                }
+            }
+
+            // enable simulation
+            physicsModel->toggleSimulation(true);
+
+            // apply local transform to the shapes
+            scene::TransformVisitor tv(*root);
+            DecomposeTransformVisitor dv(*root);
+        
+            // print scene graph
+            log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);
 			return physicsModel;
         }
 

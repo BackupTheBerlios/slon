@@ -442,7 +442,6 @@ template class Cache<animation::Animation>;
 template class Cache<graphics::Effect>;
 template class Cache<graphics::Texture>;
 template class Cache<scene::Node>;
-template class Cache<realm::Object>;
 template class Cache<realm::Location>;
 #ifdef SLON_ENGINE_USE_PHYSICS
 template class Cache<physics::PhysicsModel>;

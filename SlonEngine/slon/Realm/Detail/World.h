@@ -5,7 +5,6 @@
 #include <vector>
 #include "../Location.h"
 #include "../World.h"
-#include "Object.h"
 
 namespace slon {
 namespace realm {
@@ -17,11 +16,9 @@ namespace detail {
 class World :
 	public realm::World
 {
-template<typename World, typename Callback>
-friend class WorldVisitor;
 public:
-    typedef std::vector<location_ptr>   location_vector;
-    typedef std::vector<object_ptr>     object_vector;
+    typedef std::vector<location_ptr>		location_vector;
+    typedef std::vector<scene::node_ptr>	object_vector;
 
 public:
     World();
@@ -30,73 +27,53 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    /** Add location to the world */
+	template<typename Body>
+	void visit(const Body& body, scene::NodeVisitor& nv)
+	{
+		// visit infinite objects
+		for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+			nv.traverse(*infiniteObjects[i]);
+		}
+
+		// visit others
+		for (size_t i = 0; i<locations.size(); ++i)
+		{
+			if ( test_intersection(locations[i]->getBounds(), body) ) {
+				locations[i]->visit(body, nv);
+			}
+		}
+	}
+
+	template<typename Body>
+	void visit(const Body& body, scene::ConstNodeVisitor& nv) const
+	{
+		// visit infinite objects
+		for (size_t i = 0; i<infiniteObjects.size(); ++i) {
+			nv.traverse(*infiniteObjects[i]);
+		}
+
+		// visit others
+		for (size_t i = 0; i<locations.size(); ++i)
+		{
+			if ( test_intersection(locations[i]->getBounds(), body) ) {
+				locations[i]->visit(body, nv);
+			}
+		}
+	}
+	
+    // Override World
     void addLocation(Location* location);
-
-    /** Remove location from the world.
-     * @return true - if succeeds, false if location not found
-     */
     bool removeLocation(Location* location);
-
-    /** Check whether world have specified location */
     bool haveLocation(Location* location) const;
 		
-	template<typename Body>
-	void visit(const Body& body, object_callback& cb)
-	{
-		// visit infinite objects
-		for (size_t i = 0; i<infiniteObjects.size(); ++i) 
-		{
-			if ( cb(*infiniteObjects[i]) ) {
-				return;
-			}
-		}
+    void visit(const body_variant& body, scene::NodeVisitor& nv);
+    void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
+    void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
+    void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
 
-		// visit others
-		for (size_t i = 0; i<locations.size(); ++i)
-		{
-			if ( test_intersection(locations[i]->getBounds(), body) ) {
-				locations[i]->visit(body, cb);
-			}
-		}
-	}
-
-	template<typename Body>
-	void visit(const Body& body, object_const_callback& cb) const
-	{
-		// visit infinite objects
-		for (size_t i = 0; i<infiniteObjects.size(); ++i) 
-		{
-			if ( cb(*infiniteObjects[i]) ) {
-				return;
-			}
-		}
-
-		// visit others
-		for (size_t i = 0; i<locations.size(); ++i)
-		{
-			if ( test_intersection(locations[i]->getBounds(), body) ) {
-				locations[i]->visit(body, cb);
-			}
-		}
-	}
-
-    void visit(const body_variant& body, object_callback& cb);
-    void visit(const body_variant& body, object_const_callback& cb) const;
-    void visitVisible(const math::Frustumf& frustum, object_callback& cb);
-    void visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const;
-
-	realm::Object*  createObject() const;
-
-    bool			update(realm::Object* object);
-    bool			remove(realm::Object* object);
-    void			add(realm::Object* object);
-	realm::Object*	add(scene::Node*				node,
-						bool						dynamic
-#ifdef SLON_ENGINE_USE_PHYSICS
-						, physics::PhysicsModel*	physicsModel
-#endif                  
-						);
+    bool removeInfiniteNode(const scene::node_ptr& node);
+    void addInfiniteNode(const scene::node_ptr& node);
+	bool haveInfiniteNode(const scene::node_ptr& node) const;
 	
     thread::lock_ptr lockForReading() const;
     thread::lock_ptr lockForWriting();

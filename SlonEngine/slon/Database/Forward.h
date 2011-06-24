@@ -39,7 +39,6 @@ typedef Loader<animation::animation_ptr>        AnimationLoader;
 typedef Loader<graphics::effect_ptr>            EffectLoader;
 typedef Loader<graphics::texture_ptr>           TextureLoader;
 typedef Loader<scene::node_ptr>                 VisualSceneLoader;
-typedef Loader<realm::object_ptr>               ObjectLoader;
 typedef Loader<realm::location_ptr>             LocationLoader;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Loader<physics::physics_model_ptr>      PhysicsSceneLoader;
@@ -50,7 +49,6 @@ typedef Saver<animation::animation_ptr>         AnimationSaver;
 typedef Saver<graphics::effect_ptr>             EffectSaver;
 typedef Saver<graphics::texture_ptr>            TextureSaver;
 typedef Saver<scene::node_ptr>                  VisualSceneSaver;
-typedef Saver<realm::object_ptr>                ObjectSaver;
 typedef Saver<realm::location_ptr>              LocationSaver;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Saver<physics::physics_model_ptr>       PhysicsSceneSaver;
@@ -60,7 +58,6 @@ typedef Cache<animation::Animation>             AnimationCache;
 typedef Cache<graphics::Effect>                 EffectCache;
 typedef Cache<graphics::Texture>                TextureCache;
 typedef Cache<scene::Node>                      VisualSceneCache;
-typedef Cache<realm::Object>                    ObjectCache;
 typedef Cache<realm::Location>                  LocationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Cache<physics::PhysicsModel>            PhysicsSceneCache;
@@ -77,8 +74,6 @@ typedef boost::intrusive_ptr<TextureLoader>             texture_loader_ptr;
 typedef boost::intrusive_ptr<const TextureLoader>       const_texture_loader_ptr;
 typedef boost::intrusive_ptr<VisualSceneLoader>         visual_scene_loader_ptr;
 typedef boost::intrusive_ptr<const VisualSceneLoader>   const_visual_scene_loader_ptr;
-typedef boost::intrusive_ptr<ObjectLoader>              object_loader_ptr;
-typedef boost::intrusive_ptr<const ObjectLoader>        const_object_loader_ptr;
 typedef boost::intrusive_ptr<LocationLoader>            location_loader_ptr;
 typedef boost::intrusive_ptr<const LocationLoader>      const_location_loader_ptr;
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -96,8 +91,6 @@ typedef boost::intrusive_ptr<TextureSaver>              texture_saver_ptr;
 typedef boost::intrusive_ptr<const TextureSaver>        const_texture_saver_ptr;
 typedef boost::intrusive_ptr<VisualSceneSaver>          visual_scene_saver_ptr;
 typedef boost::intrusive_ptr<const VisualSceneSaver>    const_visual_scene_saver_ptr;
-typedef boost::intrusive_ptr<ObjectSaver>               object_saver_ptr;
-typedef boost::intrusive_ptr<const ObjectSaver>         const_object_saver_ptr;
 typedef boost::intrusive_ptr<LocationSaver>             location_saver_ptr;
 typedef boost::intrusive_ptr<const LocationSaver>       const_location_saver_ptr;
 #ifdef SLON_ENGINE_USE_PHYSICS

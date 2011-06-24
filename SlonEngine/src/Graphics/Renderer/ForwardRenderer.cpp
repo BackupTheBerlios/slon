@@ -280,8 +280,8 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
     cameraParams->setup(camera);
     {
         // gather lights && frustum renderables
-        gatherer.cv.clear();
-        gatherer.cv.setCamera(&camera);
+        cv.clear();
+        cv.setCamera(&camera);
         {
             thread::lock_ptr lock = world.lockForReading();
             world.visitVisible(camera.getFrustum(), gatherer);
@@ -290,13 +290,13 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
         // partition lights by their types
         std::vector<Light::LIGHT_TYPE> lightTypes;
         {
-            light_iterator partitionIter = gatherer.cv.beginLight();
+            light_iterator partitionIter = cv.beginLight();
             for (size_t i = 0;
-                        i != Light::NUM_LIGHT_TYPES && partitionIter != gatherer.cv.endLight();
+                        i != Light::NUM_LIGHT_TYPES && partitionIter != cv.endLight();
                         ++i)
             {
                 Light::LIGHT_TYPE   lightType = Light::LIGHT_TYPE(i);
-                light_iterator      iter = std::partition( partitionIter, gatherer.cv.endLight(), partition_by_type(lightType) );
+                light_iterator      iter = std::partition( partitionIter, cv.endLight(), partition_by_type(lightType) );
                 if (iter != partitionIter)
                 {
                     lightTypes.push_back(lightType);
@@ -351,7 +351,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                     device->Clear(false, true, false);
                 }
 
-                render_pass( renderGroup, RP_DEPTH, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+                render_pass( renderGroup, RP_DEPTH, cv.beginRenderable(), cv.endRenderable() );
 
                 // setup input textures
                 if (desc.makeDepthMap && depthMapBinder && renderTarget) {
@@ -372,12 +372,12 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                 }
 
                 // render scene for each light source
-                light_const_iterator lightIter    = gatherer.cv.beginLight();
-                light_const_iterator lightIterEnd = gatherer.cv.beginLight();
+                light_const_iterator lightIter    = cv.beginLight();
+                light_const_iterator lightIterEnd = cv.beginLight();
                 size_t i = 0;
-                while ( lightIter != gatherer.cv.endLight() ) 
+                while ( lightIter != cv.endLight() ) 
                 {
-                    if ( lightIterEnd == gatherer.cv.endLight()
+                    if ( lightIterEnd == cv.endLight()
                          || std::distance(lightIter, lightIterEnd) == lightParams->max_light_count() 
                          || (*lightIterEnd)->getLightType() != lightTypes[i] ) 
                     {
@@ -386,17 +386,17 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
                         {
                         case scene::Light::DIRECTIONAL:
                             lightParams->setup_directional(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_DIRECTIONAL_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+                            render_pass( renderGroup, RP_DIRECTIONAL_LIGHTING, cv.beginRenderable(), cv.endRenderable() );
                             break;
                                                 
                         case scene::Light::POINT:
                             lightParams->setup_point(camera, lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_POINT_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+                            render_pass( renderGroup, RP_POINT_LIGHTING, cv.beginRenderable(), cv.endRenderable() );
                             break;
 
                         case scene::Light::SPOT:
                             //lightParams->setup(lightIter, lightIterEnd);
-                            render_pass( renderGroup, RP_SPOT_LIGHTING, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+                            render_pass( renderGroup, RP_SPOT_LIGHTING, cv.beginRenderable(), cv.endRenderable() );
                             break;
 
                         default:
@@ -413,10 +413,10 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
             }
 
             // render non lightened objects
-            render_pass( renderGroup, RP_OPAQUE, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+            render_pass( renderGroup, RP_OPAQUE, cv.beginRenderable(), cv.endRenderable() );
 
             if (desc.useDebugRender) {
-                render_pass( renderGroup, RP_DEBUG, gatherer.cv.beginRenderable(), gatherer.cv.endRenderable() );
+                render_pass( renderGroup, RP_DEBUG, cv.beginRenderable(), cv.endRenderable() );
             }
         }
 

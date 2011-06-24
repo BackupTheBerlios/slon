@@ -45,54 +45,6 @@ namespace {
         return debugMesh;
     }
 
-	template<typename Tree, typename Callback>
-	class visitor : 
-		public boost::static_visitor<void>
-	{
-	private:
-		template<typename T>
-		void perform(const T& body)
-		{
-            perform_on_leaves(tree, body, cb);
-		}
-
-	public:
-		visitor(Tree& tree_, Callback& cb_)
-		:	tree(tree_)
-		,	cb(cb_)
-		{}
-
-		void operator () (const math::Ray3f& body) const
-		{
-			perform(body);
-		}
-    
-		void operator () (const math::Sphere3f& body) const
-		{
-			perform(body);
-		}
-
-		void operator () (const math::AABBf& body) const
-		{
-			perform(body);
-		}
-		
-		void operator () (const math::Frustumf& body) const
-		{
-			perform(body);
-		}
-
-	private:
-		Tree&		tree;
-		Callback&	cb;
-	};
-
-	template<typename Tree, typename Callback>
-	visitor<Tree, Callback> make_visitor(Tree& tree, Callback& cb)
-	{
-        return visitor<Tree, Callback>(tree, cb);
-	}
-
 }
 
 namespace slon {
@@ -122,19 +74,19 @@ namespace detail {
 #   define DEBUG_VISIT_TREE(debugObject, debugMesh, cb)
 #endif
 	
-template<typename Location, typename Callback>
+template<typename Location, typename Visitor>
 class LocationVisitor : 
 	public boost::static_visitor<void>
 {
 public:
-	LocationVisitor(Location& location_, Callback& cb_)
+	LocationVisitor(Location& location_, Visitor& visitor_)
 	:	location(location_)
-	,	cb(cb_)
+	,	visitor(visitor_)
 	{}
 
 	void operator () (const math::Ray3f& body) const
 	{
-        location.visit(body, cb);
+        location.visit(body, visitor);
 	}
     
 	void operator () (const math::Sphere3f& body) const
@@ -144,30 +96,30 @@ public:
 
 	void operator () (const math::AABBf& body) const
 	{
-        location.visit(body, cb);
+        location.visit(body, visitor);
 	}
 		
 	void operator () (const math::Frustumf& body) const
 	{
-        location.visit(body, cb);
+        location.visit(body, visitor);
 	}
 
 private:
 	Location& location;
-	Callback& cb;
+	Visitor&  visitor;
 };
 
-template<typename Location, typename Callback>
-LocationVisitor<Location, Callback> makeLocationVisitor(Location& location, Callback& cb)
+template<typename Location, typename Visitor>
+LocationVisitor<Location, Callback> makeLocationVisitor(Location& location, Visitor& visitor)
 {
-	return LocationVisitor<Location, Callback>(location, cb);
+	return LocationVisitor<Location, Callback>(location, visitor);
 }
 
 const char* BVHLocation::serialize(database::OArchive& ar) const
 {
     struct write_object
     {
-        void operator () (database::OArchive& ar, const object_ptr& obj)
+        void operator () (database::OArchive& ar, const node_ptr& obj)
         {
             ar.writeSerializable(obj.get());
         }
@@ -184,9 +136,9 @@ void BVHLocation::deserialize(database::IArchive& ar)
 {
     struct read_object
     {
-        object_ptr operator () (database::IArchive& ar)
+        scene::node_ptr operator () (database::IArchive& ar)
         {
-            return object_ptr(static_cast<Object*>(ar.readSerializable()));
+            return scene::node_ptr(static_cast<scene::Node*>(ar.readSerializable()));
         }
     };
 
@@ -200,44 +152,44 @@ const math::AABBf& BVHLocation::getBounds() const
     return aabb;
 }
 
-void BVHLocation::visit(const body_variant& body, object_callback& cb)
+void BVHLocation::visit(const body_variant& body, NodeVisitor& nv)
 {
-	boost::apply_visitor(makeLocationVisitor(*this, cb), body);
+	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visit(const body_variant& body, object_const_callback& cb) const
+void BVHLocation::visit(const body_variant& body, ConstNodeVisitor& nv) const
 {
-	boost::apply_visitor(makeLocationVisitor(*this, cb), body);
+	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, object_callback& cb)
+void BVHLocation::visitVisible(const math::Frustumf& frustum, NodeVisitor& nv)
 {
-	visit(frustum, cb);
-    DEBUG_VISIT_TREE(debugObject, debugMesh, cb);
+	visit(frustum, nv);
+    DEBUG_VISIT_TREE(debugObject, debugMesh, nv);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const
+void BVHLocation::visitVisible(const math::Frustumf& frustum, ConstNodeVisitor& nv) const
 {
-	visit(frustum, cb);
-    DEBUG_VISIT_TREE(debugObject, debugMesh, cb);
+	visit(frustum, nv);
+    DEBUG_VISIT_TREE(debugObject, debugMesh, nv);
 }
 
-bool BVHLocation::update(realm::Object* object_)
+bool BVHLocation::update(const scene::Node& node)
 {
-	detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
-    if (object->getLocation() != this) {
+    if (node.getLocation() != this) {
         return false;
     }
 
-    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( object->getLocationData() ) );
+    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( node.getLocationData() ) );
     assert(bvhIter);
 
-    if ( object->isDynamic() ) {
-        dynamicAABBTree.update(bvhIter, object->getBounds());
+	scene::TransformVisitor visitor(node);
+
+    if ( node.isDynamic() ) {
+        dynamicAABBTree.update(bvhIter, visitor.getBounds());
     }
     else {
-        staticAABBTree.update(bvhIter, object->getBounds());
+        staticAABBTree.update(bvhIter, visitor.getBounds());
     }
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
@@ -245,19 +197,17 @@ bool BVHLocation::update(realm::Object* object_)
     return true;
 }
 
-bool BVHLocation::remove(realm::Object* object_)
+bool BVHLocation::remove(const scene::node_ptr& node)
 {
-	detail::Object* object = static_cast<detail::Object*>(object_);
-    assert(object);
-    if (object->getLocation() != this) {
+    if (node->getLocation() != this) {
         return false;
     }
 
-    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( object->getLocationData() ) );
+    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( node->getLocationData() ) );
     assert(bvhIter);
 
-    object->setLocation(0);
-    if ( object->isDynamic() ) {
+    node->setLocation(0);
+    if ( node->isDynamic() ) {
         dynamicAABBTree.remove(bvhIter);
     }
     else {
@@ -269,28 +219,22 @@ bool BVHLocation::remove(realm::Object* object_)
     return true;
 }
 
-void BVHLocation::add(realm::Object* object_)
+void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
 {
-	detail::Object* object = static_cast<detail::Object*>(object_);
-	assert(object);
-
-	if ( Location* location = object->getLocation() ) {
-		location->remove(object);
+	assert(node);
+	if ( Location* location = node->getLocation() ) {
+		location->remove(node);
 	}
-
-    object->setLocation(this);
-    if ( object->isDynamic() ) 
-    {
-        // recompute aabb
-        scene::TransformVisitor visitor;
-        object->traverse(visitor);
-
-        // insert into tree
-        object->setLocationData( dynamicAABBTree.insert( object->getBounds(), object_ptr(object) ).get_node() );
+	
+    // recompute aabb
+    scene::TransformVisitor visitor(*node);
+    if (dynamic) {
+        node->setLocationData( dynamicAABBTree.insert(visitor.getBounds(), node).get_node() );
     }
     else {
-        object->setLocationData( staticAABBTree.insert( object->getBounds(), object_ptr(object) ).get_node() );
+        node->setLocationData( staticAABBTree.insert(visitor.getBounds(), node).get_node() );
     }
+    node->setLocation(this);
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)

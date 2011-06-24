@@ -243,13 +243,11 @@ SET ( TARGET_LOG_DETAIL_HEADERS
 SET ( TARGET_REALM_HEADERS
     ${TARGET_HEADER_PATH}/Realm/Forward.h
     ${TARGET_HEADER_PATH}/Realm/Location.h
-    ${TARGET_HEADER_PATH}/Realm/Object.h
     ${TARGET_HEADER_PATH}/Realm/World.h
 )
 
 SET ( TARGET_REALM_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Realm/Detail/BVHLocation.h
-    ${TARGET_HEADER_PATH}/Realm/Detail/Object.h
     ${TARGET_HEADER_PATH}/Realm/Detail/World.h
 )
 
@@ -640,7 +638,6 @@ SET ( TARGET_PHYSICS_DETAIL_SOURCES
 
 SET ( TARGET_REALM_DETAIL_SOURCES
     Realm/Detail/BVHLocation.cpp
-    Realm/Detail/Object.cpp
     Realm/Detail/World.cpp
 )
 
@@ -949,11 +946,6 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	INSTALL (
 		FILES       ${TARGET_REALM_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Realm
-	)
-
-	INSTALL (
-		FILES       ${TARGET_REALM_OBJECT_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Realm/Object
 	)
 
 	INSTALL (

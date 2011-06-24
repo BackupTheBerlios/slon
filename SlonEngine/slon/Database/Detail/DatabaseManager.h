@@ -59,7 +59,6 @@ public:
     EffectCache&        getEffectCache()        { return effectCache; }
     TextureCache&       getTextureCache()       { return textureCache; }
     VisualSceneCache&   getVisualSceneCache()   { return visualSceneCache; }
-    ObjectCache&        getObjectCache()        { return objectCache; }
     LocationCache&      getLocationCache()      { return locationCache; }
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache&  getPhysicsSceneCache()  { return physicsSceneCache; }
@@ -108,7 +107,6 @@ private:
     EffectCache         effectCache;
     TextureCache        textureCache;
     VisualSceneCache    visualSceneCache;
-    ObjectCache         objectCache;
     LocationCache       locationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache   physicsSceneCache;

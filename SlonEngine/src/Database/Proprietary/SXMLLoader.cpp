@@ -4,7 +4,6 @@
 #include "Database/Proprietary/SXMLArchive.h"
 #include "Log/Logger.h"
 #include "FileSystem/File.h"
-#include "Realm/Object.h"
 #include <xml++/document.h>
 #include <xml++/serialization/helpers.hpp>
 
@@ -47,24 +46,6 @@ library_ptr SXMLLoader::load(filesystem::File* file)
 			ar.closeChunk();
 		}
 
-		// read objects
-		if ( ar.openChunk("Objects", info) )
-		{
-			while ( ar.openChunk("Object", info) )
-			{
-				std::string name;
-				ar.readStringChunk("name", name);
-				realm::object_ptr object( dynamic_cast<realm::Object*>(ar.readSerializable()) );
-				if (!object) {
-					throw serialization_error(AUTO_LOGGER, "Can't deserialize object");
-				}
-
-				library->objects.insert( std::make_pair(name, object) );
-				ar.closeChunk();
-			}
-
-			ar.closeChunk();
-		}
 	}
 
     return library;
