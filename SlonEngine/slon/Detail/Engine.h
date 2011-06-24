@@ -68,7 +68,7 @@ public:
 	/** Get file system manager */
     filesystem::FileSystemManager& getFileSystemManager() { return *filesystemManager; }
 
-    void addToUpdateQueue(realm::Object* object) { updateQueue.push_back(object); }
+    void addToUpdateQueue(const scene::node_ptr& node) { updateQueue.push_back(node); }
 
 private:
     // managers, order is important!
@@ -84,7 +84,7 @@ private:
     physics::detail::PhysicsManager             physicsManager;
 #endif
 
-    std::vector<realm::object_ptr> updateQueue;
+    std::vector<scene::node_ptr> updateQueue;
 
     // misc
     DESC    desc;

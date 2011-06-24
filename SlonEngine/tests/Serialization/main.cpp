@@ -192,12 +192,10 @@ BOOST_AUTO_TEST_CASE(physics_serialization)
     }
 
     // scene
-    scene::group_ptr root( new scene::MatrixTransform("node0") );
-    root->addChild( new scene::MatrixTransform("node1") );
+    scene::group_ptr root( new physics::RigidBodyTransform(rb0.get()) );
+    root->addChild( new physics::RigidBodyTransform(rb1.get()) );
 
-    realm::object_ptr object( realm::currentWorld().add(root.get(), true, model.get()) );
-
-	// check
+    // check
 	database::library_ptr library(new database::Library);
 	library->visualScenes.insert( std::make_pair("scene_test", root) );
 	writeLoadWriteCompare(library);

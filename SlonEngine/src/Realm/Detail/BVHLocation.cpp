@@ -152,23 +152,23 @@ const math::AABBf& BVHLocation::getBounds() const
     return aabb;
 }
 
-void BVHLocation::visit(const body_variant& body, NodeVisitor& nv)
+void BVHLocation::visit(const body_variant& body, scene::NodeVisitor& nv)
 {
 	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visit(const body_variant& body, ConstNodeVisitor& nv) const
+void BVHLocation::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
 {
 	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, NodeVisitor& nv)
+void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
 {
 	visit(frustum, nv);
     DEBUG_VISIT_TREE(debugObject, debugMesh, nv);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, ConstNodeVisitor& nv) const
+void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
 {
 	visit(frustum, nv);
     DEBUG_VISIT_TREE(debugObject, debugMesh, nv);

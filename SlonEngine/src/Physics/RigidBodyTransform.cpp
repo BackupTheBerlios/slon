@@ -6,7 +6,7 @@
 namespace slon {
 namespace physics {
 
-RigidBodyTransform::RigidBodyTransform(physics::RigidBody* rigidBody_) :
+RigidBodyTransform::RigidBodyTransform(const physics::rigid_body_ptr& rigidBody_) :
     rigidBody(rigidBody_),
     absolute(false)
 {

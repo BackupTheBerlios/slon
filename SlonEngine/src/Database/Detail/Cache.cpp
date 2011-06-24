@@ -7,7 +7,6 @@
 #include "Graphics/Effect.h"
 #include "Scene/Node.h"
 #include "Realm/Location.h"
-#include "Realm/Object.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
 #include "Physics/PhysicsModel.h"
 #endif

@@ -71,14 +71,6 @@ public:
 
     /** Check whether world have specified location */
     virtual bool haveLocation(Location* location) const = 0;
-	
-	/** Create object and add it into world. */
-	virtual realm::Object* add(scene::Node*				node,
-					           bool						dynamic = false
-#ifdef SLON_ENGINE_USE_PHYSICS
-					           , physics::PhysicsModel*	physicsModel = 0
-#endif                 
-					           ) = 0;
 
     /** Grant thread read access to the world.
      * @return lock object. Lock is freed whether object is deleted.
