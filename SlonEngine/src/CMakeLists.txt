@@ -241,14 +241,15 @@ SET ( TARGET_LOG_DETAIL_HEADERS
 )
 
 SET ( TARGET_REALM_HEADERS
+    ${TARGET_HEADER_PATH}/Realm/BVHLocation.h
+    ${TARGET_HEADER_PATH}/Realm/BVHLocationNode.h
+    ${TARGET_HEADER_PATH}/Realm/DefaultWorld.h
     ${TARGET_HEADER_PATH}/Realm/Forward.h
     ${TARGET_HEADER_PATH}/Realm/Location.h
     ${TARGET_HEADER_PATH}/Realm/World.h
 )
 
 SET ( TARGET_REALM_DETAIL_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/Detail/BVHLocation.h
-    ${TARGET_HEADER_PATH}/Realm/Detail/World.h
 )
 
 SET ( TARGET_SCENE_HEADERS
@@ -636,9 +637,13 @@ SET ( TARGET_PHYSICS_DETAIL_SOURCES
     Physics/Detail/PhysicsManager.cpp
 )
 
+SET ( TARGET_REALM_SOURCES
+    Realm/BVHLocation.cpp
+    Realm/BVHLocationNode.cpp
+    Realm/DefaultWorld.cpp
+)
+
 SET ( TARGET_REALM_DETAIL_SOURCES
-    Realm/Detail/BVHLocation.cpp
-    Realm/Detail/World.cpp
 )
 
 SET ( TARGET_SCENE_SOURCES

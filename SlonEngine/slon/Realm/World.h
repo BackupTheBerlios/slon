@@ -62,15 +62,15 @@ public:
 	virtual bool haveInfiniteNode(const scene::node_ptr& node) const = 0;
 
     /** Add location to the world */
-    virtual void addLocation(Location* location) = 0;
+    virtual void addLocation(const location_ptr& location) = 0;
 
     /** Remove location from the world.
      * @return true - if succeeds, false if location not found
      */
-    virtual bool removeLocation(Location* location) = 0;
+    virtual bool removeLocation(const location_ptr& location) = 0;
 
     /** Check whether world have specified location */
-    virtual bool haveLocation(Location* location) const = 0;
+    virtual bool haveLocation(const location_ptr& location) const = 0;
 
     /** Grant thread read access to the world.
      * @return lock object. Lock is freed whether object is deleted.
@@ -86,7 +86,7 @@ public:
 };
 
 /** Get simulation world */
-World& currentWorld();
+World* currentWorld();
 
 } // namespace realm
 } // namespace slon

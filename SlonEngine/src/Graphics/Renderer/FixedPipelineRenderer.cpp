@@ -107,7 +107,7 @@ void FixedPipelineRenderer::render(realm::World& world, const scene::Camera& cam
         cv.setCamera(&camera);
         {
             thread::lock_ptr lock = world.lockForReading();
-            world.visitVisible(camera.getFrustum(), gatherer);
+            world.visitVisible(camera.getFrustum(), cv);
         }
 
         // perform forward rendering

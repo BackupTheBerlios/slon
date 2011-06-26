@@ -1,19 +1,18 @@
 #ifndef __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 #define __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 
+#include "Location.h"
+#include "World.h"
 #include <boost/thread/shared_mutex.hpp>
 #include <vector>
-#include "../Location.h"
-#include "../World.h"
 
 namespace slon {
 namespace realm {
-namespace detail {
 
 /** Very simple world. Stores array of locations and updates all
  * of them every frame. 
  */
-class World :
+class DefaultWorld :
 	public realm::World
 {
 public:
@@ -21,7 +20,7 @@ public:
     typedef std::vector<scene::node_ptr>	object_vector;
 
 public:
-    World();
+    DefaultWorld();
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -62,9 +61,9 @@ public:
 	}
 	
     // Override World
-    void addLocation(Location* location);
-    bool removeLocation(Location* location);
-    bool haveLocation(Location* location) const;
+    void addLocation(const location_ptr& location);
+    bool removeLocation(const location_ptr& location);
+    bool haveLocation(const location_ptr& location) const;
 		
     void visit(const body_variant& body, scene::NodeVisitor& nv);
     void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
@@ -87,7 +86,6 @@ private:
     mutable boost::shared_mutex accessMutex;
 };
 
-} // namespace detail
 } // namespace realm
 } // namespace slon
 

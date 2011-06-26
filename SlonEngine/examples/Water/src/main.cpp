@@ -12,6 +12,7 @@
 #include "Graphics/PostProcess/FogFilter.h"
 #include "Graphics/Renderable/ProjectedGrid.h"
 #include "Graphics/Renderable/SkyBox.h"
+#include "Realm/BVHLocation.h"
 #include "Scene/Camera/LookAtCamera.h"
 #include "Scene/Camera/ReflectCamera.h"
 #include "Scene/Light/DirectionalLight.h"
@@ -249,7 +250,9 @@ public:
             }
             //FreeConsole();
 
-			realm::World& world = realm::currentWorld();
+			realm::World*       world = realm::currentWorld();
+            realm::location_ptr location(new realm::BVHLocation);
+            world->addLocation(location);
 
             // Create skybox
             SkyBox* skyBox = new SkyBox();
@@ -265,12 +268,12 @@ public:
                 };
                 skyBox->MakeFromSideTextures(SKY_BOX_MAPS);
             }
-            world.add(skyBox, false);
+            world->addInfiniteNode(skyBox);
 
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/castle.DAE");
-                world.add(library->visualScenes.begin()->second.get());
+                location->add(library->visualScenes.begin()->second.get(), false);
 
                 // create light
                 scene::DirectionalLight* light = new DirectionalLight();
@@ -278,7 +281,7 @@ public:
                 light->setColor( Vector4f(0.8f, 0.8f, 0.8f, 1.0f) );
                 light->setAmbient(0.3f);
                 light->setIntensity(1.5f);
-                world.add(light, false);
+                world->addInfiniteNode(light);
             }
 
             // Create cameras & water surface
@@ -327,7 +330,7 @@ public:
 
                 ocean.reset( new ProjectedGrid(waterEffect) );
                 ocean->setupGrid(sizeX, sizeY);
-                world.add(ocean.get(), false);
+                location->add(ocean.get(), false);
 
                 // setup special states
                 sgl::RasterizerState::DESC desc;

@@ -7,7 +7,7 @@
 #include "../Input/Detail/InputManager.h"
 #include "../Log/Detail/LogManager.h"
 #include "../FileSystem/Detail/FileSystemManager.h"
-#include "../Realm/Detail/World.h"
+#include "../Realm/World.h"
 #include "../Thread/Detail/ThreadManager.h"
 #include "../Thread/StartStopTimer.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -40,7 +40,10 @@ public:
     unsigned int getFrameNumber() const { return frameNumber; }
 
     /** Get simulation world */
-    realm::World& getWorld() { return world; }
+    realm::World* getWorld() { return world.get(); }
+
+    /** Set world */
+    void setWorld(const realm::world_ptr& world_) { world = world_; }
 
     /** Get timer measuring time from start of the simulation. */
     Timer& getSimulationTimer() { return *simulationTimer; }
@@ -68,8 +71,6 @@ public:
 	/** Get file system manager */
     filesystem::FileSystemManager& getFileSystemManager() { return *filesystemManager; }
 
-    void addToUpdateQueue(const scene::node_ptr& node) { updateQueue.push_back(node); }
-
 private:
     // managers, order is important!
     log::detail::LogManager                     logManager;
@@ -78,13 +79,11 @@ private:
     graphics::detail::GraphicsManager           graphicsManager;
     database::detail::DatabaseManager           databaseManager;
     filesystem::detail::file_system_manager_ptr filesystemManager;
-    realm::detail::World						world;
+    realm::world_ptr						    world;
     start_stop_timer_ptr                        simulationTimer;
 #ifdef SLON_ENGINE_USE_PHYSICS
     physics::detail::PhysicsManager             physicsManager;
 #endif
-
-    std::vector<scene::node_ptr> updateQueue;
 
     // misc
     DESC    desc;

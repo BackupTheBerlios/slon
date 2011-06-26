@@ -3,11 +3,10 @@
 #include "Detail/Engine.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
-#include "Realm/World.h"
 #include "Scene/Transform.h"
 #include "Utility/error.hpp"
 
-DECLARE_AUTO_LOGGER("scene.Group");
+DECLARE_AUTO_LOGGER("scene.Transform");
 
 using namespace slon;
 using namespace scene;
@@ -70,13 +69,5 @@ void Transform::accept(log::LogVisitor& visitor) const
 void Transform::update()
 {
 	++modifiedCount;
-
-	Node* node = this;
-	while (node && !node->getObject()) {
-		node = node->getParent();
-	}
-
-	if ( node && node->getObject() ) {
-		detail::Engine::engineInstance->addToUpdateQueue(node->getObject());
-	}
+    doUpdate();
 }

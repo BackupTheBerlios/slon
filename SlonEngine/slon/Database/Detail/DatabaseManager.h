@@ -13,7 +13,6 @@ typedef Cache<animation::Animation>     AnimationCache;
 typedef Cache<graphics::Effect>         EffectCache;
 typedef Cache<graphics::Texture>        TextureCache;
 typedef Cache<scene::Node>              VisualSceneCache;
-typedef Cache<realm::Object>            ObjectCache;
 typedef Cache<realm::Location>          LocationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Cache<physics::PhysicsModel>    PhysicsSceneCache;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
 #include "Detail/Engine.h"
-#include "Realm/Detail/BVHLocation.h"
+#include "Realm/DefaultWorld.h"
 #include "Scene/Visitors/NodeVisitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
@@ -19,11 +19,10 @@ namespace {
 
 }
 
-DECLARE_AUTO_LOGGER("realm.World")
+DECLARE_AUTO_LOGGER("realm.DefaultWorld")
 
 namespace slon {
 namespace realm {
-namespace detail {
 		
 template<typename World, typename Visitor>
 class WorldVisitor : 
@@ -66,11 +65,11 @@ WorldVisitor<World, Callback> makeWorldVisitor(World& world, Callback& cb)
 	return WorldVisitor<World, Callback>(world, cb);
 }
 
-World::World()
+DefaultWorld::DefaultWorld()
 {
 }
 
-const char* World::serialize(database::OArchive& ar) const
+const char* DefaultWorld::serialize(database::OArchive& ar) const
 {
     ar.openChunk("locations");
     {
@@ -91,7 +90,7 @@ const char* World::serialize(database::OArchive& ar) const
     return "World";
 }
 
-void World::deserialize(database::IArchive& ar)
+void DefaultWorld::deserialize(database::IArchive& ar)
 {
     database::IArchive::chunk_info info;
     if ( !ar.openChunk("locations", info) ) {
@@ -105,39 +104,39 @@ void World::deserialize(database::IArchive& ar)
     if ( !ar.openChunk("infiniteObjects", info) ) {
         throw database::serialization_error(AUTO_LOGGER, "Missing locations chunk");
     }
-    while ( Object* object = ar.readSerializable<Object>(false, true) ) {
-        infiniteObjects.push_back( object_ptr(object) );
+    while ( scene::Node* object = ar.readSerializable<scene::Node>(false, true) ) {
+        infiniteObjects.push_back( scene::node_ptr(object) );
     }
     ar.closeChunk();
 }
 
-void World::addLocation(Location* location)
+void DefaultWorld::addLocation(const location_ptr& location)
 {
     assert(location);
-    locations.push_back( location_ptr(location) );
+    locations.push_back(location);
 }
 
-bool World::removeLocation(Location* location)
+bool DefaultWorld::removeLocation(const location_ptr& location)
 {
-    return quick_remove( locations, location_ptr(location) );
+    return quick_remove(locations, location);
 }
 
-bool World::haveLocation(Location* location) const
+bool DefaultWorld::haveLocation(const location_ptr& location) const
 {
     return std::find( locations.begin(), locations.end(), location ) != locations.end();
 }
 
-void World::visit(const body_variant& body, scene::NodeVisitor& nv)
+void DefaultWorld::visit(const body_variant& body, scene::NodeVisitor& nv)
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void World::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void World::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -153,7 +152,7 @@ void World::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
 	}
 }
 
-void World::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -169,34 +168,32 @@ void World::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor&
 	}
 }
 
-bool World::removeInfiniteNode(const scene::node_ptr& node)
+bool DefaultWorld::removeInfiniteNode(const scene::node_ptr& node)
 {
 	return quick_remove(infiniteObjects, node);
 }
 
-void World::addInfiniteNode(const scene::node_ptr& node)
+void DefaultWorld::addInfiniteNode(const scene::node_ptr& node)
 {
 	infiniteObjects.push_back(node);
 }
 
-bool World::haveInfiniteNode(const scene::node_ptr& node) const
+bool DefaultWorld::haveInfiniteNode(const scene::node_ptr& node) const
 {
     return std::find( infiniteObjects.begin(), infiniteObjects.end(), node ) != infiniteObjects.end();
 }
 
-thread::lock_ptr World::lockForReading() const
+thread::lock_ptr DefaultWorld::lockForReading() const
 {
     return thread::create_lock( new boost::shared_lock<boost::shared_mutex>(accessMutex) );
 }
 
-thread::lock_ptr World::lockForWriting()
+thread::lock_ptr DefaultWorld::lockForWriting()
 {
     return thread::create_lock( new boost::unique_lock<boost::shared_mutex>(accessMutex) );
 }
 
-} // namespace detail
-
-World& currentWorld()
+World* currentWorld()
 {
 	return Engine::Instance()->getWorld();
 }

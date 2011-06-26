@@ -8,6 +8,7 @@
 #include "Graphics/Renderer/ForwardRenderer.h"
 #include "Input/KeyboardHandler.h"
 #include "Input/MouseHandler.h"
+#include "Realm/BVHLocation.h"
 #include "Scene/Camera/LookAtCamera.h"
 #include "Scene/Camera/ReflectCamera.h"
 #include "Scene/Light/DirectionalLight.h"
@@ -96,7 +97,9 @@ public:
         #endif
 
             // create world
-            realm::World& world = realm::currentWorld();
+            realm::World*       world = realm::currentWorld();
+            realm::location_ptr location(new realm::BVHLocation);
+            world->addLocation(location);
 
             // Create skybox
             SkyBox* skyBox = new SkyBox();
@@ -112,12 +115,12 @@ public:
                 };
                 skyBox->MakeFromSideTextures(SKY_BOX_MAPS);
             }
-            world.add(skyBox, false);
+            world->addInfiniteNode(skyBox);
 
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
-                world.add(library->visualScenes.begin()->second.get());
+                location->add(library->visualScenes.begin()->second.get());
 
 				database::Library::key_animation_map animations = library->animations;
 				if ( !animations.empty() )
@@ -133,7 +136,7 @@ public:
                 light->setColor( Vector4f(0.8f, 0.8f, 0.8f, 1.0f) );
                 light->setAmbient(0.3f);
                 light->setIntensity(1.5f);
-                world.add(light, false);
+                world->addInfiniteNode(light);
             }
 
             // Create camera

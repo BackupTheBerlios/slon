@@ -14,7 +14,6 @@ Node::Node()
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
-,	object(0)
 {}
 
 Node::Node(hash_string name_)
@@ -23,7 +22,6 @@ Node::Node(hash_string name_)
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
-,	object(0)
 {
 }
 
@@ -57,6 +55,15 @@ void Node::deserialize(database::IArchive& ar)
 
 	std::string tmp;
 	name = hash_string( ar.readStringChunk("name", tmp) );
+}
+
+void Node::doUpdate()
+{
+    Node* node = this;
+    while (node && node->getParent()) {
+	    node = node->getParent();
+    }
+    node->onUpdate();
 }
 
 Node* findNamedNode(Node& root, hash_string name)

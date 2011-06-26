@@ -8,27 +8,23 @@ namespace boost {
 }
 
 namespace slon {
-
-template<typename Signature>
-class callback;
-
 namespace realm {
 
 // forward types
-class Object;
 class Location;
+class BVHLocation;
+class BVHLocationNode;
 class World;
 
 // ptr typedefs
-typedef boost::intrusive_ptr<Object>			object_ptr;
-typedef boost::intrusive_ptr<const Object>		const_object_ptr;
-typedef boost::intrusive_ptr<Location>          location_ptr;
-typedef boost::intrusive_ptr<const Location>    const_location_ptr;
-typedef boost::intrusive_ptr<World>				world_ptr;
-typedef boost::intrusive_ptr<const World>		const_world_ptr;
-
-typedef callback<bool (realm::Object&)>			object_callback;
-typedef callback<bool (const realm::Object&)>	object_const_callback;
+typedef boost::intrusive_ptr<Location>              location_ptr;
+typedef boost::intrusive_ptr<const Location>        const_location_ptr;
+typedef boost::intrusive_ptr<BVHLocation>           bvh_location_ptr;
+typedef boost::intrusive_ptr<const BVHLocation>     const_bvh_location_ptr;
+typedef boost::intrusive_ptr<BVHLocationNode>       bvh_location_node_ptr;
+typedef boost::intrusive_ptr<const BVHLocationNode> const_bvh_location_node_ptr;
+typedef boost::intrusive_ptr<World>				    world_ptr;
+typedef boost::intrusive_ptr<const World>		    const_world_ptr;
 
 } // namespace realm
 } // namespace slon

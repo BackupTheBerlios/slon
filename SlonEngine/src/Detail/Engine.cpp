@@ -6,7 +6,8 @@
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/StaticMesh.h"
-#include "Realm/Detail/BVHLocation.h"
+#include "Realm/BVHLocation.h"
+#include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/error.hpp"
@@ -38,7 +39,7 @@ namespace {
 
         void operator () (void)
         {
-            realm::detail::World& world = static_cast<realm::detail::World&>(engine.getWorld());
+            realm::World& world = static_cast<realm::World&>(*engine.getWorld());
             thread::detail::ThreadManager& threadManager = static_cast<thread::detail::ThreadManager&>(engine.getThreadManager());
 			if (multithreaded)
 			{
@@ -171,6 +172,7 @@ Engine::Engine() :
     working(false)
 {
     filesystemManager.reset(new filesystem::detail::FileSystemManager);
+    world.reset(new realm::DefaultWorld);
 }
 
 void Engine::init()
@@ -258,8 +260,8 @@ void Engine::init()
         //databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, &physicsManager));
 
         // realm
-        databaseManager.registerSerializableCreateFunc("Object",            boost::bind(&realm::World::createObject, &world));
-        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::detail::BVHLocation>);
+        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>);
+        databaseManager.registerSerializableCreateFunc("BVHLocationNode",   createSerializable<realm::BVHLocationNode>);
 
         // sgl
 		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);
@@ -319,17 +321,7 @@ void Engine::run(const DESC& desc_)
         int i = 0;
         while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-        // traverse updated objects
-        {
-            thread::lock_ptr lock = world.lockForWriting();
-            for (size_t i = 0; i<updateQueue.size(); ++i) 
-            {
-				traverser.traverse(*updateQueue[i]);
-                world.update(updateQueue[i]);
-            }
-            updateQueue.clear();
-        }
-        graphicsManager.render(world);
+        graphicsManager.render(*world);
     }
 
     // remove useless now delegates
@@ -372,20 +364,7 @@ void Engine::frame()
     scene::TransformVisitor traverser;    
     while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-        // traverse updated objects
-    {
-        thread::lock_ptr lock = world.lockForWriting();
-        for (size_t i = 0; i<updateQueue.size(); ++i) 
-        {
-            if ( updateQueue[i]->isInWorld() )
-            {
-                updateQueue[i]->traverse(traverser);
-                world.update(updateQueue[i].get());
-            }
-        }
-        updateQueue.clear();
-    }
-    graphicsManager.render(world);
+    graphicsManager.render(*world);
 
     ++frameNumber;
 

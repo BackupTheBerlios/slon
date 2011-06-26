@@ -6,14 +6,14 @@
 #endif
 
 #ifdef DEBUG_DBVT_LOCATION
-#   include "../../Graphics/Renderable/DebugMesh.h"
+#   include "../Graphics/Renderable/DebugMesh.h"
 #endif
-#include "../../Utility/Algorithm/aabb_tree.hpp"
-#include "../Location.h"
+#include "../Utility/Algorithm/aabb_tree.hpp"
+#include "Location.h"
+#include "BVHLocationNode.h"
 
 namespace slon {
 namespace realm {
-namespace detail {
 
 template<typename Visitor>
 class visit_node_functor
@@ -23,9 +23,9 @@ public:
 	:	nv(nv_)
 	{}
 
-	bool operator () (const scene::node_ptr& node) 
+	bool operator () (const bvh_location_node_ptr& node) 
 	{ 
-		nv.traverse(*node); 
+		nv.traverse( *node->getChild() ); 
 		return true;
 	}
 
@@ -43,8 +43,9 @@ class BVHLocation :
     public Location
 {
 public:
-    typedef aabb_tree<scene::node_ptr>  object_tree;
-    typedef object_tree::volume_node    object_tree_node;
+    typedef aabb_tree<bvh_location_node_ptr>    object_tree;
+    typedef object_tree::volume_node            object_tree_node;
+    typedef object_tree::iterator               object_tree_iterator;
 
 public:
     // Override Serializable
@@ -73,9 +74,9 @@ public:
     void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
     void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
 
-    bool update(const scene::Node& node);
-    bool remove(const scene::node_ptr& object);
-    void add(const scene::node_ptr& object, bool dynamic);
+    void add(const scene::node_ptr& node, bool dynamic);
+    void update(const scene::node_ptr& node);
+    bool remove(const scene::node_ptr& node);
 
 private:
     math::AABBf     aabb;
@@ -84,12 +85,10 @@ private:
 
     // debug
 #ifdef DEBUG_DBVT_LOCATION
-    mutable graphics::debug_mesh_ptr    debugMesh;
-    mutable object_ptr                  debugObject;
+    mutable graphics::debug_mesh_ptr debugMesh;
 #endif
 };
 
-} // namespace detail
 } // namespace realm
 } // namespace slon
 

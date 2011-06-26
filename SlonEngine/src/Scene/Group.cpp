@@ -71,10 +71,9 @@ void Group::deserialize(database::IArchive& ar)
 	}
 }
 
-void Group::addChild(Node* child, Node* left)
+void Group::addChild(const node_ptr& child, Node* left)
 {
 	assert(child->parent != this && (!left || left->parent == this));
-	node_ptr guard(child);
 
 	if (child->parent) {
 		child->parent->removeChild(child);
@@ -86,7 +85,7 @@ void Group::addChild(Node* child, Node* left)
 		child->left = 0;
 		child->right = firstChild.get();
 		if (firstChild) {
-			firstChild->left = child;
+			firstChild->left = child.get();
 		}
 		firstChild = child;
 	}
@@ -98,10 +97,9 @@ void Group::addChild(Node* child, Node* left)
 	}
 }
 
-void Group::removeChild(Node* child)
+void Group::removeChild(const node_ptr& child)
 {
 	assert(child->parent == this);
-	node_ptr guard(child);
 
 	if (child->left) {
 		child->left->right = child->right;

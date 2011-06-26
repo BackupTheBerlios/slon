@@ -206,7 +206,7 @@ public:
 
         operator bool () const { return (node != 0); }
 
-        leaf_node_type* get_node() { return static_cast<leaf_node_type*>(node); }
+        leaf_node_type* get_node() const { return static_cast<leaf_node_type*>(node); }
 
     private:
         volume_node_type* node;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/Detail/UtilitySerialization.h"
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
-#include "Realm/Detail/BVHLocation.h"
+#include "Realm/BVHLocation.h"
 #include "Realm/World.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
@@ -9,7 +9,7 @@
 namespace {
 
     using namespace slon;
-    using namespace slon::realm::detail;
+    using namespace slon::realm;
 
     template<typename LeafData, typename RealType>
     graphics::DebugMesh* DebugAABBTree(const aabb_tree<LeafData, RealType>& aabbTree)
@@ -49,7 +49,6 @@ namespace {
 
 namespace slon {
 namespace realm {
-namespace detail {
 
 #ifdef DEBUG_DBVT_LOCATION
 #   define DEBUG_UPDATE_TREE(debugMesh, staticTree, dynamicTree)\
@@ -110,16 +109,16 @@ private:
 };
 
 template<typename Location, typename Visitor>
-LocationVisitor<Location, Callback> makeLocationVisitor(Location& location, Visitor& visitor)
+LocationVisitor<Location, Visitor> makeLocationVisitor(Location& location, Visitor& visitor)
 {
-	return LocationVisitor<Location, Callback>(location, visitor);
+	return LocationVisitor<Location, Visitor>(location, visitor);
 }
 
 const char* BVHLocation::serialize(database::OArchive& ar) const
 {
     struct write_object
     {
-        void operator () (database::OArchive& ar, const node_ptr& obj)
+        void operator () (database::OArchive& ar, const bvh_location_node_ptr& obj)
         {
             ar.writeSerializable(obj.get());
         }
@@ -136,15 +135,29 @@ void BVHLocation::deserialize(database::IArchive& ar)
 {
     struct read_object
     {
-        scene::node_ptr operator () (database::IArchive& ar)
+        bvh_location_node_ptr operator () (database::IArchive& ar)
         {
-            return scene::node_ptr(static_cast<scene::Node*>(ar.readSerializable()));
+            return bvh_location_node_ptr(ar.readSerializable<BVHLocationNode>());
         }
     };
 
     database::deserialize(ar, "aabb", aabb);
     database::deserialize(ar, "staticAABBTree", staticAABBTree, read_object() );
     database::deserialize(ar, "dynamicAABBTree", dynamicAABBTree, read_object() );
+
+    for (object_tree_iterator iter  = staticAABBTree.begin(); 
+                              iter != staticAABBTree.end();
+                              ++iter)
+    {
+        (*iter)->setBVHIterator(iter);
+    }
+
+    for (object_tree_iterator iter  = dynamicAABBTree.begin(); 
+                              iter != dynamicAABBTree.end();
+                              ++iter)
+    {
+        (*iter)->setBVHIterator(iter);
+    }
 }
 
 const math::AABBf& BVHLocation::getBounds() const
@@ -174,72 +187,61 @@ void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVi
     DEBUG_VISIT_TREE(debugObject, debugMesh, nv);
 }
 
-bool BVHLocation::update(const scene::Node& node)
+void BVHLocation::update(const scene::node_ptr& node)
 {
-    if (node.getLocation() != this) {
-        return false;
-    }
+    BVHLocationNode* locNode = static_cast<BVHLocationNode*>( node->getParent() );
+    assert(locNode && locNode->getLocation() == this);
 
-    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( node.getLocationData() ) );
-    assert(bvhIter);
-
-	scene::TransformVisitor visitor(node);
-
-    if ( node.isDynamic() ) {
-        dynamicAABBTree.update(bvhIter, visitor.getBounds());
+	scene::TransformVisitor visitor(*node);
+    if ( locNode->isDynamic() ) {
+        dynamicAABBTree.update(locNode->getBVHIterator(), visitor.getBounds());
     }
     else {
-        staticAABBTree.update(bvhIter, visitor.getBounds());
+        staticAABBTree.update(locNode->getBVHIterator(), visitor.getBounds());
     }
-    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
-    DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
-    return true;
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
+    DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree);
 }
 
 bool BVHLocation::remove(const scene::node_ptr& node)
 {
-    if (node->getLocation() != this) {
+    BVHLocationNode* locNode = static_cast<BVHLocationNode*>( node->getParent() );
+    if (!locNode || locNode->getLocation() != this) {
         return false;
     }
 
-    object_tree::iterator bvhIter( reinterpret_cast<object_tree_node*>( node->getLocationData() ) );
-    assert(bvhIter);
-
-    node->setLocation(0);
-    if ( node->isDynamic() ) {
-        dynamicAABBTree.remove(bvhIter);
+    if ( locNode->isDynamic() ) {
+        dynamicAABBTree.remove(locNode->getBVHIterator());
     }
     else {
-        staticAABBTree.remove(bvhIter);
+        staticAABBTree.remove(locNode->getBVHIterator());
     }
-    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
+    locNode->removeChild(node.get());
 
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
     return true;
 }
 
 void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
 {
-	assert(node);
-	if ( Location* location = node->getLocation() ) {
-		location->remove(node);
-	}
-	
+    assert( node && !node->getParent() );
+	bvh_location_node_ptr locNode( new BVHLocationNode(this, 0, dynamic) );
+    locNode->addChild(node);
+
     // recompute aabb
     scene::TransformVisitor visitor(*node);
     if (dynamic) {
-        node->setLocationData( dynamicAABBTree.insert(visitor.getBounds(), node).get_node() );
+        locNode->setBVHIterator( dynamicAABBTree.insert(visitor.getBounds(), locNode) );
     }
     else {
-        node->setLocationData( staticAABBTree.insert(visitor.getBounds(), node).get_node() );
+        locNode->setBVHIterator( staticAABBTree.insert(visitor.getBounds(), locNode) );
     }
-    node->setLocation(this);
-    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
 
+    aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, staticAABBTree, dynamicAABBTree)
 }
 
-} // namespace detail
 } // namespace realm
 } // namespace slon

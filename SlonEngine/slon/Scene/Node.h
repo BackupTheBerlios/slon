@@ -98,11 +98,14 @@ public:
 	/** Get node name. */
 	hash_string getName() const { return name; }
 
-	/** Get object to which holds this node */
-	realm::Object* getObject() { return object; }
+    /** Notify node that scene graph is updated (changed transformation or hierarchy). 
+     * Override this function if needed. This function will be called only for root node 
+     * in hierarchy to avoid overhead.
+     */
+    virtual void onUpdate() {}
 
-	/** Set object which holds this node */
-	void setObject(realm::Object* object_) { object = object_; }
+    /** Call update for root node */
+    void doUpdate();
 
     virtual ~Node() {}
 
@@ -113,8 +116,6 @@ protected:
 	Node*			left;
 	node_ptr		right;
 	void*			userPointer;
-
-	realm::Object*	object;
 };
 
 /** Find node with specified name in the graph

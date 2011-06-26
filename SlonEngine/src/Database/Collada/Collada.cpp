@@ -1167,7 +1167,7 @@ namespace {
             return rigidBody;
         }
 
-        physics::physics_model_ptr createPhysicsScene(const collada_physics_scene& colladaScene, scene::Node& root)
+        physics::physics_model_ptr createPhysicsScene(const collada_physics_scene& colladaScene, scene::node_ptr& root)
         {
 			using namespace physics;
 
@@ -1204,7 +1204,7 @@ namespace {
                                                    ++iter)
             {
                 // insert rigid body into scene graph
-                scene::node_ptr targetNode( findNamedNode( root, hash_string((*iter)->getTarget()) ) );
+                scene::node_ptr targetNode( findNamedNode( *root, hash_string((*iter)->getTarget()) ) );
                 if (targetNode)
                 {
                     physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
@@ -1237,8 +1237,8 @@ namespace {
             physicsModel->toggleSimulation(true);
 
             // apply local transform to the shapes
-            scene::TransformVisitor tv(root);
-            DecomposeTransformVisitor dv(root);
+            scene::TransformVisitor tv(*root);
+            DecomposeTransformVisitor dv(*root);
         
             // print scene graph
             log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);
@@ -1622,7 +1622,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 										iter != document.libraryPhysicsScenes.elements.end();
 										++iter )
 	{
-		physics::physics_model_ptr physicsScene = physicsBuilder.createPhysicsScene(*iter->second, *library->visualScenes.begin());
+		physics::physics_model_ptr physicsScene = physicsBuilder.createPhysicsScene(*iter->second, library->visualScenes.begin()->second);
 		library->physicsScenes.insert( std::make_pair(physicsScene->getName(), physicsScene) );
 	}
 #endif

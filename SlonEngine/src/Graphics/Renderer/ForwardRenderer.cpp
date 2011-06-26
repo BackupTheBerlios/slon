@@ -284,7 +284,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
         cv.setCamera(&camera);
         {
             thread::lock_ptr lock = world.lockForReading();
-            world.visitVisible(camera.getFrustum(), gatherer);
+            world.visitVisible(camera.getFrustum(), cv);
         }
 
         // partition lights by their types

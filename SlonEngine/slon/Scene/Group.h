@@ -3,7 +3,6 @@
 
 #include "Node.h"
 #include <boost/intrusive_ptr.hpp>
-#include <boost/serialization/base_object.hpp>
 
 namespace slon {
 namespace scene {
@@ -28,10 +27,10 @@ public:
      * @param child - new subnode of this group. If node has parent it will be removed from it.
 	 * @param left - left node for the child.
      */
-    void addChild(Node* child, Node* left = 0);
+    void addChild(const node_ptr& child, Node* left = 0);
 
     /** Remove child from the group. Parent of this child must be this node. */
-    void removeChild(Node* child);
+    void removeChild(const node_ptr& child);
 	
     /** Remove all children of the group. */
     void removeChildren();
@@ -41,12 +40,6 @@ public:
 
 	/** Get first child of the group. */
 	const Node* getChild() const { return firstChild.get(); }
-    
-    template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version)
-    {
-        ar & boost::serialization::base_object<Node>(*this)
-    }
 
     virtual ~Group();
 
