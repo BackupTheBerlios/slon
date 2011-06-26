@@ -273,7 +273,7 @@ public:
             // create scene
             {
                 database::library_ptr library = database::loadLibrary("Data/Models/castle.DAE");
-                location->add(library->visualScenes.begin()->second.get(), false);
+                location->add(library->visualScenes.begin()->second, false);
 
                 // create light
                 scene::DirectionalLight* light = new DirectionalLight();
@@ -330,7 +330,7 @@ public:
 
                 ocean.reset( new ProjectedGrid(waterEffect) );
                 ocean->setupGrid(sizeX, sizeY);
-                location->add(ocean.get(), false);
+                world->addInfiniteNode(ocean);
 
                 // setup special states
                 sgl::RasterizerState::DESC desc;

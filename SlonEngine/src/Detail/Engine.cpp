@@ -249,11 +249,12 @@ void Engine::init()
 		using namespace database;
 
         // scene
-		databaseManager.registerSerializableCreateFunc("Node",              createSerializable<scene::Node>);
-		databaseManager.registerSerializableCreateFunc("Group",             createSerializable<scene::Group>);
-		databaseManager.registerSerializableCreateFunc("MatrixTransform",   createSerializable<scene::MatrixTransform>);
-		databaseManager.registerSerializableCreateFunc("StaticMesh",        createSerializable<graphics::StaticMesh>);
-		databaseManager.registerSerializableCreateFunc("Mesh",              createSerializable<graphics::Mesh>);
+		databaseManager.registerSerializableCreateFunc("Node",                  createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("Group",                 createSerializable<scene::Group>);
+		databaseManager.registerSerializableCreateFunc("MatrixTransform",       createSerializable<scene::MatrixTransform>);
+		databaseManager.registerSerializableCreateFunc("RigidBodyTransform",    createSerializable<physics::RigidBodyTransform>);
+		databaseManager.registerSerializableCreateFunc("StaticMesh",            createSerializable<graphics::StaticMesh>);
+		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::Mesh>);
 
         // physics
         //databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, &physicsManager));

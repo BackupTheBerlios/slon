@@ -12,9 +12,9 @@ using namespace slon;
 using namespace scene;
 using namespace math;
 
-MatrixTransform::MatrixTransform() :
-    transformDirty(false),
-    invTransformDirty(false)
+MatrixTransform::MatrixTransform()
+:   transformDirty(false)
+,   invTransformDirty(false)
 {
 	transform    = math::make_identity<float, 4>();
     invTransform = math::make_identity<float, 4>();

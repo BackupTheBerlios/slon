@@ -14,7 +14,7 @@ using namespace scene;
 Transform::Transform(const hash_string& name)
 :	Group(name)
 ,	traverseStamp(0)
-,	modifiedCount(0)
+,	modifiedCount(1)
 {
 }
 	
