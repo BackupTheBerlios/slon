@@ -7,7 +7,7 @@
 namespace slon {
 namespace physics {
 
-BulletMotionState::BulletMotionState(RigidBody* rigidBody)
+BulletMotionState::BulletMotionState(const rigid_body_ptr& rigidBody)
 :	RigidBodyTransform(rigidBody)
 ,	worldTransformTS(0)
 {
@@ -17,6 +17,23 @@ BulletMotionState::~BulletMotionState()
 {
 }
 	
+const char* BulletMotionState::serialize(database::OArchive& ar) const
+{
+	// serialize base class
+	RigidBodyTransform::serialize(ar);
+
+	// serialize data
+    return "BulletMotionState";
+}
+
+void BulletMotionState::deserialize(database::IArchive& ar)
+{
+	// deserialize base class
+	MatrixTransform::deserialize(ar);
+
+	// deserialize data
+}
+
 void BulletMotionState::getWorldTransform(btTransform &worldTrans) const
 {
     if (rigidBody->getDynamicsType() == RigidBody::DT_DYNAMIC) {

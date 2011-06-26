@@ -6,6 +6,7 @@
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/StaticMesh.h"
+#include "Physics/RigidBodyTransform.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
@@ -257,9 +258,21 @@ void Engine::init()
 		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::Mesh>);
 
         // physics
-        //databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, &physicsManager));
-        //databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, &physicsManager));
-
+#ifdef SLON_ENGINE_USE_BULLET
+        {
+            databaseManager.registerSerializableCreateFunc("BulletMotionState", boost::bind(&physics::DynamicsWorld::createRigidBodyTransform, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager), 
+                                                                                            physics::rigid_body_ptr()));
+            static physics::RigidBody::state_desc rdesc; // avoiding stack alignment
+            databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
+                                                                                            boost::ref(rdesc)));
+            static physics::Constraint::state_desc cdesc; // avoiding stack alignment
+            databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
+                                                                                            boost::ref(cdesc)));
+        }
+#endif
         // realm
         databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>);
         databaseManager.registerSerializableCreateFunc("BVHLocationNode",   createSerializable<realm::BVHLocationNode>);

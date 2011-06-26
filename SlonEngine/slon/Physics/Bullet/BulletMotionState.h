@@ -12,8 +12,12 @@ class BulletMotionState :
 	public RigidBodyTransform
 {
 public:
-	BulletMotionState(RigidBody* rigidBody);
+	BulletMotionState(const rigid_body_ptr& rigidBody = rigid_body_ptr());
 	~BulletMotionState();
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
 	// Override btMotionState
 	void getWorldTransform(btTransform &worldTrans) const;

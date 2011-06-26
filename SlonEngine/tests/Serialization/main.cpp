@@ -198,6 +198,7 @@ BOOST_AUTO_TEST_CASE(physics_serialization)
     // check
 	database::library_ptr library(new database::Library);
 	library->visualScenes.insert( std::make_pair("scene_test", root) );
+    library->physicsScenes.insert( std::make_pair("physics_test", model) );
 	writeLoadWriteCompare(library);
 
 	// Clear cache for further tests

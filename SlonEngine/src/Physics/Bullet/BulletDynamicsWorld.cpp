@@ -157,6 +157,11 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     return dt - t;
 }
 
+RigidBodyTransform* BulletDynamicsWorld::createRigidBodyTransform(const rigid_body_ptr& rigidBody)
+{
+    return new BulletMotionState(rigidBody);
+}
+
 RigidBody* BulletDynamicsWorld::createRigidBody(const RigidBody::state_desc& rigidBodyDesc)
 {
     BulletRigidBody* rigidBody = new BulletRigidBody(rigidBodyDesc, this);

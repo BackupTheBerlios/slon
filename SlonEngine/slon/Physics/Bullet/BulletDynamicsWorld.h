@@ -82,6 +82,7 @@ public:
     unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
 	size_t				getNumSimulatedSteps() const				{ return numSimulatedSteps; }
 
+    RigidBodyTransform* createRigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr());
     RigidBody*          createRigidBody(const RigidBody::state_desc& rigidBodyDesc);
     Constraint*         createConstraint(const Constraint::state_desc& constraintDesc);
 
