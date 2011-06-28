@@ -126,7 +126,16 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	   << "angularVelocity = {" << desc.angularVelocity << "}\n"
 	   << "name = " << desc.name << std::endl
 	   << "target = " << desc.target << std::endl
-	   << "shape = " << *desc.collisionShape << std::endl
+       << "shape = ";
+    
+    if (desc.collisionShape) {
+        os << *desc.collisionShape;
+    }
+    else {
+        os << "0";
+    }
+
+    os << std::endl
 	   << log::unindent()
 	   << "}";
 

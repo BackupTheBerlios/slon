@@ -271,6 +271,16 @@ void Engine::init()
             databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, 
                                                                                             boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
                                                                                             boost::ref(cdesc)));
+            
+            databaseManager.registerSerializableCreateFunc("PlaneShape",        createSerializable<physics::PlaneShape>);
+            databaseManager.registerSerializableCreateFunc("SphereShape",       createSerializable<physics::SphereShape>);
+            databaseManager.registerSerializableCreateFunc("BoxShape",          createSerializable<physics::BoxShape>);
+            databaseManager.registerSerializableCreateFunc("ConeShape",         createSerializable<physics::ConeShape>);
+            databaseManager.registerSerializableCreateFunc("CapsuleShape",      createSerializable<physics::CapsuleShape>);
+            databaseManager.registerSerializableCreateFunc("CylinderShape",     createSerializable<physics::CylinderShape>);
+            databaseManager.registerSerializableCreateFunc("ConvexShape",       createSerializable<physics::ConvexShape>);
+            databaseManager.registerSerializableCreateFunc("TriangleMeshShape", createSerializable<physics::TriangleMeshShape>);
+            databaseManager.registerSerializableCreateFunc("CompoundShape",     createSerializable<physics::CompoundShape>);
         }
 #endif
         // realm

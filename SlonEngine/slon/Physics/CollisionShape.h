@@ -55,7 +55,7 @@ class PlaneShape :
 	public CollisionShape
 {
 public:
-    PlaneShape(const math::Planer& plane_) :
+    PlaneShape(const math::Planer& plane_ = math::Planer()) :
         plane(plane_)
     {}
 
@@ -184,6 +184,10 @@ class CylinderShape :
 	public CollisionShape
 {
 public:
+    CylinderShape() :
+	    halfExtent(1.0f, 1.0f, 1.0f)
+	{}
+
     CylinderShape(const math::Vector3f& halfExtent_) :
 	    halfExtent(halfExtent_)
 	{}
