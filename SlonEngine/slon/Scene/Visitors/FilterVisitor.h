@@ -89,12 +89,20 @@ template<typename Base,
          typename T4 = void,
          typename T5 = void, 
          typename T6 = void,
-         typename T7 = void>
+         typename T7 = void,
+         typename T8 = void,
+         typename T9 = void,
+         typename TA = void,
+         typename TB = void,
+         typename TC = void,
+         typename TD = void,
+         typename TE = void,
+         typename TF = void >
 class FilterVisitor :
-    public FilterVisitorBase<Base, duo<T0, duo<T1, duo<T2, duo<T3, duo<T4, duo<T5, duo<T6, T7> > > > > > > >
+    public FilterVisitorBase<Base, duo<T0, duo<T1, duo<T2, duo<T3, duo<T4, duo<T5, duo<T6, duo<T7, duo<T8, duo<T9, duo<TA, duo<TB, duo<TC, duo<TD, duo<TE, TF> > > > > > > > > > > > > > > >
 {
 public:
-    typedef FilterVisitorBase<Base, duo<T0, duo<T1, duo<T2, duo<T3, duo<T4, duo<T5, duo<T6, T7> > > > > > > > base_type;
+    typedef FilterVisitorBase<Base, duo<T0, duo<T1, duo<T2, duo<T3, duo<T4, duo<T5, duo<T6, duo<T7, duo<T8, duo<T9, duo<TA, duo<TB, duo<TC, duo<TD, duo<TE, TF> > > > > > > > > > > > > > > > base_type;
     typedef typename Base::node_type node_type;
 
 public:

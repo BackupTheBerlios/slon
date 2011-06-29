@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_SCENE_NODE_H__
 #define __SLON_ENGINE_SCENE_NODE_H__
 
+#include "../Database/Serializable.h"
 #include "../Log/Forward.h"
 #include "../Realm/Forward.h"
 #include "../Utility/hash_string.hpp"
@@ -12,8 +13,9 @@ namespace scene {
 /** Tree Node class. Stores hierarchy. Use intrusive ptr
  * on scene graph structures. You can't construct nodes on the stack.
  */
-class Node :
-    public Referenced
+class Node
+:   public Referenced
+,   public database::Serializable
 {
 friend class Group;
 public:
@@ -52,6 +54,10 @@ private:
 public:
     Node();
     explicit Node(hash_string name);
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     /** Get type of the node */
     virtual TYPE getNodeType() const { return NODE; }
@@ -92,23 +98,24 @@ public:
 	/** Get node name. */
 	hash_string getName() const { return name; }
 
-	/** Get object to which holds this node */
-	realm::Object* getObject() { return object; }
+    /** Notify node that scene graph is updated (changed transformation or hierarchy). 
+     * Override this function if needed. This function will be called only for root node 
+     * in hierarchy to avoid overhead.
+     */
+    virtual void onUpdate() {}
 
-	/** Set object which holds this node */
-	void setObject(realm::Object* object_) { object = object_; }
+    /** Call update for root node */
+    void doUpdate();
 
     virtual ~Node() {}
 
 protected:
 	// node info
-	hash_string   name;
+	hash_string     name;
     Group*          parent;
 	Node*			left;
 	node_ptr		right;
 	void*			userPointer;
-
-	realm::Object*	object;
 };
 
 /** Find node with specified name in the graph

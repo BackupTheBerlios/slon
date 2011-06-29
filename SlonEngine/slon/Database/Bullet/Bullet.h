@@ -14,8 +14,7 @@ class BulletLoader :
 {
 public:
     // Override database::PhysicsSceneLoader
-    bool binary() const { return true; }
-    physics::physics_model_ptr load(std::istream& stream);
+    physics::physics_model_ptr load(filesystem::File* file);
 };
 
 class BulletSaver :
@@ -23,8 +22,7 @@ class BulletSaver :
 {
 public:
     // Override database::PhysicsSceneSaver
-    bool binary() const { return true; }
-    void save(physics::physics_model_ptr item, std::ostream& sink);
+    void save(physics::physics_model_ptr item, filesystem::File* file);
 };
 
 } // namespace detail

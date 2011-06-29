@@ -194,7 +194,7 @@ private:
     mutable sgl::ref_ptr<sgl::RenderTarget> postProcessRenderTarget;
 
     // frame
-    mutable RenderableGatherer  gatherer;
+    mutable scene::CullVisitor  cv;
     mutable camera_params_ptr   cameraParams;
     mutable light_params_ptr    lightParams;
     mutable render_packets      renderPackets;

@@ -2,6 +2,7 @@
 #define __FILESYSTEM_FILE_H__
 
 #include <boost/iostreams/categories.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
 #include "Node.h"
 
 namespace slon {
@@ -56,11 +57,12 @@ typedef boost::intrusive_ptr<File>       file_ptr;
 typedef boost::intrusive_ptr<const File> const_file_ptr;
 
 /** boost::iostreams compatible file device.
- * Example of constructing istream from filesystem::File:
+ * Example of constructing istream\ostream from filesystem::File:
  * \code
- * filesystem::file_ptr file( filesystem::asFile( currentFileSystemManager().getNode("Data/image.png") ) );
- * stream_buffer<filesystem::file_device> buf(file);
- * std::istream stream(&buf);
+ * file_ptr     file( asFile( currentFileSystemManager().getNode("Data/image.png") ) );
+ * file_buffer  buf(*file);
+ * std::istream is(&buf);
+ * std::ostream os(&buf);
  * \uncode
  */
 class file_device
@@ -71,32 +73,31 @@ public:
 
 public:
 	/** Aware! Implicit constructor */
-	file_device(const file_ptr& file_)
+	file_device(File& file_)
 	:	file(file_)
 	{}
 
 	// Implement device
 	std::streampos seek(std::streamoff off, std::ios_base::seekdir way) 
 	{ 
-		assert(file);
-		return file->seek(off, way);
+		return file.seek(off, way);
 	}
 
 	std::streamsize read(char* buffer, std::streamsize size)
 	{
-		assert(file);
-		return file->read(buffer, size);
+		return file.read(buffer, size);
 	}
 
 	std::streamsize write(const char* buffer, std::streamsize size)
 	{
-		assert(file);
-		return file->write(buffer, size);
+		return file.write(buffer, size);
 	}
 
 private:
-	file_ptr file;
+	File& file;
 };
+
+typedef boost::iostreams::stream_buffer<file_device> file_buffer;
 
 /** Try interpret node as file */
 inline File* asFile(Node* node) 

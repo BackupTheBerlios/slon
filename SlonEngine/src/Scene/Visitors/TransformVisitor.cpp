@@ -34,19 +34,21 @@ void TransformVisitor::traverse(Node& node)
     {
         traverse_node tn = forTraverse.top(); forTraverse.pop();
         currentNode = &tn;
-        if (tn.node->getNodeType() & Node::JOINT_BIT) {
+
+		Node::TYPE type = tn.node->getNodeType();
+        if (type & Node::JOINT_BIT) {
             visitJoint( static_cast<Joint&>(*tn.node) );
         }
-        else if (tn.node->getNodeType() & Node::TRANSFORM_BIT) {
+        else if (type & Node::TRANSFORM_BIT) {
             visitTransform( static_cast<Transform&>(*tn.node) );
         }
-        else if (tn.node->getNodeType() & Node::GROUP_BIT) {
+        else if (type & Node::GROUP_BIT) {
             visitGroup( static_cast<Group&>(*tn.node) );
         }
-        else if (tn.node->getNodeType() & Node::SKELETON_BIT) {
+        else if (type & Node::SKELETON_BIT) {
             visitSkeleton( static_cast<Skeleton&>(*tn.node) );
         }
-        else if (tn.node->getNodeType() & Node::ENTITY_BIT) {
+        else if (type & Node::ENTITY_BIT) {
             visitEntity( static_cast<Entity&>(*tn.node) );
         }
     }

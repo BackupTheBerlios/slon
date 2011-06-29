@@ -5,6 +5,7 @@
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Plane.hpp>
 #include <vector>
+#include "../Database/Serializable.h"
 #include "../Utility/Algorithm/algorithm.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
@@ -14,7 +15,8 @@ namespace physics {
 
 /** Collision shape class */
 class CollisionShape :
-	public Referenced
+	public Referenced,
+    public database::Serializable
 {
 public:
 	enum SHAPE_TYPE
@@ -53,9 +55,13 @@ class PlaneShape :
 	public CollisionShape
 {
 public:
-    PlaneShape(const math::Planer& plane_) :
+    PlaneShape(const math::Planer& plane_ = math::Planer()) :
         plane(plane_)
     {}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override shape
     CollisionShape* clone() const        { return new PlaneShape(plane); }
@@ -75,6 +81,10 @@ public:
         radius(_radius)
     {}
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     CollisionShape* clone() const { return new SphereShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return SPHERE; }
     void            applyScaling(const math::Vector3r& scaling) { radius *= fabs(scaling.x + scaling.y + scaling.z) / 3; }
@@ -89,22 +99,30 @@ class BoxShape :
 {
 public:
 	BoxShape() :
-	    halfExtents(0)
+	    halfExtent(0)
 	{}
 
-	BoxShape(const math::Vector3r& _halfExtents) :
-	    halfExtents(_halfExtents)
+	BoxShape(float halfx, float halfy, float halfz) :
+	    halfExtent(halfx, halfy, halfz)
 	{}
+
+	BoxShape(const math::Vector3r& _halfExtent) :
+	    halfExtent(_halfExtent)
+	{}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     CollisionShape* clone() const { return new BoxShape(*this); }
     SHAPE_TYPE      getShapeType() const { return BOX; }
     void            applyScaling(const math::Vector3r& scaling)
     {
-        halfExtents *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
+        halfExtent *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
     }
 
 public:
-	math::Vector3r halfExtents;
+	math::Vector3r halfExtent;
 };
 
 /** Cone collision shape. Up axis is Y.  */
@@ -116,6 +134,10 @@ public:
 	    radius(_radius),
 	    height(_height)
 	{}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     CollisionShape* clone() const { return new ConeShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONE; }
@@ -140,6 +162,10 @@ public:
 	    height(_height)
 	{}
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     CollisionShape* clone() const { return new CapsuleShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CAPSULE; }
     void applyScaling(const math::Vector3r& scaling)
@@ -158,6 +184,10 @@ class CylinderShape :
 	public CollisionShape
 {
 public:
+    CylinderShape() :
+	    halfExtent(1.0f, 1.0f, 1.0f)
+	{}
+
     CylinderShape(const math::Vector3f& halfExtent_) :
 	    halfExtent(halfExtent_)
 	{}
@@ -165,6 +195,10 @@ public:
     CylinderShape(real x, real y, real z) :
 	    halfExtent(x, y, z)
 	{}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     CollisionShape* clone() const { return new CylinderShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CYLINDER; }
@@ -186,6 +220,10 @@ class ConvexShape :
 	public CollisionShape
 {
 public:
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
 	// Override CollisionShape
     CollisionShape* clone() const { return new ConvexShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONVEX_MESH; }
@@ -221,6 +259,10 @@ class TriangleMeshShape :
 	public CollisionShape
 {
 public:
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     CollisionShape* clone() const { return new TriangleMeshShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return TRIANGLE_MESH; }
     void applyScaling(const math::Vector3r& scaling)
@@ -260,6 +302,10 @@ public:
     {
         addShape(transform, collisionShape);
     }
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override CollisionShape
     CollisionShape* clone() const { return new CompoundShape(*this); }

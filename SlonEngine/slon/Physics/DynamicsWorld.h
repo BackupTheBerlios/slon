@@ -82,6 +82,9 @@ public:
     /** Get iterator end iterator for enumerating active contacts */
     virtual contact_const_iterator endActiveContact() const = 0;
 
+    /** Create rigid body transform node. */
+    virtual RigidBodyTransform* createRigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr()) = 0;
+
     /** Create rigid body and add it to the world. */
     virtual RigidBody* createRigidBody(const RigidBody::state_desc& rigidBodyDesc) = 0;
 

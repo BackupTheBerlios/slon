@@ -1,9 +1,9 @@
 #ifndef __SLON_ENGINE_REALM_LOCATION_H__
 #define __SLON_ENGINE_REALM_LOCATION_H__
 
+#include "../Database/Serializable.h"
 #include "../Scene/Forward.h"
 #include "../Thread/Lock.h"
-#include "../Utility/callback.hpp"
 #include "../Utility/math.hpp"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
@@ -12,56 +12,61 @@ namespace slon {
 namespace realm {
 	
 class Location :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     /** Get bounds of the hole location. */
     virtual const math::AABBf& getBounds() const = 0;
 
-    /** Update object in the spatial structure if it is presented. 
-     * @return true if object updated.
+    /** Add object to the world. Doesn't check for duplicates. 
+	 * @param node - scene graph node for insertion (must be root). Some location classes may add parent
+     * nodes for scene graph to store necessary information in them.
+	 * @param dynamic - hint, object transform will be frequently updated during execution.
+	 */
+    virtual void add(const scene::node_ptr& node, bool dynamic = true) = 0;
+		
+    /** Update spatial structure for the object. Generally you haven't to call this
+     * function, engine handles it automatically.
      */
-    virtual bool update(Object* object) = 0;
+    virtual void update(const scene::node_ptr& node) = 0;
 
-    /** Remove object from the world if it is presented. 
+    /** Remove object from the location if it is presented. 
      * @return true if object removed
      */
-    virtual bool remove(Object* object) = 0;
-
-    /** Add object to the world. Doesn't check for duplicates. */
-    virtual void add(Object* object) = 0;
-		
-    /** Visit objects intersecting body.
-     * @param body - body which intersects objects.
-     * @param cb - visitor.
-     */
-    virtual void visit(const body_variant& body, object_callback& cb) = 0;
+    virtual bool remove(const scene::node_ptr& node) = 0;
 
     /** Visit objects intersecting body.
      * @param body - body which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visit(const body_variant& body, object_const_callback& cb) const = 0;
+    virtual void visit(const body_variant& body, scene::NodeVisitor& nv) = 0;
+
+    /** Visit objects intersecting body.
+     * @param body - body which intersects objects.
+     * @param cb - visitor.
+     */
+    virtual void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const = 0;
 	
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, object_callback& cb) = 0;
+    virtual void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv) = 0;
 
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const = 0;
+    virtual void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const = 0;
 
     /** Grant thread read access to the location.
-     * @return lock object. Lock is freed wether object is deleted.
+     * @return lock object. Lock is freed whether object is deleted.
      *
     virtual thread::lock_ptr lockForReading() const = 0;*/
 
     /** Grant thread write access to the location.
-     * @return lock object. Lock is freed wether object is deleted.
+     * @return lock object. Lock is freed whether object is deleted.
      *
     virtual thread::lock_ptr lockForWriting() = 0;*/
 

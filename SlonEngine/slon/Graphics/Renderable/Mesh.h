@@ -8,9 +8,11 @@
 #include <sgl/Program.h>
 #include <sgl/VertexBuffer.h>
 #include <vector>
+#include "../../Database/Serializable.h"
 #include "../Detail/AttributeTable.h"
 #include "../Effect.h"
 #include "../Renderable.h"
+#include "Forward.h"
 
 namespace slon {
 namespace graphics {
@@ -96,12 +98,10 @@ private:
     indices_array       indicesArrays[MAX_NUM_ATTRIBUTES];
 };
 
-typedef boost::intrusive_ptr<MeshData>			mesh_data_ptr;
-typedef boost::intrusive_ptr<const MeshData>	mesh_data_const_ptr;
-
 /** Mesh representation convinient for rendering */
 class Mesh :
-    public Referenced
+    public Referenced,
+	public database::Serializable
 {
 public:
     static const int LOCK_READ  = 1;
@@ -166,21 +166,23 @@ public:
     {
     friend class Mesh;
     protected:
+	    subset(Mesh* _mesh) :
+            mesh(_mesh)
+        {}
+
 	    subset( Mesh*   _mesh,
 			    Effect* _effect) :
             mesh(_mesh),
             effect(_effect)
         {}
+
         virtual ~subset() {}
 
     public:
         // Override Renderable
-        Effect* getEffect() const       { return effect.get(); }
+        Effect* getEffect() const { return effect.get(); }
 
-        /** Setup effect for rendering subset */
-        void setEffect(Effect* _effect) { effect.reset(_effect); }
-
-    protected:
+    public:
         Mesh*       mesh;
         effect_ptr  effect;
     };
@@ -196,6 +198,10 @@ public:
     {
     friend class Mesh;
     private:
+        plain_subset( Mesh* mesh )
+        :   subset(mesh)
+        {}
+
 	    plain_subset( Mesh*                 mesh,
 				      Effect*               effect,
                       sgl::PRIMITIVE_TYPE   _primitiveType,
@@ -211,9 +217,7 @@ public:
         // Override Renderable
         void render() const;
 
-		sgl::PRIMITIVE_TYPE getPrimitiveType() const { return primitiveType; }
-
-    private:
+    public:
         sgl::PRIMITIVE_TYPE primitiveType;
         unsigned            startVertex;
         unsigned            numVertices;
@@ -224,6 +228,10 @@ public:
     {
     friend class Mesh;
     private:
+        indexed_subset( Mesh* mesh )
+        :   subset(mesh)
+        {}
+
 	    indexed_subset( Mesh*               mesh,
 				        Effect*             effect,
                         sgl::PRIMITIVE_TYPE _primitiveType,
@@ -250,6 +258,9 @@ public:
         unsigned            startIndex;
         unsigned            numIndices;
     };
+
+    typedef boost::intrusive_ptr<plain_subset>    plain_subset_ptr;
+    typedef boost::intrusive_ptr<indexed_subset>  indexed_subset_ptr;
 
     template<typename T>
     class accessor
@@ -364,8 +375,13 @@ private:
     Mesh& operator = (const Mesh&);
 
 public:
-	Mesh(const MeshData* meshData);
-    Mesh(const DESC& desc);
+    Mesh();
+	explicit Mesh(const const_mesh_data_ptr& meshData);
+    explicit Mesh(const DESC& desc);
+		
+	// Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     /** Add primitives subset to the mesh.
      * @param effect - effect for rendering subset.
@@ -453,11 +469,8 @@ private:
     size_t                              vertexSize;
 	subset_vector                       subsets;
     attribute_vector                    attributes;
-	mesh_data_const_ptr					data;
+	const_mesh_data_ptr					data;
 };
-
-typedef boost::intrusive_ptr<Mesh>          mesh_ptr;
-typedef boost::intrusive_ptr<const Mesh>    const_mesh_ptr;
 
 } // namespace graphics
 } // namespace slon

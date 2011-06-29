@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
+#include "Database/Detail/SGLSerialization.h"
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/Mesh.h"
 #include "Graphics/Renderer.h"
@@ -164,7 +166,7 @@ void Mesh::indexed_subset::render() const
     currentDevice()->DrawIndexed(primitiveType, startIndex, numIndices);
 }
 
-Mesh::Mesh(const MeshData* data_)
+Mesh::Mesh(const const_mesh_data_ptr& data_)
 :	data(data_)
 {
     // attributes must have zero attribute
@@ -342,6 +344,10 @@ Mesh::Mesh(const MeshData* data_)
     dirtyVertexLayout();
 }
 
+Mesh::Mesh()
+{
+}
+
 Mesh::Mesh(const DESC& desc) :
     aabb(desc.aabb),
     indexType(desc.indexType),
@@ -351,6 +357,92 @@ Mesh::Mesh(const DESC& desc) :
     attributes(desc.attributes, desc.attributes + desc.numAttributes)
 {
     dirtyVertexLayout();
+}
+
+const char* Mesh::serialize(database::OArchive& ar) const
+{
+	database::serialize( ar, "aabb", aabb );
+	ar.writeChunk( "indexType", reinterpret_cast<const int*>(&indexType) );
+	ar.writeCustomSerializable( vertexLayout.get() );
+	ar.writeCustomSerializable( vertexBuffer.get() );
+	ar.writeCustomSerializable( indexBuffer.get() );
+	ar.writeChunk( "vertexSize", &vertexSize );
+	
+	ar.openChunk("subsets");
+	{
+		for (size_t i = 0; i<subsets.size(); ++i)
+		{
+			if ( indexed_subset* s = dynamic_cast<indexed_subset*>(subsets[i].get()) ) 
+			{
+				ar.openChunk( "indexed_subset" );
+				//ar.writeSerializable( s->effect.get() );
+				ar.writeChunk( "primitiveType", reinterpret_cast<const int*>(&s->primitiveType) );
+				ar.writeChunk( "startIndex", &s->startIndex );
+				ar.writeChunk( "numIndices", &s->numIndices );
+				ar.closeChunk();
+			}
+			else if ( plain_subset* s = dynamic_cast<plain_subset*>(subsets[i].get()) ) 
+			{
+				ar.openChunk( "plain_subset" );
+				//ar.writeSerializable( s->effect.get() );
+				ar.writeChunk( "primitiveType", reinterpret_cast<const int*>(&s->primitiveType) );
+				ar.writeChunk( "startVertex", &s->startVertex );
+				ar.writeChunk( "numVertices", &s->numVertices );
+				ar.closeChunk();
+			}
+			else {
+				assert(false);
+			}
+		}
+	}
+	ar.closeChunk();
+
+    return "Mesh";
+}
+
+void Mesh::deserialize(database::IArchive& ar)
+{
+	using namespace database;
+
+    database::deserialize( ar, "aabb", aabb );
+	ar.readChunk( "indexType", reinterpret_cast<int*>(&indexType) );
+    vertexLayout.reset( ar.readCustomSerializable<sgl::VertexLayout>() );
+	vertexBuffer.reset( ar.readCustomSerializable<sgl::VertexBuffer>() );
+	indexBuffer.reset( ar.readCustomSerializable<sgl::IndexBuffer>() );
+	ar.readChunk( "vertexSize", &vertexSize );
+	
+    IArchive::chunk_info info;
+	if ( ar.openChunk("subsets", info) )
+	{
+		while (true)
+		{
+			if ( ar.openChunk("indexed_subset", info) )
+			{
+				indexed_subset_ptr subset( new indexed_subset(this) );
+				//subset->effect = ar.readSerializable();
+				ar.readChunk("primitiveType", reinterpret_cast<int*>(&subset->primitiveType));
+				ar.readChunk("startIndex", &subset->startIndex);
+				ar.readChunk("numIndices", &subset->numIndices);
+				ar.closeChunk();
+			    subsets.push_back(subset);
+			}
+			else if ( ar.openChunk("plain_subset", info) ) 
+			{
+				plain_subset_ptr subset( new plain_subset(this) );
+				//subset->effect = ar.readSerializable();
+				ar.readChunk("primitiveType", reinterpret_cast<int*>(&subset->primitiveType));
+				ar.readChunk("startVertex", &subset->startVertex);
+				ar.readChunk("numVertices", &subset->numVertices);
+				ar.closeChunk();
+			    subsets.push_back(subset);
+			}
+			else {
+				break;
+			}
+		}
+	
+		ar.closeChunk();
+	}
 }
 
 void Mesh::dirtyVertexLayout()
@@ -406,7 +498,6 @@ Mesh* Mesh::shallowCopy() const
 
     return copy;
 }
-
 
 } // namespace graphics
 } // namespace slon

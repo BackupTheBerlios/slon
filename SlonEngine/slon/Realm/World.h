@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_REALM_WORLD_H__
 #define __SLON_ENGINE_REALM_WORLD_H__
 
+#include "../Database/Serializable.h"
 #include "../Scene/Forward.h"
 #include "../Thread/Lock.h"
 #include "../Utility/callback.hpp"
@@ -21,56 +22,55 @@ namespace realm {
  * safety.
  */
 class World :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     /** Visit objects intersecting body.
      * @param body - body which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visit(const body_variant& body, object_callback& cb) = 0;
+    virtual void visit(const body_variant& body, scene::NodeVisitor& nv) = 0;
 
     /** Visit objects intersecting body.
      * @param body - body which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visit(const body_variant& body, object_const_callback& cb) const = 0;
+    virtual void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const = 0;
 	
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, object_callback& cb) = 0;
+    virtual void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv) = 0;
 
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, object_const_callback& cb) const = 0;
-
-	/** Create object. Object is not added into world by default. */
-	virtual Object* createObject() const = 0;
-
-    /** Update object in the spatial structure if it is presented. 
-     * @return true if object updated.
-     */
-    virtual bool update(Object* object) = 0;
-
-    /** Remove object from the world if it is presented. 
+    virtual void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const = 0;
+	   
+	/** Remove infinite object from the world if it is presented. 
      * @return true if object removed
      */
-    virtual bool remove(Object* object) = 0;
+    virtual bool removeInfiniteNode(const scene::node_ptr& object) = 0;
 
-    /** Add object to the world. Doesn't check for duplicates. */
-    virtual void add(Object* object) = 0;
+    /** Add infinite object to the world. Doesn't check for duplicates. */
+    virtual void addInfiniteNode(const scene::node_ptr& object) = 0;
 	
-	/** Create object and add it into world. */
-	virtual realm::Object* add(scene::Node*				node,
-					           bool						dynamic = false
-#ifdef SLON_ENGINE_USE_PHYSICS
-					           , physics::PhysicsModel*	physicsModel = 0
-#endif                 
-					           ) = 0;
+    /** Check whether world have specified node. */
+	virtual bool haveInfiniteNode(const scene::node_ptr& node) const = 0;
+
+    /** Add location to the world */
+    virtual void addLocation(const location_ptr& location) = 0;
+
+    /** Remove location from the world.
+     * @return true - if succeeds, false if location not found
+     */
+    virtual bool removeLocation(const location_ptr& location) = 0;
+
+    /** Check whether world have specified location */
+    virtual bool haveLocation(const location_ptr& location) const = 0;
 
     /** Grant thread read access to the world.
      * @return lock object. Lock is freed whether object is deleted.
@@ -86,7 +86,7 @@ public:
 };
 
 /** Get simulation world */
-World& currentWorld();
+World* currentWorld();
 
 } // namespace realm
 } // namespace slon

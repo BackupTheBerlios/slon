@@ -117,8 +117,7 @@ class ColladaLoader :
     public LibraryLoader
 {
 public:
-	bool binary() const { return false; }
-    library_ptr load(std::istream& stream);
+    library_ptr load(filesystem::File* file);
 };
 
 } // namespace database

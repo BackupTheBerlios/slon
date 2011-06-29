@@ -59,9 +59,9 @@ system_error::system_error( const log::logger_ptr&  logger,
 {
 }
 
-file_not_found_error::file_not_found_error( const log::logger_ptr&  logger,
-                                            const std::string&		message,
-                                            log::SEVERITY			severity )
+file_error::file_error( const log::logger_ptr&  logger,
+                        const std::string&      message,
+                        log::SEVERITY           severity )
 :   slon_error(logger, message, severity)
 {
 }
@@ -73,28 +73,44 @@ io_error::io_error( const log::logger_ptr&  logger,
 {
 }
 
+namespace database {
+	
+    serialization_error::serialization_error( const std::string&	message )
+	:	slon_error(message)
+	{
+	}
+
+    serialization_error::serialization_error( const log::logger_ptr&	logger,
+                                              const std::string&		message,
+                                              log::SEVERITY             severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
+
+} // namespace database
+
 namespace graphics {
 
-shader_error::shader_error( const log::logger_ptr&  logger,
-                            const std::string&		message,
-                            log::SEVERITY			severity )
-:   slon_error(logger, message, severity)
-{
-}
+    shader_error::shader_error( const log::logger_ptr&  logger,
+                                const std::string&		message,
+                                log::SEVERITY			severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
-unsupported_error::unsupported_error( const log::logger_ptr&    logger,
-                                      const std::string&		message,
-                                      log::SEVERITY				severity )
-:   slon_error(logger, message, severity)
-{
-}
+    unsupported_error::unsupported_error( const log::logger_ptr&    logger,
+                                          const std::string&		message,
+                                          log::SEVERITY				severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
-gl_error::gl_error( const log::logger_ptr&	logger,
-                    const std::string&		message,
-                    log::SEVERITY			severity )
-:   slon_error(logger, message, severity)
-{
-}
+    gl_error::gl_error( const log::logger_ptr&	logger,
+                        const std::string&		message,
+                        log::SEVERITY			severity )
+    :   slon_error(logger, message, severity)
+    {
+    }
 
 } // namespace graphics
 } // namespace slon

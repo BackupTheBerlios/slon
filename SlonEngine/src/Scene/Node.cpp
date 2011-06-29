@@ -1,6 +1,10 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Group.h"
+#include "Utility/error.hpp"
+
+DECLARE_AUTO_LOGGER("scene.Node");
 
 namespace slon {
 namespace scene {
@@ -10,7 +14,6 @@ Node::Node()
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
-,	object(0)
 {}
 
 Node::Node(hash_string name_)
@@ -19,7 +22,6 @@ Node::Node(hash_string name_)
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
-,	object(0)
 {
 }
 
@@ -33,6 +35,35 @@ void Node::accept(log::LogVisitor& visitor) const
         }
         visitor << " {}\n";
     }
+}
+
+const char* Node::serialize(database::OArchive& ar) const
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+    ar.writeStringChunk( "name", name.str().data(), name.str().length() );
+    return "Node";
+}
+
+void Node::deserialize(database::IArchive& ar)
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+	std::string tmp;
+	name = hash_string( ar.readStringChunk("name", tmp) );
+}
+
+void Node::doUpdate()
+{
+    Node* node = this;
+    while (node && node->getParent()) {
+	    node = node->getParent();
+    }
+    node->onUpdate();
 }
 
 Node* findNamedNode(Node& root, hash_string name)

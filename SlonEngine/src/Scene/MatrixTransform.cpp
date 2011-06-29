@@ -1,19 +1,82 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Scene/MatrixTransform.h"
+#include "Utility/error.hpp"
 #include <sgl/Math/MatrixFunctions.hpp>
+
+DECLARE_AUTO_LOGGER("scene.MatrixTransform");
 
 using namespace slon;
 using namespace scene;
 using namespace math;
 
-MatrixTransform::MatrixTransform() :
-    transformDirty(false),
-    invTransformDirty(false)
+MatrixTransform::MatrixTransform()
+:   transformDirty(false)
+,   invTransformDirty(false)
 {
-	localToWorld = transform    = math::make_identity<float, 4>();
-    worldToLocal = invTransform = math::make_identity<float, 4>();
+	transform    = math::make_identity<float, 4>();
+    invTransform = math::make_identity<float, 4>();
+}
+	
+MatrixTransform::MatrixTransform(const math::Matrix4f& transform_)
+:	transform(transform_)
+,	transformDirty(false)
+,	invTransformDirty(true)
+{
+}
+	
+MatrixTransform::MatrixTransform(const hash_string& name)
+:	Transform(name)
+,	transformDirty(false)
+,	invTransformDirty(false)
+{
+	transform    = math::make_identity<float, 4>();
+    invTransform = math::make_identity<float, 4>();
+}
+
+MatrixTransform::MatrixTransform(const hash_string& name, const math::Matrix4f& transform_)
+:	Transform(name)
+,	transform(transform_)
+,	transformDirty(false)
+,	invTransformDirty(true)
+{
+}
+
+// Override Serializable
+const char* MatrixTransform::serialize(database::OArchive& ar) const
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+	
+	// serialize base class
+	Transform::serialize(ar);
+
+	// serialize data
+	ar.writeChunk("transform", transform.data(), transform.num_elements);
+	ar.writeChunk("invTransform", invTransform.data(), invTransform.num_elements);
+	ar.writeChunk("transformDirty", &transformDirty);
+	ar.writeChunk("invTransformDirty", &invTransformDirty);
+
+	return "MatrixTransform";
+}
+
+void MatrixTransform::deserialize(database::IArchive& ar)
+{
+    if ( ar.getVersion() < database::getVersion(0, 1, 0) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Trying to serialize using unsupported version");
+    }
+
+	// deserialize base class
+	Transform::deserialize(ar);
+
+	// deserialize data
+	ar.readChunk("transform", transform.data(), transform.num_elements);
+	ar.readChunk("invTransform", invTransform.data(), invTransform.num_elements);
+	ar.readChunk("transformDirty", &transformDirty);
+	ar.readChunk("invTransformDirty", &invTransformDirty);
 }
 
 // Override transform

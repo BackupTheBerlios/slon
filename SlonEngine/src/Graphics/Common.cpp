@@ -20,7 +20,7 @@ void checkShaderError(const std::string& fileName, sgl::SGL_HRESULT err)
     switch(err)
     {
     case sgl::SGLERR_FILE_NOT_FOUND:
-        throw file_not_found_error(AUTO_LOGGER, "Couldn't find file: " + fileName);
+        throw file_error(AUTO_LOGGER, "Couldn't find file: " + fileName);
     case sgl::SGLERR_INVALID_CALL:
         throw shader_error(AUTO_LOGGER, fileName + ":" + sglGetErrorMsg() );
     default:

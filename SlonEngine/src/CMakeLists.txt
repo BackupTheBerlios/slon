@@ -25,17 +25,26 @@ SET ( TARGET_ANIMATION_DETAIL_HEADERS
 )
 
 SET ( TARGET_DATABASE_HEADERS
+    ${TARGET_HEADER_PATH}/Database/Archive.h
     ${TARGET_HEADER_PATH}/Database/Cache.h
     ${TARGET_HEADER_PATH}/Database/DatabaseManager.h
     ${TARGET_HEADER_PATH}/Database/Forward.h
     ${TARGET_HEADER_PATH}/Database/Library.h
     ${TARGET_HEADER_PATH}/Database/Loader.h
+    ${TARGET_HEADER_PATH}/Database/NVP.h
     ${TARGET_HEADER_PATH}/Database/Saver.h
+    ${TARGET_HEADER_PATH}/Database/Serializable.h
     ${TARGET_HEADER_PATH}/Database/Storage.h
 )
 
 SET ( TARGET_DATABASE_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Database/Bullet/Bullet.h
+)
+
+SET ( TARGET_DATABASE_PROPRIETARY_HEADERS
+    ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLLoader.h
+    ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLSaver.h
+    ${TARGET_HEADER_PATH}/Database/Proprietary/SXMLArchive.h
 )
 
 SET ( TARGET_DATABASE_COLLADA_HEADERS
@@ -48,8 +57,10 @@ SET ( TARGET_DATABASE_COLLADA_HEADERS
 
 SET ( TARGET_DATABASE_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Database/Detail/Cache.h
-    ${TARGET_HEADER_PATH}/Database/Detail/Library.h
     ${TARGET_HEADER_PATH}/Database/Detail/DatabaseManager.h
+    ${TARGET_HEADER_PATH}/Database/Detail/Library.h
+    ${TARGET_HEADER_PATH}/Database/Detail/SGLSerialization.h
+    ${TARGET_HEADER_PATH}/Database/Detail/UtilitySerialization.h
 )
 
 SET ( TARGET_INPUT_HEADERS
@@ -66,6 +77,7 @@ SET ( TARGET_INPUT_DETAIL_HEADERS
 SET ( TARGET_FILESYSTEM_HEADERS
     ${TARGET_HEADER_PATH}/FileSystem/Directory.h
     ${TARGET_HEADER_PATH}/FileSystem/File.h
+    ${TARGET_HEADER_PATH}/FileSystem/Forward.h
     ${TARGET_HEADER_PATH}/FileSystem/Node.h
     ${TARGET_HEADER_PATH}/FileSystem/FileSystemManager.h
 )
@@ -229,16 +241,15 @@ SET ( TARGET_LOG_DETAIL_HEADERS
 )
 
 SET ( TARGET_REALM_HEADERS
+    ${TARGET_HEADER_PATH}/Realm/BVHLocation.h
+    ${TARGET_HEADER_PATH}/Realm/BVHLocationNode.h
+    ${TARGET_HEADER_PATH}/Realm/DefaultWorld.h
     ${TARGET_HEADER_PATH}/Realm/Forward.h
     ${TARGET_HEADER_PATH}/Realm/Location.h
-    ${TARGET_HEADER_PATH}/Realm/Object.h
     ${TARGET_HEADER_PATH}/Realm/World.h
 )
 
 SET ( TARGET_REALM_DETAIL_HEADERS
-    ${TARGET_HEADER_PATH}/Realm/Detail/BVHLocation.h
-    ${TARGET_HEADER_PATH}/Realm/Detail/Object.h
-    ${TARGET_HEADER_PATH}/Realm/Detail/World.h
 )
 
 SET ( TARGET_SCENE_HEADERS
@@ -292,6 +303,7 @@ SET ( TARGET_THREAD_DETAIL_HEADERS
 )
 
 SET ( TARGET_UTILITY_HEADERS
+    ${TARGET_HEADER_PATH}/Utility/base64.hpp
     ${TARGET_HEADER_PATH}/Utility/cached_value.hpp
     ${TARGET_HEADER_PATH}/Utility/callback.hpp
     ${TARGET_HEADER_PATH}/Utility/error.hpp
@@ -341,6 +353,7 @@ SOURCE_GROUP( headers\\Database FILES                      ${TARGET_DATABASE_HEA
 SOURCE_GROUP( headers\\Database\\Bullet FILES              ${TARGET_DATABASE_BULLET_HEADERS} )
 SOURCE_GROUP( headers\\Database\\Collada FILES             ${TARGET_DATABASE_COLLADA_HEADERS} )
 SOURCE_GROUP( headers\\Database\\Detail FILES              ${TARGET_DATABASE_DETAIL_HEADERS} )
+SOURCE_GROUP( headers\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem FILES                    ${TARGET_FILESYSTEM_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_HEADERS} )
@@ -384,6 +397,7 @@ SET ( TARGET_HEADERS
     ${TARGET_DATABASE_HEADERS}
     ${TARGET_DATABASE_COLLADA_HEADERS}
     ${TARGET_DATABASE_DETAIL_HEADERS}
+    ${TARGET_DATABASE_PROPRIETARY_HEADERS}
     ${TARGET_DETAIL_HEADERS}
     ${TARGET_FILESYSTEM_HEADERS}
     ${TARGET_FILESYSTEM_DETAIL_HEADERS}
@@ -458,6 +472,12 @@ SET ( TARGET_DATABASE_BULLET_SOURCES
     Database/Bullet/Bullet.cpp
 )
 
+SET ( TARGET_DATABASE_PROPRIETARY_SOURCES
+    Database/Proprietary/SXMLArchive.cpp
+    Database/Proprietary/SXMLLoader.cpp
+    Database/Proprietary/SXMLSaver.cpp
+)
+
 SET ( TARGET_DATABASE_COLLADA_SOURCES
     Database/Collada/Collada.cpp
     Database/Collada/ColladaCore.cpp
@@ -469,6 +489,8 @@ SET ( TARGET_DATABASE_DETAIL_SOURCES
     Database/Detail/Cache.cpp
     Database/Detail/DatabaseManager.cpp
     Database/Detail/Library.cpp
+    Database/Detail/SGLSerialization.cpp
+    Database/Detail/UtilitySerialization.cpp
 )
 
 SET ( TARGET_FILESYSTEM_SOURCES
@@ -615,10 +637,13 @@ SET ( TARGET_PHYSICS_DETAIL_SOURCES
     Physics/Detail/PhysicsManager.cpp
 )
 
+SET ( TARGET_REALM_SOURCES
+    Realm/BVHLocation.cpp
+    Realm/BVHLocationNode.cpp
+    Realm/DefaultWorld.cpp
+)
+
 SET ( TARGET_REALM_DETAIL_SOURCES
-    Realm/Detail/BVHLocation.cpp
-    Realm/Detail/Object.cpp
-    Realm/Detail/World.cpp
 )
 
 SET ( TARGET_SCENE_SOURCES
@@ -684,6 +709,7 @@ SOURCE_GROUP( sources\\Database FILES                      ${TARGET_DATABASE_SOU
 SOURCE_GROUP( sources\\Database\\Bullet FILES              ${TARGET_DATABASE_BULLET_SOURCES} )
 SOURCE_GROUP( sources\\Database\\Collada FILES             ${TARGET_DATABASE_COLLADA_SOURCES} )
 SOURCE_GROUP( sources\\Database\\Detail FILES              ${TARGET_DATABASE_DETAIL_SOURCES} )
+SOURCE_GROUP( sources\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem FILES                    ${TARGET_FILESYSTEM_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_SOURCES} )
@@ -725,6 +751,7 @@ SET ( TARGET_SOURCES
     ${TARGET_DATABASE_SOURCES}
     ${TARGET_DATABASE_COLLADA_SOURCES}
 	${TARGET_DATABASE_DETAIL_SOURCES}
+    ${TARGET_DATABASE_PROPRIETARY_SOURCES}
     ${TARGET_FILESYSTEM_SOURCES}
     ${TARGET_FILESYSTEM_DETAIL_SOURCES}
     ${TARGET_FILESYSTEM_NATIVE_SOURCES}
@@ -924,11 +951,6 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	INSTALL (
 		FILES       ${TARGET_REALM_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Realm
-	)
-
-	INSTALL (
-		FILES       ${TARGET_REALM_OBJECT_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Realm/Object
 	)
 
 	INSTALL (

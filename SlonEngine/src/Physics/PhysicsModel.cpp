@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Physics/PhysicsModel.h"
 #include <boost/iterator/indirect_iterator.hpp>
+
+DECLARE_AUTO_LOGGER("physics.PhysicsModel")
 
 namespace slon {
 namespace physics {
@@ -11,6 +14,41 @@ PhysicsModel::PhysicsModel()
 
 PhysicsModel::~PhysicsModel()
 {
+}
+
+const char* PhysicsModel::serialize(database::OArchive& ar) const
+{
+    ar.writeStringChunk("name", name.data(), name.length());
+    ar.openChunk("rigidBodies");
+    std::for_each(rigidBodies.begin(), rigidBodies.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&rigid_body_ptr::get, _1), true, true));
+    ar.closeChunk();
+    ar.openChunk("constraints");
+    std::for_each(constraints.begin(), constraints.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&constraint_ptr::get, _1), true, true));
+    ar.closeChunk();
+
+    return "PhysicsModel";
+}
+
+void PhysicsModel::deserialize(database::IArchive& ar)
+{
+    ar.readStringChunk("name", name);
+
+    database::IArchive::chunk_info info;
+    if ( !ar.openChunk("rigidBodies", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Missing rigid bodies chunk");
+    }
+    while ( RigidBody* rbody = ar.readSerializable<RigidBody>(false, true) ) {
+        rigidBodies.insert( rigid_body_ptr(rbody) );
+    }
+    ar.closeChunk();
+
+    if ( !ar.openChunk("constraints", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Missing locations chunk");
+    }
+    while ( Constraint* constraint = ar.readSerializable<Constraint>(false, true) ) {
+        constraints.insert( constraint_ptr(constraint) );
+    }
+    ar.closeChunk();
 }
 
 bool PhysicsModel::addRigidBody(RigidBody* rigidBody)

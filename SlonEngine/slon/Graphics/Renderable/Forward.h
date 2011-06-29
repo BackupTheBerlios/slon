@@ -1,6 +1,12 @@
 #ifndef __SLON_ENGINE_RENDERABLE_FORWARD_H__
 #define __SLON_ENGINE_RENDERABLE_FORWARD_H__
 
+namespace boost
+{
+    template<typename T>
+    class intrusive_ptr;
+}
+
 namespace slon {
 namespace graphics {
 
@@ -16,6 +22,19 @@ enum ATTRIBUTE_SEMANTIC
     ATTRIBUTE_COLOR    = 4,
     ATTRIBUTE_WEIGHTS  = 5,
 };
+
+class Mesh;
+class MeshData;
+class StaticMesh;
+
+typedef boost::intrusive_ptr<StaticMesh>		static_mesh_ptr;
+typedef boost::intrusive_ptr<const StaticMesh>	const_static_mesh_ptr;
+
+typedef boost::intrusive_ptr<MeshData>			mesh_data_ptr;
+typedef boost::intrusive_ptr<const MeshData>	const_mesh_data_ptr;
+
+typedef boost::intrusive_ptr<Mesh>				mesh_ptr;
+typedef boost::intrusive_ptr<const Mesh>		const_mesh_ptr;
 
 } // namespace graphics
 } // namespace slon

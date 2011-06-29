@@ -2,6 +2,7 @@
 #define SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_H
 
 #include "../../Scene/Geode.h"
+#include "Forward.h"
 #include "Mesh.h"
 
 namespace slon {
@@ -15,8 +16,13 @@ public:
     typedef scene::Geode base_type;
 
 public:
-    StaticMesh(Mesh* mesh);
+	StaticMesh();
+    StaticMesh(const mesh_ptr& mesh);
     ~StaticMesh();
+
+	// Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override Entity
     using Entity::accept;

@@ -58,6 +58,7 @@ public:
 
         state_desc(const std::string& _name = "") :
             transform( math::make_identity<float, 4>() ),
+			type(DT_DYNAMIC),
             mass(0),
 			inertia(0, 0, 0),
             margin(0),

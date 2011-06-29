@@ -57,7 +57,10 @@ public:
     virtual Timer& getSimulationTimer() = 0;
 
     /** Get simulation world */
-    virtual realm::World& getWorld() = 0;
+    virtual realm::World* getWorld() = 0;
+
+    /** Set world */
+    virtual void setWorld(const realm::world_ptr& world_) = 0;
 
     /** Get database manager */
     virtual database::DatabaseManager& getDatabaseManager() = 0;

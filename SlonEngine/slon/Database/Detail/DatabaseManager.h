@@ -13,6 +13,7 @@ typedef Cache<animation::Animation>     AnimationCache;
 typedef Cache<graphics::Effect>         EffectCache;
 typedef Cache<graphics::Texture>        TextureCache;
 typedef Cache<scene::Node>              VisualSceneCache;
+typedef Cache<realm::Location>          LocationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
 typedef Cache<physics::PhysicsModel>    PhysicsSceneCache;
 #endif
@@ -38,6 +39,8 @@ private:
     typedef std::map<format_id, library_loader_array>   format_loader_map;
     typedef std::map<format_id, library_saver_array>    format_saver_map;
 
+	typedef boost::unordered_map<std::string, serializable_create_func>	serializable_create_func_map;
+
 private:
     format_desc makeFormatDesc(format_id            id, 
                                const string_array&  regexps);
@@ -49,11 +52,13 @@ private:
 public:
     DatabaseManager();
 	~DatabaseManager();
-
+	
+    LibraryCache&		getLibraryCache()		{ return libraryCache; }
 	AnimationCache&		getAnimationCache()     { return animationCache; }
     EffectCache&        getEffectCache()        { return effectCache; }
     TextureCache&       getTextureCache()       { return textureCache; }
     VisualSceneCache&   getVisualSceneCache()   { return visualSceneCache; }
+    LocationCache&      getLocationCache()      { return locationCache; }
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache&  getPhysicsSceneCache()  { return physicsSceneCache; }
 #endif
@@ -87,6 +92,13 @@ public:
     void                 unregisterLibrarySaver(format_id format, LibrarySaver* saver)			{ libraryCache.unregisterSaver(format, saver); }
     size_t               unregisterLibrarySaver(LibrarySaver* saver)							{ return libraryCache.unregisterSaver(saver); }
     void                 clearLibrarySavers()													{ libraryCache.clearSavers(); }
+	
+	Serializable*		createSerializableByName(const std::string& name);
+	bool				registerSerializableCreateFunc(const std::string& name, const serializable_create_func& func);
+	bool				unregisterSerializableCreateFunc(const std::string& name);
+
+private:
+	format_desc* unwrap(format_id format) const;
 
 private:
     LibraryCache        libraryCache;
@@ -94,6 +106,7 @@ private:
     EffectCache         effectCache;
     TextureCache        textureCache;
     VisualSceneCache    visualSceneCache;
+    LocationCache       locationCache;
 #ifdef SLON_ENGINE_USE_PHYSICS
     PhysicsSceneCache   physicsSceneCache;
 #endif
@@ -101,6 +114,8 @@ private:
     format_desc_vector  formatDescs;
     format_loader_map   formatLoaders;
     format_saver_map    formatSavers;
+
+	serializable_create_func_map serializableCreateFuncs;
 };
 
 template<typename T>
@@ -165,6 +180,19 @@ inline void registerSavers(size_t numSavers, fmt_saver<T>* savers)
         
         format_id fmtId = cache.registerFormat(fmtExpr);
         cache.registerSaver(fmtId, typename fmt_saver<T>::saver_ptr(savers[i].fmtSaver));
+    }
+}
+
+template<>
+inline void registerSavers<database::Library>(size_t numSavers, fmt_saver<database::Library>* savers)
+{
+    database::DatabaseManager& manager = currentDatabaseManager();
+    for (size_t i = 0; i<numSavers; ++i)
+    {
+        std::vector<std::string> fmtExpr(savers[i].fmtExpr, savers[i].fmtExpr + savers[i].numExpr);
+        
+        format_id fmtId = manager.registerLibraryFormat(fmtExpr);
+        manager.registerLibrarySaver(fmtId, fmt_saver<database::Library>::saver_ptr(savers[i].fmtSaver));
     }
 }
 

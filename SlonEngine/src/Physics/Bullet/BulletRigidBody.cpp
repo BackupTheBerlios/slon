@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
+#include "Database/Archive.h"
 #include "Engine.h"
 #include "Log/Formatters.h"
 #include "Physics/Bullet/BulletCommon.h"
@@ -44,7 +45,7 @@ std::ostream& operator << (std::ostream& os, const RigidBody::DYNAMICS_TYPE& typ
 
 std::ostream& operator << (std::ostream& os, const BoxShape& shape)
 {
-	os << "box { halfExtent = {" << shape.halfExtents << "} }";
+	os << "box { halfExtent = {" << shape.halfExtent << "} }";
 	return os;
 }
 
@@ -125,11 +126,25 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	   << "angularVelocity = {" << desc.angularVelocity << "}\n"
 	   << "name = " << desc.name << std::endl
 	   << "target = " << desc.target << std::endl
-	   << "shape = " << *desc.collisionShape << std::endl
+       << "shape = ";
+    
+    if (desc.collisionShape) {
+        os << *desc.collisionShape;
+    }
+    else {
+        os << "0";
+    }
+
+    os << std::endl
 	   << log::unindent()
 	   << "}";
 
 	return os;
+}
+
+BulletRigidBody::BulletRigidBody()
+:   base_type( currentPhysicsManager().getDynamicsWorld() )
+{
 }
 
 BulletRigidBody::BulletRigidBody(const rigid_body_ptr rigidBody_,
@@ -190,6 +205,38 @@ BulletRigidBody::BulletRigidBody(const RigidBody::state_desc& desc_, DynamicsWor
 BulletRigidBody::~BulletRigidBody()
 {
     destroy();
+}
+
+const char* BulletRigidBody::serialize(database::OArchive& ar) const
+{
+    ar.writeChunk("transform", desc.transform.data(), desc.transform.num_elements);
+    ar.writeChunk("type", reinterpret_cast<const int*>(&desc.type));
+    ar.writeChunk("mass", &desc.mass);
+    ar.writeChunk("inertia", desc.inertia.arr, desc.inertia.num_elements);
+    ar.writeChunk("margin", &desc.margin);
+    ar.writeChunk("relativeMargin", &desc.relativeMargin);
+    ar.writeChunk("linearVelocity", desc.linearVelocity.arr, desc.linearVelocity.num_elements);
+    ar.writeChunk("angularVelocity", desc.angularVelocity.arr, desc.angularVelocity.num_elements);
+    ar.writeStringChunk("name", desc.name.data(), desc.name.length());
+    ar.writeStringChunk("target", desc.target.data(), desc.target.length());
+    ar.writeSerializable(desc.collisionShape.get());
+    return "BulletRigidBody";
+}
+
+void BulletRigidBody::deserialize(database::IArchive& ar)
+{
+    ar.readChunk("transform", desc.transform.data(), desc.transform.num_elements);
+    ar.readChunk("type", reinterpret_cast<int*>(&desc.type));
+    ar.readChunk("mass", &desc.mass);
+    ar.readChunk("inertia", desc.inertia.arr, desc.inertia.num_elements);
+    ar.readChunk("margin", &desc.margin);
+    ar.readChunk("relativeMargin", &desc.relativeMargin);
+    ar.readChunk("linearVelocity", desc.linearVelocity.arr, desc.linearVelocity.num_elements);
+    ar.readChunk("angularVelocity", desc.angularVelocity.arr, desc.angularVelocity.num_elements);
+    ar.readStringChunk("name", desc.name);
+    ar.readStringChunk("target", desc.target);
+    desc.collisionShape = ar.readSerializable<CollisionShape>();
+    reset(desc);
 }
 
 void BulletRigidBody::applyForce(const math::Vector3r& force, const math::Vector3r& pos)

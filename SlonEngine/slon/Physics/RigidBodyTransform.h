@@ -11,25 +11,31 @@ class RigidBodyTransform :
 	public scene::MatrixTransform
 {
 public:
-    RigidBodyTransform(physics::RigidBody* rigidBody = 0);
+    RigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr());
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override Node
     void accept(log::LogVisitor& visitor) const;
 
     // Override Transform
-    bool isAbsolute() const;
-
+    bool isAbsolute() const          { return absolute; }
     void setAbsolute(bool absolute_) { absolute = absolute_; }
 
-    /** Get rigid body which handles transformation for this node. */
-    physics::RigidBody* getRigidBody() { return rigidBody; }
+    /** Set rigid body which handles transform. */
+    void setRigidBody(const rigid_body_ptr& rigidBody_) { rigidBody = rigidBody_; }
 
     /** Get rigid body which handles transformation for this node. */
-    const physics::RigidBody* getRigidBody() const { return rigidBody; }
+    RigidBody* getRigidBody() { return rigidBody.get(); }
+
+    /** Get rigid body which handles transformation for this node. */
+    const RigidBody* getRigidBody() const { return rigidBody.get(); }
 
 protected:
-    bool                absolute;
-    physics::RigidBody*	rigidBody;
+    bool            absolute;
+    rigid_body_ptr	rigidBody;
 };
 
 } // namespace physics

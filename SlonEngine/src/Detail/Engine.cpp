@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "Database/Collada/Collada.h"
+#include "Database/Proprietary/SXMLLoader.h"
+#include "Database/Proprietary/SXMLSaver.h"
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
+#include "Graphics/Renderable/StaticMesh.h"
+#include "Physics/RigidBodyTransform.h"
+#include "Realm/BVHLocation.h"
+#include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/error.hpp"
@@ -34,7 +40,7 @@ namespace {
 
         void operator () (void)
         {
-            realm::detail::World& world = static_cast<realm::detail::World&>(engine.getWorld());
+            realm::World& world = static_cast<realm::World&>(*engine.getWorld());
             thread::detail::ThreadManager& threadManager = static_cast<thread::detail::ThreadManager&>(engine.getThreadManager());
 			if (multithreaded)
 			{
@@ -128,13 +134,14 @@ namespace {
     public:
 		bool binary() const { return true; }
 
-        graphics::texture_ptr load(std::istream& stream)
+        graphics::texture_ptr load(filesystem::File* file)
         {
             graphics::texture_ptr texture;
 
-			std::stringstream buffer;
-			buffer << stream.rdbuf();
-			std::string data( buffer.str() );
+            file->open(filesystem::File::in | filesystem::File::binary);
+			std::string data(file->size(), ' ');
+            file->read(&data[0], data.size());
+            file->close();
 
             graphics::image_ptr image( graphics::currentDevice()->CreateImage() );
 		    if ( sgl::SGL_OK == image->LoadFromFileInMemory(format, data.size(), &data[0]) )
@@ -166,6 +173,7 @@ Engine::Engine() :
     working(false)
 {
     filesystemManager.reset(new filesystem::detail::FileSystemManager);
+    world.reset(new realm::DefaultWorld);
 }
 
 void Engine::init()
@@ -184,16 +192,24 @@ void Engine::init()
     logManager.redirectOutputToConsole("database");
     logManager.redirectOutputToConsole("graphics");
 
-    // initialize loaders
+    // initialize loaders & savers
     {
         using namespace database::detail;
 
-        const size_t                    numLibraryLoaders = 1;
+        const size_t                    numLibraryLoaders = 2;
         fmt_loader<database::Library>   libraryLoaders[numLibraryLoaders] = 
         {
-            {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader}
+            {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader},
+            {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLLoader}
         };
         database::detail::registerLoaders<database::Library>(numLibraryLoaders, libraryLoaders);
+
+        const size_t                    numLibrarySavers = 1;
+        fmt_saver<database::Library>    librarySavers[numLibrarySavers] = 
+        {
+            {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLSaver}
+        };
+        database::detail::registerSavers<database::Library>(numLibrarySavers, librarySavers);
     
         const size_t                    numImageFormats = 11;
         fmt_loader<graphics::Texture>   imageLoaders[numImageFormats] =
@@ -228,6 +244,54 @@ void Engine::init()
         database::detail::registerSavers<physics::PhysicsModel>(numPhysicsSceneSavers, physicsSceneSavers);
 #endif
     }
+
+	// register serializables
+	{
+		using namespace database;
+
+        // scene
+		databaseManager.registerSerializableCreateFunc("Node",                  createSerializable<scene::Node>);
+		databaseManager.registerSerializableCreateFunc("Group",                 createSerializable<scene::Group>);
+		databaseManager.registerSerializableCreateFunc("MatrixTransform",       createSerializable<scene::MatrixTransform>);
+		databaseManager.registerSerializableCreateFunc("RigidBodyTransform",    createSerializable<physics::RigidBodyTransform>);
+		databaseManager.registerSerializableCreateFunc("StaticMesh",            createSerializable<graphics::StaticMesh>);
+		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::Mesh>);
+
+        // physics
+#ifdef SLON_ENGINE_USE_BULLET
+        {
+            databaseManager.registerSerializableCreateFunc("BulletMotionState", boost::bind(&physics::DynamicsWorld::createRigidBodyTransform, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager), 
+                                                                                            physics::rigid_body_ptr()));
+            static physics::RigidBody::state_desc rdesc; // avoiding stack alignment
+            databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
+                                                                                            boost::ref(rdesc)));
+            static physics::Constraint::state_desc cdesc; // avoiding stack alignment
+            databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, 
+                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
+                                                                                            boost::ref(cdesc)));
+            
+            databaseManager.registerSerializableCreateFunc("PlaneShape",        createSerializable<physics::PlaneShape>);
+            databaseManager.registerSerializableCreateFunc("SphereShape",       createSerializable<physics::SphereShape>);
+            databaseManager.registerSerializableCreateFunc("BoxShape",          createSerializable<physics::BoxShape>);
+            databaseManager.registerSerializableCreateFunc("ConeShape",         createSerializable<physics::ConeShape>);
+            databaseManager.registerSerializableCreateFunc("CapsuleShape",      createSerializable<physics::CapsuleShape>);
+            databaseManager.registerSerializableCreateFunc("CylinderShape",     createSerializable<physics::CylinderShape>);
+            databaseManager.registerSerializableCreateFunc("ConvexShape",       createSerializable<physics::ConvexShape>);
+            databaseManager.registerSerializableCreateFunc("TriangleMeshShape", createSerializable<physics::TriangleMeshShape>);
+            databaseManager.registerSerializableCreateFunc("CompoundShape",     createSerializable<physics::CompoundShape>);
+        }
+#endif
+        // realm
+        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>);
+        databaseManager.registerSerializableCreateFunc("BVHLocationNode",   createSerializable<realm::BVHLocationNode>);
+
+        // sgl
+		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);
+		databaseManager.registerSerializableCreateFunc("VertexBuffer",      createSerializableWrapper<sgl::VertexBuffer>);
+		databaseManager.registerSerializableCreateFunc("IndexBuffer",       createSerializableWrapper<sgl::IndexBuffer>);
+	}
 
     // init SDL
     if ( SDL_Init(SDL_INIT_VIDEO) < 0 && !SDL_GetVideoInfo() ) {
@@ -281,20 +345,7 @@ void Engine::run(const DESC& desc_)
         int i = 0;
         while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-        // traverse updated objects
-        {
-            thread::lock_ptr lock = world.lockForWriting();
-            for (size_t i = 0; i<updateQueue.size(); ++i) 
-            {
-                if ( updateQueue[i]->isInWorld() )
-                {
-                    updateQueue[i]->traverse(traverser);
-                    world.update(updateQueue[i].get());
-                }
-            }
-            updateQueue.clear();
-        }
-        graphicsManager.render(world);
+        graphicsManager.render(*world);
     }
 
     // remove useless now delegates
@@ -337,20 +388,7 @@ void Engine::frame()
     scene::TransformVisitor traverser;    
     while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
 
-        // traverse updated objects
-    {
-        thread::lock_ptr lock = world.lockForWriting();
-        for (size_t i = 0; i<updateQueue.size(); ++i) 
-        {
-            if ( updateQueue[i]->isInWorld() )
-            {
-                updateQueue[i]->traverse(traverser);
-                world.update(updateQueue[i].get());
-            }
-        }
-        updateQueue.clear();
-    }
-    graphicsManager.render(world);
+    graphicsManager.render(*world);
 
     ++frameNumber;
 

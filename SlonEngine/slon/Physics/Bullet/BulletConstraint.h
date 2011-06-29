@@ -45,6 +45,10 @@ public:
                      const std::string&           name);
     BulletConstraint(const state_desc& desc);
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Get internal bullet constraint */
     btGeneric6DofConstraint* getBtConstraint() { return constraint.get(); }
 

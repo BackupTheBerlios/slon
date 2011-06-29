@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_GRAPH_GROUP_H__
 #define __SLON_ENGINE_SCENE_GRAPH_GROUP_H__
 
-#include <boost/intrusive_ptr.hpp>
 #include "Node.h"
+#include <boost/intrusive_ptr.hpp>
 
 namespace slon {
 namespace scene {
@@ -12,18 +12,25 @@ class Group :
     public Node
 {
 public:
+	Group();
+	Group(const hash_string& name);
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Get type of the node */
     TYPE getNodeType() const { return GROUP; }
     void accept(log::LogVisitor& visitor) const;
-    
+
     /** Add child to the group.
      * @param child - new subnode of this group. If node has parent it will be removed from it.
 	 * @param left - left node for the child.
      */
-    void addChild(Node* child, Node* left = 0);
+    void addChild(const node_ptr& child, Node* left = 0);
 
     /** Remove child from the group. Parent of this child must be this node. */
-    void removeChild(Node* child);
+    void removeChild(const node_ptr& child);
 	
     /** Remove all children of the group. */
     void removeChildren();

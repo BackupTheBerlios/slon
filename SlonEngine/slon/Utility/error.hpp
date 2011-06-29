@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_ERROR_H__
 #define __SLON_ENGINE_ERROR_H__
 
-#include <stdexcept>
 #include "../Log/Logger.h"
+#include <stdexcept>
 
 namespace slon {
 
@@ -23,7 +23,7 @@ class slon_error :
     public std::runtime_error
 {
 public:
-    slon_error( const std::string&   message);
+    slon_error( const std::string&		message);
 
     slon_error( const log::logger_ptr&  logger,
                 const std::string&		message,
@@ -49,16 +49,16 @@ public:
 	~system_error() throw() {} 
 };
 
-/** Error occured when necessary file is not found. */
-class file_not_found_error :
+/** Error occured when necessary file is not found or error occured opening it. */
+class file_error :
     public slon_error
 {
 public:
-    file_not_found_error( const log::logger_ptr&	logger,
-                          const std::string&		message,
-                          log::SEVERITY				severity = log::S_ERROR );
+    file_error( const log::logger_ptr&	logger,
+                const std::string&		message,
+                log::SEVERITY				severity = log::S_ERROR );
 
-	~file_not_found_error() throw() {} 
+	~file_error() throw() {} 
 };
 
 /** Error occures due to failed input/output operation */
@@ -72,6 +72,23 @@ public:
 
 	~io_error() throw() {} 
 };
+
+namespace database {
+
+    class serialization_error :
+        public slon_error
+    {
+    public:
+        serialization_error( const std::string&		message );
+
+        serialization_error( const log::logger_ptr&	logger,
+                             const std::string&		message,
+                             log::SEVERITY          severity = log::S_ERROR );
+
+	    ~serialization_error() throw() {} 
+    };
+
+} // namespace database
 
 namespace graphics {
 

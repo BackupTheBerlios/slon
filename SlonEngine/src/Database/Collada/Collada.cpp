@@ -11,6 +11,8 @@
 #include "Graphics/Renderable/SkinnedMesh.h"
 #include "Graphics/Renderable/StaticMesh.h"
 #include "Graphics/Effect/LightingEffect.h"
+#include "Log/LogVisitor.h"
+#include "Physics/RigidBodyTransform.h"
 #include "Scene/Skeleton.h"
 #include "Scene/Visitors/CullVisitor.h"
 #include "Scene/Visitors/DFSNodeVisitor.h"
@@ -533,13 +535,13 @@ namespace {
 							{
                                 // add sub subset
                                 size_t primIndex = std::distance( iter, primitiveMaterials.begin() );
-                                mesh->getSubset(i).setEffect( materials[primIndex]->createEffect() );
+                                mesh->getSubset(i).effect = materials[primIndex]->createEffect();
 							}
 							else
 							{
 								// add new subset
                                 graphics::material_ptr material = createMaterial(**materialInstanceIter);
-                                mesh->getSubset(i).setEffect( material->createEffect() );
+                                mesh->getSubset(i).effect = material->createEffect();
                                 primitiveMaterials.push_back(*materialInstanceIter);
                                 materials.push_back(material);
 							}
@@ -555,7 +557,7 @@ namespace {
                 // use default material
                 graphics::material_ptr defaultMaterial(new graphics::LightingMaterial);
                 for(size_t i = 0; i<colladaMesh.primitives.size(); ++i) {
-                    mesh->getSubset(i).setEffect( defaultMaterial->createEffect() );
+                    mesh->getSubset(i).effect = defaultMaterial->createEffect();
                 }
                 AUTO_LOGGER_MESSAGE(log::S_WARNING, "Mesh subset doesn't have any material, using default." << std::endl);
             }
@@ -886,7 +888,39 @@ namespace {
 	};
 
 #ifdef SLON_ENGINE_USE_PHYSICS
-    class PhysicsSceneBuilder
+    class DecomposeTransformVisitor :
+        public scene::FilterVisitor<scene::DFSNodeVisitor, physics::RigidBodyTransform>
+	{
+	public:
+        DecomposeTransformVisitor(scene::Node& node)
+        {
+            traverse(node);
+        }
+
+		void visit(physics::RigidBodyTransform& rbTransform)
+		{
+			math::Matrix4f T( rbTransform.getLocalToWorld() );
+			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
+
+			rbTransform.setTransform( math::invert(R) * T ); // physics -> graphics 
+			switch ( rbTransform.getRigidBody()->getDynamicsType() )
+			{
+			case physics::RigidBody::DT_STATIC:
+			case physics::RigidBody::DT_DYNAMIC:
+                rbTransform.setAbsolute(true);
+				break;
+				
+			case physics::RigidBody::DT_KINEMATIC:
+                rbTransform.setAbsolute(false);
+				break;
+
+			default:
+				assert(!"Can't get here");
+			}
+		}
+	};
+
+	class PhysicsSceneBuilder
     {
     public:
         PhysicsSceneBuilder( const ColladaDocument&     document_,
@@ -1133,9 +1167,11 @@ namespace {
             return rigidBody;
         }
 
-        physics::physics_model_ptr createPhysicsScene(const collada_physics_scene& colladaScene)
+        physics::physics_model_ptr createPhysicsScene(const collada_physics_scene& colladaScene, scene::node_ptr& root)
         {
-			physics::physics_model_ptr physicsModel(new physics::PhysicsModel);
+			using namespace physics;
+
+			physics_model_ptr physicsModel(new PhysicsModel);
 			physicsModel->setName(colladaScene.id);
 
 			for (size_t k = 0; k<colladaScene.physicsModelInstances.size(); ++k)
@@ -1163,6 +1199,49 @@ namespace {
 				}
 			}
 
+            for (PhysicsModel::rigid_body_iterator iter  = physicsModel->firstRigidBody();
+                                                   iter != physicsModel->endRigidBody();
+                                                   ++iter)
+            {
+                // insert rigid body into scene graph
+                scene::node_ptr targetNode( findNamedNode( *root, hash_string((*iter)->getTarget()) ) );
+                if (targetNode)
+                {
+                    physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
+                    if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
+                    {
+                        // relink children
+                        while ( scene::Node* child = group->getChild() ) {
+                            rbTransform->addChild(child);
+                        }
+
+                        group->addChild(rbTransform);
+                    }
+                    else if ( targetNode->getParent() != 0 )
+                    {
+                        targetNode->getParent()->addChild(rbTransform);
+                        rbTransform->addChild(targetNode.get());
+                    }
+                    else 
+                    {
+                        rbTransform->addChild(targetNode.get());
+                        root.reset(rbTransform);
+                    }
+                }
+                else {
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl);
+                }
+            }
+
+            // enable simulation
+            physicsModel->toggleSimulation(true);
+
+            // apply local transform to the shapes
+            scene::TransformVisitor tv(*root);
+            DecomposeTransformVisitor dv(*root);
+        
+            // print scene graph
+            log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);
 			return physicsModel;
         }
 
@@ -1508,7 +1587,7 @@ void ColladaDocument::set_file_source(const std::string& fileName)
 	}
 }
 
-library_ptr ColladaLoader::load(std::istream& stream)
+library_ptr ColladaLoader::load(filesystem::File* file)
 {
 	typedef collada_library_visual_scenes::element_set	visual_scene_set;
 	typedef collada_library_animations::element_set		animation_set;
@@ -1517,13 +1596,15 @@ library_ptr ColladaLoader::load(std::istream& stream)
 #endif
 		
 	// read file content
-	std::ostringstream buffer;
-	buffer << stream.rdbuf();
+    file->open(filesystem::File::in);
+	std::string fileContent(file->size(), ' ');
+    file->read( &fileContent[0], fileContent.size() );
+    file->close();
 
 	ColladaDocument document;
-	document.set_source( buffer.str().size(), buffer.str().c_str() );
+	document.set_source( fileContent.length(), fileContent.data() );
 
-	detail::library_ptr library(new detail::Library);
+	library_ptr			library(new Library);
 	scene::group_ptr	root(new scene::Group);
 	SceneBuilder	    visualBuilder(document);
 	for ( visual_scene_set::iterator iter  = document.libraryVisualScenes.elements.begin();
@@ -1532,7 +1613,7 @@ library_ptr ColladaLoader::load(std::istream& stream)
 	{
 		scene::group_ptr visualScene = visualBuilder.createVisualScene(*iter->second);
 		root->addChild(visualScene.get());
-        library->visualScenes.push_back( Library::key_visual_scene_pair(visualScene->getName().str(), visualScene) );
+        library->visualScenes.insert( std::make_pair(visualScene->getName().str(), visualScene) );
 	}
 
 #ifdef SLON_ENGINE_USE_PHYSICS				
@@ -1541,8 +1622,8 @@ library_ptr ColladaLoader::load(std::istream& stream)
 										iter != document.libraryPhysicsScenes.elements.end();
 										++iter )
 	{
-		physics::physics_model_ptr physicsScene = physicsBuilder.createPhysicsScene(*iter->second);
-		library->physicsScenes.push_back( Library::key_physics_scene_pair(physicsScene->getName(), physicsScene) );
+		physics::physics_model_ptr physicsScene = physicsBuilder.createPhysicsScene(*iter->second, library->visualScenes.begin()->second);
+		library->physicsScenes.insert( std::make_pair(physicsScene->getName(), physicsScene) );
 	}
 #endif
 
@@ -1551,7 +1632,7 @@ library_ptr ColladaLoader::load(std::istream& stream)
 								  ++iter )
 	{
 		animation::animation_ptr animation = visualBuilder.createAnimation(*iter->second, *root);
-		library->animations.push_back( Library::key_animation_pair(animation->getName(), animation) );
+		library->animations.insert( std::make_pair(animation->getName(), animation) );
 	}
 
 	return library;
