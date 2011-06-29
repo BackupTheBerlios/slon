@@ -19,6 +19,9 @@ public:
     /** Get bounds of the hole location. */
     virtual const math::AABBf& getBounds() const = 0;
 
+	/** Check whether location have specified node. */
+	virtual bool have(const scene::node_ptr& node) const = 0;
+
     /** Add object to the world. Doesn't check for duplicates. 
 	 * @param node - scene graph node for insertion (must be root). Some location classes may add parent
      * nodes for scene graph to store necessary information in them.

@@ -15,6 +15,7 @@ DebugMesh::DebugMesh() :
     stateChanged(true),
     infiniteBounds(false),
     useCameraProjection(true),
+	baseTransform( math::make_identity<float, 4>() ),
     transform( math::make_identity<float, 4>() ),
     color(1.0f, 1.0f, 1.0f, 1.0f),
     textSize(10, 12),

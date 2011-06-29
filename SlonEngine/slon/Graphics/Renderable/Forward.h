@@ -26,6 +26,7 @@ enum ATTRIBUTE_SEMANTIC
 class Mesh;
 class MeshData;
 class StaticMesh;
+class SkyBox;
 
 typedef boost::intrusive_ptr<StaticMesh>		static_mesh_ptr;
 typedef boost::intrusive_ptr<const StaticMesh>	const_static_mesh_ptr;
@@ -35,6 +36,9 @@ typedef boost::intrusive_ptr<const MeshData>	const_mesh_data_ptr;
 
 typedef boost::intrusive_ptr<Mesh>				mesh_ptr;
 typedef boost::intrusive_ptr<const Mesh>		const_mesh_ptr;
+
+typedef boost::intrusive_ptr<SkyBox>			sky_box_ptr;
+typedef boost::intrusive_ptr<const SkyBox>		const_sky_box_ptr;
 
 } // namespace graphics
 } // namespace slon

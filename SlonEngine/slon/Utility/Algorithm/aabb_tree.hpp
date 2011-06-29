@@ -525,6 +525,6 @@ void perform_on_leaves( const aabb_tree<LeafData, RealType>& tree,
     }
 }
 
-} // namesapce slon
+} // namespace slon
 
 #endif // SLON_ENGINE_UTILITY_ALGORITHM_AABB_TREE_HPP

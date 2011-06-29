@@ -8,7 +8,6 @@
 #ifdef DEBUG_DBVT_LOCATION
 #   include "../Graphics/Renderable/DebugMesh.h"
 #endif
-#include "../Utility/Algorithm/aabb_tree.hpp"
 #include "Location.h"
 #include "BVHLocationNode.h"
 
@@ -26,7 +25,7 @@ public:
 	bool operator () (const bvh_location_node_ptr& node) 
 	{ 
 		nv.traverse( *node->getChild() ); 
-		return true;
+		return false;
 	}
 
 private:
@@ -73,7 +72,8 @@ public:
     void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
     void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
     void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
-
+	
+	bool have(const scene::node_ptr& node) const;
     void add(const scene::node_ptr& node, bool dynamic);
     void update(const scene::node_ptr& node);
     bool remove(const scene::node_ptr& node);
