@@ -25,6 +25,7 @@
 #   include "Physics/PhysicsModel.h"
 #endif
 
+#pragma optimize("", off)
 DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace {
@@ -1691,3 +1692,5 @@ void ColladaDocument::on_save()
 	serializer &= xmlpp::make_nvp( "scene",						xmlpp::as_element(scene) );
 	serializer.save(*this, colladaElem);
 }
+
+#pragma optimize("", on)

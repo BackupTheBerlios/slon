@@ -66,7 +66,7 @@ namespace realm {
 #   define DEBUG_VISIT_TREE(debugMesh, cv)\
         cv.traverse(*debugMesh);
 #else
-#   define DEBUG_UPDATE_TREE(debugMesh, staticTree, dynamicTree)
+#   define DEBUG_UPDATE_TREE(debugMesh, aabb, staticTree, dynamicTree)
 #   define DEBUG_VISIT_TREE(debugMesh, cv)
 #endif
 	

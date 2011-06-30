@@ -22,6 +22,8 @@ public:
     typedef math::AABB<RealType, 3>         aabb_type;
 
     class leaf_node;
+    class volume_node;
+
     class volume_node :
         public object_in_pool<volume_node>
     {

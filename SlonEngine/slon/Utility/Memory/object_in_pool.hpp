@@ -174,9 +174,6 @@ public:
 template<typename T, typename Allocator>
 class object_in_pool<T, void, Allocator>
 {
-private:
-    typedef singleton_pool<sizeof(T), Allocator> singleton_pool_type;
-
 public:
 	void* operator new (size_t size)
 	{

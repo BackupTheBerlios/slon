@@ -98,10 +98,10 @@ void collada_primitives::load( const ColladaDocument&   document,
                                const xmlpp::element&    elem )
 {
     // get primitive type
-    if ( elem.get_value() == "triangles" ) {
+    if ( elem.get_value() == std::string("triangles") ) {
         primType = sgl::TRIANGLES;
     }
-	else if ( elem.get_value() == "polylist" ) {
+    else if ( elem.get_value() == std::string("polylist") ) {
 		primType = sgl::POLYGON;
 	}
 
