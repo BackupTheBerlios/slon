@@ -2,9 +2,9 @@
 #define __SLON_ENGINE_SCENE_NODE_H__
 
 #include "../Database/Serializable.h"
-#include "../Log/Forward.h"
-#include "../Realm/Forward.h"
+#include "../Log/LogVisitor.h"
 #include "../Utility/hash_string.hpp"
+#include "AcceptVisitor.h"
 #include "Forward.h"
 
 namespace slon {
@@ -16,6 +16,7 @@ namespace scene {
 class Node
 :   public Referenced
 ,   public database::Serializable
+,   public ConstAcceptVisitor<log::LogVisitor>
 {
 friend class Group;
 public:
@@ -62,8 +63,8 @@ public:
     /** Get type of the node */
     virtual TYPE getNodeType() const { return NODE; }
 
-    /** Helper function outputs information about node. Override in derived classes. */
-    virtual void accept(log::LogVisitor& visitor) const;
+    /** Helper function outputs information about node. */
+    void accept(log::LogVisitor& visitor) const;
 
     /** Get parent node in the hierarchy. */
     Group* getParent() { return parent; }

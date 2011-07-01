@@ -253,6 +253,7 @@ SET ( TARGET_REALM_DETAIL_HEADERS
 )
 
 SET ( TARGET_SCENE_HEADERS
+    ${TARGET_HEADER_PATH}/Scene/AcceptVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Camera.h
     ${TARGET_HEADER_PATH}/Scene/Entity.h
     ${TARGET_HEADER_PATH}/Scene/Forward.h
@@ -265,6 +266,7 @@ SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Skeleton.h
     #${TARGET_HEADER_PATH}/Scene/Switch.h
     ${TARGET_HEADER_PATH}/Scene/Transform.h
+    ${TARGET_HEADER_PATH}/Scene/Visitable.h
 )
 
 SET ( TARGET_SCENE_CAMERA_HEADERS
@@ -676,6 +678,7 @@ SET ( TARGET_SCENE_VISITORS_SOURCES
     Scene/Visitors/BFSNodeVisitor.cpp
     Scene/Visitors/CullVisitor.cpp
     Scene/Visitors/DFSNodeVisitor.cpp
+    Scene/Visitors/NodeVisitor.cpp
     Scene/Visitors/TransformVisitor.cpp
 )
 

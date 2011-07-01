@@ -3,6 +3,8 @@
 
 #include <sgl/Math/AABB.hpp>
 #include "Group.h"
+#include "Visitors/CullVisitor.h"
+#include "Visitors/TransformVisitor.h"
 
 namespace slon {
 namespace scene {
@@ -11,27 +13,24 @@ namespace scene {
  * game world.
  */
 class Entity :
-    public Node
+    public Node,
+    public AcceptVisitor<TransformVisitor>,
+    public ConstAcceptVisitor<CullVisitor>
 {
 public:
     // Override Node
     TYPE getNodeType() const { return ENTITY; }
     void accept(log::LogVisitor& visitor) const;
 
+    // Override AcceptVisitor
+    void accept(TransformVisitor& /*visitor*/)  {}
+    void accept(CullVisitor& /*visitor*/) const {}
+
     /** Get bounds of the entity */
     virtual const math::AABBf& getBounds() const = 0;
 
-    /** Handle transform visitor */
-    virtual void accept(TransformVisitor& cv) {}
-
-    /** Handle cull visitor */
-    virtual void accept(CullVisitor& cv) const {}
-
     virtual ~Entity() {}
 };
-
-typedef boost::intrusive_ptr<Entity>            entity_ptr;
-typedef boost::intrusive_ptr<const Entity>      const_entity_ptr;
 
 } // namespace scene
 } // namespace slon

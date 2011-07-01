@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_LOG_LOG_VISITOR_H__
 
 #include "../Scene/Visitors/NodeVisitor.h"
-#include "Log/Logger.h"
+#include "Logger.h"
 
 namespace slon {
 namespace log {

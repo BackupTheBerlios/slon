@@ -23,24 +23,24 @@ namespace scene {
     class Node;
     class Skeleton;
     class Transform;
+    
+    template<typename Visitor>
+    class AcceptVisitor;
 
-    template<typename Node>
+    template<typename Visitor>
+    class ConstAcceptVisitor;
+
+    class NodeVisitor;
+    class ConstNodeVisitor;
+
+    template<typename Derived, typename Base>
     class NodeVisitorImpl;
 
-    typedef NodeVisitorImpl<Node>           NodeVisitor;
-    typedef NodeVisitorImpl<const Node>     ConstNodeVisitor;
-
-    template<typename Node>
+    template<typename Derived, typename Base>
     class BFSNodeVisitorImpl;
 
-    typedef BFSNodeVisitorImpl<Node>        BFSNodeVisitor;
-    typedef BFSNodeVisitorImpl<const Node>  ConstBFSNodeVisitor;
-
-    template<typename Node>
+    template<typename Derived, typename Base>
     class DFSNodeVisitorImpl;
-
-    typedef DFSNodeVisitorImpl<Node>        DFSNodeVisitor;
-    typedef DFSNodeVisitorImpl<const Node>  ConstDFSNodeVisitor;
 
     class CullVisitor;
     class TransformVisitor;

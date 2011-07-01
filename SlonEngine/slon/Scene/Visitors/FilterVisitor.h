@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_SCENE_FILTER_NODE_VISITOR_H__
 
 #include "../Forward.h"
+#include <boost/bind.hpp>
 
 namespace slon {
 namespace scene {
@@ -110,6 +111,11 @@ public:
     void visitNode(node_type& node)
     {
         base_type::visit(node);
+    }
+
+    void traverse(node_type& node)
+    {
+        traverse_dfs( node, boost::bind(&FilterVisitor::visitNode, this, _1) );
     }
 
     virtual ~FilterVisitor() {}

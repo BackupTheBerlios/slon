@@ -17,16 +17,18 @@ namespace scene {
  * that is not culled by the cull function.
  */
 class CullVisitor :
-    public ConstNodeVisitor
+    public NodeVisitorImpl<CullVisitor, ConstNodeVisitor>
 {
 public:
-    typedef std::vector<const graphics::Renderable*>    renderable_vector;
-    typedef renderable_vector::iterator                 renderable_iterator;
-    typedef renderable_vector::const_iterator           renderable_const_iterator;
+    typedef std::vector<const graphics::Renderable*>        renderable_vector;
+    typedef renderable_vector::iterator                     renderable_iterator;
+    typedef renderable_vector::const_iterator               renderable_const_iterator;
 
-    typedef std::vector<const Light*>                   light_vector;
-    typedef light_vector::iterator                      light_iterator;
-    typedef light_vector::const_iterator                light_const_iterator;
+    typedef std::vector<const Light*>                       light_vector;
+    typedef light_vector::iterator                          light_iterator;
+    typedef light_vector::const_iterator                    light_const_iterator;
+
+    typedef NodeVisitorImpl<CullVisitor, ConstNodeVisitor>  base_type;
 
 public:
     CullVisitor(const Camera* camera_ = 0) :

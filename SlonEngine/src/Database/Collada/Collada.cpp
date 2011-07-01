@@ -25,7 +25,6 @@
 #   include "Physics/PhysicsModel.h"
 #endif
 
-#pragma optimize("", off)
 DECLARE_AUTO_LOGGER("database.COLLADA")
 
 namespace {
@@ -98,7 +97,7 @@ namespace {
     };
 
     class find_transform_visitor :
-        public scene::FilterVisitor<scene::DFSNodeVisitor, scene::Joint, scene::MatrixTransform>
+        public scene::FilterVisitor<scene::NodeVisitor, scene::Joint, scene::MatrixTransform>
     {
     public:
         find_transform_visitor(hash_string name_)
@@ -890,7 +889,7 @@ namespace {
 
 #ifdef SLON_ENGINE_USE_PHYSICS
     class DecomposeTransformVisitor :
-        public scene::FilterVisitor<scene::DFSNodeVisitor, physics::RigidBodyTransform>
+        public scene::FilterVisitor<scene::NodeVisitor, physics::RigidBodyTransform>
 	{
 	public:
         DecomposeTransformVisitor(scene::Node& node)
@@ -1445,7 +1444,7 @@ namespace {
 		collada_bind_material_ptr createBindMaterial(const scene::Geode* geode)
 		{
 			scene::CullVisitor visitor;
-			const_cast<scene::Geode*>(geode)->accept(visitor);
+			geode->accept(visitor);
 
 			collada_bind_material_ptr bindMaterial(new collada_bind_material);
 			for (scene::CullVisitor::renderable_iterator iter  = visitor.beginRenderable();
@@ -1692,5 +1691,3 @@ void ColladaDocument::on_save()
 	serializer &= xmlpp::make_nvp( "scene",						xmlpp::as_element(scene) );
 	serializer.save(*this, colladaElem);
 }
-
-#pragma optimize("", on)

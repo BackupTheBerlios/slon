@@ -16,7 +16,7 @@ namespace {
     using namespace graphics;
 
     struct gather_joints_visitor :
-        public scene::FilterVisitor<scene::DFSNodeVisitor, scene::Joint>
+        public scene::FilterVisitor<scene::NodeVisitor, scene::Joint>
     {
         gather_joints_visitor(SkinnedMesh&                  skinnedMesh_,
                               SkinnedMesh::joint_vector&    joints_)
@@ -625,8 +625,6 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
     {
         visitor.addRenderable( subsetIter->get() );
     }
-
-    base_type::accept(visitor);
 }
 
 } // namespace graphics
