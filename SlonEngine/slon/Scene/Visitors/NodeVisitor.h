@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_SCENE_NODE_VISITOR_H__
 
 #include "../Forward.h"
+#include "../Visitable.h"
 
 namespace slon {
 namespace scene {
@@ -10,14 +11,15 @@ namespace scene {
 class NodeVisitor
 {
 public:
-    typedef Node node_type;
+    typedef Node      node_type;
+    typedef Visitable visitable_type;
 
 public:
     /** Perform traverse. */
     virtual void traverse(Node& node) = 0;
 
     /** Call node accept function if one is presented. */
-    void visit(Node* node);
+    void visit(visitable_type* node) {}
 
     virtual ~NodeVisitor() {}
 };
@@ -26,14 +28,15 @@ public:
 class ConstNodeVisitor
 {
 public:
-    typedef const Node node_type;
+    typedef const Node      node_type;
+    typedef const Visitable visitable_type;
 
 public:
     /** Perform traverse. */
     virtual void traverse(const Node& node) = 0;
 
     /** Call node accept function if one is presented. */
-    void visit(const Node* node);
+    void visit(visitable_type* node) {}
 
     virtual ~ConstNodeVisitor() {}
 };
@@ -44,13 +47,14 @@ class NodeVisitorImpl :
     public Base
 {
 public:
-    typedef typename Base::node_type node_type;
+    typedef typename Base::node_type        node_type;
+    typedef typename Base::visitable_type   visitable_type;
 
 public:
     /** Call node accept function if one is presented. Then try to call accept function using reference to base visitor class. */
-    void visit(node_type* node)
+    void visit(visitable_type* node)
     {
-        typedef if_then_else< boost::is_const<node_type>::value,
+        typedef if_then_else< boost::is_const<visitable_type>::value,
                               const ConstAcceptVisitor<Derived>,
                               AcceptVisitor<Derived> >::type accept_visitor_type;
 
@@ -107,6 +111,27 @@ void traverse_dfs(const Node& root, Func func)
             }
         }
     }
+}
+
+/** traverse scene graph using depth first search. Call visitors visit func for every traversed node. */
+template<typename Node, typename Visitor>
+inline void visitor_traverse_dfs( Visitor& visitor,
+                                  Node&    root, 
+                                  typename boost::is_convertible<Visitor&, const scene::NodeVisitor&>::type*   tag0 = 0,
+                                  typename boost::is_convertible<Node&, const scene::Node&>::type*             tag1 = 0)
+{
+    struct visit_func
+    {
+        visit_func(Visitor& visitor_)
+        :   visitor(visitor_)
+        {}
+    
+        void operator () (Node& node) { visitor.visit(&node); }
+
+        Visitor& visitor;
+    };
+
+    traverse_dfs(root, visit_func(visitor));
 }
 
 } // namepsace scene

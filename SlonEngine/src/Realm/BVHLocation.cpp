@@ -2,6 +2,7 @@
 #include "Database/Detail/UtilitySerialization.h"
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Realm/BVHLocation.h"
+#include "Realm/EventVisitor.h"
 #include "Realm/World.h"
 #include "Scene/Visitors/TransformVisitor.h"
 #include "Utility/math.hpp"
@@ -228,6 +229,8 @@ void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
 
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
+
+    EventVisitor ev(EventVisitor::WORLD_ADD, 0, this, *node);
 }
 
 bool BVHLocation::remove(const scene::node_ptr& node)
@@ -249,6 +252,8 @@ bool BVHLocation::remove(const scene::node_ptr& node)
 
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
+    
+    EventVisitor ev(EventVisitor::WORLD_REMOVE, 0, this, *node);
     return true;
 }
 

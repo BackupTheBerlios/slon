@@ -2,6 +2,7 @@
 #include "Database/Archive.h"
 #include "Detail/Engine.h"
 #include "Realm/DefaultWorld.h"
+#include "Realm/EventVisitor.h"
 #include "Scene/Visitors/NodeVisitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
@@ -170,12 +171,19 @@ void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstNodeV
 
 bool DefaultWorld::removeInfiniteNode(const scene::node_ptr& node)
 {
-	return quick_remove(infiniteObjects, node);
+    if ( quick_remove(infiniteObjects, node) ) 
+    {
+        EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
+        return true;
+    }
+
+    return false;
 }
 
 void DefaultWorld::addInfiniteNode(const scene::node_ptr& node)
 {
 	infiniteObjects.push_back(node);
+    EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
 }
 
 bool DefaultWorld::haveInfiniteNode(const scene::node_ptr& node) const

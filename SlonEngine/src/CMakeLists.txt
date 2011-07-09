@@ -243,6 +243,7 @@ SET ( TARGET_LOG_DETAIL_HEADERS
 SET ( TARGET_REALM_HEADERS
     ${TARGET_HEADER_PATH}/Realm/BVHLocation.h
     ${TARGET_HEADER_PATH}/Realm/BVHLocationNode.h
+    ${TARGET_HEADER_PATH}/Realm/EventVisitor.h 
     ${TARGET_HEADER_PATH}/Realm/DefaultWorld.h
     ${TARGET_HEADER_PATH}/Realm/Forward.h
     ${TARGET_HEADER_PATH}/Realm/Location.h
@@ -643,6 +644,7 @@ SET ( TARGET_REALM_SOURCES
     Realm/BVHLocation.cpp
     Realm/BVHLocationNode.cpp
     Realm/DefaultWorld.cpp
+	Realm/EventVisitor.cpp
 )
 
 SET ( TARGET_REALM_DETAIL_SOURCES
@@ -678,7 +680,7 @@ SET ( TARGET_SCENE_VISITORS_SOURCES
     Scene/Visitors/BFSNodeVisitor.cpp
     Scene/Visitors/CullVisitor.cpp
     Scene/Visitors/DFSNodeVisitor.cpp
-    Scene/Visitors/NodeVisitor.cpp
+    #Scene/Visitors/NodeVisitor.cpp
     Scene/Visitors/TransformVisitor.cpp
 )
 
