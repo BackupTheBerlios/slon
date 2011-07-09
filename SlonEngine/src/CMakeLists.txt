@@ -292,6 +292,7 @@ SET ( TARGET_SCENE_VISITORS_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Visitors/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/NodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/TransformVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitors/Traverse.hpp
 )
 
 SET ( TARGET_THREAD_HEADERS

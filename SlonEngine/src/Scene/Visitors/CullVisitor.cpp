@@ -17,13 +17,17 @@ void CullVisitor::traverse(const Node& node)
         if (traversed->getNodeType() & Node::ENTITY_BIT) {
             static_cast<const Entity*>(traversed)->accept(*this);
         }
-        else if (traversed->getNodeType() & Node::GROUP_BIT) 
+        else
         {
-            const Group* group = static_cast<const Group*>(traversed);
-            for(const Node* i = group->getChild(); i; i = i->getRight()) {
-                forTraverse.push(i);
+            if (traversed->getNodeType() & Node::GROUP_BIT) 
+            {
+                const Group* group = static_cast<const Group*>(traversed);
+                for(const Node* i = group->getChild(); i; i = i->getRight()) {
+                    forTraverse.push(i);
+                }
             }
-            base_type::visit(group);
+            
+            base_type::visit(traversed);
         }
     }
 }

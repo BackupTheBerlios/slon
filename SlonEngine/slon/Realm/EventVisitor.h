@@ -1,7 +1,9 @@
 #ifndef __SLON_ENGINE_REALM_EVENT_VISITOR_H__
 #define __SLON_ENGINE_REALM_EVENT_VISITOR_H__
 
-#include "../Scene/AcceptVisitor.h"
+#include "../Scene/Node.h"
+#include "../Scene/Visitors/NodeVisitor.h"
+#include "../Scene/Visitors/Traverse.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -35,7 +37,7 @@ public:
     }
 
     // Override NodeVisitor
-    void traverse(scene::Node& node) { scene::visitor_traverse_dfs(*this, node); }
+    void traverse(scene::Node& node) { scene::traverseVisitorDFS(*this, node); }
 
     /** Get type of the event. */
     TYPE getType() const { return type; }
