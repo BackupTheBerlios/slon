@@ -286,9 +286,7 @@ SET ( TARGET_SCENE_LIGHT_HEADERS
 )
 
 SET ( TARGET_SCENE_VISITORS_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Visitors/BFSNodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/CullVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/DFSNodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/NodeVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Visitors/TransformVisitor.h
@@ -678,10 +676,8 @@ SET ( TARGET_SCENE_LIGHT_SOURCES
 )
 
 SET ( TARGET_SCENE_VISITORS_SOURCES
-    Scene/Visitors/BFSNodeVisitor.cpp
     Scene/Visitors/CullVisitor.cpp
-    Scene/Visitors/DFSNodeVisitor.cpp
-    #Scene/Visitors/NodeVisitor.cpp
+    Scene/Visitors/NodeVisitor.cpp
     Scene/Visitors/TransformVisitor.cpp
 )
 
