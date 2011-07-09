@@ -678,7 +678,7 @@ SET ( TARGET_SCENE_VISITORS_SOURCES
     Scene/Visitors/BFSNodeVisitor.cpp
     Scene/Visitors/CullVisitor.cpp
     Scene/Visitors/DFSNodeVisitor.cpp
-    Scene/Visitors/NodeVisitor.cpp
+    #Scene/Visitors/NodeVisitor.cpp
     Scene/Visitors/TransformVisitor.cpp
 )
 

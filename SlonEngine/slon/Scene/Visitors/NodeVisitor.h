@@ -17,7 +17,7 @@ public:
     virtual void traverse(Node& node) = 0;
 
     /** Call node accept function if one is presented. */
-    void visit(Node* node);
+    void visit(Node* node) {}
 
     virtual ~NodeVisitor() {}
 };
@@ -33,7 +33,7 @@ public:
     virtual void traverse(const Node& node) = 0;
 
     /** Call node accept function if one is presented. */
-    void visit(const Node* node);
+    void visit(const Node* node) {}
 
     virtual ~ConstNodeVisitor() {}
 };
