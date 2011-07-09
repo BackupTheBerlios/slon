@@ -60,7 +60,7 @@ void BulletMotionState::accept(realm::EventVisitor& ev)
     if (ev.getType() == realm::EventVisitor::WORLD_ADD) {
         rigidBody->toggleSimulation(true);
     }
-    else if (ev.getType() == realm::EventVisitor::WORLD_ADD) {
+    else if (ev.getType() == realm::EventVisitor::WORLD_REMOVE) {
         rigidBody->toggleSimulation(false);
     }
 }
