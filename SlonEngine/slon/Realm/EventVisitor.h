@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_REALM_EVENT_VISITOR_H__
 
 #include "../Scene/Node.h"
-#include "../Scene/Visitor/VisitorImpl.hpp"
+#include "../Scene/VisitorImpl.hpp"
 #include "Forward.h"
 
 namespace slon {

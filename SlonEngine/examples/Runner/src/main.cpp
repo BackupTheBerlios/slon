@@ -9,9 +9,9 @@
 #include "Input/KeyboardHandler.h"
 #include "Input/MouseHandler.h"
 #include "Realm/BVHLocation.h"
-#include "Scene/Camera/LookAtCamera.h"
-#include "Scene/Camera/ReflectCamera.h"
-#include "Scene/Light/DirectionalLight.h"
+#include "Scene/LookAtCamera.h"
+#include "Scene/ReflectCamera.h"
+#include "Scene/DirectionalLight.h"
 #include "Scene/Group.h"
 #include "Thread/StartStopTimer.h"
 #include <sgl/State.h>

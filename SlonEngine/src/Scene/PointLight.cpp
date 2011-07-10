@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Scene/Light/PointLight.h"
-#include "Scene/Visitor/TransformVisitor.h"
-#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/PointLight.h"
+#include "Scene/TransformVisitor.h"
+#include "Scene/CullVisitor.h"
 
 namespace slon {
 namespace scene {

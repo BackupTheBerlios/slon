@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_LIGHT_DIRECTIONAL_H__
 #define __SLON_ENGINE_GRAPHICS_LIGHT_DIRECTIONAL_H__
 
-#include "../Light.h"
-#include "../../Utility/math.hpp"
+#include "../Utility/math.hpp"
+#include "Light.h"
 
 namespace slon {
 namespace scene {

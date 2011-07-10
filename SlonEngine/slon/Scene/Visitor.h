@@ -1,7 +1,7 @@
-#ifndef __SLON_ENGINE_SCENE_VISITOR_VISITOR_H__
-#define __SLON_ENGINE_SCENE_VISITOR_VISITOR_H__
+#ifndef __SLON_ENGINE_SCENE_VISITOR_H__
+#define __SLON_ENGINE_SCENE_VISITOR_H__
 
-#include "../Forward.h"
+#include "Forward.h"
 #include <boost/type_traits/integral_constant.hpp>
 
 namespace slon {
@@ -42,4 +42,4 @@ public:
 } // namepsace scene
 } // namespace slon
 
-#endif // __SLON_ENGINE_SCENE_VISITOR_VISITOR_H__
+#endif // __SLON_ENGINE_SCENE_VISITOR_H__

@@ -2,7 +2,7 @@
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Graphics/Renderable/Debug/DebugDrawSkinned.h"
 #include "Scene/Skeleton.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/TransformVisitor.h"
 
 namespace slon {
 namespace graphics {

@@ -5,10 +5,10 @@
 #include "Graphics/Renderable.h"
 #include "Graphics/Renderer/ForwardRenderer.h"
 #include "Log/Logger.h"
-#include "Scene/Camera/ReflectCamera.h"
-#include "Scene/Light/DirectionalLight.h"
-#include "Scene/Light/PointLight.h"
-#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/ReflectCamera.h"
+#include "Scene/DirectionalLight.h"
+#include "Scene/PointLight.h"
+#include "Scene/CullVisitor.h"
 #include "Utility/error.hpp"
 
 DECLARE_AUTO_LOGGER("graphics.ForwardRenderer")

@@ -1,7 +1,6 @@
 #ifndef __SLON_ENGINE_SCENE_FILTER_NODE_VISITOR_H__
 #define __SLON_ENGINE_SCENE_FILTER_NODE_VISITOR_H__
 
-#include "../Forward.h"
 #include "Traverse.hpp"
 #include <boost/bind.hpp>
 

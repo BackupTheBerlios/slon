@@ -2,7 +2,7 @@
 #include "Graphics/Common.h"
 #include "Graphics/ParameterBinding.h"
 #include "Graphics/Renderable/ProjectedGrid.h"
-#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/CullVisitor.h"
 #include <sgl/Math/Matrix.hpp>
 
 using namespace std;

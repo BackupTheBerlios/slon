@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_CAMERA_LOOK_AT_CAMERA__
 #define __SLON_ENGINE_CAMERA_LOOK_AT_CAMERA__
 
+#include "../Utility/cached_value.hpp"
 #include "CommonCamera.h"
-#include "../../Utility/cached_value.hpp"
 
 namespace slon {
 namespace scene {

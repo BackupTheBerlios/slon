@@ -255,40 +255,30 @@ SET ( TARGET_REALM_DETAIL_HEADERS
 
 SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/AcceptVisitor.hpp
+    ${TARGET_HEADER_PATH}/Scene/AmbientLight.h
     ${TARGET_HEADER_PATH}/Scene/Camera.h
+    ${TARGET_HEADER_PATH}/Scene/CommonCamera.h
+    ${TARGET_HEADER_PATH}/Scene/CullVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/DirectionalLight.h
     ${TARGET_HEADER_PATH}/Scene/Entity.h
     ${TARGET_HEADER_PATH}/Scene/Forward.h
     ${TARGET_HEADER_PATH}/Scene/Geode.h
+    ${TARGET_HEADER_PATH}/Scene/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Light.h
+    ${TARGET_HEADER_PATH}/Scene/LookAtCamera.h
     ${TARGET_HEADER_PATH}/Scene/MatrixTransform.h
     ${TARGET_HEADER_PATH}/Scene/Node.h
+    ${TARGET_HEADER_PATH}/Scene/PointLight.h
     ${TARGET_HEADER_PATH}/Scene/Group.h
     ${TARGET_HEADER_PATH}/Scene/Joint.h
+    ${TARGET_HEADER_PATH}/Scene/ReflectCamera.h
     ${TARGET_HEADER_PATH}/Scene/Skeleton.h
-    #${TARGET_HEADER_PATH}/Scene/Switch.h
+    ${TARGET_HEADER_PATH}/Scene/SlaveCamera.h
     ${TARGET_HEADER_PATH}/Scene/Transform.h
-)
-
-SET ( TARGET_SCENE_CAMERA_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Camera/CommonCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/LookAtCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/ReflectCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/SlaveCamera.h
-)
-
-SET ( TARGET_SCENE_LIGHT_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Light/AmbientLight.h
-    ${TARGET_HEADER_PATH}/Scene/Light/DirectionalLight.h
-    ${TARGET_HEADER_PATH}/Scene/Light/PointLight.h
-)
-
-SET ( TARGET_SCENE_VISITOR_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Visitor/CullVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/FilterVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/TransformVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/Traverse.hpp
-    ${TARGET_HEADER_PATH}/Scene/Visitor/Visitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/VisitorImpl.hpp
+    ${TARGET_HEADER_PATH}/Scene/TransformVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Traverse.hpp
+    ${TARGET_HEADER_PATH}/Scene/Visitor.h
+    ${TARGET_HEADER_PATH}/Scene/VisitorImpl.hpp
 )
 
 SET ( TARGET_THREAD_HEADERS
@@ -379,9 +369,6 @@ SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( headers\\Realm FILES                         ${TARGET_REALM_HEADERS} )
 SOURCE_GROUP( headers\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Visitor FILES			   	   ${TARGET_SCENE_VISITOR_HEADERS} )
 SOURCE_GROUP( headers\\Thread FILES                        ${TARGET_THREAD_HEADERS} )
 SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
@@ -421,9 +408,7 @@ SET ( TARGET_HEADERS
     ${TARGET_LOG_DETAIL_HEADERS}
     ${TARGET_REALM_HEADERS}
     ${TARGET_REALM_DETAIL_HEADERS}
-    ${TARGET_SCENE_LIGHT_HEADERS}
     ${TARGET_SCENE_HEADERS}
-    ${TARGET_SCENE_VISITOR_HEADERS}
     ${TARGET_THREAD_HEADERS}
     ${TARGET_THREAD_DETAIL_HEADERS}
     ${TARGET_UTILITY_HEADERS}
@@ -648,33 +633,23 @@ SET ( TARGET_REALM_DETAIL_SOURCES
 )
 
 SET ( TARGET_SCENE_SOURCES
+	Scene/AmbientLight.cpp
+    Scene/CullVisitor.cpp
+	Scene/DirectionalLight.cpp
     Scene/Entity.cpp
+    Scene/CommonCamera.cpp
     Scene/Group.cpp
     Scene/Joint.cpp
+    Scene/LookAtCamera.cpp
     Scene/MatrixTransform.cpp
     Scene/Node.cpp
+	Scene/PointLight.cpp
+    Scene/ReflectCamera.cpp
+    Scene/SlaveCamera.cpp
     Scene/Skeleton.cpp
-    #Scene/Switch.cpp
     Scene/Transform.cpp
-)
-
-SET ( TARGET_SCENE_CAMERA_SOURCES
-    Scene/Camera/CommonCamera.cpp
-    Scene/Camera/LookAtCamera.cpp
-    Scene/Camera/ReflectCamera.cpp
-    Scene/Camera/SlaveCamera.cpp
-)
-
-SET ( TARGET_SCENE_LIGHT_SOURCES
-    Scene/Light/AmbientLight.cpp
-    Scene/Light/DirectionalLight.cpp
-    Scene/Light/PointLight.cpp
-)
-
-SET ( TARGET_SCENE_VISITOR_SOURCES
-    Scene/Visitor/CullVisitor.cpp
-    Scene/Visitor/TransformVisitor.cpp
-    Scene/Visitor/Visitor.cpp
+	Scene/TransformVisitor.cpp
+	Scene/Visitor.cpp
 )
 
 SET ( TARGET_THREAD_SOURCES
@@ -732,9 +707,6 @@ SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( sources\\Realm FILES                         ${TARGET_REALM_SOURCES} )
 SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Visitor FILES                ${TARGET_SCENE_VISITOR_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -772,9 +744,6 @@ SET ( TARGET_SOURCES
     ${TARGET_REALM_SOURCES}
     ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
-    ${TARGET_SCENE_CAMERA_SOURCES}
-    ${TARGET_SCENE_LIGHT_SOURCES}
-    ${TARGET_SCENE_VISITOR_SOURCES}
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}

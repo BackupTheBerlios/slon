@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Scene/Camera/LookAtCamera.h"
+#include "Scene/LookAtCamera.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Quaternion.hpp>
 #include <sgl/Math/Utility.hpp>

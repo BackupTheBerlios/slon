@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Scene/Camera/SlaveCamera.h"
+#include "Scene/SlaveCamera.h"
 
 using namespace slon;
 using namespace scene;

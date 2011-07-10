@@ -1,7 +1,7 @@
 #ifndef SLON_ENGINE_GRAPHICS_LIGHT_PHONG_LIGHT_H
 #define SLON_ENGINE_GRAPHICS_LIGHT_PHONG_LIGHT_H
 
-#include "../Light.h"
+#include "Light.h"
 
 namespace slon {
 namespace scene {

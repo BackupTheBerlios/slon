@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Scene/Entity.h"
 #include "Scene/Skeleton.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 using namespace slon;

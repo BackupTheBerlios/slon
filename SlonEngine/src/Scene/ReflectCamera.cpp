@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Scene/Camera/ReflectCamera.h"
+#include "Scene/ReflectCamera.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
 using namespace slon;

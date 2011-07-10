@@ -1,8 +1,8 @@
 #ifndef __SLON_ENGINE_SCENE_VISITORS_TRAVERSE_HPP_
 #define __SLON_ENGINE_SCENE_VISITORS_TRAVERSE_HPP_
 
-#include "../../Utility/if_then_else.hpp"
-#include "../Group.h"
+#include "../Utility/if_then_else.hpp"
+#include "Group.h"
 #include <boost/type_traits/is_convertible.hpp>
 
 namespace slon {

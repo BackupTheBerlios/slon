@@ -3,8 +3,8 @@
 #include "Graphics/Renderable/DebugMesh.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Common.h"
-#include "Scene/Visitor/CullVisitor.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/CullVisitor.h"
+#include "Scene/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace slon {

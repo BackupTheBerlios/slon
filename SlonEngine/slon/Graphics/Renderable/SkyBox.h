@@ -3,7 +3,6 @@
 
 #include <sgl/TextureCube.h>
 #include "../../Scene/Geode.h"
-#include "../../Scene/Visitor/CullVisitor.h"
 #include "../../Utility/math.hpp"
 #include "../Detail/AttributeTable.h"
 #include "../Effect/SkyBoxEffect.h"

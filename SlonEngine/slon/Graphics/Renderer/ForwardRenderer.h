@@ -3,7 +3,7 @@
 
 #include <sgl/Device.h>
 #include <vector>
-#include "../../Scene/Visitor/CullVisitor.h"
+#include "../../Scene/CullVisitor.h"
 #include "../Detail/Utility.h"
 #include "../Effect/Pass.h"
 #include "../Renderer.h"

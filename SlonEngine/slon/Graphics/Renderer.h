@@ -5,7 +5,7 @@
 #include "../Realm/World.h"
 #include "../Scene/Camera.h"
 #include "../Scene/Light.h"
-#include "../Scene/Visitor/Visitor.h"
+#include "../Scene/Visitor.h"
 #include "Effect.h"
 
 namespace slon {

@@ -14,9 +14,9 @@
 #include "Log/LogVisitor.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Scene/Skeleton.h"
-#include "Scene/Visitor/CullVisitor.h"
-#include "Scene/Visitor/FilterVisitor.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/CullVisitor.h"
+#include "Scene/FilterVisitor.h"
+#include "Scene/TransformVisitor.h"
 #include "Utility/URI/file_uri.hpp"
 
 #ifdef SLON_ENGINE_USE_PHYSICS

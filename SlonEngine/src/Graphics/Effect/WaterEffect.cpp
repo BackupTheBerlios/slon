@@ -9,7 +9,7 @@
 #include "Graphics/PostProcess/Common.h"
 #include "Graphics/Renderer/ForwardRenderer.h"
 #include "Log/Logger.h"
-#include "Scene/Light/DirectionalLight.h"
+#include "Scene/DirectionalLight.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
 //#define DEBUG_WATER_PERFORMANCE

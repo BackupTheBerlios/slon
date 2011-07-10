@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Scene/Camera/CommonCamera.h"
+#include "Scene/CommonCamera.h"
 #include <boost/thread/locks.hpp>
 
 using namespace slon;

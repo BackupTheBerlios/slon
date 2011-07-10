@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Scene/Light/DirectionalLight.h"
-#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/DirectionalLight.h"
+#include "Scene/CullVisitor.h"
 
 namespace slon {
 namespace scene {

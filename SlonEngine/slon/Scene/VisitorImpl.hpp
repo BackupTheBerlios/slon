@@ -1,7 +1,7 @@
-#ifndef __SLON_ENGINE_SCENE_VISITOR_VISITOR_IMPL_HPP__
-#define __SLON_ENGINE_SCENE_VISITOR_VISITOR_IMPL_HPP__
+#ifndef __SLON_ENGINE_SCENE_VISITOR_IMPL_HPP__
+#define __SLON_ENGINE_SCENE_VISITOR_IMPL_HPP__
 
-#include "../AcceptVisitor.hpp"
+#include "AcceptVisitor.hpp"
 #include "Traverse.hpp"
 #include "Visitor.h"
 #include <boost/static_assert.hpp>
@@ -131,4 +131,4 @@ public:
 } // namepsace scene
 } // namespace slon
 
-#endif // __SLON_ENGINE_SCENE_VISITOR_VISITOR_IMPL_HPP__
+#endif // __SLON_ENGINE_SCENE_VISITOR_IMPL_HPP__
