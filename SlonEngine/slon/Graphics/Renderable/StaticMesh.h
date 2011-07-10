@@ -1,7 +1,7 @@
 #ifndef SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_H
 #define SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_H
 
-#include "../../Scene/Geode.h"
+#include "../../Scene/Entity.h"
 #include "Forward.h"
 #include "Mesh.h"
 
@@ -10,10 +10,10 @@ namespace graphics {
 
 /** Mesh class represents renderable 3d object */
 class StaticMesh :
-    public scene::Geode
+    public scene::Entity
 {
 public:
-    typedef scene::Geode base_type;
+    typedef scene::Entity base_type;
 
 public:
 	StaticMesh();

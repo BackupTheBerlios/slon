@@ -6,7 +6,7 @@
 #include <sgl/IndexBuffer.h>
 #include <sgl/VertexBuffer.h>
 #include <sgl/Program.h>
-#include "../../Scene/Geode.h"
+#include "../../Scene/Entity.h"
 #include "../Effect/DebugEffect.h"
 #include "../Effect/DebugTextEffect.h"
 #include "../Renderable.h"
@@ -16,7 +16,7 @@ namespace graphics {
 
 /** Debug mesh provides basic functionality for drawing debug information */
 class DebugMesh :
-    public scene::Geode
+    public scene::Entity
 {
 private:
     typedef Renderable renderable;

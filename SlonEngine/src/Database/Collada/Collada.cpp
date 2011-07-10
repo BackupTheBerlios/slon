@@ -1254,7 +1254,7 @@ namespace {
 	{
 	private:
 		typedef std::set<std::string>									string_set;
-		typedef std::map<const scene::Geode*, collada_geometry_ptr>		geode_geometry_map;
+		typedef std::map<const scene::Entity*, collada_geometry_ptr>	geode_geometry_map;
 		typedef std::map<const graphics::Effect*, collada_material_ptr>	effect_material_map;
 
 		std::string getUniqueId(const std::string& name)
@@ -1273,7 +1273,7 @@ namespace {
 			return id;
 		}
 
-		const graphics::Mesh* getMesh(const scene::Geode* geode)
+		const graphics::Mesh* getMesh(const scene::Entity* geode)
 		{
 			if ( const graphics::StaticMesh* mesh = dynamic_cast<const graphics::StaticMesh*>(geode) ) {
 				return mesh->getMesh();
@@ -1286,7 +1286,7 @@ namespace {
 		}
 
 	public:
-		collada_geometry_ptr createGeometry(const scene::Geode* geode)
+		collada_geometry_ptr createGeometry(const scene::Entity* geode)
 		{
 			geode_geometry_map::iterator geomIter = geometries.find(geode);
 			if ( geomIter != geometries.end() ) {
@@ -1440,7 +1440,7 @@ namespace {
 			return materialInstance;
 		}
 
-		collada_bind_material_ptr createBindMaterial(const scene::Geode* geode)
+		collada_bind_material_ptr createBindMaterial(const scene::Entity* geode)
 		{
 			scene::CullVisitor visitor;
 			geode->accept(visitor);
@@ -1455,7 +1455,7 @@ namespace {
 			}
 		}
 
-		collada_instance_geometry_ptr createGeometryInstance(const scene::Geode* geode)
+		collada_instance_geometry_ptr createGeometryInstance(const scene::Entity* geode)
 		{
 			collada_instance_geometry_ptr geometry(new collada_instance_geometry);
 			geometry->geometry = createGeometry(geode);
@@ -1468,7 +1468,7 @@ namespace {
 			switch ( entity->getNodeType() )
 			{
 			case scene::Entity::GEODE:
-				cNode.geometries.push_back( createGeometryInstance( static_cast<const scene::Geode*>(entity) ) );
+				cNode.geometries.push_back( createGeometryInstance(entity) );
 				break;
 
 			default:

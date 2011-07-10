@@ -2,7 +2,7 @@
 #define WATER_SIMULATION_CAMERA_ALIGNED_WATER_SURFACE_H
 
 #include "../../Scene/Camera.h"
-#include "../../Scene/Geode.h"
+#include "../../Scene/Entity.h"
 #include "../../Utility/math.hpp"
 #include "../Effect.h"
 #include "../Renderable.h"
@@ -12,11 +12,11 @@ namespace slon {
 namespace graphics {
 
 class ProjectedGrid :
-    public scene::Geode,
+    public scene::Entity,
     public Renderable
 {
 public:
-    typedef Geode base_type;
+    typedef Entity base_type;
 
 public:
     /** Create projective grid. Setups 128x512 grid

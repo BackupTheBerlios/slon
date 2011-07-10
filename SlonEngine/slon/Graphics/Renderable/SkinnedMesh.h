@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_RENDERABLE_SKINNED_MESH_H__
 
 #include <sgl/Math/Containers.hpp>
-#include "../../Scene/Geode.h"
+#include "../../Scene/Entity.h"
 #include "Mesh.h"
 
 namespace slon {
@@ -26,10 +26,10 @@ namespace graphics {
  * all visitors, except CullVisitor to the its skeleton.
  */
 class SkinnedMesh :
-    public scene::Geode
+    public scene::Entity
 {
 public:
-    typedef scene::Geode base_type;
+    typedef scene::Entity base_type;
 
     typedef std::vector<unsigned>   uint_vector;
     typedef std::vector<int>        int_vector;

@@ -2,7 +2,7 @@
 #define SLON_ENGINE_RENDERABLE_SKY_BOX_H
 
 #include <sgl/TextureCube.h>
-#include "../../Scene/Geode.h"
+#include "../../Scene/Entity.h"
 #include "../../Utility/math.hpp"
 #include "../Detail/AttributeTable.h"
 #include "../Effect/SkyBoxEffect.h"
@@ -12,7 +12,7 @@ namespace slon {
 namespace graphics {
 
 class SkyBox :
-    public scene::Geode,
+    public scene::Entity,
     public Renderable
 {
 public:

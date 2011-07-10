@@ -262,7 +262,6 @@ SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/DirectionalLight.h
     ${TARGET_HEADER_PATH}/Scene/Entity.h
     ${TARGET_HEADER_PATH}/Scene/Forward.h
-    ${TARGET_HEADER_PATH}/Scene/Geode.h
     ${TARGET_HEADER_PATH}/Scene/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Light.h
     ${TARGET_HEADER_PATH}/Scene/LookAtCamera.h
