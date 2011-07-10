@@ -39,28 +39,28 @@ void TransformVisitor::traverse(Node& node)
         if (type & Node::JOINT_BIT) 
         {
             visitJoint( static_cast<Joint&>(*tn.node) );
-            base_type::visit(tn.node);
+            base_type::visit(*tn.node);
         }
         else if (type & Node::TRANSFORM_BIT) 
         {
             visitTransform( static_cast<Transform&>(*tn.node) );
-            base_type::visit(tn.node);
+            base_type::visit(*tn.node);
         }
         else if (type & Node::GROUP_BIT) 
         {
             visitGroup( static_cast<Group&>(*tn.node) );
-            base_type::visit(tn.node);
+            base_type::visit(*tn.node);
         }
         else if (type & Node::SKELETON_BIT) 
         {
             visitSkeleton( static_cast<Skeleton&>(*tn.node) );
-            base_type::visit(tn.node);
+            base_type::visit(*tn.node);
         }
         else if (type & Node::ENTITY_BIT) {
             visitEntity( static_cast<Entity&>(*tn.node) );
         }
         else {
-            base_type::visit(tn.node);
+            base_type::visit(*tn.node);
         }
     }
     currentNode = 0;

@@ -10,6 +10,18 @@
 namespace slon {
 namespace scene {
 
+template<typename VisitorT>
+struct visit_func
+{
+    visit_func(VisitorT* visitor_)
+    :   visitor(visitor_)
+    {}
+
+    void operator () (typename VisitorT::node_type& node) { visitor->visit(node); }
+
+    VisitorT* visitor;
+};
+
 /** Implement visitor accept functionality. */
 template<typename Derived, typename Base>
 class VisitorImpl :
@@ -20,36 +32,96 @@ public:
     typedef Base                        base_type;
     typedef typename Base::node_type    node_type;
 
+    // tags
+    typedef boost::true_type            accept_tag;
+
 public:
     /// Traverse using DFS, call visit func on nodes, override if you wish to change default behaviour
     void traverse(node_type& node)
     {
-        struct visit_func
-        {
-            visit_func(Derived& visitor_)
-            :   visitor(visitor_)
-            {}
-        
-            void operator () (node_type& node) { visitor.visit(&node); }
-
-            Derived& visitor;
-        };
-
-        traverseDFS(node, visit_func(static_cast<Derived&>(*this)));
+        traverseDFS(node, visit_func<VisitorImpl>(this));
     }
 
     /** Call node accept function if one is presented. Then try to call accept function using reference to base visitor class. */
-    void visit(node_type* node)
+    void visit(node_type& node)
     {
         typedef typename if_then_else< boost::is_const<node_type>::value,
                                        const ConstAcceptVisitor<Derived>,
                                        AcceptVisitor<Derived> >::type    accept_visitor_type;
 
-        if ( accept_visitor_type* accNode = dynamic_cast<accept_visitor_type*>(node) ) {
+        if ( accept_visitor_type* accNode = dynamic_cast<accept_visitor_type*>(&node) ) {
             accNode->accept( static_cast<Derived&>(*this) );
         }
         else {
             base_type::visit(node);
+        }
+    }
+
+    virtual ~VisitorImpl() {}
+};
+
+/** Implement visitor accept functionality. */
+template<typename Derived>
+class VisitorImpl<Derived, Visitor> :
+    public Visitor
+{
+public:
+    typedef Visitor                         base_type;
+    typedef typename Visitor::node_type     node_type;
+
+    // tags
+    typedef boost::true_type                accept_tag;
+
+public:
+    /// Traverse using DFS, call visit func on nodes, override if you wish to change default behaviour
+    void traverse(node_type& node)
+    {
+        traverseDFS(node, visit_func<VisitorImpl>(this));
+    }
+
+    /** Call node accept function if one is presented. Then try to call accept function using reference to base visitor class. */
+    void visit(node_type& node)
+    {
+        typedef typename if_then_else< boost::is_const<node_type>::value,
+                                       const ConstAcceptVisitor<Derived>,
+                                       AcceptVisitor<Derived> >::type    accept_visitor_type;
+
+        if ( accept_visitor_type* accNode = dynamic_cast<accept_visitor_type*>(&node) ) {
+            accNode->accept( static_cast<Derived&>(*this) );
+        }
+    }
+
+    virtual ~VisitorImpl() {}
+};
+
+/** Implement visitor accept functionality. */
+template<typename Derived>
+class VisitorImpl<Derived, ConstVisitor> :
+    public ConstVisitor
+{
+public:
+    typedef ConstVisitor                        base_type;
+    typedef typename ConstVisitor::node_type    node_type;
+
+    // tags
+    typedef boost::true_type                    accept_tag;
+
+public:
+    /// Traverse using DFS, call visit func on nodes, override if you wish to change default behaviour
+    void traverse(node_type& node)
+    {
+        traverseDFS(node, visit_func<VisitorImpl>(this));
+    }
+
+    /** Call node accept function if one is presented. Then try to call accept function using reference to base visitor class. */
+    void visit(node_type& node)
+    {
+        typedef typename if_then_else< boost::is_const<node_type>::value,
+                                       const ConstAcceptVisitor<Derived>,
+                                       AcceptVisitor<Derived> >::type    accept_visitor_type;
+
+        if ( accept_visitor_type* accNode = dynamic_cast<accept_visitor_type*>(&node) ) {
+            accNode->accept( static_cast<Derived&>(*this) );
         }
     }
 

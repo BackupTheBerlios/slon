@@ -27,7 +27,7 @@ void CullVisitor::traverse(const Node& node)
                 }
             }
             
-            base_type::visit(traversed);
+            base_type::visit(*traversed);
         }
     }
 }

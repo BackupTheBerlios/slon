@@ -12,12 +12,12 @@ class Visitor
 public:
     typedef Node node_type;
 
+    // tags
+    typedef boost::false_type accept_tag;
+
 public:
     /** Perform traverse. */
     virtual void traverse(node_type& node) = 0;
-
-    /** Call node accept function if one is presented. */
-    void visit(node_type* node) {}
 
     virtual ~Visitor() {}
 };
@@ -28,12 +28,12 @@ class ConstVisitor
 public:
     typedef const Node node_type;
 
+    // tags
+    typedef boost::false_type accept_tag;
+
 public:
     /** Perform traverse. */
     virtual void traverse(node_type& node) = 0;
-
-    /** Call node accept function if one is presented. */
-    void visit(node_type* node) {}
 
     virtual ~ConstVisitor() {}
 };
