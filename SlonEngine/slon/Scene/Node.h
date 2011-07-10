@@ -16,7 +16,6 @@ namespace scene {
 class Node
 :   public Referenced
 ,   public database::Serializable
-,   public ConstAcceptVisitor<log::LogVisitor>
 {
 friend class Group;
 public:

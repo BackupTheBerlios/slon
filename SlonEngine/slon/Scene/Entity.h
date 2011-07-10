@@ -13,18 +13,18 @@ namespace scene {
  * game world.
  */
 class Entity :
-    public Node,
-    public AcceptVisitor<TransformVisitor>,
-    public ConstAcceptVisitor<CullVisitor>
+    public Node
 {
 public:
     // Override Node
     TYPE getNodeType() const { return ENTITY; }
     void accept(log::LogVisitor& visitor) const;
 
-    // Override AcceptVisitor
-    void accept(TransformVisitor& /*visitor*/)  {}
-    void accept(CullVisitor& /*visitor*/) const {}
+    /** Capture transform from visitor. */
+    virtual void accept(TransformVisitor& /*visitor*/)  {}
+
+    /** Add lights,renderables,cameras to cull visitor. */
+    virtual void accept(CullVisitor& /*visitor*/) const {}
 
     /** Get bounds of the entity */
     virtual const math::AABBf& getBounds() const = 0;

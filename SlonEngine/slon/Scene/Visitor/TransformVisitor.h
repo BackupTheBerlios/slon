@@ -11,7 +11,7 @@ namespace scene {
 
 /** Visits transformation nodes, performing worldToLocal, localToWorld matrices, AABB calculation. */
 class TransformVisitor :
-    public VisitorImpl<TransformVisitor, Visitor>
+    public Visitor
 {
 private:
     struct traverse_node
@@ -26,8 +26,6 @@ private:
         Transform*  transform;
         bool        dirty;
     };
-
-    typedef VisitorImpl<TransformVisitor, Visitor> base_type;
 
 public:
     TransformVisitor();
