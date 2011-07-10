@@ -5,7 +5,7 @@
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
-#include "Graphics/Renderable/StaticMesh.h"
+#include "Graphics/StaticMesh.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/DefaultWorld.h"
