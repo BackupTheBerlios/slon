@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_SCENE_VISITOR_VISITOR_H__
 
 #include "../Forward.h"
+#include <boost/type_traits/integral_constant.hpp>
 
 namespace slon {
 namespace scene {
