@@ -271,10 +271,8 @@ SET ( TARGET_SCENE_HEADERS
 
 SET ( TARGET_SCENE_CAMERA_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Camera/CommonCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/CopyCamera.h
     ${TARGET_HEADER_PATH}/Scene/Camera/LookAtCamera.h
     ${TARGET_HEADER_PATH}/Scene/Camera/ReflectCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/RenderTargetCamera.h
     ${TARGET_HEADER_PATH}/Scene/Camera/SlaveCamera.h
 )
 
@@ -662,10 +660,8 @@ SET ( TARGET_SCENE_SOURCES
 
 SET ( TARGET_SCENE_CAMERA_SOURCES
     Scene/Camera/CommonCamera.cpp
-    Scene/Camera/CopyCamera.cpp
     Scene/Camera/LookAtCamera.cpp
     Scene/Camera/ReflectCamera.cpp
-    Scene/Camera/RenderTargetCamera.cpp
     Scene/Camera/SlaveCamera.cpp
 )
 
