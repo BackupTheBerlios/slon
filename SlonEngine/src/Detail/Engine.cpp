@@ -10,7 +10,7 @@
 #include "Realm/BVHLocation.h"
 #include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
-#include "Scene/Visitors/TransformVisitor.h"
+#include "Scene/Visitor/TransformVisitor.h"
 #include "Utility/error.hpp"
 #include <boost/filesystem.hpp>
 #include <SDL.h>

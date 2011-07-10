@@ -3,7 +3,7 @@
 #include "Detail/Engine.h"
 #include "Realm/DefaultWorld.h"
 #include "Realm/EventVisitor.h"
-#include "Scene/Visitors/NodeVisitor.h"
+#include "Scene/Visitor/Visitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
 #include <boost/thread/locks.hpp>
@@ -127,17 +127,17 @@ bool DefaultWorld::haveLocation(const location_ptr& location) const
     return std::find( locations.begin(), locations.end(), location ) != locations.end();
 }
 
-void DefaultWorld::visit(const body_variant& body, scene::NodeVisitor& nv)
+void DefaultWorld::visit(const body_variant& body, scene::Visitor& nv)
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void DefaultWorld::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visit(const body_variant& body, scene::ConstVisitor& nv) const
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::Visitor& nv)
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -153,7 +153,7 @@ void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::NodeVisito
 	}
 }
 
-void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {

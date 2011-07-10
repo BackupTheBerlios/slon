@@ -254,7 +254,7 @@ SET ( TARGET_REALM_DETAIL_HEADERS
 )
 
 SET ( TARGET_SCENE_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/AcceptVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/AcceptVisitor.hpp
     ${TARGET_HEADER_PATH}/Scene/Camera.h
     ${TARGET_HEADER_PATH}/Scene/Entity.h
     ${TARGET_HEADER_PATH}/Scene/Forward.h
@@ -267,7 +267,6 @@ SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Skeleton.h
     #${TARGET_HEADER_PATH}/Scene/Switch.h
     ${TARGET_HEADER_PATH}/Scene/Transform.h
-    ${TARGET_HEADER_PATH}/Scene/Visitable.h
 )
 
 SET ( TARGET_SCENE_CAMERA_HEADERS
@@ -285,12 +284,13 @@ SET ( TARGET_SCENE_LIGHT_HEADERS
     ${TARGET_HEADER_PATH}/Scene/Light/PointLight.h
 )
 
-SET ( TARGET_SCENE_VISITORS_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Visitors/CullVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/FilterVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/NodeVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/TransformVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitors/Traverse.hpp
+SET ( TARGET_SCENE_VISITOR_HEADERS
+    ${TARGET_HEADER_PATH}/Scene/Visitor/CullVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitor/FilterVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitor/TransformVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitor/Traverse.hpp
+    ${TARGET_HEADER_PATH}/Scene/Visitor/Visitor.h
+    ${TARGET_HEADER_PATH}/Scene/Visitor/VisitorImpl.hpp
 )
 
 SET ( TARGET_THREAD_HEADERS
@@ -383,7 +383,7 @@ SOURCE_GROUP( headers\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_HEADERS} )
 SOURCE_GROUP( headers\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Visitors FILES			   ${TARGET_SCENE_VISITORS_HEADERS} )
+SOURCE_GROUP( headers\\Scene\\Visitor FILES			   	   ${TARGET_SCENE_VISITOR_HEADERS} )
 SOURCE_GROUP( headers\\Thread FILES                        ${TARGET_THREAD_HEADERS} )
 SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
@@ -425,7 +425,7 @@ SET ( TARGET_HEADERS
     ${TARGET_REALM_DETAIL_HEADERS}
     ${TARGET_SCENE_LIGHT_HEADERS}
     ${TARGET_SCENE_HEADERS}
-    ${TARGET_SCENE_VISITORS_HEADERS}
+    ${TARGET_SCENE_VISITOR_HEADERS}
     ${TARGET_THREAD_HEADERS}
     ${TARGET_THREAD_DETAIL_HEADERS}
     ${TARGET_UTILITY_HEADERS}
@@ -675,10 +675,10 @@ SET ( TARGET_SCENE_LIGHT_SOURCES
     Scene/Light/PointLight.cpp
 )
 
-SET ( TARGET_SCENE_VISITORS_SOURCES
-    Scene/Visitors/CullVisitor.cpp
-    Scene/Visitors/NodeVisitor.cpp
-    Scene/Visitors/TransformVisitor.cpp
+SET ( TARGET_SCENE_VISITOR_SOURCES
+    Scene/Visitor/CullVisitor.cpp
+    Scene/Visitor/TransformVisitor.cpp
+    Scene/Visitor/Visitor.cpp
 )
 
 SET ( TARGET_THREAD_SOURCES
@@ -738,7 +738,7 @@ SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_SOURCES} )
 SOURCE_GROUP( sources\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Visitors FILES               ${TARGET_SCENE_VISITORS_SOURCES} )
+SOURCE_GROUP( sources\\Scene\\Visitor FILES                ${TARGET_SCENE_VISITOR_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -778,7 +778,7 @@ SET ( TARGET_SOURCES
     ${TARGET_SCENE_SOURCES}
     ${TARGET_SCENE_CAMERA_SOURCES}
     ${TARGET_SCENE_LIGHT_SOURCES}
-    ${TARGET_SCENE_VISITORS_SOURCES}
+    ${TARGET_SCENE_VISITOR_SOURCES}
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}

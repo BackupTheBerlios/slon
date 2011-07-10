@@ -27,7 +27,7 @@ public:
     void        deserialize(database::IArchive& ar);
 
 	template<typename Body>
-	void visit(const Body& body, scene::NodeVisitor& nv)
+	void visit(const Body& body, scene::Visitor& nv)
 	{
 		// visit infinite objects
 		for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -44,7 +44,7 @@ public:
 	}
 
 	template<typename Body>
-	void visit(const Body& body, scene::ConstNodeVisitor& nv) const
+	void visit(const Body& body, scene::ConstVisitor& nv) const
 	{
 		// visit infinite objects
 		for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -65,10 +65,10 @@ public:
     bool removeLocation(const location_ptr& location);
     bool haveLocation(const location_ptr& location) const;
 		
-    void visit(const body_variant& body, scene::NodeVisitor& nv);
-    void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
-    void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
-    void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
+    void visit(const body_variant& body, scene::Visitor& nv);
+    void visit(const body_variant& body, scene::ConstVisitor& nv) const;
+    void visitVisible(const math::Frustumf& frustum, scene::Visitor& nv);
+    void visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const;
 
     bool removeInfiniteNode(const scene::node_ptr& node);
     void addInfiniteNode(const scene::node_ptr& node);

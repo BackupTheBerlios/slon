@@ -14,10 +14,9 @@
 #include "Log/LogVisitor.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Scene/Skeleton.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/DFSNodeVisitor.h"
-#include "Scene/Visitors/FilterVisitor.h"
-#include "Scene/Visitors/TransformVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/Visitor/FilterVisitor.h"
+#include "Scene/Visitor/TransformVisitor.h"
 #include "Utility/URI/file_uri.hpp"
 
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -97,7 +96,7 @@ namespace {
     };
 
     class find_transform_visitor :
-        public scene::FilterVisitor<scene::NodeVisitor, scene::Joint, scene::MatrixTransform>
+        public scene::FilterVisitor<scene::Visitor, scene::Joint, scene::MatrixTransform>
     {
     public:
         find_transform_visitor(hash_string name_)
@@ -889,7 +888,7 @@ namespace {
 
 #ifdef SLON_ENGINE_USE_PHYSICS
     class DecomposeTransformVisitor :
-        public scene::FilterVisitor<scene::NodeVisitor, physics::RigidBodyTransform>
+        public scene::FilterVisitor<scene::Visitor, physics::RigidBodyTransform>
 	{
 	public:
         DecomposeTransformVisitor(scene::Node& node)

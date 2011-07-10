@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Scene/Entity.h"
 #include "Scene/Group.h"
-#include "Scene/Visitors/CullVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
 
 namespace slon {
 namespace scene {

@@ -43,25 +43,25 @@ public:
      * @param body - body which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visit(const body_variant& body, scene::NodeVisitor& nv) = 0;
+    virtual void visit(const body_variant& body, scene::Visitor& nv) = 0;
 
     /** Visit objects intersecting body.
      * @param body - body which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const = 0;
+    virtual void visit(const body_variant& body, scene::ConstVisitor& nv) const = 0;
 	
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv) = 0;
+    virtual void visitVisible(const math::Frustumf& frustum, scene::Visitor& nv) = 0;
 
     /** Visit objects visible in frustum.
      * @param frustum - frustum which intersects objects.
      * @param cb - visitor.
      */
-    virtual void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const = 0;
+    virtual void visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const = 0;
 
     /** Grant thread read access to the location.
      * @return lock object. Lock is freed whether object is deleted.

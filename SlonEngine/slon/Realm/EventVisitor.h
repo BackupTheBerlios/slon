@@ -2,8 +2,7 @@
 #define __SLON_ENGINE_REALM_EVENT_VISITOR_H__
 
 #include "../Scene/Node.h"
-#include "../Scene/Visitors/NodeVisitor.h"
-#include "../Scene/Visitors/Traverse.hpp"
+#include "../Scene/Visitor/VisitorImpl.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -12,7 +11,7 @@ namespace realm {
 /** Event visitor notifies scene graph nodes about being added/removed to/form world.
  */
 class EventVisitor :
-    public scene::NodeVisitorImpl<EventVisitor, scene::NodeVisitor>
+    public scene::VisitorImpl<EventVisitor, scene::Visitor>
 {
 public:
     enum TYPE
@@ -35,9 +34,6 @@ public:
     {
         traverse(node);
     }
-
-    // Override NodeVisitor
-    void traverse(scene::Node& node) { scene::traverseVisitorDFS(*this, node); }
 
     /** Get type of the event. */
     TYPE getType() const { return type; }

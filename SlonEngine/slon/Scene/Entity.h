@@ -3,8 +3,8 @@
 
 #include <sgl/Math/AABB.hpp>
 #include "Group.h"
-#include "Visitors/CullVisitor.h"
-#include "Visitors/TransformVisitor.h"
+#include "Visitor/CullVisitor.h"
+#include "Visitor/TransformVisitor.h"
 
 namespace slon {
 namespace scene {
