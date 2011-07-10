@@ -2,8 +2,9 @@
 #include "Database/Detail/UtilitySerialization.h"
 #include "Graphics/Renderable/Debug/DebugDrawCommon.h"
 #include "Realm/BVHLocation.h"
+#include "Realm/EventVisitor.h"
 #include "Realm/World.h"
-#include "Scene/Visitors/TransformVisitor.h"
+#include "Scene/Visitor/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace {
@@ -162,23 +163,23 @@ const math::AABBf& BVHLocation::getBounds() const
     return aabb;
 }
 
-void BVHLocation::visit(const body_variant& body, scene::NodeVisitor& nv)
+void BVHLocation::visit(const body_variant& body, scene::Visitor& nv)
 {
 	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
+void BVHLocation::visit(const body_variant& body, scene::ConstVisitor& nv) const
 {
 	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::Visitor& nv)
 {
 	visit(frustum, nv);
     DEBUG_VISIT_TREE(debugMesh, nv);
 }
 
-void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
+void BVHLocation::visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const
 {
 	visit(frustum, nv);
     DEBUG_VISIT_TREE(debugMesh, nv);
@@ -228,6 +229,8 @@ void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
 
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
+
+    EventVisitor ev(EventVisitor::WORLD_ADD, 0, this, *node);
 }
 
 bool BVHLocation::remove(const scene::node_ptr& node)
@@ -249,6 +252,8 @@ bool BVHLocation::remove(const scene::node_ptr& node)
 
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
+    
+    EventVisitor ev(EventVisitor::WORLD_REMOVE, 0, this, *node);
     return true;
 }
 

@@ -55,23 +55,23 @@ public:
     const math::AABBf& getBounds() const;
 	
 	template<typename Body>
-	void visit(const Body& body, scene::NodeVisitor& nv)
+	void visit(const Body& body, scene::Visitor& nv)
 	{
 		perform_on_leaves(staticAABBTree, body, visit_node(nv));
 		perform_on_leaves(dynamicAABBTree, body, visit_node(nv));
 	}
 	
 	template<typename Body>
-	void visit(const Body& body, scene::ConstNodeVisitor& nv) const
+	void visit(const Body& body, scene::ConstVisitor& nv) const
 	{
 		perform_on_leaves(staticAABBTree, body, visit_node(nv));
 		perform_on_leaves(dynamicAABBTree, body, visit_node(nv));
 	}
 
-    void visit(const body_variant& body, scene::NodeVisitor& nv);
-    void visit(const body_variant& body, scene::ConstNodeVisitor& nv) const;
-    void visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv);
-    void visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const;
+    void visit(const body_variant& body, scene::Visitor& nv);
+    void visit(const body_variant& body, scene::ConstVisitor& nv) const;
+    void visitVisible(const math::Frustumf& frustum, scene::Visitor& nv);
+    void visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const;
 	
 	bool have(const scene::node_ptr& node) const;
     void add(const scene::node_ptr& node, bool dynamic);

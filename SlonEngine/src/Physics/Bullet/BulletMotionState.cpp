@@ -55,5 +55,15 @@ void BulletMotionState::setWorldTransform(const btTransform &worldTrans)
     update();
 }
 
+void BulletMotionState::accept(realm::EventVisitor& ev)
+{
+    if (ev.getType() == realm::EventVisitor::WORLD_ADD) {
+        rigidBody->toggleSimulation(true);
+    }
+    else if (ev.getType() == realm::EventVisitor::WORLD_REMOVE) {
+        rigidBody->toggleSimulation(false);
+    }
+}
+
 } // namespace physics
 } // namespace slon

@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "Graphics/Renderable/SkinnedMesh.h"
-#include "Scene/Visitors/DFSNodeVisitor.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/FilterVisitor.h"
-#include "Scene/Visitors/TransformVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/Visitor/FilterVisitor.h"
+#include "Scene/Visitor/TransformVisitor.h"
 #include "Scene/Skeleton.h"
 #include "Utility/error.hpp"
 #include "Utility/math.hpp"
@@ -16,7 +15,7 @@ namespace {
     using namespace graphics;
 
     struct gather_joints_visitor :
-        public scene::FilterVisitor<scene::NodeVisitor, scene::Joint>
+        public scene::FilterVisitor<scene::Visitor, scene::Joint>
     {
         gather_joints_visitor(SkinnedMesh&                  skinnedMesh_,
                               SkinnedMesh::joint_vector&    joints_)

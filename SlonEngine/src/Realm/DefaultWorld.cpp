@@ -2,7 +2,8 @@
 #include "Database/Archive.h"
 #include "Detail/Engine.h"
 #include "Realm/DefaultWorld.h"
-#include "Scene/Visitors/NodeVisitor.h"
+#include "Realm/EventVisitor.h"
+#include "Scene/Visitor/Visitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
 #include <boost/thread/locks.hpp>
@@ -126,17 +127,17 @@ bool DefaultWorld::haveLocation(const location_ptr& location) const
     return std::find( locations.begin(), locations.end(), location ) != locations.end();
 }
 
-void DefaultWorld::visit(const body_variant& body, scene::NodeVisitor& nv)
+void DefaultWorld::visit(const body_variant& body, scene::Visitor& nv)
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void DefaultWorld::visit(const body_variant& body, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visit(const body_variant& body, scene::ConstVisitor& nv) const
 {
 	boost::apply_visitor(makeWorldVisitor(*this, nv), body);
 }
 
-void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::NodeVisitor& nv)
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::Visitor& nv)
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -152,7 +153,7 @@ void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::NodeVisito
 	}
 }
 
-void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstNodeVisitor& nv) const
+void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const
 {
 	// visit infinite objects
 	for (size_t i = 0; i<infiniteObjects.size(); ++i) {
@@ -170,12 +171,19 @@ void DefaultWorld::visitVisible(const math::Frustumf& frustum, scene::ConstNodeV
 
 bool DefaultWorld::removeInfiniteNode(const scene::node_ptr& node)
 {
-	return quick_remove(infiniteObjects, node);
+    if ( quick_remove(infiniteObjects, node) ) 
+    {
+        EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
+        return true;
+    }
+
+    return false;
 }
 
 void DefaultWorld::addInfiniteNode(const scene::node_ptr& node)
 {
 	infiniteObjects.push_back(node);
+    EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
 }
 
 bool DefaultWorld::haveInfiniteNode(const scene::node_ptr& node) const

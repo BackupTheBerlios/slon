@@ -5,7 +5,7 @@
 #include "Graphics/Detail/ParameterTable.h"
 #include "Graphics/Renderable.h"
 #include "Graphics/Renderer/FixedPipelineRenderer.h"
-#include "Scene/Visitors/CullVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
 #include "Scene/Light/DirectionalLight.h"
 
 namespace slon {

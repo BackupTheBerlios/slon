@@ -2,7 +2,7 @@
 #include "Graphics/Common.h"
 #include "Graphics/Renderable/SkyBox.h"
 #include "Graphics/Renderer.h"
-#include "Scene/Visitors/CullVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
 #include "Log/Logger.h"
 
 using namespace slon;

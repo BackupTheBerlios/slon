@@ -30,17 +30,11 @@ namespace scene {
     template<typename Visitor>
     class ConstAcceptVisitor;
 
-    class NodeVisitor;
-    class ConstNodeVisitor;
+    class Visitor;
+    class ConstVisitor;
 
     template<typename Derived, typename Base>
-    class NodeVisitorImpl;
-
-    template<typename Derived, typename Base>
-    class BFSNodeVisitorImpl;
-
-    template<typename Derived, typename Base>
-    class DFSNodeVisitorImpl;
+    class VisitorImpl;
 
     class CullVisitor;
     class TransformVisitor;

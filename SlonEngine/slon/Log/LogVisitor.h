@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_LOG_LOG_VISITOR_H__
 #define __SLON_ENGINE_LOG_LOG_VISITOR_H__
 
-#include "../Scene/Visitors/NodeVisitor.h"
+#include "../Scene/Visitor/Visitor.h"
 #include "Logger.h"
 
 namespace slon {
@@ -9,7 +9,7 @@ namespace log {
 
 /** LogVisitor logs information on the scene graph. Performs traverse using recursion. */
 class LogVisitor :
-    public scene::ConstNodeVisitor
+    public scene::ConstVisitor
 {
 public:
     LogVisitor(const log::logger_ptr& logger = 0, log::SEVERITY severity = log::S_FLOOD);

@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_PHYSICS_BULLET_MOTION_STATE_H__
 #define __SLON_ENGINE_PHYSICS_BULLET_MOTION_STATE_H__
 
+#include "../../Realm/EventVisitor.h"
 #include "../RigidBodyTransform.h"
 #include <bullet/btBulletDynamicsCommon.h>
 
@@ -9,7 +10,8 @@ namespace physics {
 
 class BulletMotionState :
 	public btMotionState,
-	public RigidBodyTransform
+	public RigidBodyTransform,
+    public scene::AcceptVisitor<realm::EventVisitor>
 {
 public:
 	BulletMotionState(const rigid_body_ptr& rigidBody = rigid_body_ptr());
@@ -22,6 +24,9 @@ public:
 	// Override btMotionState
 	void getWorldTransform(btTransform &worldTrans) const;
 	void setWorldTransform(const btTransform &worldTrans);
+
+    // Override Acceptable
+    void accept(realm::EventVisitor& ev);
 
 private:
 	btTransform  worldTransform;

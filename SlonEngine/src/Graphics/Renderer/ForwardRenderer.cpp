@@ -8,7 +8,7 @@
 #include "Scene/Camera/ReflectCamera.h"
 #include "Scene/Light/DirectionalLight.h"
 #include "Scene/Light/PointLight.h"
-#include "Scene/Visitors/CullVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
 #include "Utility/error.hpp"
 
 DECLARE_AUTO_LOGGER("graphics.ForwardRenderer")

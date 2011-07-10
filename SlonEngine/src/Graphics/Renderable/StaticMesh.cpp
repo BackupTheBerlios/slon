@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
 #include "Graphics/Renderable/StaticMesh.h"
-#include "Scene/Visitors/CullVisitor.h"
-#include "Scene/Visitors/TransformVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
+#include "Scene/Visitor/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace slon {

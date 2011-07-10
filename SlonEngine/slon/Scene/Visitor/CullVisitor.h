@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_SCENE_GRAPH_CULL_VISITOR_H__
 #define __SLON_ENGINE_SCENE_GRAPH_CULL_VISITOR_H__
 
-#include "NodeVisitor.h"
+#include "VisitorImpl.hpp"
 #include <stack>
 
 namespace slon {
@@ -17,7 +17,7 @@ namespace scene {
  * that is not culled by the cull function.
  */
 class CullVisitor :
-    public NodeVisitorImpl<CullVisitor, ConstNodeVisitor>
+    public ConstVisitor
 {
 public:
     typedef std::vector<const graphics::Renderable*>        renderable_vector;
@@ -27,8 +27,6 @@ public:
     typedef std::vector<const Light*>                       light_vector;
     typedef light_vector::iterator                          light_iterator;
     typedef light_vector::const_iterator                    light_const_iterator;
-
-    typedef NodeVisitorImpl<CullVisitor, ConstNodeVisitor>  base_type;
 
 public:
     CullVisitor(const Camera* camera_ = 0) :

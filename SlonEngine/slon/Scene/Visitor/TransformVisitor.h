@@ -4,14 +4,14 @@
 #include <sgl/Math/AABB.hpp>
 #include <stack>
 #include <vector>
-#include "NodeVisitor.h"
+#include "VisitorImpl.hpp"
 
 namespace slon {
 namespace scene {
 
 /** Visits transformation nodes, performing worldToLocal, localToWorld matrices, AABB calculation. */
 class TransformVisitor :
-    public NodeVisitorImpl<TransformVisitor, NodeVisitor>
+    public Visitor
 {
 private:
     struct traverse_node
@@ -26,8 +26,6 @@ private:
         Transform*  transform;
         bool        dirty;
     };
-
-    typedef NodeVisitorImpl<TransformVisitor, NodeVisitor>  base_type;
 
 public:
     TransformVisitor();

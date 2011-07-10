@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Scene/Entity.h"
 #include "Scene/Group.h"
-#include "Scene/Visitors/CullVisitor.h"
+#include "Scene/Visitor/CullVisitor.h"
 
 namespace slon {
 namespace scene {
@@ -23,7 +23,6 @@ void CullVisitor::traverse(const Node& node)
             for(const Node* i = group->getChild(); i; i = i->getRight()) {
                 forTraverse.push(i);
             }
-            base_type::visit(group);
         }
     }
 }

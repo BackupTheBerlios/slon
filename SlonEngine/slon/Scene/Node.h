@@ -4,7 +4,7 @@
 #include "../Database/Serializable.h"
 #include "../Log/LogVisitor.h"
 #include "../Utility/hash_string.hpp"
-#include "AcceptVisitor.h"
+#include "AcceptVisitor.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -16,7 +16,6 @@ namespace scene {
 class Node
 :   public Referenced
 ,   public database::Serializable
-,   public ConstAcceptVisitor<log::LogVisitor>
 {
 friend class Group;
 public:
