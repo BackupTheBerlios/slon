@@ -1,38 +1,38 @@
-#ifndef __FILESYSTEM_NATIVE_NODE_H__
-#define __FILESYSTEM_NATIVE_NODE_H__
+#ifndef __FILESYSTEM_DETAIL_NATIVE_NODE_H__
+#define __FILESYSTEM_DETAIL_NATIVE_NODE_H__
 
 #include <boost/filesystem.hpp>
 #include "../../Utility/Algorithm/prefix_tree.hpp"
-#include "../Detail/FileSystemManager.h"
 #include "../Directory.h"
 #include "../File.h"
+#include "FileSystemManager.h"
 
 namespace slon {
 namespace filesystem {
-namespace native {
+namespace detail {
 
 // Forward
 class Directory;
 	
 template<typename Base>
-class Node :
+class NativeNode :
 	public Base
 {
 public:
-    Node(detail::FileSystemManager*         manager,
-         const boost::filesystem::path&     systemPath,
-         const boost::filesystem::path&     virtualPath);
-	~Node();
+    NativeNode(detail::FileSystemManager*         manager,
+               const boost::filesystem::path&     systemPath,
+               const boost::filesystem::path&     virtualPath);
+    ~NativeNode();
 
-	/** Setup system path for node */
+    /** Setup system path for node */
     virtual void reset(const boost::filesystem::path& systemPath_) { systemPath = systemPath_; }
 
     /** Get native node path */
     virtual const boost::filesystem::path& getSystemPath() const { return systemPath; }
 
-	// Override Node
+    // Override Node
     const char*	getPath() const { return vpath.c_str(); }
-	const char*	getName() const { return name.c_str(); }
+    const char*	getName() const { return name.c_str(); }
 
 protected:
     detail::FileSystemManager*  manager;
@@ -42,8 +42,8 @@ protected:
     std::string                 name;
 };
 
-} // namespace native
+} // namespace detail
 } // namespace filesystem
 } // namespace slon
 
-#endif // __FILESYSTEM_NATIVE_NODE_H__
+#endif // __FILESYSTEM_DETAIL_NATIVE_NODE_H__

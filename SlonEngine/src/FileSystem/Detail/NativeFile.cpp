@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "FileSystem/Native/File.h"
+#include "FileSystem/Detail/NativeFile.h"
 #include "Utility/error.hpp"
 
 DECLARE_AUTO_LOGGER("filesystem.File")
@@ -10,12 +10,12 @@ namespace boost {
 
 namespace slon {
 namespace filesystem {
-namespace native {
+namespace detail {
 
-File::File(detail::FileSystemManager*       manager,
-           const boost::filesystem::path&   systemPath,
-           const boost::filesystem::path&   virtualPath)
-:   native::Node<filesystem::File>(manager, systemPath, virtualPath)
+NativeFile::NativeFile(detail::FileSystemManager*       manager,
+                       const boost::filesystem::path&   systemPath,
+                       const boost::filesystem::path&   virtualPath)
+:   NativeNode<filesystem::File>(manager, systemPath, virtualPath)
 {
    if ( !boost::fs::is_regular_file(systemPath) ) {
        throw slon_error(AUTO_LOGGER, "File::File failed. Can't initialized file from non-file path");
@@ -23,17 +23,17 @@ File::File(detail::FileSystemManager*       manager,
 }
 
 // Override Node
-void File::reload()
+void NativeFile::reload()
 {
 }
 
-void File::flush()
+void NativeFile::flush()
 {
 	if (file) fflush( file.get() );
 }
 
 // Override File
-bool File::open(mask_t mode_)
+bool NativeFile::open(mask_t mode_)
 {
 	std::string mode;
 	if ( (mode_ & in) ) {
@@ -63,32 +63,32 @@ bool File::open(mask_t mode_)
 	return true;
 }
 
-void File::close()
+void NativeFile::close()
 {
 	file.reset();
 }
 
-bool File::isOpen() const
+bool NativeFile::isOpen() const
 {
 	return (bool)file;
 }
 
-bool File::eof() const	
+bool NativeFile::eof() const	
 {
 	return file ? (feof( file.get() ) != 0) : false;
 }
 
-std::streampos File::tell() const	
+std::streampos NativeFile::tell() const	
 {
 	return file ? ftell( file.get() ) : 0;
 }
 
-std::streamsize File::size() const
+std::streamsize NativeFile::size() const
 {
     return boost::fs::file_size(systemPath);
 }
 
-std::streampos File::seek(std::streamoff off, std::ios_base::seekdir way)
+std::streampos NativeFile::seek(std::streamoff off, std::ios_base::seekdir way)
 {
 	if (file) 
 	{
@@ -109,16 +109,16 @@ std::streampos File::seek(std::streamoff off, std::ios_base::seekdir way)
 	return 0;
 }
 
-std::streamsize File::read(char* buffer, std::streamsize size)
+std::streamsize NativeFile::read(char* buffer, std::streamsize size)
 {
 	return file ? (std::streamsize)fread( buffer, 1, size, file.get() ) : 0;
 }
 
-std::streamsize File::write(const char* buffer, std::streamsize size)
+std::streamsize NativeFile::write(const char* buffer, std::streamsize size)
 {
 	return file ? (std::streamsize)fwrite( buffer, 1, size, file.get() ) : 0;
 }
 
-} // namespace native
+} // namespace detail
 } // namespace filesystem
 } // namespace slon

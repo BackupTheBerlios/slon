@@ -84,12 +84,9 @@ SET ( TARGET_FILESYSTEM_HEADERS
 
 SET ( TARGET_FILESYSTEM_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/FileSystem/Detail/FileSystemManager.h
-)
-
-SET ( TARGET_FILESYSTEM_NATIVE_HEADERS
-    ${TARGET_HEADER_PATH}/FileSystem/Native/Directory.h
-    ${TARGET_HEADER_PATH}/FileSystem/Native/File.h
-    ${TARGET_HEADER_PATH}/FileSystem/Native/Node.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeDirectory.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeFile.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeNode.h
 )
 
 SET ( TARGET_GRAPHICS_HEADERS
@@ -304,7 +301,6 @@ SOURCE_GROUP( headers\\Database\\Collada FILES             ${TARGET_DATABASE_COL
 SOURCE_GROUP( headers\\Database\\Detail FILES              ${TARGET_DATABASE_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem FILES                    ${TARGET_FILESYSTEM_HEADERS} )
-SOURCE_GROUP( headers\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Graphics FILES                      ${TARGET_GRAPHICS_HEADERS} )
 SOURCE_GROUP( headers\\Graphics\\Detail FILES              ${TARGET_GRAPHICS_DETAIL_HEADERS} )
@@ -337,7 +333,6 @@ SET ( TARGET_HEADERS
     ${TARGET_DETAIL_HEADERS}
     ${TARGET_FILESYSTEM_HEADERS}
     ${TARGET_FILESYSTEM_DETAIL_HEADERS}
-    ${TARGET_FILESYSTEM_NATIVE_HEADERS}
     ${TARGET_GRAPHICS_HEADERS}
     ${TARGET_GRAPHICS_DETAIL_HEADERS}
     ${TARGET_INPUT_HEADERS}
@@ -421,12 +416,9 @@ SET ( TARGET_FILESYSTEM_SOURCES
 
 SET ( TARGET_FILESYSTEM_DETAIL_SOURCES
     FileSystem/Detail/FileSystemManager.cpp
-)
-
-SET ( TARGET_FILESYSTEM_NATIVE_SOURCES
-    FileSystem/Native/Directory.cpp
-    FileSystem/Native/File.cpp
-    FileSystem/Native/Node.cpp
+    FileSystem/Detail/NativeDirectory.cpp
+    FileSystem/Detail/NativeFile.cpp
+    FileSystem/Detail/NativeNode.cpp
 )
 
 SET ( TARGET_INPUT_SOURCES
@@ -585,7 +577,6 @@ SOURCE_GROUP( sources\\Database\\Detail FILES              ${TARGET_DATABASE_DET
 SOURCE_GROUP( sources\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem FILES                    ${TARGET_FILESYSTEM_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_SOURCES} )
-SOURCE_GROUP( sources\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_SOURCES} )
 SOURCE_GROUP( sources\\Input FILES                         ${TARGET_INPUT_SOURCES} )
 SOURCE_GROUP( sources\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Graphics FILES                      ${TARGET_GRAPHICS_SOURCES} )
@@ -615,7 +606,6 @@ SET ( TARGET_SOURCES
     ${TARGET_DATABASE_PROPRIETARY_SOURCES}
     ${TARGET_FILESYSTEM_SOURCES}
     ${TARGET_FILESYSTEM_DETAIL_SOURCES}
-    ${TARGET_FILESYSTEM_NATIVE_SOURCES}
     ${TARGET_INPUT_SOURCES}
     ${TARGET_INPUT_DETAIL_SOURCES} 
     ${TARGET_GRAPHICS_SOURCES}

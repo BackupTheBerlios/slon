@@ -1,20 +1,20 @@
-#ifndef __FILESYSTEM_NATIVE_FILE_H__
-#define __FILESYSTEM_NATIVE_FILE_H__
+#ifndef __FILESYSTEM_DETAIL_NATIVE_FILE_H__
+#define __FILESYSTEM_DETAIL_NATIVE_FILE_H__
 
 #include <cstdio>
-#include "Node.h"
+#include "NativeNode.h"
 
 namespace slon {
 namespace filesystem {
-namespace native {
+namespace detail {
 
-class File :
-	public Node<filesystem::File>
+class NativeFile :
+	public NativeNode<filesystem::File>
 {
 public:
-    File(detail::FileSystemManager*         manager,
-         const boost::filesystem::path&     systemPath,
-         const boost::filesystem::path&     virtualPath);
+    NativeFile(detail::FileSystemManager*         manager,
+               const boost::filesystem::path&     systemPath,
+               const boost::filesystem::path&     virtualPath);
 
 	// Override Node
 	filesystem::Node::TYPE  getType() const { return filesystem::Node::FILE; }
@@ -38,8 +38,8 @@ private:
 	boost::shared_ptr<std::FILE> file;
 };
 
-} // namespace native
+} // namespace detail
 } // namespace filesystem
 } // namespace slon
 
-#endif // __FILESYSTEM_FILE_NATIVE_H__
+#endif // __FILESYSTEM_DETAIL_NATIVE_FILE_H__

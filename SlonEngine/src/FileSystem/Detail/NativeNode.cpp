@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FileSystem/Detail/FileSystemManager.h"
-#include "FileSystem/Native/Directory.h"
+#include "FileSystem/Detail/NativeDirectory.h"
 
 namespace boost {
 	namespace fs = filesystem;
@@ -8,12 +8,12 @@ namespace boost {
 
 namespace slon {
 namespace filesystem {
-namespace native {
+namespace detail {
 
 template<typename Base>
-Node<Base>::Node(detail::FileSystemManager*         manager_,
-                 const boost::filesystem::path&     systemPath_,
-                 const boost::filesystem::path&     virtualPath_)
+NativeNode<Base>::NativeNode(detail::FileSystemManager*         manager_,
+                             const boost::filesystem::path&     systemPath_,
+                             const boost::filesystem::path&     virtualPath_)
 :	manager(manager_)
 {
     virtualPath = virtualPath_;
@@ -24,14 +24,14 @@ Node<Base>::Node(detail::FileSystemManager*         manager_,
 }
 
 template<typename Base>
-Node<Base>::~Node()
+NativeNode<Base>::~NativeNode()
 {
     manager->unregisterNode(vpath);
 }
 
-template class Node<filesystem::Directory>;
-template class Node<filesystem::File>;
+template class NativeNode<filesystem::Directory>;
+template class NativeNode<filesystem::File>;
 
-} // namespace native
+} // namespace detail
 } // namespace filesystem
 } // namespace slon
