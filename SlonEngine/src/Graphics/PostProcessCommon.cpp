@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Graphics/Common.h"
-#include "Graphics/PostProcess/Common.h"
+#include "Graphics/PostProcessCommon.h"
 
 using namespace slon;
 using namespace graphics;

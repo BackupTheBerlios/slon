@@ -1,9 +1,9 @@
-#ifndef __SLON_ENGINE_GRAPHICS_POST_PROCESS_FOG_FILTER_H__
-#define __SLON_ENGINE_GRAPHICS_POST_PROCESS_FOG_FILTER_H__
+#ifndef __SLON_ENGINE_GRAPHICS_FOG_FILTER_H__
+#define __SLON_ENGINE_GRAPHICS_FOG_FILTER_H__
 
 #include "Detail/EffectShaderProgram.h"
 #include "ParameterBinding.h"
-#include "Filter.h"
+#include "PostProcessFilter.h"
 
 namespace slon {
 namespace graphics {
@@ -34,7 +34,7 @@ public:
 
 /** Post process fog based on scene depth. */
 class FogFilter :
-    public Filter
+    public PostProcessFilter
 {
 private:
     // noncopyable
@@ -83,7 +83,7 @@ private:
     float           fogDensity;
     float           fogHeightFalloff;
 
-    // binders for retreiving depth map & input map
+    // binders for retrieving depth map & input map
     binding_tex_2d_ptr        inputMapBinder;
     binding_tex_2d_ptr        depthMapBinder;
     binding_mat3x3f_ptr       normalMatrixBinder;
@@ -96,4 +96,4 @@ typedef boost::intrusive_ptr<const FogFilter>   const_fog_filter_ptr;
 } // namespace graphics
 } // namespace slon
 
-#endif // __SLON_ENGINE_GRAPHICS_POST_PROCESS_FOG_FILTER_H__
+#endif // __SLON_ENGINE_GRAPHICS_FOG_FILTER_H__

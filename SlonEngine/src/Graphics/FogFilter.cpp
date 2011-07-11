@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Graphics/PostProcess/Common.h"
+#include "Graphics/PostProcessCommon.h"
 #include "Graphics/Detail/ParameterTable.h"
 #include "Graphics/Effect.h"
 #include "Graphics/GraphicsManager.h"

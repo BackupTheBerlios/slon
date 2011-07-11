@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_POST_PROCESS_FFT_FILTER_H__
 
 #include "Detail/EffectShaderProgram.h"
-#include "Filter.h"
+#include "PostProcessFilter.h"
 #include <sgl/Math/Matrix.hpp>
 #include <sgl/Program.h>
 #include <sgl/State.h>
@@ -35,7 +35,7 @@ public:
  * texture have RGBA format.
  */
 class FFTFilter :
-    public Filter
+    public PostProcessFilter
 {
 private:
     // noncopyable

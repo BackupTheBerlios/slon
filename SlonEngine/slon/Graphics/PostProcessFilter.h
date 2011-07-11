@@ -1,16 +1,15 @@
 #ifndef __SLON_ENGINE_GRAPHICS_POST_PROCESS_FILTER_H__
 #define __SLON_ENGINE_GRAPHICS_POST_PROCESS_FILTER_H__
 
-#include <boost/intrusive_ptr.hpp>
-#include <list>
-#include <sgl/RenderTarget.h>
 #include "../Utility/referenced.hpp"
+#include "Forward.h"
+#include <sgl/RenderTarget.h>
 
 namespace slon {
 namespace graphics {
 
 /** Abstract interface for every post process filter */
-class Filter :
+class PostProcessFilter :
     public Referenced
 {
 public:
@@ -23,12 +22,9 @@ public:
      */
     virtual unsigned perform( sgl::RenderTarget*    renderTarget,
                               unsigned              source ) const = 0;
-    virtual ~Filter() {}
-};
 
-typedef boost::intrusive_ptr<Filter>        filter_ptr;
-typedef boost::intrusive_ptr<const Filter>  const_filter_ptr;
-typedef std::list<const_filter_ptr>         filter_chain;
+    virtual ~PostProcessFilter() {}
+};
 
 } // namespace graphics
 } // namespace slon

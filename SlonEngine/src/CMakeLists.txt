@@ -100,8 +100,7 @@ SET ( TARGET_GRAPHICS_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/DebugMesh.h
     ${TARGET_HEADER_PATH}/Graphics/DebugTextEffect.h
     ${TARGET_HEADER_PATH}/Graphics/Effect.h
-    ${TARGET_HEADER_PATH}/Graphics/FFTFilter.h
-    ${TARGET_HEADER_PATH}/Graphics/Filter.h   
+    ${TARGET_HEADER_PATH}/Graphics/FFTFilter.h  
     ${TARGET_HEADER_PATH}/Graphics/FixedPipelineRenderer.h
     ${TARGET_HEADER_PATH}/Graphics/FogFilter.h  
     ${TARGET_HEADER_PATH}/Graphics/Forward.h  
@@ -115,6 +114,8 @@ SET ( TARGET_GRAPHICS_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/ParameterBinding.h
     ${TARGET_HEADER_PATH}/Graphics/Pass.h
     ${TARGET_HEADER_PATH}/Graphics/PhillipsSpectrum.h
+    ${TARGET_HEADER_PATH}/Graphics/PostProcessFilter.h 
+	${TARGET_HEADER_PATH}/Graphics/PostProcessUnit.h
     ${TARGET_HEADER_PATH}/Graphics/ProjectedGrid.h
     ${TARGET_HEADER_PATH}/Graphics/Renderable.h
     ${TARGET_HEADER_PATH}/Graphics/Renderer.h
@@ -123,7 +124,6 @@ SET ( TARGET_GRAPHICS_HEADERS
 	${TARGET_HEADER_PATH}/Graphics/SkyBoxEffect.h
     ${TARGET_HEADER_PATH}/Graphics/StaticMesh.h
     ${TARGET_HEADER_PATH}/Graphics/TransformEffect.h
-	${TARGET_HEADER_PATH}/Graphics/Unit.h
     ${TARGET_HEADER_PATH}/Graphics/WaterEffect.h
     ${TARGET_HEADER_PATH}/Graphics/WaterMaterial.h
 )
@@ -139,10 +139,6 @@ SET ( TARGET_GRAPHICS_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Detail/StateTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/UniformTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/Utility.h
-)
-
-SET ( TARGET_GRAPHICS_POST_PROCESS_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/PostProcess/Common.h
 )
 
 IF (SLON_ENGINE_USE_PHYSICS)
@@ -312,7 +308,6 @@ SOURCE_GROUP( headers\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_N
 SOURCE_GROUP( headers\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Graphics FILES                      ${TARGET_GRAPHICS_HEADERS} )
 SOURCE_GROUP( headers\\Graphics\\Detail FILES              ${TARGET_GRAPHICS_DETAIL_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\PostProcess FILES         ${TARGET_GRAPHICS_POST_PROCESS_HEADERS} )
 SOURCE_GROUP( headers\\Input FILES                         ${TARGET_INPUT_HEADERS} )
 SOURCE_GROUP( headers\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Log FILES                           ${TARGET_LOG_HEADERS} )
@@ -458,6 +453,7 @@ SET ( TARGET_GRAPHICS_SOURCES
     Graphics/LightingMaterial.cpp
 	Graphics/Mesh.cpp
     Graphics/PhillipsSpectrum.cpp
+    Graphics/PostProcessCommon.cpp
     Graphics/ProjectedGrid.cpp
     Graphics/SkinnedMesh.cpp
     Graphics/SkyBox.cpp
@@ -479,10 +475,6 @@ SET ( TARGET_GRAPHICS_DETAIL_SOURCES
     Graphics/Detail/UniformTable.cpp
     Graphics/Detail/Utility.cpp
     Graphics/Detail/Pass.cpp
-)
-
-SET ( TARGET_GRAPHICS_POST_PROCESS_SOURCES
-    Graphics/PostProcess/Common.cpp
 )
 
 IF (SLON_ENGINE_USE_PHYSICS)
@@ -598,7 +590,6 @@ SOURCE_GROUP( sources\\Input FILES                         ${TARGET_INPUT_SOURCE
 SOURCE_GROUP( sources\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Graphics FILES                      ${TARGET_GRAPHICS_SOURCES} )
 SOURCE_GROUP( sources\\Graphics\\Detail FILES              ${TARGET_GRAPHICS_DETAIL_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\PostProcess FILES         ${TARGET_GRAPHICS_POST_PROCESS_SOURCES} )
 SOURCE_GROUP( sources\\Log FILES                           ${TARGET_LOG_SOURCES} )
 SOURCE_GROUP( sources\\Log\\Detail FILES                   ${TARGET_LOG_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Physics FILES                       ${TARGET_PHYSICS_SOURCES} )
@@ -629,7 +620,6 @@ SET ( TARGET_SOURCES
     ${TARGET_INPUT_DETAIL_SOURCES} 
     ${TARGET_GRAPHICS_SOURCES}
     ${TARGET_GRAPHICS_DETAIL_SOURCES}
-    ${TARGET_GRAPHICS_POST_PROCESS_SOURCES}
     ${TARGET_LOG_SOURCES}
     ${TARGET_LOG_DETAIL_SOURCES}
     ${TARGET_REALM_SOURCES}
@@ -749,11 +739,6 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	INSTALL (
 		FILES       ${TARGET_GRAPHICS_DETAIL_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Detail
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_POST_PROCESS_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/PostProcess
 	)
 
 	INSTALL (

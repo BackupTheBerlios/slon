@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_SCENE_COMMON_CAMERA__
 
 #include "../Utility/math.hpp"
+#include "../Graphics/PostProcessFilter.h"
 #include "Camera.h"
 
 #define NOMINMAX // thread may include windows.h
@@ -30,12 +31,12 @@ public:
     virtual const math::AABBf& getBounds() const;
 
     /** Get mutable post effect chain. */
-    virtual graphics::filter_chain& getPostEffectChain()        { return postEffects; }
+    virtual graphics::post_process_filter_chain& getPostEffectChain()        { return postEffects; }
 
     // Override Camera
-    sgl::RenderTarget*              getRenderTarget() const     { return renderTarget.get(); }
-    sgl::rectangle                  getViewport() const         { return viewport; }
-    const graphics::filter_chain&   getPostEffectChain() const  { return postEffects; }
+    sgl::RenderTarget*                           getRenderTarget() const     { return renderTarget.get(); }
+    sgl::rectangle                               getViewport() const         { return viewport; }
+    const graphics::post_process_filter_chain&   getPostEffectChain() const  { return postEffects; }
 
     thread::lock_ptr    lockForReading() const;
     thread::lock_ptr    lockForWriting();
@@ -43,9 +44,9 @@ public:
     virtual ~CommonCamera() {}
 
 protected:
-    sgl::ref_ptr<sgl::RenderTarget> renderTarget;
-    graphics::filter_chain          postEffects;
-    sgl::rectangle		            viewport;
+    sgl::ref_ptr<sgl::RenderTarget>     renderTarget;
+    graphics::post_process_filter_chain postEffects;
+    sgl::rectangle                      viewport;
 
     // update area
     mutable math::AABBf             updateArea;

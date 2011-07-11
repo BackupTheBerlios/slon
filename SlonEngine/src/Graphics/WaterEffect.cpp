@@ -6,7 +6,7 @@
 #include "Graphics/Detail/Pass.h"
 #include "Graphics/Common.h"
 #include "Graphics/GraphicsManager.h"
-#include "Graphics/PostProcess/Common.h"
+#include "Graphics/PostProcessCommon.h"
 #include "Graphics/ForwardRenderer.h"
 #include "Log/Logger.h"
 #include "Scene/DirectionalLight.h"

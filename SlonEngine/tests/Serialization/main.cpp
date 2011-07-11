@@ -1,9 +1,9 @@
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Engine.h"
 #include "FileSystem/File.h"
-#include "Graphics/Effect/TransformEffect.h"
-#include "Graphics/Renderable/Mesh.h"
-#include "Graphics/Renderable/StaticMesh.h"
+#include "Graphics/TransformEffect.h"
+#include "Graphics/Mesh.h"
+#include "Graphics/StaticMesh.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
 #   include "Physics/PhysicsManager.h"
 #endif

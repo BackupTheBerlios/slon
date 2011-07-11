@@ -425,7 +425,7 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
         }
 
         // perform post effect chain
-        const filter_chain& postEffects = camera.getPostEffectChain();
+        const post_process_filter_chain& postEffects = camera.getPostEffectChain();
         if ( !postEffects.empty() )
         {
             sgl::Texture2D* attachments[] =
@@ -435,9 +435,9 @@ void ForwardRenderer::render(realm::World& world, const scene::Camera& camera) c
             };
 
             unsigned pingPongSource = 0;
-            for (filter_chain::const_iterator iter  = postEffects.begin();
-                                              iter != postEffects.end();
-                                              ++iter)
+            for (post_process_filter_chain::const_iterator iter  = postEffects.begin();
+                                                           iter != postEffects.end();
+                                                           ++iter)
             {
                 inputMapBinder->switch_values(attachments[pingPongSource], 1, false);
                 if (*iter == postEffects.back() && renderTarget == postProcessRenderTarget)

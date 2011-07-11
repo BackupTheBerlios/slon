@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_GRAPHICS_FORWARD_H__
 
 #include "../Config.h"
+#include <list>
 
 namespace sgl
 {
@@ -29,7 +30,10 @@ namespace graphics {
     class Renderable;
     class Mesh;
     class MeshData;
+    class PostProcessFilter;
+    class SkinnedMesh;
     class SkyBox;
+    class StaticMesh;
 
     // export types into graphics namespace
     typedef sgl::Device                Device;
@@ -56,9 +60,16 @@ namespace graphics {
     typedef boost::intrusive_ptr<Mesh>              mesh_ptr;
     typedef boost::intrusive_ptr<MeshData>          mesh_data_ptr;
     typedef boost::intrusive_ptr<const MeshData>    const_mesh_data_ptr;
+    typedef boost::intrusive_ptr<SkinnedMesh>       skinned_mesh_ptr;
+    typedef boost::intrusive_ptr<const SkinnedMesh> const_skinned_mesh_ptr;
     typedef boost::intrusive_ptr<SkyBox>            sky_box_ptr;
     typedef boost::intrusive_ptr<const SkyBox>      const_sky_box_ptr;
+    typedef boost::intrusive_ptr<StaticMesh>        static_mesh_ptr;
+    typedef boost::intrusive_ptr<const StaticMesh>  const_static_mesh_ptr;
 
+    typedef boost::intrusive_ptr<PostProcessFilter>        post_process_filter_ptr;
+    typedef boost::intrusive_ptr<const PostProcessFilter>  const_post_process_filter_ptr;
+    typedef std::list<const_post_process_filter_ptr>       post_process_filter_chain;
 
 } // namespace graphics
 } // namespace slon
