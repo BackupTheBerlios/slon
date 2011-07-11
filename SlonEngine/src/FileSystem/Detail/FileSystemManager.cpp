@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Engine.h"
 #include "FileSystem/Detail/FileSystemManager.h"
-#include "FileSystem/Native/Directory.h"
-#include "FileSystem/Native/File.h"
+#include "FileSystem/Detail/NativeDirectory.h"
+#include "FileSystem/Detail/NativeFile.h"
 #include "Log/Logger.h"
 #include "Utility/error.hpp"
 #include <cstring>
@@ -49,10 +49,10 @@ bool FileSystemManager::mount(const char* systemPath, const char* mountPoint)
         {
             workingDir.reset();
             if ( boost::fs::is_regular_file(path) ) {
-                workingDir.reset( new native::File(this, path, boost::fs::path(mountPointStr)) );
+                workingDir.reset( new NativeFile(this, path, boost::fs::path(mountPointStr)) );
             }
             else if ( boost::fs::is_directory(path) ) {
-                workingDir.reset( new native::Directory(this, path, boost::fs::path(mountPointStr), true) );
+                workingDir.reset( new NativeDirectory(this, path, boost::fs::path(mountPointStr), true) );
             }
         }
 
@@ -91,7 +91,7 @@ filesystem::Node* FileSystemManager::getNode(const char* path)
             // try to find active node
             if ( boost::fs::exists(systemPath) )
             {
-				std::string systemPathStr = systemPath.string();
+                std::string systemPathStr = systemPath.string();
                 node_prefix_tree::iterator activeIter = activeNodes.find(systemPathStr);
                 if ( activeIter != activeNodes.end() ) {
                     return activeIter->second;
@@ -99,10 +99,10 @@ filesystem::Node* FileSystemManager::getNode(const char* path)
 
                 // create node
                 if ( boost::fs::is_regular_file(systemPath) ) {
-                    return new native::File(this, systemPath, boost::fs::path(path));
+                    return new NativeFile(this, systemPath, boost::fs::path(path));
                 }
                 else if ( boost::fs::is_directory(systemPath) ) {
-                    return new native::Directory(this, systemPath, boost::fs::path(path), true);
+                    return new NativeDirectory(this, systemPath, boost::fs::path(path), true);
                 }
             }
         }
@@ -126,9 +126,9 @@ filesystem::File* FileSystemManager::createFile(const char* path)
     if ( filesystem::File* file = asFile( getNode(path) ) ) {
         return file;
     }
-	    
-    boost::fs::path    vPath(path);
-    native::Directory* parentDir = static_cast<native::Directory*>( asDirectory( getNode(vPath.parent_path().string().c_str()) ) );
+
+    boost::fs::path  vPath(path);
+    NativeDirectory* parentDir = static_cast<NativeDirectory*>( asDirectory( getNode(vPath.parent_path().string().c_str()) ) );
     if (!parentDir) {
         return 0;
     }
@@ -136,7 +136,7 @@ filesystem::File* FileSystemManager::createFile(const char* path)
     boost::fs::path sPath = parentDir->getSystemPath() / vPath.filename();
     std::ofstream file( sPath.string().c_str() );
 
-    return new native::File(this, sPath, vPath);
+    return new NativeFile(this, sPath, vPath);
 }
 
 void FileSystemManager::registerNode(const std::string& sysPath, filesystem::Node* node)

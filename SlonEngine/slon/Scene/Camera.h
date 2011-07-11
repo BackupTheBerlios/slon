@@ -3,7 +3,7 @@
 
 #include <sgl/RenderTarget.h>
 #include <sgl/Math/Frustum.hpp>
-#include "../Graphics/Filter.h"
+#include "../Graphics/Forward.h"
 #include "../Thread/Lock.h"
 #include "Entity.h"
 
@@ -48,7 +48,7 @@ public:
     virtual sgl::RenderTarget* getRenderTarget() const = 0;
 
     /** Get posteffect chain */
-    virtual const graphics::filter_chain& getPostEffectChain() const = 0;
+    virtual const graphics::post_process_filter_chain& getPostEffectChain() const = 0;
 
     /** Grant thread read access to the camera.
      * @return lock object. Lock is freed whether object is deleted.

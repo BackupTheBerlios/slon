@@ -3,7 +3,7 @@
 #include "Detail/Engine.h"
 #include "Realm/DefaultWorld.h"
 #include "Realm/EventVisitor.h"
-#include "Scene/Visitor/Visitor.h"
+#include "Scene/Visitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
 #include <boost/thread/locks.hpp>

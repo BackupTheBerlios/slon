@@ -84,108 +84,65 @@ SET ( TARGET_FILESYSTEM_HEADERS
 
 SET ( TARGET_FILESYSTEM_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/FileSystem/Detail/FileSystemManager.h
-)
-
-SET ( TARGET_FILESYSTEM_NATIVE_HEADERS
-    ${TARGET_HEADER_PATH}/FileSystem/Native/Directory.h
-    ${TARGET_HEADER_PATH}/FileSystem/Native/File.h
-    ${TARGET_HEADER_PATH}/FileSystem/Native/Node.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeDirectory.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeFile.h
+    ${TARGET_HEADER_PATH}/FileSystem/Detail/NativeNode.h
 )
 
 SET ( TARGET_GRAPHICS_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Common.h
+    ${TARGET_HEADER_PATH}/Graphics/DebugDrawCommon.h
+    ${TARGET_HEADER_PATH}/Graphics/DebugDrawSkinned.h
+    ${TARGET_HEADER_PATH}/Graphics/DebugEffect.h
+    ${TARGET_HEADER_PATH}/Graphics/DebugMesh.h
+    ${TARGET_HEADER_PATH}/Graphics/DebugTextEffect.h
     ${TARGET_HEADER_PATH}/Graphics/Effect.h
-    ${TARGET_HEADER_PATH}/Graphics/Filter.h   
+    ${TARGET_HEADER_PATH}/Graphics/FFTFilter.h  
+    ${TARGET_HEADER_PATH}/Graphics/FixedPipelineRenderer.h
+    ${TARGET_HEADER_PATH}/Graphics/FogFilter.h  
     ${TARGET_HEADER_PATH}/Graphics/Forward.h  
+    ${TARGET_HEADER_PATH}/Graphics/ForwardRenderer.h
+    ${TARGET_HEADER_PATH}/Graphics/FrequencySpectrum.h
     ${TARGET_HEADER_PATH}/Graphics/GraphicsManager.h
+    ${TARGET_HEADER_PATH}/Graphics/LightingEffect.h
+    ${TARGET_HEADER_PATH}/Graphics/LightingMaterial.h
     ${TARGET_HEADER_PATH}/Graphics/Material.h
+    ${TARGET_HEADER_PATH}/Graphics/Mesh.h
     ${TARGET_HEADER_PATH}/Graphics/ParameterBinding.h
+    ${TARGET_HEADER_PATH}/Graphics/Pass.h
+    ${TARGET_HEADER_PATH}/Graphics/PhillipsSpectrum.h
+    ${TARGET_HEADER_PATH}/Graphics/PostProcessFilter.h 
+	${TARGET_HEADER_PATH}/Graphics/PostProcessUnit.h
+    ${TARGET_HEADER_PATH}/Graphics/ProjectedGrid.h
     ${TARGET_HEADER_PATH}/Graphics/Renderable.h
     ${TARGET_HEADER_PATH}/Graphics/Renderer.h
+    ${TARGET_HEADER_PATH}/Graphics/SkinnedMesh.h
+    ${TARGET_HEADER_PATH}/Graphics/SkyBox.h
+	${TARGET_HEADER_PATH}/Graphics/SkyBoxEffect.h
+    ${TARGET_HEADER_PATH}/Graphics/StaticMesh.h
+    ${TARGET_HEADER_PATH}/Graphics/TransformEffect.h
+    ${TARGET_HEADER_PATH}/Graphics/WaterEffect.h
+    ${TARGET_HEADER_PATH}/Graphics/WaterMaterial.h
 )
 
 SET ( TARGET_GRAPHICS_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Detail/AttributeTable.h
+    ${TARGET_HEADER_PATH}/Graphics/Detail/Effect.h
+    ${TARGET_HEADER_PATH}/Graphics/Detail/EffectShaderProgram.h
+    ${TARGET_HEADER_PATH}/Graphics/Detail/FFPPass.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/GraphicsManager.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/ParameterTable.h
+    ${TARGET_HEADER_PATH}/Graphics/Detail/Pass.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/StateTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/UniformTable.h
     ${TARGET_HEADER_PATH}/Graphics/Detail/Utility.h
 )
 
-SET ( TARGET_GRAPHICS_EFFECT_HEADERS
-    #${TARGET_HEADER_PATH}/Graphics/Effect/ExtrudeEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/DebugEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/DebugTextEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/LightingEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Pass.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/SkyBoxEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/TransformEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/WaterEffect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/FrequencySpectrum.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/PhillipsSpectrum.h
-)
-
-SET ( TARGET_GRAPHICS_EFFECT_DETAIL_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/Effect.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/EffectShaderProgram.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/FFPPass.h
-    ${TARGET_HEADER_PATH}/Graphics/Effect/Detail/Pass.h
-)
-
-SET ( TARGET_GRAPHICS_MATERIAL_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/Material/LightingMaterial.h
-    ${TARGET_HEADER_PATH}/Graphics/Material/WaterMaterial.h
-)
-
-SET ( TARGET_GRAPHICS_GUI_HEADERS
-    #${TARGET_HEADER_PATH}/Graphics/GUI/ProgressBar.h
-)
-
-SET ( TARGET_GRAPHICS_PASS_HEADERS
-    #${TARGET_HEADER_PATH}/Graphics/Pass/AllRenderPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/AmbientPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/DebugPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/DepthPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/MultiLightPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/LightingPass.h
-    #${TARGET_HEADER_PATH}/Graphics/Pass/ShadowVolumePass.h
-)
-
-SET ( TARGET_GRAPHICS_POST_PROCESS_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/PostProcess/Common.h
-    ${TARGET_HEADER_PATH}/Graphics/PostProcess/FFTFilter.h
-    ${TARGET_HEADER_PATH}/Graphics/PostProcess/FogFilter.h  
-    ${TARGET_HEADER_PATH}/Graphics/PostProcess/Unit.h
-)
-
-SET ( TARGET_GRAPHICS_RENDERABLE_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/DebugMesh.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/Forward.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/Mesh.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/ProjectedGrid.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/SkyBox.h
-    #${TARGET_HEADER_PATH}/Graphics/Renderable/ShadowVolumeMesh.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/SkinnedMesh.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/StaticMesh.h
-)
-
-SET ( TARGET_GRAPHICS_RENDERABLE_DEBUG_HEADERS
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/Debug/DebugDrawCommon.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderable/Debug/DebugDrawSkinned.h
-)
-
 IF (SLON_ENGINE_USE_PHYSICS)
-    LIST ( APPEND TARGET_GRAPHICS_RENDERABLE_DEBUG_HEADERS
-    	${TARGET_HEADER_PATH}/Graphics/Renderable/Debug/DebugDrawPhysics.h
+    LIST ( APPEND TARGET_GRAPHICS_HEADERS
+    	${TARGET_HEADER_PATH}/Graphics/DebugDrawPhysics.h
     )
 ENDIF (SLON_ENGINE_USE_PHYSICS)
-
-SET ( TARGET_GRAPHICS_RENDERER_HEADERS
-    #${TARGET_HEADER_PATH}/Graphics/Renderer/DefferedRenderer.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderer/FixedPipelineRenderer.h
-    ${TARGET_HEADER_PATH}/Graphics/Renderer/ForwardRenderer.h
-)
 
 SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Constraint.h
@@ -255,40 +212,29 @@ SET ( TARGET_REALM_DETAIL_HEADERS
 
 SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/AcceptVisitor.hpp
+    ${TARGET_HEADER_PATH}/Scene/AmbientLight.h
     ${TARGET_HEADER_PATH}/Scene/Camera.h
+    ${TARGET_HEADER_PATH}/Scene/CommonCamera.h
+    ${TARGET_HEADER_PATH}/Scene/CullVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/DirectionalLight.h
     ${TARGET_HEADER_PATH}/Scene/Entity.h
     ${TARGET_HEADER_PATH}/Scene/Forward.h
-    ${TARGET_HEADER_PATH}/Scene/Geode.h
+    ${TARGET_HEADER_PATH}/Scene/FilterVisitor.h
     ${TARGET_HEADER_PATH}/Scene/Light.h
+    ${TARGET_HEADER_PATH}/Scene/LookAtCamera.h
     ${TARGET_HEADER_PATH}/Scene/MatrixTransform.h
     ${TARGET_HEADER_PATH}/Scene/Node.h
+    ${TARGET_HEADER_PATH}/Scene/PointLight.h
     ${TARGET_HEADER_PATH}/Scene/Group.h
     ${TARGET_HEADER_PATH}/Scene/Joint.h
+    ${TARGET_HEADER_PATH}/Scene/ReflectCamera.h
     ${TARGET_HEADER_PATH}/Scene/Skeleton.h
-    #${TARGET_HEADER_PATH}/Scene/Switch.h
+    ${TARGET_HEADER_PATH}/Scene/SlaveCamera.h
     ${TARGET_HEADER_PATH}/Scene/Transform.h
-)
-
-SET ( TARGET_SCENE_CAMERA_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Camera/CommonCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/LookAtCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/ReflectCamera.h
-    ${TARGET_HEADER_PATH}/Scene/Camera/SlaveCamera.h
-)
-
-SET ( TARGET_SCENE_LIGHT_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Light/AmbientLight.h
-    ${TARGET_HEADER_PATH}/Scene/Light/DirectionalLight.h
-    ${TARGET_HEADER_PATH}/Scene/Light/PointLight.h
-)
-
-SET ( TARGET_SCENE_VISITOR_HEADERS
-    ${TARGET_HEADER_PATH}/Scene/Visitor/CullVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/FilterVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/TransformVisitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/Traverse.hpp
-    ${TARGET_HEADER_PATH}/Scene/Visitor/Visitor.h
-    ${TARGET_HEADER_PATH}/Scene/Visitor/VisitorImpl.hpp
+    ${TARGET_HEADER_PATH}/Scene/TransformVisitor.h
+    ${TARGET_HEADER_PATH}/Scene/Traverse.hpp
+    ${TARGET_HEADER_PATH}/Scene/Visitor.h
+    ${TARGET_HEADER_PATH}/Scene/VisitorImpl.hpp
 )
 
 SET ( TARGET_THREAD_HEADERS
@@ -355,20 +301,9 @@ SOURCE_GROUP( headers\\Database\\Collada FILES             ${TARGET_DATABASE_COL
 SOURCE_GROUP( headers\\Database\\Detail FILES              ${TARGET_DATABASE_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem FILES                    ${TARGET_FILESYSTEM_HEADERS} )
-SOURCE_GROUP( headers\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_HEADERS} )
 SOURCE_GROUP( headers\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Graphics FILES                      ${TARGET_GRAPHICS_HEADERS} )
 SOURCE_GROUP( headers\\Graphics\\Detail FILES              ${TARGET_GRAPHICS_DETAIL_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Effect FILES              ${TARGET_GRAPHICS_EFFECT_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Effect\\Detail FILES	   ${TARGET_GRAPHICS_EFFECT_DETAIL_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\GUI FILES                 ${TARGET_GRAPHICS_GUI_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Material FILES            ${TARGET_GRAPHICS_MATERIAL_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Pass FILES                ${TARGET_GRAPHICS_PASS_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\PostProcess FILES         ${TARGET_GRAPHICS_POST_PROCESS_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Renderable FILES          ${TARGET_GRAPHICS_RENDERABLE_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Renderable\\Debug FILES   ${TARGET_GRAPHICS_RENDERABLE_DEBUG_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Renderer FILES            ${TARGET_GRAPHICS_RENDERER_HEADERS} )
-SOURCE_GROUP( headers\\Graphics\\Log FILES                 ${TARGET_GRAPHICS_LOG_HEADERS} )
 SOURCE_GROUP( headers\\Input FILES                         ${TARGET_INPUT_HEADERS} )
 SOURCE_GROUP( headers\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Log FILES                           ${TARGET_LOG_HEADERS} )
@@ -379,9 +314,6 @@ SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( headers\\Realm FILES                         ${TARGET_REALM_HEADERS} )
 SOURCE_GROUP( headers\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_HEADERS} )
-SOURCE_GROUP( headers\\Scene\\Visitor FILES			   	   ${TARGET_SCENE_VISITOR_HEADERS} )
 SOURCE_GROUP( headers\\Thread FILES                        ${TARGET_THREAD_HEADERS} )
 SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
@@ -401,29 +333,15 @@ SET ( TARGET_HEADERS
     ${TARGET_DETAIL_HEADERS}
     ${TARGET_FILESYSTEM_HEADERS}
     ${TARGET_FILESYSTEM_DETAIL_HEADERS}
-    ${TARGET_FILESYSTEM_NATIVE_HEADERS}
     ${TARGET_GRAPHICS_HEADERS}
-    ${TARGET_SCENE_CAMERA_HEADERS}
     ${TARGET_GRAPHICS_DETAIL_HEADERS}
-    ${TARGET_GRAPHICS_EFFECT_HEADERS}
-    ${TARGET_GRAPHICS_EFFECT_DETAIL_HEADERS}
-    ${TARGET_GRAPHICS_MATERIAL_HEADERS}
-    ${TARGET_GRAPHICS_GUI_HEADERS}
-    ${TARGET_GRAPHICS_PASS_HEADERS}
-    ${TARGET_GRAPHICS_POST_PROCESS_HEADERS}    
-    ${TARGET_GRAPHICS_RENDERABLE_HEADERS}
-    ${TARGET_GRAPHICS_RENDERABLE_DEBUG_HEADERS}
-    ${TARGET_GRAPHICS_RENDERER_HEADERS}
-    ${TARGET_GRAPHICS_WATER_HEADERS}
     ${TARGET_INPUT_HEADERS}
     ${TARGET_INPUT_DETAIL_HEADERS}
     ${TARGET_LOG_HEADERS}
     ${TARGET_LOG_DETAIL_HEADERS}
     ${TARGET_REALM_HEADERS}
     ${TARGET_REALM_DETAIL_HEADERS}
-    ${TARGET_SCENE_LIGHT_HEADERS}
     ${TARGET_SCENE_HEADERS}
-    ${TARGET_SCENE_VISITOR_HEADERS}
     ${TARGET_THREAD_HEADERS}
     ${TARGET_THREAD_DETAIL_HEADERS}
     ${TARGET_UTILITY_HEADERS}
@@ -498,12 +416,9 @@ SET ( TARGET_FILESYSTEM_SOURCES
 
 SET ( TARGET_FILESYSTEM_DETAIL_SOURCES
     FileSystem/Detail/FileSystemManager.cpp
-)
-
-SET ( TARGET_FILESYSTEM_NATIVE_SOURCES
-    FileSystem/Native/Directory.cpp
-    FileSystem/Native/File.cpp
-    FileSystem/Native/Node.cpp
+    FileSystem/Detail/NativeDirectory.cpp
+    FileSystem/Detail/NativeFile.cpp
+    FileSystem/Detail/NativeNode.cpp
 )
 
 SET ( TARGET_INPUT_SOURCES
@@ -517,86 +432,48 @@ SET ( TARGET_INPUT_DETAIL_SOURCES
 
 SET ( TARGET_GRAPHICS_SOURCES
     Graphics/Common.cpp
+    Graphics/DebugDrawCommon.cpp
+    Graphics/DebugDrawSkinned.cpp
+    Graphics/DebugEffect.cpp
+    Graphics/DebugMesh.cpp
+    Graphics/DebugTextEffect.cpp
+    Graphics/FFTFilter.cpp
+    Graphics/FixedPipelineRenderer.cpp
+    Graphics/FogFilter.cpp
+    Graphics/ForwardRenderer.cpp
+    Graphics/LightingEffect.cpp
+    Graphics/LightingMaterial.cpp
+	Graphics/Mesh.cpp
+    Graphics/PhillipsSpectrum.cpp
+    Graphics/PostProcessCommon.cpp
+    Graphics/ProjectedGrid.cpp
+    Graphics/SkinnedMesh.cpp
+    Graphics/SkyBox.cpp
+    Graphics/SkyBoxEffect.cpp
+    Graphics/StaticMesh.cpp
+    Graphics/TransformEffect.cpp
+    Graphics/WaterEffect.cpp
+    Graphics/WaterMaterial.cpp
 )
 
 SET ( TARGET_GRAPHICS_DETAIL_SOURCES
     Graphics/Detail/AttributeTable.cpp
-    Graphics/Detail/ParameterTable.cpp
+    Graphics/Detail/Effect.cpp
+    Graphics/Detail/EffectShaderProgram.cpp
+    Graphics/Detail/FFPPass.cpp
     Graphics/Detail/GraphicsManager.cpp
+    Graphics/Detail/ParameterTable.cpp
     Graphics/Detail/StateTable.cpp
     Graphics/Detail/UniformTable.cpp
     Graphics/Detail/Utility.cpp
-)
-
-SET ( TARGET_GRAPHICS_EFFECT_SOURCES
-    #Graphics/Effect/ExtrudeEffect.cpp
-    Graphics/Effect/DebugEffect.cpp
-    Graphics/Effect/DebugTextEffect.cpp
-    Graphics/Effect/LightingEffect.cpp
-    Graphics/Effect/PhillipsSpectrum.cpp
-    Graphics/Effect/SkyBoxEffect.cpp
-    Graphics/Effect/TransformEffect.cpp
-    Graphics/Effect/WaterEffect.cpp
-)
-
-SET ( TARGET_GRAPHICS_EFFECT_DETAIL_SOURCES
-    Graphics/Effect/Detail/Effect.cpp
-    Graphics/Effect/Detail/EffectShaderProgram.cpp
-    Graphics/Effect/Detail/FFPPass.cpp
-    Graphics/Effect/Detail/Pass.cpp
-)
-
-SET ( TARGET_GRAPHICS_MATERIAL_SOURCES
-    Graphics/Material/LightingMaterial.cpp
-    Graphics/Material/WaterMaterial.cpp
-)
-
-SET ( TARGET_GRAPHICS_GUI_SOURCES
-    #Graphics/GUI/ProgressBar.cpp
-)
-
-SET ( TARGET_GRAPHICS_PASS_SOURCES
-    #Graphics/Pass/AllRenderPass.cpp
-    #Graphics/Pass/AmbientPass.cpp
-    #Graphics/Pass/DebugPass.cpp
-    #Graphics/Pass/DepthPass.cpp
-    #Graphics/Pass/MultiLightPass.cpp
-    #Graphics/Pass/LightingPass.cpp
-    #Graphics/Pass/ShadowVolumePass.cpp
-)
-
-SET ( TARGET_GRAPHICS_POST_PROCESS_SOURCES
-    Graphics/PostProcess/Common.cpp
-    Graphics/PostProcess/FFTFilter.cpp
-    Graphics/PostProcess/FogFilter.cpp
-)
-
-SET ( TARGET_GRAPHICS_RENDERABLE_SOURCES
-    Graphics/Renderable/DebugMesh.cpp
-	Graphics/Renderable/Mesh.cpp
-    Graphics/Renderable/ProjectedGrid.cpp
-    Graphics/Renderable/SkyBox.cpp
-    #Graphics/Renderable/ShadowVolumeMesh.cpp
-    Graphics/Renderable/StaticMesh.cpp
-    Graphics/Renderable/SkinnedMesh.cpp
-)
-
-SET ( TARGET_GRAPHICS_RENDERABLE_DEBUG_SOURCES
-    Graphics/Renderable/Debug/DebugDrawCommon.cpp
-    Graphics/Renderable/Debug/DebugDrawSkinned.cpp
+    Graphics/Detail/Pass.cpp
 )
 
 IF (SLON_ENGINE_USE_PHYSICS)
-    LIST ( APPEND TARGET_GRAPHICS_RENDERABLE_DEBUG_SOURCES
-        Graphics/Renderable/Debug/DebugDrawPhysics.cpp
+    LIST ( APPEND TARGET_GRAPHICS_SOURCES
+        Graphics/DebugDrawPhysics.cpp
     )
 ENDIF (SLON_ENGINE_USE_PHYSICS)
-
-SET ( TARGET_GRAPHICS_RENDERER_SOURCES
-    #Graphics/Renderer/DefferedRenderer.cpp
-    Graphics/Renderer/FixedPipelineRenderer.cpp
-    Graphics/Renderer/ForwardRenderer.cpp
-)
 
 SET ( TARGET_LOG_SOURCES
     Log/LogVisitor.cpp
@@ -648,33 +525,23 @@ SET ( TARGET_REALM_DETAIL_SOURCES
 )
 
 SET ( TARGET_SCENE_SOURCES
+	Scene/AmbientLight.cpp
+    Scene/CullVisitor.cpp
+	Scene/DirectionalLight.cpp
     Scene/Entity.cpp
+    Scene/CommonCamera.cpp
     Scene/Group.cpp
     Scene/Joint.cpp
+    Scene/LookAtCamera.cpp
     Scene/MatrixTransform.cpp
     Scene/Node.cpp
+	Scene/PointLight.cpp
+    Scene/ReflectCamera.cpp
+    Scene/SlaveCamera.cpp
     Scene/Skeleton.cpp
-    #Scene/Switch.cpp
     Scene/Transform.cpp
-)
-
-SET ( TARGET_SCENE_CAMERA_SOURCES
-    Scene/Camera/CommonCamera.cpp
-    Scene/Camera/LookAtCamera.cpp
-    Scene/Camera/ReflectCamera.cpp
-    Scene/Camera/SlaveCamera.cpp
-)
-
-SET ( TARGET_SCENE_LIGHT_SOURCES
-    Scene/Light/AmbientLight.cpp
-    Scene/Light/DirectionalLight.cpp
-    Scene/Light/PointLight.cpp
-)
-
-SET ( TARGET_SCENE_VISITOR_SOURCES
-    Scene/Visitor/CullVisitor.cpp
-    Scene/Visitor/TransformVisitor.cpp
-    Scene/Visitor/Visitor.cpp
+	Scene/TransformVisitor.cpp
+	Scene/Visitor.cpp
 )
 
 SET ( TARGET_THREAD_SOURCES
@@ -710,20 +577,10 @@ SOURCE_GROUP( sources\\Database\\Detail FILES              ${TARGET_DATABASE_DET
 SOURCE_GROUP( sources\\Database\\Proprietary FILES         ${TARGET_DATABASE_PROPRIETARY_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem FILES                    ${TARGET_FILESYSTEM_SOURCES} )
 SOURCE_GROUP( sources\\FileSystem\\Detail FILES            ${TARGET_FILESYSTEM_DETAIL_SOURCES} )
-SOURCE_GROUP( sources\\FileSystem\\Native FILES            ${TARGET_FILESYSTEM_NATIVE_SOURCES} )
 SOURCE_GROUP( sources\\Input FILES                         ${TARGET_INPUT_SOURCES} )
 SOURCE_GROUP( sources\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Graphics FILES                      ${TARGET_GRAPHICS_SOURCES} )
 SOURCE_GROUP( sources\\Graphics\\Detail FILES              ${TARGET_GRAPHICS_DETAIL_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Effect FILES              ${TARGET_GRAPHICS_EFFECT_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Effect\\Detail FILES	   ${TARGET_GRAPHICS_EFFECT_DETAIL_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\GUI FILES                 ${TARGET_GRAPHICS_GUI_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Material FILES            ${TARGET_GRAPHICS_MATERIAL_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Pass FILES                ${TARGET_GRAPHICS_PASS_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\PostProcess FILES         ${TARGET_GRAPHICS_POST_PROCESS_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Renderable FILES          ${TARGET_GRAPHICS_RENDERABLE_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Renderable\\Debug FILES   ${TARGET_GRAPHICS_RENDERABLE_DEBUG_SOURCES} )
-SOURCE_GROUP( sources\\Graphics\\Renderer FILES            ${TARGET_GRAPHICS_RENDERER_SOURCES} )
 SOURCE_GROUP( sources\\Log FILES                           ${TARGET_LOG_SOURCES} )
 SOURCE_GROUP( sources\\Log\\Detail FILES                   ${TARGET_LOG_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Physics FILES                       ${TARGET_PHYSICS_SOURCES} )
@@ -732,9 +589,6 @@ SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( sources\\Realm FILES                         ${TARGET_REALM_SOURCES} )
 SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Camera FILES                 ${TARGET_SCENE_CAMERA_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Light FILES                  ${TARGET_SCENE_LIGHT_SOURCES} )
-SOURCE_GROUP( sources\\Scene\\Visitor FILES                ${TARGET_SCENE_VISITOR_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -752,29 +606,15 @@ SET ( TARGET_SOURCES
     ${TARGET_DATABASE_PROPRIETARY_SOURCES}
     ${TARGET_FILESYSTEM_SOURCES}
     ${TARGET_FILESYSTEM_DETAIL_SOURCES}
-    ${TARGET_FILESYSTEM_NATIVE_SOURCES}
     ${TARGET_INPUT_SOURCES}
     ${TARGET_INPUT_DETAIL_SOURCES} 
     ${TARGET_GRAPHICS_SOURCES}
     ${TARGET_GRAPHICS_DETAIL_SOURCES}
-    ${TARGET_GRAPHICS_EFFECT_SOURCES}
-    ${TARGET_GRAPHICS_EFFECT_DETAIL_SOURCES}
-    ${TARGET_GRAPHICS_GUI_SOURCES}
-    ${TARGET_GRAPHICS_MATERIAL_SOURCES}
-    ${TARGET_GRAPHICS_PASS_SOURCES}
-    ${TARGET_GRAPHICS_POST_PROCESS_SOURCES}
-    ${TARGET_GRAPHICS_RENDERABLE_SOURCES}
-    ${TARGET_GRAPHICS_RENDERABLE_DEBUG_SOURCES}
-    ${TARGET_GRAPHICS_RENDERER_SOURCES}
-    ${TARGET_GRAPHICS_WATER_SOURCES}
     ${TARGET_LOG_SOURCES}
     ${TARGET_LOG_DETAIL_SOURCES}
     ${TARGET_REALM_SOURCES}
     ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
-    ${TARGET_SCENE_CAMERA_SOURCES}
-    ${TARGET_SCENE_LIGHT_SOURCES}
-    ${TARGET_SCENE_VISITOR_SOURCES}
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}
@@ -892,56 +732,6 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	)
 
 	INSTALL (
-		FILES       ${TARGET_GRAPHICS_EFFECT_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Effect
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_EFFECT_DETAIL_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Effect/Detail
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_GUI_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/GUI
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_MATERIAL_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Material
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_PASS_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Pass
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_POST_PROCESS_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/PostProcess
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_RENDERABLE_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Renderable
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_RENDERABLE_DEBUG_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Renderable/Debug
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_RENDERER_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Renderer
-	)
-
-	INSTALL (
-		FILES       ${TARGET_GRAPHICS_WATER_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Graphics/Water
-	)
-
-	INSTALL (
 		FILES       ${TARGET_LOG_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Log
 	)
@@ -964,21 +754,6 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 	INSTALL (
 		FILES       ${TARGET_SCENE_HEADERS}
 		DESTINATION ${INSTALL_INCDIR}/slon/Scene
-	)
-
-	INSTALL (
-		FILES       ${TARGET_SCENE_CAMERA_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Scene/Camera
-	)
-
-	INSTALL (
-		FILES       ${TARGET_SCENE_LIGHT_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Scene/Light
-	)
-
-	INSTALL (
-		FILES       ${TARGET_SCENE_VISITORS_HEADERS}
-		DESTINATION ${INSTALL_INCDIR}/slon/Scene/Visitors
 	)
 
 	INSTALL (

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Database/DatabaseManager.h"
 #include "Database/Collada/Collada.h"
-#include "Graphics/Renderable/Mesh.h"
+#include "Graphics/Mesh.h"
 #include "Utility/URI/file_uri.hpp"
 #include <sgl/Math/Utility.hpp>
 #include <sstream>

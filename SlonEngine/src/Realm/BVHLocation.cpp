@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Database/Detail/UtilitySerialization.h"
-#include "Graphics/Renderable/Debug/DebugDrawCommon.h"
+#include "Graphics/DebugDrawCommon.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/EventVisitor.h"
 #include "Realm/World.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/TransformVisitor.h"
 #include "Utility/math.hpp"
 
 namespace {

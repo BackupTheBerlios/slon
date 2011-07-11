@@ -5,12 +5,12 @@
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
-#include "Graphics/Renderable/StaticMesh.h"
+#include "Graphics/StaticMesh.h"
 #include "Physics/RigidBodyTransform.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
-#include "Scene/Visitor/TransformVisitor.h"
+#include "Scene/TransformVisitor.h"
 #include "Utility/error.hpp"
 #include <boost/filesystem.hpp>
 #include <SDL.h>

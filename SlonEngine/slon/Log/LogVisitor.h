@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_LOG_LOG_VISITOR_H__
 #define __SLON_ENGINE_LOG_LOG_VISITOR_H__
 
-#include "../Scene/Visitor/Visitor.h"
+#include "../Scene/Visitor.h"
 #include "Logger.h"
 
 namespace slon {
