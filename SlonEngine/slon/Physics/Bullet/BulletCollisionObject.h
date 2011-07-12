@@ -8,16 +8,14 @@
 namespace slon {
 namespace physics {
 
-template<typename Base>
-class BulletCollisionObject :
-    public Base
+class BulletCollisionObject
 {
 private:
     typedef boost::signal<void (const Contact&)>        contact_signal;
     typedef boost::intrusive_ptr<BulletDynamicsWorld>   dynamics_world_ptr;
 
 public:
-    BulletCollisionObject(DynamicsWorld* dynamicsWorld);
+    BulletCollisionObject(CollisionObject* pInterface, DynamicsWorld* dynamicsWorld);
     virtual ~BulletCollisionObject();
 
     // Override CollisionObject
@@ -44,6 +42,7 @@ public:
     }
 
 protected:
+	CollisionObject*        pInterface;
     contact_signal          contactAppearSignal;
     contact_signal          contactDissapearSignal;
     dynamics_world_ptr      dynamicsWorld;

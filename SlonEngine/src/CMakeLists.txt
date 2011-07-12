@@ -487,11 +487,15 @@ SET ( TARGET_LOG_DETAIL_SOURCES
 
 SET ( TARGET_PHYSICS_SOURCES
     Physics/CollisionShape.cpp
-#    Physics/DynamicsWorld.cpp
-#    Physics/PhysicsMaterial.cpp
+    Physics/Constraint.cpp
+    Physics/DynamicsWorld.cpp
+    Physics/PhysicsMaterial.cpp
     Physics/PhysicsModel.cpp
     Physics/RigidBodyTransform.cpp
-#    Physics/RigidBody.cpp
+    Physics/RigidBody.cpp
+    Physics/ServoMotor.cpp
+    Physics/SpringMotor.cpp
+    Physics/VelocityMotor.cpp  
 )
 
 SET ( TARGET_PHYSICS_BULLET_SOURCES

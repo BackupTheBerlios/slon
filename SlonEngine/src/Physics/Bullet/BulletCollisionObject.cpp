@@ -7,8 +7,9 @@ namespace slon {
 namespace physics {
 
 template<typename Base>
-BulletCollisionObject<Base>::BulletCollisionObject(DynamicsWorld* dynamicsWorld_) :
-	dynamicsWorld( static_cast<BulletDynamicsWorld*>(dynamicsWorld_) )
+BulletCollisionObject<Base>::BulletCollisionObject(CollisionObject* pInterface_, DynamicsWorld* dynamicsWorld_) 
+:   pInterface(pInterface_)
+,   dynamicsWorld( static_cast<BulletDynamicsWorld*>(dynamicsWorld_) )
 {
 }
 

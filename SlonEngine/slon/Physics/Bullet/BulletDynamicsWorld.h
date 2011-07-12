@@ -35,8 +35,7 @@ struct compare_contact
 class BulletConstraint;
 
 /* Bullet implementation of the physics dynamics world. */
-class BulletDynamicsWorld :
-    public DynamicsWorld
+class BulletDynamicsWorld
 {
 friend class BulletRigidBody;
 private:
@@ -66,60 +65,37 @@ private:
     BulletDynamicsWorld& operator = (const BulletDynamicsWorld&);
 
 public:
-    BulletDynamicsWorld(const state_desc& desc);
+    BulletDynamicsWorld(DynamicsWorld* pInterface);
 
     //
-    void                accept(BulletSolverCollector& collector);
+    void accept(BulletSolverCollector& collector);
 
-    // Override dynamics world
-    void                setGravity(const math::Vector3r& gravity);
-    math::Vector3r      getGravity() const;
-    void                setFixedTimeStep(const real dt)             { desc.fixedTimeStep = dt; }
-    real                getFixedTimeStep() const                    { return desc.fixedTimeStep; }
-    const state_desc&   getStateDesc() const;
-    real                stepSimulation(real dt);
-    void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
-    unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
-	size_t				getNumSimulatedSteps() const				{ return numSimulatedSteps; }
+    // implement dynamics world
+    void setGravity(const math::Vector3r& gravity);
+    void setFixedTimeStep(const real dt)             { /* nothing */ }
+    real stepSimulation(real dt);
+    void setMaxNumSubSteps(unsigned maxSubSteps_)    { /* nothing */ }
 
-    RigidBodyTransform* createRigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr());
-    RigidBody*          createRigidBody(const RigidBody::state_desc& rigidBodyDesc);
-    Constraint*         createConstraint(const Constraint::state_desc& constraintDesc);
-
-    /** Get maximum number of substeps in the simulation step. */
     contact_const_iterator firstActiveContact() const   { return contacts.begin(); }
     contact_const_iterator endActiveContact() const     { return contacts.end(); }
-
-    thread::lock_ptr    lockForReading() const;
-    thread::lock_ptr    lockForWriting();
 
     // get bullet dynamics world
     btDynamicsWorld& getBtDynamicsWorld() { return *dynamicsWorld; }
 
 private:
-    state_desc                  desc;
+	DynamicsWorld*              pInterface;
     broadphase_ptr              broadPhase;
     collision_configuration_ptr collisionConfiguration;
     collision_dispatcher_ptr    collisionDispatcher;
     constraint_solver_ptr       constraintSolver;
     dynamics_world_ptr          dynamicsWorld;
 
-    // items
-    constraint_list             constraints;
-
-    // proprietary solvers
-    BulletSolverCollector       solverCollector;
-
     // settings 
-    unsigned                    maxSubSteps;
-	size_t						numSimulatedSteps;
+    size_t                      numSimulatedSteps;
 
     // for handling contact callbacks
     contact_vector              contacts;
     std::vector<math::Vector3r> contactPoints;
-
-    // mutex locks any camera modification
-    mutable boost::shared_mutex accessMutex;
 };
 
 } // namespace physics

@@ -20,8 +20,8 @@ namespace {
     {
         assert(desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies");
 
-        btRigidBody& rigidBodyA = *static_cast<BulletRigidBody*>(desc.rigidBodies[0])->getBtRigidBody();
-        btRigidBody& rigidBodyB = *static_cast<BulletRigidBody*>(desc.rigidBodies[1])->getBtRigidBody();
+        btRigidBody& rigidBodyA = *desc.rigidBodies[0]->getImpl()->getBtRigidBody();
+        btRigidBody& rigidBodyB = *desc.rigidBodies[1]->getImpl()->getBtRigidBody();
 
         btGeneric6DofConstraint* constraint = new btGeneric6DofConstraint( rigidBodyA,
                                                                            rigidBodyB,
@@ -31,14 +31,14 @@ namespace {
 
         for (int i = 0; i<3; ++i)
         {
-            if ( desc.linearLimits[0][i] == -std::numeric_limits<float>::infinity() && desc.linearLimits[1][i] == std::numeric_limits<float>::infinity() ) {
+            if ( desc.linearLimits[0][i] == -std::numeric_limits<real>::infinity() && desc.linearLimits[1][i] == std::numeric_limits<real>::infinity() ) {
                 constraint->setLimit(i, 1.0f, -1.0f); // unlocked
             }
             else {
                 constraint->setLimit(i, desc.linearLimits[0][i], desc.linearLimits[1][i]);
             }       
             
-            if ( desc.angularLimits[0][i] == -std::numeric_limits<float>::infinity() && desc.angularLimits[1][i] == std::numeric_limits<float>::infinity() ) {
+            if ( desc.angularLimits[0][i] == -std::numeric_limits<real>::infinity() && desc.angularLimits[1][i] == std::numeric_limits<real>::infinity() ) {
                 constraint->setLimit(i + 3, 1.0f, -1.0f); // unlocked
             }
             else {
@@ -101,218 +101,26 @@ BulletConstraint::BulletConstraint(const bullet_constraint_ptr& constraint_,
     }
 }
 
-BulletConstraint::BulletConstraint(const state_desc& _desc)
+BulletConstraint::BulletConstraint(const BulletDynamicsWorld&   world,
+                                   Constraint*                  pInterface_)
+:	pInterface(pInterface_)
 {
-    reset(_desc);
+    const state_desc& desc = pInterface->desc;
+
+    // get bodies
+    assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies.");  
+    BulletRigidBody* rigidBodyA = static_cast<BulletRigidBody*>( desc.rigidBodies[0]->getImpl() );
+    BulletRigidBody* rigidBodyB = static_cast<BulletRigidBody*>( desc.rigidBodies[1]->getImpl() );
+    assert( rigidBodyA && rigidBodyB && "Rigid bodies should be in world when instantiating constraint." );
+
+    // setup constraint
+    constraint.reset( createBulletConstraint(desc) );
+    world.getBtDynamicsWorld().addConstraint( constraint.get() );
 }
 
 BulletConstraint::~BulletConstraint()
 {
-    // remove constraint references
-    if (desc.rigidBodies[0]) unlink(*desc.rigidBodies[0]);
-    if (desc.rigidBodies[1]) unlink(*desc.rigidBodies[1]);
-}
-
-const char* BulletConstraint::serialize(database::OArchive& ar) const
-{
-    ar.writeStringChunk("name", desc.name.data(), desc.name.length());
-    ar.writeSerializable(desc.rigidBodies[0]);
-    ar.writeSerializable(desc.rigidBodies[1]);
-    ar.writeChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
-    ar.writeChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
-    ar.writeChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
-    ar.writeChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
-    ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
-    ar.writeChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    return "BulletConstraint";
-}
-
-void BulletConstraint::deserialize(database::IArchive& ar)
-{
-    ar.readStringChunk("name", desc.name);
-    desc.rigidBodies[0] = ar.readSerializable<RigidBody>();
-    desc.rigidBodies[1] = ar.readSerializable<RigidBody>();
-    ar.readChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
-    ar.readChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
-    ar.readChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
-    ar.readChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
-    ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
-    ar.readChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    reset(desc);
-}
-
-void BulletConstraint::unlink(const RigidBody& rigidBody)
-{
-    if (desc.rigidBodies[0] == &rigidBody) 
-    {
-        static_cast<BulletRigidBody*>(desc.rigidBodies[0])->removeConstraint(*this);
-        desc.rigidBodies[0] = 0;
-    }
-    else if (desc.rigidBodies[1] == &rigidBody) 
-    {
-        static_cast<BulletRigidBody*>(desc.rigidBodies[1])->removeConstraint(*this);
-        desc.rigidBodies[1] = 0;
-    }
-    else {
-        return;
-    }
-
-    // destroy invalid constraint
-    destroy();
-}
-
-void BulletConstraint::destroy()
-{
-    if (constraint) 
-    {
-        assert(dynamicsWorld);
-
-        // destroy
-        dynamicsWorld->getBtDynamicsWorld().removeConstraint( constraint.get() );
-        constraint.reset();
-    }
-}
-
-void BulletConstraint::reset(const state_desc& _desc)
-{
-    destroy();
-
-    // get bodies
-    assert( _desc.rigidBodies[0] && _desc.rigidBodies[1] && "Constraint must specify affected rigid bodies");  
-    BulletRigidBody* rigidBodyA = static_cast<BulletRigidBody*>(_desc.rigidBodies[0]);
-    BulletRigidBody* rigidBodyB = static_cast<BulletRigidBody*>(_desc.rigidBodies[1]);
-
-    // setup constraint
-    bullet_constraint_ptr newConstraint( createBulletConstraint(_desc) );
-    assert( rigidBodyA->dynamicsWorld == rigidBodyB->dynamicsWorld && "Linked bodies must be in same dynamics world" );
-    {
-        dynamicsWorld = rigidBodyA->dynamicsWorld;
-        if ( newConstraint->getRigidBodyA().isInWorld() && newConstraint->getRigidBodyB().isInWorld() ) {
-            dynamicsWorld->getBtDynamicsWorld().addConstraint( newConstraint.get() );
-        }
-        
-        // attach constraints to rigid body
-        for (int i = 0; i<2; ++i) 
-        {
-            BulletRigidBody* oldRigidBody = static_cast<BulletRigidBody*>( desc.rigidBodies[i] );
-            BulletRigidBody* rigidBody    = static_cast<BulletRigidBody*>( _desc.rigidBodies[i] );
-            if (oldRigidBody != rigidBody) 
-            {
-                rigidBody->constraints.push_back(this);
-                if (oldRigidBody) {
-                    oldRigidBody->removeConstraint(*this);
-                }
-            }
-        }
-    }
-    constraint.swap(newConstraint);
-
-    // create motors
-    for (int i = 0; i<3; ++i)
-    {
-        if ( fabs(desc.angularLimits[0][i] - desc.angularLimits[1][i]) > 0.02f && rotationalMotors[i] ) {
-            rotationalMotors[i]->reset(this, i);
-        }
-        else {
-            rotationalMotors[i].reset();
-        }
-    }
-
-    if (newConstraint) 
-    {
-        dynamicsWorld->getBtDynamicsWorld().removeConstraint( newConstraint.get() );
-        newConstraint.reset();
-    }
-
-    desc = _desc;
-}
-
-const Motor* BulletConstraint::getMotor(Motor::TYPE motor) const
-{
-    assert(motor < 6); 
-    
-    if (motor < 3) {
-        return 0;
-    }
-    
-    return rotationalMotors[motor - 3] ? rotationalMotors[motor - 3]->asMotor() : 0; 
-}
-
-Motor* BulletConstraint::getMotor(Motor::TYPE motor)            
-{ 
-    assert(motor < 6); 
-    
-    if (motor < 3) {
-        return 0;
-    }
-    
-    return rotationalMotors[motor - 3] ? rotationalMotors[motor - 3]->asMotor() : 0; 
-}
-
-ServoMotor* BulletConstraint::createServoMotor(Motor::TYPE motor)
-{
-    btGeneric6DofConstraint* genericConstraint = (btGeneric6DofConstraint*)constraint.get();
-    if (motor >= 3) 
-    {
-        // rotational
-        int i = motor - 3;
-        if ( fabs(desc.angularLimits[0][i] - desc.angularLimits[1][i]) > 0.02f ) 
-        {
-            BulletRotationalServoMotor* m = new BulletRotationalServoMotor(this, i);
-            rotationalMotors[i].reset(m);
-            return m;
-        }
-    }
-    else 
-    {
-        // translational
-    }
-
-    return 0;
-}
-
-VelocityMotor* BulletConstraint::createVelocityMotor(Motor::TYPE motor)
-{
-    btGeneric6DofConstraint* genericConstraint = (btGeneric6DofConstraint*)constraint.get();
-    if (motor >= 3) 
-    {
-        // rotational
-        int i = motor - 3;
-        if ( fabs(desc.angularLimits[0][i] - desc.angularLimits[1][i]) > 0.02f ) 
-        {
-            BulletRotationalVelocityMotor* m = new BulletRotationalVelocityMotor(this, i);
-            rotationalMotors[i].reset(m);
-            return m;
-        }
-    }
-    else 
-    {
-        // translational
-    }
-
-    return 0;
-}
-
-SpringMotor* BulletConstraint::createSpringMotor(Motor::TYPE motor)
-{
-    btGeneric6DofConstraint* genericConstraint = (btGeneric6DofConstraint*)constraint.get();
-    if (motor >= 3) 
-    {
-        // rotational
-        int i = motor - 3;
-        if ( fabs(desc.angularLimits[0][i] - desc.angularLimits[1][i]) > 0.02f ) 
-        {
-            BulletRotationalSpringMotor* m = new BulletRotationalSpringMotor(this, i);
-            rotationalMotors[i].reset(m);
-            return m;
-        }
-    }
-    else 
-    {
-        // translational
-    }
-
-    return 0;
+	dynamicsWorld->getBtDynamicsWorld().removeConstraint( constraint.get() );
 }
 
 math::Vector3r BulletConstraint::getAxis(unsigned int axis) const
@@ -321,24 +129,14 @@ math::Vector3r BulletConstraint::getAxis(unsigned int axis) const
     return to_vec( constraint->getAxis(axis) );
 }
 
-real BulletConstraint::getRotationAngle(unsigned int axis) const
+real BulletConstraint::getPosition(Constraint::DOF dof) const
 {
-    return constraint->getRotationalLimitMotor(axis)->m_currentPosition;
-}
-
-BulletConstraint::AXIS_RESTRICTION BulletConstraint::getAxisRestriction(unsigned int axis) const
-{
-    assert(axis < 3);
-    if (!rotationalMotors[axis]) {
-        return AXIS_LOCKED;
-    }
-
-    const btRotationalLimitMotor* motor = constraint->getRotationalLimitMotor(axis);
-    if (motor->m_loLimit > motor->m_hiLimit) { 
-        return AXIS_FREE;
-    }
-
-    return AXIS_RESTRICTED;
+    if (dof < 3) {
+		return 0.0f;/*constraint->getTranslationalLimitMotor(dof)->m*/
+	}
+	else {
+		return constraint->getRotationalLimitMotor(dof - 3)->m_currentPosition;
+	}
 }
 
 void BulletConstraint::accept(BulletSolverCollector& collector)

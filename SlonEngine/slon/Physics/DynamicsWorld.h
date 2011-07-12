@@ -1,22 +1,19 @@
 #ifndef __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 #define __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 
-#include <sgl/Math/AABB.hpp>
-#include <vector>
-#include "../Thread/Lock.h"
 #include "../Utility/referenced.hpp"
 #include "PhysicsModel.h"
+#include <sgl/Math/AABB.hpp>
+#include <vector>
 
 namespace slon {
 namespace physics {
-
-// forward
-class CollisionObject;
 
 /** Dynamics world or physics scene, as you wish. */
 class DynamicsWorld :
     public Referenced
 {
+friend class RigidBody;
 public:
     enum COLLISION_TYPE
     {
@@ -33,12 +30,14 @@ public:
         COLLISION_TYPE  collisionType;
         math::Vector3r  gravity;
         real            fixedTimeStep;
+        size_t          maxNumSubSteps;
 
         state_desc() :
             worldSize( math::Vector3r(0), math::Vector3r(0) ),
             collisionType(CT_DISCRETE),
             gravity(0, real(-9.8), 0),
-            fixedTimeStep( real(1.0 / 60.0) )
+            fixedTimeStep( real(1.0 / 60.0) ),
+            maxNumSubSteps(3)
         {}
     };
 
@@ -47,65 +46,59 @@ public:
     typedef contact_vector::const_iterator  contact_const_iterator;
 
 public:
+    DynamicsWorld(const state_desc& desc);
+
     /** Setup world's gravity and its direction. */
-    virtual void setGravity(const math::Vector3r& gravity) = 0;
+    void setGravity(const math::Vector3r& gravity);
 
     /** Get gravity of our toy world. */
-    virtual math::Vector3r getGravity() const = 0;
+    math::Vector3r getGravity() const;
 
     /** Set fixed time step for simulation */
-    virtual void setFixedTimeStep(const real dt) = 0;
+    void setFixedTimeStep(const real dt);
 
     /** Set fixed time step of the simulation */
-    virtual real getFixedTimeStep() const = 0;
+    real getFixedTimeStep() const;
 
-	/** Get number of simulation steps performed */
-	virtual size_t getNumSimulatedSteps() const = 0;
+    /** Get number of simulation steps performed */
+    size_t getNumSimulatedSteps() const;
 
     /** Get description of the world. */
-    virtual const state_desc& getStateDesc() const = 0;
+    const state_desc& getStateDesc() const;
 
     /** Step simulation. 
      * @return "unsimulated" time < fixedTimeStep
      */
-    virtual real stepSimulation(real dt) = 0;
+    real stepSimulation(real dt);
 
     /** Set maximum number of substeps in the simulation step. */
-    virtual void setMaxNumSubSteps(unsigned maxSubSteps) = 0;
+    void setMaxNumSubSteps(unsigned maxSubSteps);
 
     /** Get maximum number of substeps in the simulation step. */
-    virtual unsigned getMaxNumSubSteps() const = 0;
+    unsigned getMaxNumSubSteps() const;
 
     /** Get iterator for enumerating active contacts. */
-    virtual contact_const_iterator firstActiveContact() const = 0; 
+    contact_const_iterator firstActiveContact() const; 
 
     /** Get iterator end iterator for enumerating active contacts */
-    virtual contact_const_iterator endActiveContact() const = 0;
+    contact_const_iterator endActiveContact() const;
 
-    /** Create rigid body transform node. */
-    virtual RigidBodyTransform* createRigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr()) = 0;
+    /** Add rigid body into the world. */
+    void addRigidBody(RigidBody* rigidBody);
 
-    /** Create rigid body and add it to the world. */
-    virtual RigidBody* createRigidBody(const RigidBody::state_desc& rigidBodyDesc) = 0;
+    /** Add constraint into the world. */
+    void addConstraint(Constraint* constraint);
 
-    /** Create constraint and add it to the world. */
-    virtual Constraint* createConstraint(const Constraint::state_desc& constraintDesc) = 0;
+    /** Remove rigid body from the world. Return true if succeeded. */
+    bool removeRigidBody(RigidBody* rigidBody);
 
-    /** Grant thread read access to the world.
-     * @return lock object. Lock is freed whether object is deleted.
-     */
-    virtual thread::lock_ptr lockForReading() const = 0;
+    /** Add constraint into the world. Return true if succeeded. */
+    bool removeConstraint(Constraint* constraint);
 
-    /** Grant thread write access to the world.
-     * @return lock object. Lock is freed whether object is deleted.
-     */
-    virtual thread::lock_ptr lockForWriting() = 0;
-
-    virtual ~DynamicsWorld() {}
+private:
+	state_desc desc;
+	impl_ptr   impl;
 };
-
-typedef boost::intrusive_ptr<DynamicsWorld>         dynamics_world_ptr;
-typedef boost::intrusive_ptr<const DynamicsWorld>   const_dynamics_world_ptr;
 
 } // namespace physics
 } // namespace slon

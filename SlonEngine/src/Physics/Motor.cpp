@@ -13,6 +13,17 @@ class Constraint;
 class Motor
 {
 public:
+    enum TYPE
+    {
+        MOTOR_X_TRANS,
+        MOTOR_Y_TRANS,
+        MOTOR_Z_TRANS,
+        MOTOR_X_ROT,
+        MOTOR_Y_ROT,
+        MOTOR_Z_ROT
+    };
+
+public:
     /** Get constraint to which motor is attached */
     virtual const Constraint* getConstraint() const = 0;
 
