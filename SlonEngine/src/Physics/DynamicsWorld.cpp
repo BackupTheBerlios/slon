@@ -60,14 +60,15 @@ real DynamicsWorld::stepSimulation(real dt)
 {
 	return impl->stepSimulation(dt);
 }
-contact_const_iterator DynamicsWorld::firstActiveContact() const
+
+DynamicsWorld::contact_const_iterator DynamicsWorld::firstActiveContact() const
 {
-	return impl->firstActiveContant();
+	return impl->firstActiveContact();
 }
 
-contact_const_iterator DynamicsWorld::endActiveContact() const
+DynamicsWorld::contact_const_iterator DynamicsWorld::endActiveContact() const
 {
-	return impl->endActiveContant();
+	return impl->endActiveContact();
 }
 
 void DynamicsWorld::addRigidBody(RigidBody* rigidBody)

@@ -18,11 +18,12 @@ class Constraint :
     public Referenced,
     public database::Serializable
 {
-private:
+public:
     friend class DynamicsWorld;
 #ifdef SLON_ENGINE_USE_BULLET
     friend class BulletConstraint;
-    typedef boost::scoped_ptr<BulletConstraint> impl_ptr;
+    typedef BulletConstraint             impl_type;
+    typedef boost::scoped_ptr<impl_type> impl_ptr;
 #endif
 
 public:
@@ -66,7 +67,7 @@ public:
 
 public:
     Constraint(dynamics_world_ptr world,
-               const state_desc&  desc)
+               const state_desc&  desc);
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -131,6 +132,12 @@ public:
     /** Recreate constraint from description. */
     void reset(const state_desc& desc);
 
+	/** Get implementation object */
+	impl_type* getImpl() { return impl.get(); }
+
+	/** Get implementation object */
+	const impl_type* getImpl() const { return impl.get(); }
+
 private:
 	/** Add constraint into the world, should be called by DynamicsWorld. */
 	void setWorld(const dynamics_world_ptr& world);
@@ -142,10 +149,10 @@ private:
 	void release();
 
 private:
-	dynamics_world_ptr   world;
-	state_desc           desc;
-	impl_ptr             impl;
-	rotational_motor_ptr motors[6];
+	dynamics_world_ptr world;
+	state_desc         desc;
+	impl_ptr           impl;
+	motor_ptr          motors[6];
 };
 
 } // namespace physics

@@ -1,41 +1,104 @@
-#ifndef __SLON_ENGINE_PHYSICS_VELOCITY_MOTOR_H__
-#define __SLON_ENGINE_PHYSICS_VELOCITY_MOTOR_H__
-
-#include "Motor.h"
+#include "stdafx.h"
+#include "Physics/Constraint.h"
+#include "Physics/VelocityMotor.h"
+#ifdef SLON_ENGINE_USE_BULLET
+#	include "Physics/Bullet/BulletRotationalVelocityMotor.h"
+#endif
 
 namespace slon {
 namespace physics {
 
-/** The motor controlled by velocity. Usually underlying physics engine trying
- * to solve multi-rigid-body simulation problem, keeping the provided velocity constraints,
- * using LCP solver or some similar staff.
- */
-class VelocityMotor :
-    public Motor
+VelocityMotor::VelocityMotor(Constraint*     constraint_, 
+	                         Constraint::DOF dof_)
+:	constraint(constraint_)
+,	dof(dof_)
 {
-public:
-    /** Check wether motor is enabled. */
-    virtual bool enabled() const = 0;
+}
 
-    /** Enable/Disable motor. */
-    virtual void toggle(bool toggle) = 0;
+Motor::TYPE VelocityMotor::getType() const
+{
+	return MOTOR_SERVO;
+}
 
-    /** Get velocity(angular velocity) which motor is trying to reach. */
-    virtual real getTargetVelocity() const = 0;
+const Constraint* VelocityMotor::getConstraint() const
+{
+	return constraint;
+}
 
-    /** Set velocity(angular velocity) which motor will try to reach. */
-    virtual void setTargetVelocity(real velocity) = 0;
+Constraint::DOF VelocityMotor::getDOF() const
+{
+	return dof;
+}
 
-    /** Get maximum force(torque) the motor can apply. Must be non negative. */
-    virtual real getMaxForce() const = 0;
+math::Vector3r VelocityMotor::getAxis() const
+{
+	return impl->getAxis();
+}
 
-    /** Set maximum force(torque) the motor can apply. Must be non negative. */
-    virtual void setMaxForce(real force) = 0;
+real VelocityMotor::getLoLimit() const
+{
+	return impl->getLoLimit();
+}
 
-    virtual ~VelocityMotor() {} 
-};
+real VelocityMotor::getHiLimit() const
+{
+	return impl->getHiLimit();
+}
+
+real VelocityMotor::getPosition() const
+{
+	return impl->getPosition();
+}
+
+real VelocityMotor::getVelocity() const
+{
+	return impl->getVelocity();
+}
+
+real VelocityMotor::getForce() const
+{
+	return impl->getForce();
+}
+
+bool VelocityMotor::enabled() const
+{
+	return impl->enabled();
+}
+
+void VelocityMotor::toggle(bool toggle)
+{
+	impl->toggle(toggle);
+}
+
+real VelocityMotor::getTargetVelocity() const
+{
+	return impl->getTargetVelocity();
+}
+
+void VelocityMotor::setTargetVelocity(real force)
+{
+	impl->setTargetVelocity(force);
+}
+
+real VelocityMotor::getMaxForce() const
+{
+	return impl->getMaxForce();
+}
+
+void VelocityMotor::setMaxForce(real force)
+{
+	impl->setMaxForce(force);
+}
+
+void VelocityMotor::instantiate()
+{
+	impl.reset( new impl_type(constraint->getImpl(), dof) );
+}
+
+void VelocityMotor::release()
+{
+	impl.reset();
+}
 
 } // namespace physics
 } // namespace slon
-
-#endif // __SLON_ENGINE_PHYSICS_VELOCITY_DRIVEN_MOTOR_H__

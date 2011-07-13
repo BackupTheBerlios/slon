@@ -2,8 +2,6 @@
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletCommon.h"
-#include "Physics/Bullet/BulletConstraint.h"
-#include "Physics/Bullet/BulletRigidBody.h"
 #include "Physics/CollisionObject.h"
 #include <sgl/Math/Utility.hpp>
 
@@ -51,36 +49,20 @@ void BulletDynamicsWorld::setGravity(const math::Vector3r& gravity)
 	dynamicsWorld->setGravity( to_bt_vec(gravity) );
 }
 
-void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
-{
-    std::for_each( constraints.begin(),
-                   constraints.end(),
-                   boost::bind(&BulletConstraint::accept, _1, boost::ref(collector)) );
-}
-
 real BulletDynamicsWorld::stepSimulation(real dt)
 {
     if (dt < 0) {
         return 0;
     }
 
-    // simulate
-    accept(solverCollector);
-
     real t = 0;
     {
         const state_desc& desc = pInterface->desc;
-        for (unsigned i = 0; i<desc.maxSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
+        for (unsigned i = 0; i<desc.maxNumSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
         {
-            solverCollector.solve(desc.fixedTimeStep); // run proprietary solvers
             dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
         }
     }
-    solverCollector.clear();
-
-    // calculate angle info after
-    accept(solverCollector);
-    solverCollector.clear();
 
     // enumerate contacts
     contact_vector              currentContacts;

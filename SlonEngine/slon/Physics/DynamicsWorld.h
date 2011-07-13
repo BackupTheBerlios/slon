@@ -13,7 +13,13 @@ namespace physics {
 class DynamicsWorld :
     public Referenced
 {
-friend class RigidBody;
+private:
+#ifdef SLON_ENGINE_USE_BULLET
+    friend class BulletDynamicsWorld;
+	typedef BulletDynamicsWorld          impl_type;
+    typedef boost::scoped_ptr<impl_type> impl_ptr;
+#endif
+
 public:
     enum COLLISION_TYPE
     {
@@ -94,6 +100,12 @@ public:
 
     /** Add constraint into the world. Return true if succeeded. */
     bool removeConstraint(Constraint* constraint);
+
+	/** Get implementation object */
+	impl_type* getImpl() { return impl.get(); }
+
+	/** Get implementation object */
+	const impl_type* getImpl() const { return impl.get(); }
 
 private:
 	state_desc desc;

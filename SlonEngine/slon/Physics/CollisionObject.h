@@ -62,7 +62,7 @@ public:
     virtual const CollisionShape* getCollisionShape() const = 0;
 
     /** Get dynamics world where object is created. */
-    virtual const DynamicsWorld& getDynamicsWorld() const = 0;
+    virtual const DynamicsWorld* getDynamicsWorld() const = 0;
 
     /** Get name of the objecty */
     virtual const std::string& getName() const = 0;

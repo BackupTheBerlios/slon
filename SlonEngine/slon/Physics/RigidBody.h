@@ -20,7 +20,8 @@ private:
     friend class DynamicsWorld;
 #ifdef SLON_ENGINE_USE_BULLET
     friend class BulletRigidBody;
-    typedef boost::scoped_ptr<BulletRigidBody> impl_ptr;
+	typedef BulletRigidBody              impl_type;
+    typedef boost::scoped_ptr<impl_type> impl_ptr;
 
 #endif
 public:
@@ -82,7 +83,7 @@ public:
 	// Override CollisionObject
 	COLLISION_TYPE        getCollisionType() const;
     const CollisionShape* getCollisionShape() const;
-    const DynamicsWorld&  getDynamicsWorld() const;
+    const DynamicsWorld*  getDynamicsWorld() const;
     const std::string&    getName() const;
     math::Matrix4r        getTransform() const;
     void                  setTransform(const math::Matrix4r& transform);
@@ -161,6 +162,12 @@ public:
     /** Get iterator addressing end of the constraints */
     constraint_iterator endConstraint();
 
+	/** Get implementation object. */
+	impl_type* getImpl() { return impl.get(); }
+
+	/** Get implementation object. */
+	const impl_type* getImpl() const { return impl.get(); }
+
 private:
     /** Add rigid body into the world, should be called by DynamicsWorld. */
     void setWorld(const dynamics_world_ptr& world);
@@ -175,7 +182,7 @@ private:
     dynamics_world_ptr world;
     state_desc         desc;
     impl_ptr           impl;
-	constraint_vector  constraints;
+    constraint_vector  constraints;
 };
 
 // ptr typedef

@@ -1,25 +1,39 @@
 #include "stdafx.h"
-#define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletCollisionObject.h"
-#include "Physics/RigidBody.h"
+#include "Physics/Bullet/BulletDynamicsWorld.h"
 
 namespace slon {
 namespace physics {
 
-template<typename Base>
-BulletCollisionObject<Base>::BulletCollisionObject(CollisionObject* pInterface_, DynamicsWorld* dynamicsWorld_) 
+BulletCollisionObject::BulletCollisionObject(CollisionObject* pInterface_, DynamicsWorld* dynamicsWorld_) 
 :   pInterface(pInterface_)
-,   dynamicsWorld( static_cast<BulletDynamicsWorld*>(dynamicsWorld_) )
+,   dynamicsWorld( dynamicsWorld_->getImpl() )
 {
 }
 
-template<typename Base>
-BulletCollisionObject<Base>::~BulletCollisionObject()
+BulletCollisionObject::~BulletCollisionObject()
 {
 }
 
-// explicit instantiation
-template class BulletCollisionObject<RigidBody>;
+CollisionObject::connection_type BulletCollisionObject::connectContactAppearCallback(const CollisionObject::contact_handler& handler)
+{
+    return contactAppearSignal.connect(handler); 
+}
+
+CollisionObject::connection_type BulletCollisionObject::connectContactDissapearCallback(const CollisionObject::contact_handler& handler)
+{
+    return contactDissapearSignal.connect(handler); 
+}
+
+void BulletCollisionObject::handleAppearingContact(const Contact& contact)
+{
+    contactAppearSignal(contact);
+}
+
+void BulletCollisionObject::handleDissappearingContact(const Contact& contact)
+{
+    contactDissapearSignal(contact);
+}
 
 } // namespace slon
 } // namespace physics

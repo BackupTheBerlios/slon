@@ -10,7 +10,7 @@ namespace slon {
 namespace physics {
 
 class BulletRigidBody :
-    public BulletCollisionObject
+	public BulletCollisionObject
 {
 friend class BulletConstraint;
 public:
@@ -28,13 +28,12 @@ private:
 	BulletRigidBody& operator = (const BulletRigidBody&);
 
 public:
-    BulletRigidBody(RigidBody*           pInterface,
-                    DynamicsWorld*       dynamicsWorld,
-		            const rigid_body_ptr rigidBody, 
-                    const std::string&   name );
-    BulletRigidBody(RigidBody*                   pInterface,
-                    DynamicsWorld*               dynamicsWorld,
-		            const RigidBody::state_desc& desc );
+    BulletRigidBody(RigidBody*         pInterface,
+                    DynamicsWorld*     dynamicsWorld,
+                    btRigidBody*       rigidBody, 
+                    const std::string& name );
+    BulletRigidBody(RigidBody*         pInterface,
+                    DynamicsWorld*     dynamicsWorld);
     ~BulletRigidBody();
 
     // Implement RigidBody
@@ -57,7 +56,7 @@ public:
     void    toggleSimulation(bool toggle);
 
     /** Get internal bullet rigid body. */
-    const rigid_body_ptr& getBtRigidBody() const { return rigidBody; }
+    btRigidBody& getBtRigidBody() const { return (*rigidBody); }
 
 private:
     RigidBody*          pInterface;

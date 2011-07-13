@@ -6,9 +6,7 @@
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
-#include "Physics/Bullet/BulletRotationalServoMotor.h"
-#include "Physics/Bullet/BulletRotationalSpringMotor.h"
-#include "Physics/Bullet/BulletRotationalVelocityMotor.h"
+#include "Physics/Bullet/BulletDynamicsWorld.h"
 #include <sgl/Math/Utility.hpp>
 
 namespace {
@@ -20,8 +18,8 @@ namespace {
     {
         assert(desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies");
 
-        btRigidBody& rigidBodyA = *desc.rigidBodies[0]->getImpl()->getBtRigidBody();
-        btRigidBody& rigidBodyB = *desc.rigidBodies[1]->getImpl()->getBtRigidBody();
+        btRigidBody& rigidBodyA = desc.rigidBodies[0]->getImpl()->getBtRigidBody();
+        btRigidBody& rigidBodyB = desc.rigidBodies[1]->getImpl()->getBtRigidBody();
 
         btGeneric6DofConstraint* constraint = new btGeneric6DofConstraint( rigidBodyA,
                                                                            rigidBodyB,
@@ -54,8 +52,8 @@ namespace {
 namespace slon {
 namespace physics {
 
-BulletConstraint::BulletConstraint(const bullet_constraint_ptr& constraint_,
-                                   const std::string&           name_) :
+BulletConstraint::BulletConstraint(btGeneric6DofConstraint* constraint_,
+                                   const std::string&       name_) :
     constraint(constraint_)
 {
     assert(constraint);
@@ -80,31 +78,14 @@ BulletConstraint::BulletConstraint(const bullet_constraint_ptr& constraint_,
                                                 genericConstraint->getRotationalLimitMotor(1)->m_hiLimit,
                                                 genericConstraint->getRotationalLimitMotor(2)->m_hiLimit );
     }
-
-    // link with rigid body
-    for (int i = 0; i<2; ++i)
-    {
-        if ( BulletRigidBody* rb = static_cast<BulletRigidBody*>(desc.rigidBodies[i]) )
-        {
-            BulletRigidBody::constraint_iterator iter = std::find(rb->constraints.begin(), rb->constraints.end(), this);
-            if ( iter == rb->constraints.end() ) {
-                rb->constraints.push_back(this);
-            }
-
-            if (!dynamicsWorld) {
-                dynamicsWorld = rb->dynamicsWorld;
-            }
-            else {
-                assert(dynamicsWorld == rb->dynamicsWorld);
-            }
-        }
-    }
 }
 
-BulletConstraint::BulletConstraint(const BulletDynamicsWorld&   world,
-                                   Constraint*                  pInterface_)
+BulletConstraint::BulletConstraint(Constraint*      pInterface_,
+					               DynamicsWorld*   dynamicsWorld_)
 :	pInterface(pInterface_)
+,	dynamicsWorld(dynamicsWorld_->getImpl())
 {
+	assert(dynamicsWorld);
     const state_desc& desc = pInterface->desc;
 
     // get bodies
@@ -115,7 +96,7 @@ BulletConstraint::BulletConstraint(const BulletDynamicsWorld&   world,
 
     // setup constraint
     constraint.reset( createBulletConstraint(desc) );
-    world.getBtDynamicsWorld().addConstraint( constraint.get() );
+    dynamicsWorld->getBtDynamicsWorld().addConstraint( constraint.get() );
 }
 
 BulletConstraint::~BulletConstraint()

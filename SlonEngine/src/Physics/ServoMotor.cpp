@@ -1,29 +1,89 @@
-#ifndef __SLON_ENGINE_PHYSICS_SERVO_MOTOR_H__
-#define __SLON_ENGINE_PHYSICS_SERVO_MOTOR_H__
-
-#include "Motor.h"
+#include "stdafx.h"
+#include "Physics/Constraint.h"
+#include "Physics/ServoMotor.h"
+#ifdef SLON_ENGINE_USE_BULLET
+#	include "Physics/Bullet/BulletRotationalServoMotor.h"
+#endif
 
 namespace slon {
 namespace physics {
 
-/** The simpliest motor, can apply force(torque). */
-class ServoMotor :
-    public Motor
+ServoMotor::ServoMotor(Constraint*     constraint_, 
+	                   Constraint::DOF dof_)
+:	constraint(constraint_)
+,	dof(dof_)
 {
-public:
-    /** Check wether motor is enabled (non zero target force) */
-    virtual bool enabled() const = 0;
+}
 
-    /** Set force(torque) the motor want to apply. */
-    virtual real getTargetForce() const = 0;
+Motor::TYPE ServoMotor::getType() const
+{
+	return MOTOR_SERVO;
+}
 
-    /** Set force(torque) the motor want to apply. */
-    virtual void setTargetForce(real force) = 0;
+const Constraint* ServoMotor::getConstraint() const
+{
+	return constraint;
+}
 
-    virtual ~ServoMotor() {} 
-};
+Constraint::DOF ServoMotor::getDOF() const
+{
+	return dof;
+}
+
+math::Vector3r ServoMotor::getAxis() const
+{
+	return impl->getAxis();
+}
+
+real ServoMotor::getLoLimit() const
+{
+	return impl->getLoLimit();
+}
+
+real ServoMotor::getHiLimit() const
+{
+	return impl->getHiLimit();
+}
+
+real ServoMotor::getPosition() const
+{
+	return impl->getPosition();
+}
+
+real ServoMotor::getVelocity() const
+{
+	return impl->getVelocity();
+}
+
+real ServoMotor::getForce() const
+{
+	return impl->getForce();
+}
+
+bool ServoMotor::enabled() const
+{
+	return impl->enabled();
+}
+
+real ServoMotor::getTargetForce() const
+{
+	return impl->getTargetForce();
+}
+
+void ServoMotor::setTargetForce(real force)
+{
+	impl->setTargetForce(force);
+}
+
+void ServoMotor::instantiate()
+{
+	impl.reset( new impl_type(constraint->getImpl(), dof) );
+}
+
+void ServoMotor::release()
+{
+	impl.reset();
+}
 
 } // namespace physics
 } // namespace slon
-
-#endif // __SLON_ENGINE_PHYSICS_SERVO_MOTOR_H__

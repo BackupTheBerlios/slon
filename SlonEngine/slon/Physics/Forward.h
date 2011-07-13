@@ -73,6 +73,8 @@ typedef boost::intrusive_ptr<Constraint>				constraint_ptr;
 typedef boost::intrusive_ptr<const Constraint>			const_constraint_ptr;
 typedef boost::intrusive_ptr<DynamicsWorld>				dynamics_world_ptr;
 typedef boost::intrusive_ptr<const DynamicsWorld>		const_dynamics_world_ptr;
+typedef boost::intrusive_ptr<Motor>						motor_ptr;
+typedef boost::intrusive_ptr<const Motor>				const_motor_ptr;
 typedef boost::intrusive_ptr<PhysicsMaterial>			physics_material_ptr;
 typedef boost::intrusive_ptr<const PhysicsMaterial>		const_physics_material_ptr;
 typedef boost::intrusive_ptr<PhysicsModel>				physics_model_ptr;

@@ -41,10 +41,11 @@ private:
     void destroy();
 
 public:
-    BulletConstraint(const bullet_constraint_ptr& constraint,
-                     const std::string&           name);
-    BulletConstraint(const BulletDynamicsWorld&   world,
-                     Constraint*                  pInterface);
+    BulletConstraint(btGeneric6DofConstraint* constraint,
+                     const std::string&       name);
+    BulletConstraint(Constraint*      pInterface,
+					 DynamicsWorld*   dynamicsWorld);
+	~BulletConstraint();
 
     /** Get internal bullet constraint */
     btGeneric6DofConstraint* getBtConstraint() { return constraint.get(); }
@@ -56,16 +57,16 @@ public:
     void accept(BulletSolverCollector& collector);
 
     // Override Constraint
-    RigidBody*       getRigidBodyA() const { return desc.rigidBodies[0]; }
-    RigidBody*       getRigidBodyB() const { return desc.rigidBodies[1]; }
+    RigidBody*       getRigidBodyA() const { return desc.rigidBodies[0].get(); }
+    RigidBody*       getRigidBodyB() const { return desc.rigidBodies[1].get(); }
 
     math::Vector3r   getAxis(unsigned int axis) const;
     real             getPosition(Constraint::DOF dof) const;
 
 private:
     Constraint*             pInterface;
-    bullet_constraint_ptr   constraint;
     dynamics_world_ptr      dynamicsWorld;
+    bullet_constraint_ptr   constraint;
     slist_hook              dynamicsWorldHook; // to store in dynamics World
 };
 

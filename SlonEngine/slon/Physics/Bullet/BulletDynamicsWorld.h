@@ -3,11 +3,7 @@
 
 #define NOMINMAX
 #include "../DynamicsWorld.h"
-#include "BulletConstraint.h"
-#include "BulletSolverCollector.h"
-#include <boost/intrusive/slist.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include <sgl/Math/Containers.hpp>
@@ -39,42 +35,25 @@ class BulletDynamicsWorld
 {
 friend class BulletRigidBody;
 private:
-    typedef boost::shared_ptr<btBroadphaseInterface>    broadphase_ptr;
-    typedef boost::shared_ptr<btCollisionConfiguration> collision_configuration_ptr;
-    typedef boost::shared_ptr<btCollisionDispatcher>    collision_dispatcher_ptr;
-    typedef boost::shared_ptr<btConstraintSolver>       constraint_solver_ptr;
-    typedef boost::shared_ptr<btDynamicsWorld>          dynamics_world_ptr;
+    typedef boost::scoped_ptr<btBroadphaseInterface>    broadphase_ptr;
+    typedef boost::scoped_ptr<btCollisionConfiguration> collision_configuration_ptr;
+    typedef boost::scoped_ptr<btCollisionDispatcher>    collision_dispatcher_ptr;
+    typedef boost::scoped_ptr<btConstraintSolver>       constraint_solver_ptr;
+    typedef boost::scoped_ptr<btDynamicsWorld>          dynamics_world_ptr;
 
-    typedef boost::intrusive::member_hook
-    < 
-        BulletConstraint, 
-        BulletConstraint::slist_hook, 
-        &BulletConstraint::dynamicsWorldHook 
-    > constraint_hook;
-
-    typedef boost::intrusive::slist
-    <
-        BulletConstraint, 
-        constraint_hook,
-        boost::intrusive::constant_time_size<false> 
-    > constraint_list;
-
-private:
-    // non copyable
-    BulletDynamicsWorld(const BulletDynamicsWorld&);
-    BulletDynamicsWorld& operator = (const BulletDynamicsWorld&);
+	typedef DynamicsWorld::contact_vector               contact_vector;
+	typedef DynamicsWorld::contact_const_iterator       contact_const_iterator;
+	typedef DynamicsWorld::state_desc                   state_desc;
 
 public:
     BulletDynamicsWorld(DynamicsWorld* pInterface);
 
-    //
-    void accept(BulletSolverCollector& collector);
-
     // implement dynamics world
-    void setGravity(const math::Vector3r& gravity);
-    void setFixedTimeStep(const real dt)             { /* nothing */ }
-    real stepSimulation(real dt);
-    void setMaxNumSubSteps(unsigned maxSubSteps_)    { /* nothing */ }
+    void   setGravity(const math::Vector3r& gravity);
+    void   setFixedTimeStep(const real dt)            { /* nothing */ }
+    void   setMaxNumSubSteps(unsigned maxSubSteps_)   { /* nothing */ }
+    size_t getNumSimulatedSteps() const               { return numSimulatedSteps; }
+    real   stepSimulation(real dt);
 
     contact_const_iterator firstActiveContact() const   { return contacts.begin(); }
     contact_const_iterator endActiveContact() const     { return contacts.end(); }
@@ -83,7 +62,7 @@ public:
     btDynamicsWorld& getBtDynamicsWorld() { return *dynamicsWorld; }
 
 private:
-	DynamicsWorld*              pInterface;
+    DynamicsWorld*              pInterface;
     broadphase_ptr              broadPhase;
     collision_configuration_ptr collisionConfiguration;
     collision_dispatcher_ptr    collisionDispatcher;

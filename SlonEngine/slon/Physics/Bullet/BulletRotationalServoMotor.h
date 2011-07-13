@@ -9,8 +9,7 @@ namespace slon {
 namespace physics {
 
 class BulletRotationalServoMotor :
-    public BulletRotationalMotor<ServoMotor>,
-    public BulletSolver
+    public BulletRotationalMotor<ServoMotor>
 {
 typedef BulletRotationalMotor<ServoMotor> motor_base;
 public:

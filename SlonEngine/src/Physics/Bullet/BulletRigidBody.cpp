@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Log/Formatters.h"
 #include "Physics/Bullet/BulletCommon.h"
-#include "Physics/Bullet/BulletConstraint.h"
+#include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 
 DECLARE_AUTO_LOGGER("physics.BulletRigidBody")
@@ -141,10 +141,10 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	return os;
 }
 
-BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
-                                 DynamicsWorld*       dynamicsWorld_,
-	                             const rigid_body_ptr rigidBody_,
-                                 const std::string&   name_ ) :
+BulletRigidBody::BulletRigidBody(RigidBody*         pInterface_,
+                                 DynamicsWorld*     dynamicsWorld_,
+	                             btRigidBody*       rigidBody_,
+                                 const std::string& name_ ) :
     base_type(pInterface, dynamicsWorld_),
     rigidBody(rigidBody_)
 {
@@ -190,17 +190,49 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
 }
 
 BulletRigidBody::BulletRigidBody(RigidBody*		pInterface_,
-								 DynamicsWorld*	dynamicsWorld_) 
+								 DynamicsWorld*	dynamicsWorld_)
 :	base_type(pInterface_, dynamicsWorld_)
 {
+	RigidBody::state_desc& desc = pInterface_->desc;
 	motionState.reset( new BulletMotionState(this) );
-    reset(desc_);
+
+	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
+    rigidBody->setUserPointer(this);
+	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
+	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );
+
+    // static or dynamic rb
+    if (desc.type != RigidBody::DT_DYNAMIC)
+    {
+        int flags = desc.type == RigidBody::DT_KINEMATIC ? btCollisionObject::CF_KINEMATIC_OBJECT : btCollisionObject::CF_STATIC_OBJECT;
+        rigidBody->setCollisionFlags( rigidBody->getCollisionFlags() | flags );
+        rigidBody->setActivationState(DISABLE_DEACTIVATION);
+    }
+
+	dynamicsWorld->getBtDynamicsWorld().addRigidBody( rigidBody.get() );
+    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Creating rigid body:\n" << desc << LOG_FILE_AND_LINE);
 }
 
 BulletRigidBody::~BulletRigidBody()
 {
+    // clear contacts
+    for (size_t i = 0; i<dynamicsWorld->contacts.size(); ++i)
+    {
+        Contact& contact = dynamicsWorld->contacts[i];
+        if (contact.collisionObjects[0] == pInterface || contact.collisionObjects[1] == pInterface)
+        {
+            contact.collisionObjects[0]->handleDissappearingContact(contact);
+            contact.collisionObjects[1]->handleDissappearingContact(contact);
+            std::swap( contact, dynamicsWorld->contacts.back() );
+            dynamicsWorld->contacts.pop_back();
+            --i;
+        }
+    }
+
+    // restore ordering
+    std::sort( dynamicsWorld->contacts.begin(), dynamicsWorld->contacts.end(), compare_contact() );
+
 	dynamicsWorld->getBtDynamicsWorld().removeRigidBody( rigidBody.get() );
-    rigidBody.reset();
 	AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Destroying rigid body" << LOG_FILE_AND_LINE);
 }
 
@@ -301,54 +333,9 @@ math::Vector3r BulletRigidBody::getAngularVelocity() const
 	return to_vec( rigidBody->getAngularVelocity() );
 }
 
-void BulletRigidBody::reset(RigidBody::state_desc& desc)
-{
-    bool isInWorld = rigidBody ? rigidBody->isInWorld() : false;
-
-    // remove old rigid body
-    destroy(false);
-
-	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
-    rigidBody->setUserPointer(this);
-	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
-	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );
-
-    // static or dynamic rb
-    if (desc.type != RigidBody::DT_DYNAMIC)
-    {
-        int flags = desc.type == RigidBody::DT_KINEMATIC ? btCollisionObject::CF_KINEMATIC_OBJECT : btCollisionObject::CF_STATIC_OBJECT;
-        rigidBody->setCollisionFlags( rigidBody->getCollisionFlags() | flags );
-        rigidBody->setActivationState(DISABLE_DEACTIVATION);
-    }
-
-    // recreate constraints
-    for (size_t i = 0; i<constraints.size(); ++i) {
-        constraints[i]->reset( constraints[i]->getStateDesc() );
-    }
-
-    // remember
-    toggleSimulation(isInWorld);
-
-    // call handlers
-    onResetSignal(*this);
-
-    AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Resetting rigid body:\n" << desc << LOG_FILE_AND_LINE);
-}
-
 void BulletRigidBody::setTransform(const math::Matrix4r& worldTransform)
 {
-    //rigidBody->setWorldTransform( to_bt_mat(worldTransform) );
-    rigidBody->getMotionState()->setWorldTransform( to_bt_mat(worldTransform) );
-}
-
-void BulletRigidBody::removeConstraint(const Constraint& constraint)
-{
-    RigidBody::constraint_iterator iter = std::find(constraints.begin(), constraints.end(), &constraint);
-    if ( iter != constraints.end() ) 
-    {
-        std::swap( *iter, constraints.back() );
-        constraints.pop_back();
-    }
+    motionState->setWorldTransform( to_bt_mat(worldTransform) );
 }
 
 } // namespace physics

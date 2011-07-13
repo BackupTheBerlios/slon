@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
+#include "Physics/DynamicsWorld.h"
 #include "Physics/RigidBody.h"
 #ifdef SLON_ENGINE_USE_BULLET
 #	include "Physics/Bullet/BulletRigidBody.h"
@@ -14,25 +16,6 @@ RigidBody::RigidBody(const state_desc& desc_)
 
 RigidBody::~RigidBody()
 {
-    // clear contacts
-    if (world)
-    {
-        for (size_t i = 0; i<world->contacts.size(); ++i)
-        {
-            Contact& contact = world->contacts[i];
-            if (contact.collisionObjects[0] == this || contact.collisionObjects[1] == this)
-            {
-                contact.collisionObjects[0]->handleDissappearingContact(contact);
-                contact.collisionObjects[1]->handleDissappearingContact(contact);
-                std::swap( contact, dynamicsWorld->contacts.back() );
-                dynamicsWorld->contacts.pop_back();
-                --i;
-            }
-        }
-
-        // restore ordering
-        std::sort( world->contacts.begin(), world->contacts.end(), compare_contact() );
-    }
 }
 
 const char* RigidBody::serialize(database::OArchive& ar) const
@@ -78,9 +61,9 @@ const CollisionShape* RigidBody::getCollisionShape() const
 	return desc.collisionShape.get();
 }
 
-const DynamicsWorld& RigidBody::getDynamicsWorld() const
+const DynamicsWorld* RigidBody::getDynamicsWorld() const
 {
-	return *currentPhysicsManager().getDynamicsWorld();
+	return currentPhysicsManager().getDynamicsWorld();
 }
 
 const std::string& RigidBody::getName() const
@@ -208,7 +191,7 @@ RigidBody::constraint_iterator RigidBody::endConstraint()
 
 void RigidBody::setWorld(const dynamics_world_ptr& world_)
 {
-	impl.reset();
+    impl.reset();
     for (size_t i = 0; i<constraints.size(); ++i) {
         constraints[i]->release();
     }
