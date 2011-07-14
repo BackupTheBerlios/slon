@@ -17,6 +17,7 @@ class RigidBody :
     public CollisionObject
 {
 private:
+	friend class Constraint;
     friend class DynamicsWorld;
 #ifdef SLON_ENGINE_USE_BULLET
     friend class BulletRigidBody;

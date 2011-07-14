@@ -3,6 +3,7 @@
 
 #include "../CollisionShape.h"
 #include <bullet/btBulletCollisionCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
 #include <sgl/Math/Matrix.hpp>
 
 namespace slon {

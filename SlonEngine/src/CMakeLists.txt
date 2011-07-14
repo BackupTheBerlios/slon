@@ -175,7 +175,6 @@ SET ( TARGET_PHYSICS_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRotationalSpringMotor.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRotationalVelocityMotor.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletSolver.h
-    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletSolverCollector.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletTranslationalMotor.h
 )
 
@@ -510,7 +509,6 @@ SET ( TARGET_PHYSICS_BULLET_SOURCES
     Physics/Bullet/BulletRotationalServoMotor.cpp
     Physics/Bullet/BulletRotationalSpringMotor.cpp
     Physics/Bullet/BulletRotationalVelocityMotor.cpp  
-    Physics/Bullet/BulletSolverCollector.cpp
     Physics/Bullet/BulletTranslationalMotor.cpp
 )
 

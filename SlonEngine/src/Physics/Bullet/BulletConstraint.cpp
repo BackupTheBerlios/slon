@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #define NOMINMAX
 #define _DEBUG_NEW_REDEFINE_NEW 0
-#include "Database/Archive.h"
-#include "Engine.h"
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletRigidBody.h"
@@ -52,11 +50,16 @@ namespace {
 namespace slon {
 namespace physics {
 
-BulletConstraint::BulletConstraint(btGeneric6DofConstraint* constraint_,
-                                   const std::string&       name_) :
-    constraint(constraint_)
+BulletConstraint::BulletConstraint(Constraint*              pInterface_,
+					               DynamicsWorld*           dynamicsWorld_,
+					               btGeneric6DofConstraint* constraint_,
+                                   const std::string&       name_) 
+:	pInterface(pInterface_)
+,	dynamicsWorld(dynamicsWorld_->getImpl())
+,	constraint(constraint_)
 {
     assert(constraint);
+	Constraint::state_desc& desc = pInterface->desc;
 
     desc.name           = name_;
     desc.rigidBodies[0] = reinterpret_cast<RigidBody*>( constraint->getRigidBodyA().getUserPointer() );
@@ -86,7 +89,7 @@ BulletConstraint::BulletConstraint(Constraint*      pInterface_,
 ,	dynamicsWorld(dynamicsWorld_->getImpl())
 {
 	assert(dynamicsWorld);
-    const state_desc& desc = pInterface->desc;
+    const Constraint::state_desc& desc = pInterface->desc;
 
     // get bodies
     assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies.");  
@@ -118,16 +121,6 @@ real BulletConstraint::getPosition(Constraint::DOF dof) const
 	else {
 		return constraint->getRotationalLimitMotor(dof - 3)->m_currentPosition;
 	}
-}
-
-void BulletConstraint::accept(BulletSolverCollector& collector)
-{
-    for (int i = 0; i<3; ++i)
-    {
-        if (rotationalMotors[i]) {
-            rotationalMotors[i]->accept(collector);
-        }
-    }
 }
 
 } // namespace physics

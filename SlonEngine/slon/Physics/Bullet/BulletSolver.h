@@ -2,25 +2,28 @@
 #define __SLON_ENGINE_PHYSICS_BULLET_SOLVER_H__
 
 #include "../Forward.h"
-#include <boost/intrusive/slist.hpp>
 
 namespace slon {
 namespace physics {
 
-class BulletSolverCollector;
-
+/** Base class for solvers which should be processed every frame. Organized in list. */
 class BulletSolver
 {
-friend class BulletSolverCollector;
 public:
-    /** Resolve some physics */
+	BulletSolver()
+	:	next(0)
+	,	prev(0)
+	{}
+
+    /** Do some physics*/
     virtual void solve(real dt) = 0;
 
-    /** Accept collector */
-    virtual void accept(BulletSolverCollector& collector) = 0;
+protected:
+    ~BulletSolver() {}
 
-private:
-    boost::intrusive::slist_member_hook<> collectorHook;
+public:
+    BulletSolver* next;
+	BulletSolver* prev;
 };
 
 } // namespace slon

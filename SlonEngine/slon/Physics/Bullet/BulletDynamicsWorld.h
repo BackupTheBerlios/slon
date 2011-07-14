@@ -29,6 +29,7 @@ struct compare_contact
 };
 
 class BulletConstraint;
+class BulletSolver;
 
 /* Bullet implementation of the physics dynamics world. */
 class BulletDynamicsWorld
@@ -61,6 +62,15 @@ public:
     // get bullet dynamics world
     btDynamicsWorld& getBtDynamicsWorld() { return *dynamicsWorld; }
 
+	/** Get interface to dynamics world */
+	DynamicsWorld* getInterface() { return pInterface; }
+
+	/** Add solver to dynamics world. */
+	void addSolver(BulletSolver* solver);
+
+	/** Remove solver from dynamics world. */
+	void removeSolver(BulletSolver* solver);
+
 private:
     DynamicsWorld*              pInterface;
     broadphase_ptr              broadPhase;
@@ -71,6 +81,9 @@ private:
 
     // settings 
     size_t                      numSimulatedSteps;
+
+	// internal solvers
+	BulletSolver*				firstSolver;
 
     // for handling contact callbacks
     contact_vector              contacts;

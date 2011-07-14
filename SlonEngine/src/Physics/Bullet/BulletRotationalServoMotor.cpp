@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletConstraint.h"
+#include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletRigidBody.h"
 #include "Physics/Bullet/BulletRotationalServoMotor.h"
 
@@ -8,21 +9,15 @@ namespace slon {
 namespace physics {
 
 BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constraint, int axis)
-:   BulletRotationalMotor<ServoMotor>(constraint, axis)
+:   BulletRotationalMotor(constraint, axis)
 ,   targetForce(0.0f)
 ,   enableMotor(false)
 {
 }
 
-void BulletRotationalServoMotor::reset(BulletConstraint* constraint, int axis)
-{
-    BulletRotationalMotor<ServoMotor>::reset(constraint, axis);
-    setTargetForce(targetForce);
-}
-
 void BulletRotationalServoMotor::solve(real dt)
 {
-    btGeneric6DofConstraint* constraint = motor_base::constraint->getBtConstraint();
+    btGeneric6DofConstraint* constraint = BulletRotationalMotor::constraint->getImpl()->getBtConstraint();
    
     btRigidBody& rbA = constraint->getRigidBodyA();
     btRigidBody& rbB = constraint->getRigidBodyB();
@@ -58,18 +53,18 @@ void BulletRotationalServoMotor::solve(real dt)
 	*/
 }
 
-void BulletRotationalServoMotor::accept(BulletSolverCollector& collector)
-{
-    if (enableMotor) {
-        collector.addSolver(*this);
-    }
-    BulletRotationalMotor<ServoMotor>::accept(collector);
-}
-
 void BulletRotationalServoMotor::setTargetForce(real targetForce_) 
 { 
     targetForce = targetForce_;
-    enableMotor = fabs(targetForce) > real(0.01);
+
+    bool enableMotor_ = fabs(targetForce) > real(0.01);
+	if (enableMotor_ && !enableMotor) {
+		constraint->dynamicsWorld->addSolver(this);
+	}
+	else if (!enableMotor_ && enableMotor_) {
+		constraint->dynamicsWorld->removeSolver(this);
+	}
+	enableMotor = enableMotor_;
 }
 
 } // namespace physics

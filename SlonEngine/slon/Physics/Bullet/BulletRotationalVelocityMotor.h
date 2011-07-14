@@ -9,15 +9,11 @@ namespace slon {
 namespace physics {
 
 class BulletRotationalVelocityMotor :
-    public BulletRotationalMotor<VelocityMotor>
+    public BulletRotationalMotor
 {
-typedef BulletRotationalMotor<VelocityMotor> motor_base;
 public:
     BulletRotationalVelocityMotor(BulletConstraint* constraint, int axis);
     ~BulletRotationalVelocityMotor();
-
-    // Override BulletRotationalMotor
-    void reset(BulletConstraint* constraint, int axis);
 
     // Override VelocityMotor
     bool enabled() const { return motor->m_enableMotor; }

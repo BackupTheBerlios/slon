@@ -11,6 +11,7 @@ using namespace physics;
 BulletDynamicsWorld::BulletDynamicsWorld(DynamicsWorld* pInterface_)
 :	pInterface(pInterface_)
 ,	numSimulatedSteps(0)
+,	firstSolver(0)
 {
     const state_desc& desc = pInterface->desc;
 
@@ -60,6 +61,13 @@ real BulletDynamicsWorld::stepSimulation(real dt)
         const state_desc& desc = pInterface->desc;
         for (unsigned i = 0; i<desc.maxNumSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
         {
+			BulletSolver* solver = firstSolver;
+			while (solver) 
+			{
+				solver->solve(desc.fixedTimeStep);
+				solver = solver->next;
+			}
+
             dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
         }
     }
@@ -126,4 +134,28 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     }
 
     return dt - t;
+}
+
+void BulletDynamicsWorld::addSolver(BulletSolver* solver)
+{
+	solver->next = firstSolver;
+	firstSolver = solver;
+}
+
+/** Remove solver from dynamics world. */
+void BulletDynamicsWorld::removeSolver(BulletSolver* solver)
+{
+	if (solver->prev) 
+	{
+		solver->prev->next = solver->next;
+		if (solver->next) {
+			solver->next->prev = solver->prev;
+		}
+	}
+	else 
+	{
+		assert(firstSolver == solver);
+		firstSolver = solver->next;
+		firstSolver->prev = 0;
+	}
 }

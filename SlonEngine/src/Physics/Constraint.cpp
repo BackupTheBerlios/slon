@@ -1,5 +1,10 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Physics/Constraint.h"
+#include "Physics/RigidBody.h"
+#ifdef SLON_ENGINE_USE_BULLET
+#	include "Physics/Bullet/BulletConstraint.h"
+#endif
 
 namespace slon {
 namespace physics {
@@ -37,7 +42,7 @@ void Constraint::deserialize(database::IArchive& ar)
     ar.readChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    reset(desc);
+    instantiate();
 }
 
 RigidBody* Constraint::getRigidBodyA() const
@@ -83,7 +88,7 @@ SpringMotor* Constraint::createSpringMotor(Motor::TYPE motor)
 
 math::Vector3r Constraint::getAxis(unsigned int axis) const
 {
-	return impl->getAxis();
+	return impl->getAxis(axis);
 }
 
 real Constraint::getPosition(DOF dof) const
@@ -91,7 +96,7 @@ real Constraint::getPosition(DOF dof) const
 	return impl->getPosition(dof);
 }
 
-AXIS_RESTRICTION Constraint::getRestriction(DOF dof) const
+Constraint::AXIS_RESTRICTION Constraint::getRestriction(DOF dof) const
 {
 	if (dof < 3) 
 	{
@@ -163,7 +168,7 @@ void Constraint::setWorld(const dynamics_world_ptr& world_)
 
 void Constraint::instantiate()
 {
-	if ( !impl && desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) 
+	if ( !impl && world && desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) 
 	{
         assert( world == desc.rigidBodies[0]->getDynamicsWorld()
                 && desc.rigidBodies[0]->getDynamicsWorld() == desc.rigidBodies[0]->getDynamicsWorld() 

@@ -3,7 +3,6 @@
 
 #include "../../Realm/EventVisitor.h"
 #include "../RigidBodyTransform.h"
-#include <bullet/btBulletDynamicsCommon.h>
 
 namespace slon {
 namespace physics {
