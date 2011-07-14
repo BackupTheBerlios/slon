@@ -155,7 +155,7 @@ SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/PhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Motor.h
     ${TARGET_HEADER_PATH}/Physics/RigidBody.h
-    ${TARGET_HEADER_PATH}/Physics/RigidBodyTransform.h
+    ${TARGET_HEADER_PATH}/Physics/PhysicsTransform.h
     ${TARGET_HEADER_PATH}/Physics/ServoMotor.h
     ${TARGET_HEADER_PATH}/Physics/SpringMotor.h
     ${TARGET_HEADER_PATH}/Physics/VelocityMotor.h
@@ -166,7 +166,6 @@ SET ( TARGET_PHYSICS_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletConstraint.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletCollisionObject.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletDynamicsWorld.h
-    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletMotionState.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsMaterial.h
 #    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRigidBody.h
@@ -490,7 +489,7 @@ SET ( TARGET_PHYSICS_SOURCES
     Physics/DynamicsWorld.cpp
     Physics/PhysicsMaterial.cpp
     Physics/PhysicsModel.cpp
-    Physics/RigidBodyTransform.cpp
+    Physics/PhysicsTransform.cpp
     Physics/RigidBody.cpp
     Physics/ServoMotor.cpp
     Physics/SpringMotor.cpp
@@ -501,7 +500,6 @@ SET ( TARGET_PHYSICS_BULLET_SOURCES
     Physics/Bullet/BulletConstraint.cpp
     Physics/Bullet/BulletCollisionObject.cpp
     Physics/Bullet/BulletDynamicsWorld.cpp
-    Physics/Bullet/BulletMotionState.cpp
     Physics/Bullet/BulletPhysicsMaterial.cpp
 #    Physics/Bullet/BulletPhysicsModel.cpp
     Physics/Bullet/BulletRigidBody.cpp

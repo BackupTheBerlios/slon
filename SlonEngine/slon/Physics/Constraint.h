@@ -20,6 +20,7 @@ class Constraint :
 {
 public:
     friend class DynamicsWorld;
+	friend class RigidBody;
 #ifdef SLON_ENGINE_USE_BULLET
     friend class BulletConstraint;
     typedef BulletConstraint             impl_type;

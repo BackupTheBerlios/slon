@@ -3,8 +3,9 @@
 
 #include "../RigidBody.h"
 #include "BulletCollisionObject.h"
-#include "BulletMotionState.h"
-#include <bullet/btBulletDynamicsCommon.h>
+
+class btMotionState;
+class btRigidBody;
 
 namespace slon {
 namespace physics {
@@ -16,7 +17,7 @@ friend class BulletConstraint;
 public:
     typedef BulletCollisionObject                           base_type;
 
-	typedef boost::intrusive_ptr<BulletMotionState>         motion_state_ptr;
+	typedef boost::scoped_ptr<btMotionState>                motion_state_ptr;
 	typedef boost::scoped_ptr<btRigidBody>                  rigid_body_ptr;
 
     typedef boost::signal<void (const BulletRigidBody&)>    rigid_body_signal;
@@ -48,8 +49,6 @@ public:
     RigidBody::ACTIVATION_STATE getActivationState() const;
     math::Vector3r				getLinearVelocity() const;
     math::Vector3r				getAngularVelocity() const;
-    RigidBodyTransform*			getMotionState()			{ return motionState.get(); }
-    const RigidBodyTransform*	getMotionState() const		{ return motionState.get(); }
 
     void    setTransform(const math::Matrix4r& worldTransform);
     void    setActivationState(RigidBody::ACTIVATION_STATE state);

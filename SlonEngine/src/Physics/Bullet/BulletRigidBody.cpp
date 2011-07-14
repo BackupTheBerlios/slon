@@ -149,7 +149,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*         pInterface_,
     rigidBody(rigidBody_)
 {
     assert(rigidBody);
-	motionState.reset( new BulletMotionState(this) );
+	motionState.reset(new btDefaultMotionState);
 	{
 		btTransform transform;
 		if (btMotionState* ms = rigidBody->getMotionState() ) {
@@ -194,7 +194,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*		pInterface_,
 :	base_type(pInterface_, dynamicsWorld_)
 {
 	RigidBody::state_desc& desc = pInterface_->desc;
-	motionState.reset( new BulletMotionState(this) );
+	motionState.reset(new btDefaultMotionState);
 
 	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
     rigidBody->setUserPointer(this);

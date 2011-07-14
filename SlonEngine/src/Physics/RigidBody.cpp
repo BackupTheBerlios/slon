@@ -14,10 +14,6 @@ RigidBody::RigidBody(const state_desc& desc_)
 {
 }
 
-RigidBody::~RigidBody()
-{
-}
-
 const char* RigidBody::serialize(database::OArchive& ar) const
 {
     getStateDesc();
@@ -30,7 +26,6 @@ const char* RigidBody::serialize(database::OArchive& ar) const
     ar.writeChunk("linearVelocity", desc.linearVelocity.arr, desc.linearVelocity.num_elements);
     ar.writeChunk("angularVelocity", desc.angularVelocity.arr, desc.angularVelocity.num_elements);
     ar.writeStringChunk("name", desc.name.data(), desc.name.length());
-    ar.writeStringChunk("target", desc.target.data(), desc.target.length());
     ar.writeSerializable(desc.collisionShape.get());
     return "RigidBody";
 }
@@ -46,7 +41,6 @@ void RigidBody::deserialize(database::IArchive& ar)
     ar.readChunk("linearVelocity", desc.linearVelocity.arr, desc.linearVelocity.num_elements);
     ar.readChunk("angularVelocity", desc.angularVelocity.arr, desc.angularVelocity.num_elements);
     ar.readStringChunk("name", desc.name);
-    ar.readStringChunk("target", desc.target);
     desc.collisionShape = ar.readSerializable<CollisionShape>();
     reset(desc);
 }
@@ -63,22 +57,22 @@ const CollisionShape* RigidBody::getCollisionShape() const
 
 const DynamicsWorld* RigidBody::getDynamicsWorld() const
 {
-	return currentPhysicsManager().getDynamicsWorld();
+	return world.get();
 }
 
 const std::string& RigidBody::getName() const
 {
-	return desc.getName();
+	return desc.name;
 }
 
 math::Matrix4r RigidBody::getTransform() const
 {
-	return impl->getMotionState()->getTransform();
+	return impl->getTransform();
 }
 
 void RigidBody::setTransform(const math::Matrix4r& transform)
 {
-	impl->getMotionState()->setTransform(transform);
+	impl->setTransform(transform);
 }
 
 void RigidBody::applyForce(const math::Vector3r& force, const math::Vector3r& pos)
@@ -141,68 +135,59 @@ math::Vector3r RigidBody::getAngularVelocity() const
 	return impl->getAngularVelocity();
 }
 
-const std::string& RigidBody::getName() const
-{
-	return desc.name;
-}
-
-DYNAMICS_TYPE RigidBody::getDynamicsType() const
+RigidBody::DYNAMICS_TYPE RigidBody::getDynamicsType() const
 {
 	return desc.type;
 }
 
-const state_desc& RigidBody::getStateDesc() const
+const RigidBody::state_desc& RigidBody::getStateDesc() const
 {
-	desc.transform       = impl->getMotionState()->getTransform();
+	desc.transform       = impl->getTransform();
 	desc.linearVelocity  = impl->getLinearVelocity();
 	desc.angularVelocity = impl->getAngularVelocity();
 	return desc;
 }
 
-RigidBodyTransform* RigidBody::getMotionState()
+void RigidBody::reset(const state_desc& desc_)
 {
-	return impl->getMotionState();
-}
-
-const RigidBodyTransform* RigidBody::getMotionState() const
-{
-	return impl->getMotionState();
-}
-
-void RigidBody::reset(const state_desc& desc)
-{
-	impl->reset(desc);
-}
-
-void RigidBody::toggleSimulation(bool toggle)
-{
-	impl->toggleSimulation(toggle);
+	release();
+	desc = desc_;
+	instantiate();
 }
 
 RigidBody::constraint_iterator RigidBody::firstConstraint()
 {
-	return impl->firstConstraint();
+	return constraints.begin();
 }
 
 RigidBody::constraint_iterator RigidBody::endConstraint()
 {
-	return impl->endConstraint();
+	return constraints.end();
 }
 
 void RigidBody::setWorld(const dynamics_world_ptr& world_)
 {
-    impl.reset();
-    for (size_t i = 0; i<constraints.size(); ++i) {
-        constraints[i]->release();
-    }
-
+	release();
     world = world_;
+	instantiate();
+}
+
+void RigidBody::instantiate()
+{
     if (world)
     {
-        impl.reset( new BulletRigidBody(static_cast<BulletDynamicsWorld&>(*world), this) );
+        impl.reset( new BulletRigidBody(this, world.get()) );
         for (size_t i = 0; i<constraints.size(); ++i) {
             constraints[i]->instantiate();
         }
+    }
+}
+
+void RigidBody::release()
+{
+    impl.reset();
+    for (size_t i = 0; i<constraints.size(); ++i) {
+        constraints[i]->release();
     }
 }
 

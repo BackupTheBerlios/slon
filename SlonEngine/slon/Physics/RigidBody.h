@@ -140,20 +140,6 @@ public:
     /** Get rigid body description structure state. */
     const state_desc& getStateDesc() const;
 
-	/** Get motion state of rigid body for tracking its motion.
-	 * For dynamic rigid body motion state will treat rigid body transform as absolute transform for scene graph, for
-	 * kinematic it will setup scene graph transform as rigid body transform.
-	 * Use matrix to specify transition between rigidBody and scene frames.
-	 */
-	RigidBodyTransform* getMotionState();
-
-	/** Get motion state of rigid body for tracking its motion.
-	 * For dynamic rigid body motion state will treat rigid body transform as absolute transform for scene graph, for
-	 * kinematic it will setup scene graph transform as rigid body transform.
-	 * Use matrix to specify transition between rigidBody and scene frames.
-	 */
-	const RigidBodyTransform* getMotionState() const;
-
     /** Recreate rigid body from desc */
     void reset(const state_desc& desc);
 
@@ -173,6 +159,12 @@ private:
     /** Add rigid body into the world, should be called by DynamicsWorld. */
     void setWorld(const dynamics_world_ptr& world);
 
+	/** Instantiate implementation. */
+	void instantiate();
+
+	/** Release implementation. */
+	void release();
+
 	/** Add constraint affecting this rigid body, should be called by Constraint. */
 	void addConstraint(Constraint* constraint);
 	
@@ -181,7 +173,7 @@ private:
 
 private:
     dynamics_world_ptr world;
-    state_desc         desc;
+    mutable state_desc desc;
     impl_ptr           impl;
     constraint_vector  constraints;
 };
