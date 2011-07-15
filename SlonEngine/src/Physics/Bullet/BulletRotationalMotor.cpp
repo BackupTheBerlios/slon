@@ -8,9 +8,9 @@
 namespace slon {
 namespace physics {
     
-BulletRotationalMotor::BulletRotationalMotor(Constraint* constraint_,
+BulletRotationalMotor::BulletRotationalMotor(BulletConstraint* constraint_,
                                              int               axis_)
-:   constraint(constraint_->getImpl())
+:   constraint(constraint_)
 ,   axis(axis_)
 {
     assert(constraint && axis >= 0 && axis < 3);

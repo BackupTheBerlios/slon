@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
+#include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletConstraint.h"
 #include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletRigidBody.h"
@@ -17,10 +18,10 @@ BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constra
 
 void BulletRotationalServoMotor::solve(real dt)
 {
-    btGeneric6DofConstraint* constraint = BulletRotationalMotor::constraint->getImpl()->getBtConstraint();
+    btGeneric6DofConstraint& constraint = BulletRotationalMotor::constraint->getBtConstraint();
    
-    btRigidBody& rbA = constraint->getRigidBodyA();
-    btRigidBody& rbB = constraint->getRigidBodyB();
+    btRigidBody& rbA = constraint.getRigidBodyA();
+    btRigidBody& rbB = constraint.getRigidBodyB();
 
     btTransform  trans;
 		   /*
@@ -36,7 +37,7 @@ void BulletRotationalServoMotor::solve(real dt)
     rbB.applyCentralForce(forceB);
     rbB.activate(true);
 		*/
-    btVector3 torque = constraint->getAxis(axis) * targetForce;
+    btVector3 torque = constraint.getAxis(axis) * targetForce;
     rbA.applyTorque( torque);
     rbA.activate(true);
     rbB.applyTorque(-torque);

@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
 #include "Physics/Constraint.h"
+#include "Physics/DynamicsWorld.h"
 #include "Physics/RigidBody.h"
+#include "Physics/ServoMotor.h"
+#include "Physics/VelocityMotor.h"
 #ifdef SLON_ENGINE_USE_BULLET
 #	include "Physics/Bullet/BulletConstraint.h"
 #endif
@@ -9,10 +12,8 @@
 namespace slon {
 namespace physics {
 
-Constraint::Constraint(dynamics_world_ptr world_,
-                       const state_desc&  desc_)
-:   world(world_)
-,   desc(desc_)
+Constraint::Constraint(const state_desc& desc_)
+:   desc(desc_)
 {
 }
 
@@ -20,8 +21,8 @@ Constraint::Constraint(dynamics_world_ptr world_,
 const char* Constraint::serialize(database::OArchive& ar) const
 {
     ar.writeStringChunk("name", desc.name.data(), desc.name.length());
-    ar.writeSerializable(desc.rigidBodies[0]);
-    ar.writeSerializable(desc.rigidBodies[1]);
+    ar.writeSerializable(desc.rigidBodies[0].get());
+    ar.writeSerializable(desc.rigidBodies[1].get());
     ar.writeChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
     ar.writeChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
     ar.writeChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
@@ -47,43 +48,44 @@ void Constraint::deserialize(database::IArchive& ar)
 
 RigidBody* Constraint::getRigidBodyA() const
 {
-	return desc.rigidBodies[0];
+	return desc.rigidBodies[0].get();
 }
 
 RigidBody* Constraint::getRigidBodyB() const
 {
-	return desc.rigidBodies[1];
+	return desc.rigidBodies[1].get();
 }
 
-const Motor* Constraint::getMotor(Motor::TYPE motor) const
+const Motor* Constraint::getMotor(DOF dof) const
 {
-	return motors[type];
+	return motors[dof].get();
 }
 
-Motor* Constraint::getMotor(Motor::TYPE motor)
+Motor* Constraint::getMotor(DOF dof)
 {
-	return motors[type];
+	return motors[dof].get();
 }
 
-ServoMotor* Constraint::createServoMotor(Motor::TYPE motor)
+ServoMotor* Constraint::createServoMotor(DOF dof)
 {
-	assert( getRestriction(motor) != AXIS_LOCKED );
-	motors[type].reset( new ServoMotor(motor) );
-	return motors[type].get();
+	assert( getRestriction(dof) != AXIS_LOCKED );
+	motors[dof].reset( new ServoMotor(this, dof) );
+	return static_cast<ServoMotor*>(motors[dof].get());
 }
 
-VelocityMotor* Constraint::createVelocityMotor(Motor::TYPE motor)
+VelocityMotor* Constraint::createVelocityMotor(DOF dof)
 {
-	assert( getRestriction(motor) != AXIS_LOCKED );
-	motors[type].reset( new VelocityMotor(motor) );
-	return motors[type].get();
+	assert( getRestriction(dof) != AXIS_LOCKED );
+	motors[dof].reset( new VelocityMotor(this, dof) );
+	return static_cast<VelocityMotor*>(motors[dof].get());
 }
 
-SpringMotor* Constraint::createSpringMotor(Motor::TYPE motor)
+SpringMotor* Constraint::createSpringMotor(DOF dof)
 {
-	assert( getRestriction(motor) != AXIS_LOCKED );
-	motors[type].reset( new SpringMotor(motor) );
-	return motors[type].get();
+	assert( getRestriction(dof) != AXIS_LOCKED );
+	//motors[dof].reset( new SpringMotor(this, dof) );
+	//return motors[dof].get();
+	return 0;
 }
 
 math::Vector3r Constraint::getAxis(unsigned int axis) const
@@ -126,7 +128,7 @@ const std::string& Constraint::getName() const
 	return desc.name;
 }
 
-const state_desc& Constraint::getStateDesc() const
+const Constraint::state_desc& Constraint::getStateDesc() const
 {
 	return desc;
 }
@@ -144,9 +146,15 @@ void Constraint::reset(const state_desc& desc_)
 void Constraint::setWorld(const dynamics_world_ptr& world_)
 {
     assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies."); 
-	desc.rigidBodies[0]->removeConstraint(this);
-	desc.rigidBodies[1]->removeConstraint(this);
-	impl.reset();
+    desc.rigidBodies[0]->removeConstraint(this);
+    desc.rigidBodies[1]->removeConstraint(this);
+    for (int i = 0; i<6; ++i) 
+    {
+        if (motors[i]) {
+            motors[i]->release();
+        }
+    }
+    impl.reset();
 
     world = world_;
     if (world) 
@@ -156,13 +164,13 @@ void Constraint::setWorld(const dynamics_world_ptr& world_)
         if ( desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) {
             instantiate();
         }
-    }
 
-    for (int i = 0; i<6; ++i) 
-    {
-        if (motors[i]) {
-            motors[i]->setWorld(world);
-        }
+		for (int i = 0; i<6; ++i) 
+		{
+			if (motors[i]) {
+				motors[i]->instantiate();
+			}
+		}
     }
 }
 
@@ -173,7 +181,7 @@ void Constraint::instantiate()
         assert( world == desc.rigidBodies[0]->getDynamicsWorld()
                 && desc.rigidBodies[0]->getDynamicsWorld() == desc.rigidBodies[0]->getDynamicsWorld() 
                 && "Linked bodies and constraint should be in same dynamics world." );
-		impl.reset( new BulletConstraint(static_cast<BulletDynamicsWorld&>(*world), this) );
+        impl.reset( new BulletConstraint(this, world->getImpl()) );
 	}
 }
 

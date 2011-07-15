@@ -51,11 +51,11 @@ namespace slon {
 namespace physics {
 
 BulletConstraint::BulletConstraint(Constraint*              pInterface_,
-					               DynamicsWorld*           dynamicsWorld_,
+					               BulletDynamicsWorld*     dynamicsWorld_,
 					               btGeneric6DofConstraint* constraint_,
                                    const std::string&       name_) 
 :	pInterface(pInterface_)
-,	dynamicsWorld(dynamicsWorld_->getImpl())
+,	dynamicsWorld(dynamicsWorld_)
 ,	constraint(constraint_)
 {
     assert(constraint);
@@ -83,10 +83,10 @@ BulletConstraint::BulletConstraint(Constraint*              pInterface_,
     }
 }
 
-BulletConstraint::BulletConstraint(Constraint*      pInterface_,
-					               DynamicsWorld*   dynamicsWorld_)
+BulletConstraint::BulletConstraint(Constraint*          pInterface_,
+					               BulletDynamicsWorld* dynamicsWorld_)
 :	pInterface(pInterface_)
-,	dynamicsWorld(dynamicsWorld_->getImpl())
+,	dynamicsWorld(dynamicsWorld_)
 {
 	assert(dynamicsWorld);
     const Constraint::state_desc& desc = pInterface->desc;

@@ -54,14 +54,12 @@ public:
 private:
 	VelocityMotor(Constraint* constraint, Constraint::DOF dof);
 
-	/** Create motor implementation, should be called by constraint. */
+	// Override Motor
 	void instantiate();
-
-	/** Release motor implementation, should be called by constraint. */
 	void release();
 
 private:
-	const Constraint* constraint;
+	Constraint*       constraint;
 	Constraint::DOF   dof;
 	impl_ptr          impl;
 };

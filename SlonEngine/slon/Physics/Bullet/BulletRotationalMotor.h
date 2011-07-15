@@ -12,10 +12,11 @@ namespace physics {
 // forward
 class BulletConstraint;
 
-class BulletRotationalMotor
+class BulletRotationalMotor :
+	public boost::noncopyable
 {
 public:
-    BulletRotationalMotor(Constraint* constraint, int axis);
+    BulletRotationalMotor(BulletConstraint* constraint, int axis);
 
     // Implement Motor
     math::Vector3r     getAxis() const;
@@ -26,10 +27,10 @@ public:
     real               getForce() const;
 
     /** Get internal bullet motor */
-    virtual btRotationalLimitMotor& getBtMotor() { return *motor; }
+    btRotationalLimitMotor& getBtMotor() { return *motor; }
 
     /** Get internal bullet motor */
-    virtual const btRotationalLimitMotor& getBtMotor() const { return *motor; }
+    const btRotationalLimitMotor& getBtMotor() const { return *motor; }
 
 protected:
     void calculateAngleInfo() const;

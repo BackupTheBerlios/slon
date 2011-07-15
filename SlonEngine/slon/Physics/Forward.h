@@ -55,6 +55,7 @@ namespace math
 namespace slon {
 namespace physics {
 
+class CollisionObject;
 class CollisionShape;
 class Constraint;
 class DynamicsWorld;
@@ -62,27 +63,27 @@ class Motor;
 class PhysicsMaterial;
 class PhysicsModel;
 class RigidBody;
-class RigidBodyTransform;
+class PhysicsTransform;
 class ServoMotor;
 class SpringMotor;
 class VelocityMotor;
 
+typedef boost::intrusive_ptr<CollisionObject>			collision_object_ptr;
+typedef boost::intrusive_ptr<const CollisionObject>		const_collision_object_ptr;
 typedef boost::intrusive_ptr<CollisionShape>			collision_shape_ptr;
 typedef boost::intrusive_ptr<const CollisionShape>		const_collision_shape_ptr;
 typedef boost::intrusive_ptr<Constraint>				constraint_ptr;
 typedef boost::intrusive_ptr<const Constraint>			const_constraint_ptr;
 typedef boost::intrusive_ptr<DynamicsWorld>				dynamics_world_ptr;
 typedef boost::intrusive_ptr<const DynamicsWorld>		const_dynamics_world_ptr;
-typedef boost::intrusive_ptr<Motor>						motor_ptr;
-typedef boost::intrusive_ptr<const Motor>				const_motor_ptr;
 typedef boost::intrusive_ptr<PhysicsMaterial>			physics_material_ptr;
 typedef boost::intrusive_ptr<const PhysicsMaterial>		const_physics_material_ptr;
 typedef boost::intrusive_ptr<PhysicsModel>				physics_model_ptr;
 typedef boost::intrusive_ptr<const PhysicsModel>		const_physics_model_ptr;
 typedef boost::intrusive_ptr<RigidBody>					rigid_body_ptr;
 typedef boost::intrusive_ptr<const RigidBody>			const_rigid_body_ptr;
-typedef boost::intrusive_ptr<RigidBodyTransform>        rigid_body_transform_ptr;
-typedef boost::intrusive_ptr<const RigidBodyTransform>  const_rigid_body_transform_ptr;
+typedef boost::intrusive_ptr<PhysicsTransform>			physics_transform_ptr;
+typedef boost::intrusive_ptr<const PhysicsTransform>	const_physics_transform_ptr;
 
 typedef math::Matrix<real, 4, 1>   Vector4r;
 typedef math::Matrix<real, 3, 1>   Vector3r;

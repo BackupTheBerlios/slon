@@ -1,30 +1,30 @@
 #ifndef __SLON_ENGINE_PHYSICS_PHYSICS_MODEL_H__
 #define __SLON_ENGINE_PHYSICS_PHYSICS_MODEL_H__
 
-#include "../Config.h"
-#include "Constraint.h"
-#include "RigidBody.h"
+#include "../Database/Serializable.h"
+#include "../Utility/referenced.hpp"
+#include "Forward.h"
+#include <map>
 #include <set>
 
 namespace slon {
 namespace physics {
 
-/** Set of rigid bodies, constraints and other physics models. */
+/** Container for rigid bodies, constraints and other physics entities. */
 class PhysicsModel :
-	public Referenced,
+    public Referenced,
     public database::Serializable
 {
 public: 
-    typedef std::set<rigid_body_ptr>    rigid_body_set;
-    typedef rigid_body_set::iterator    rigid_body_iterator;
+    typedef std::map<collision_object_ptr, std::string>  collision_object_map;
+    typedef collision_object_map::iterator               collision_object_iterator;
+    typedef collision_object_map::const_iterator         collision_object_const_iterator;
 
-    typedef std::set<constraint_ptr>    constraint_set;
-    typedef constraint_set::iterator    constraint_iterator;
+    typedef std::set<constraint_ptr>                     constraint_set;
+    typedef constraint_set::iterator                     constraint_iterator;
+    typedef constraint_set::const_iterator               constraint_const_iterator;
 
 public:
-    PhysicsModel();
-    ~PhysicsModel();
-
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
@@ -35,53 +35,59 @@ public:
 	/** Set name of the physics model */
 	void setName(const std::string& name_) { name = name_; }
 
-    /** Add rigid body to the physics model and all its constraints */
-    bool addRigidBody(RigidBody* rigidBody);
+    /** Add rigid body to the physics model. 
+     * @param rigidBody - rigid body to store in the model.
+     * @param target - name of the target node for rigid body.
+     */
+    void addCollisionObject(const collision_object_ptr& rigidBody, const std::string& target = "");
 
-    /** Remove rigid body with its constraints from the model */
-    bool removeRigidBody(RigidBody* rigidBody);
+    /** Remove rigid body from the model. */
+    bool removeCollisionObject(const collision_object_ptr& rigidBody);
 
     /** Add constraint to the physics model */
-    bool addConstraint(Constraint* constraint);
+    void addConstraint(const constraint_ptr& constraint);
 
     /** Remove constraint from the physics model */
-    bool removeConstraint(Constraint* constraint);
+    bool removeConstraint(const constraint_ptr& constraint);
 
-    /** Get iterator addressing first rigid body. */
-    rigid_body_iterator firstRigidBody() { return rigidBodies.begin(); }
+	/** Find collision object by name */
+	collision_object_iterator findCollisionObjectByName(const std::string& name);
+	
+	/** Find collision object by target */
+	collision_object_iterator findCollisionObjectByTarget(const std::string& target);
 
-    /** Get iterator addressing end of rigid bodies. */
-    rigid_body_iterator endRigidBody() { return rigidBodies.end(); }
+	/** Find constraint by name */
+	constraint_iterator findConstraintByName(const std::string& name);
+
+    /** Get iterator addressing first collision object. */
+    collision_object_iterator firstCollisionObject() { return collisionObjects.begin(); }
+
+    /** Get iterator addressing first collision object. */
+    collision_object_const_iterator firstCollisionObject() const { return collisionObjects.begin(); }
+
+    /** Get iterator addressing end of collision objects. */
+    collision_object_iterator endCollisionObject() { return collisionObjects.end(); }
+
+    /** Get iterator addressing end of collision objects. */
+    collision_object_const_iterator endCollisionObject() const { return collisionObjects.end(); }
 
     /** Get iterator addressing first constraint. */
     constraint_iterator firstConstraint() { return constraints.begin(); }
 
+    /** Get iterator addressing first constraint. */
+    constraint_const_iterator firstConstraint() const { return constraints.begin(); }
+
     /** Get iterator addressing end of constraints. */
     constraint_iterator endConstraint() { return constraints.end(); }
-    
-    /** find rigid body by pointer. */
-    rigid_body_iterator findRigidBody(RigidBody* rigidBody);
 
-    /** find constraint by pointer. */
-    constraint_iterator findConstraint(Constraint* constraint);
-
-    /** find rigid body by the name. */
-    rigid_body_iterator findRigidBody(const std::string& name);
-
-    /** find constraint by the name. */
-    constraint_iterator findConstraint(const std::string& name);
-
-    /** Toggle physics simulation for model */
-    void toggleSimulation(bool toggle);
+    /** Get iterator addressing end of constraints. */
+    constraint_const_iterator endConstraint() const { return constraints.end(); }
 
 private:
-	std::string			 name;
-    rigid_body_set       rigidBodies;
+	std::string          name;
+    collision_object_map collisionObjects;
     constraint_set       constraints;
 };
-
-typedef boost::intrusive_ptr<PhysicsModel>          physics_model_ptr;
-typedef boost::intrusive_ptr<const PhysicsModel>    const_physics_model_ptr;
 
 } // namespace physics
 } // namespace slon

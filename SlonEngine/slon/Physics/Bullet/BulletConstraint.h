@@ -15,32 +15,26 @@ class BulletDynamicsWorld;
 class BulletRigidBody;
 
 /** Bullet constraint implementation */
-class BulletConstraint
+class BulletConstraint :
+	public boost::noncopyable
 {
 friend class BulletDynamicsWorld;
 friend class BulletRigidBody;
 friend class BulletRotationalMotor;
 friend class BulletRotationalServoMotor;
+friend class BulletRotationalSpringMotor;
 friend class BulletRotationalVelocityMotor;
 public:
     typedef boost::scoped_ptr<btGeneric6DofConstraint> bullet_constraint_ptr;
 
-private:
-    // non copyable
-    BulletConstraint(const BulletConstraint&);
-    BulletConstraint& operator = (const BulletConstraint&);
-
-    // Destroy constraint
-    void destroy();
-
 public:
     BulletConstraint(Constraint*              pInterface,
-					 DynamicsWorld*           dynamicsWorld,
+					 BulletDynamicsWorld*     dynamicsWorld,
 					 btGeneric6DofConstraint* constraint,
                      const std::string&       name);
 
-    BulletConstraint(Constraint*      pInterface,
-					 DynamicsWorld*   dynamicsWorld);
+    BulletConstraint(Constraint*              pInterface,
+					 BulletDynamicsWorld*     dynamicsWorld);
 
 	~BulletConstraint();
 

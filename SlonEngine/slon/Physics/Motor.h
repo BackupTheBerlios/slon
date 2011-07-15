@@ -10,6 +10,9 @@ namespace physics {
 /** Interface for rotational or translational motor. For rotational motor force means torque. */
 class Motor
 {
+private:
+	friend class Constraint;
+
 public:
 	enum TYPE
 	{
@@ -46,6 +49,13 @@ public:
     virtual real getForce() const = 0;
 
     virtual ~Motor() {} 
+
+protected:
+	/** Create motor implementation, should be called by constraint. */
+	virtual void instantiate() = 0;
+
+	/** Release motor implementation, should be called by constraint. */
+	virtual void release() = 0;
 };
 
 } // namespace physics

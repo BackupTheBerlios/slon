@@ -141,10 +141,10 @@ std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
 	return os;
 }
 
-BulletRigidBody::BulletRigidBody(RigidBody*         pInterface_,
-                                 DynamicsWorld*     dynamicsWorld_,
-	                             btRigidBody*       rigidBody_,
-                                 const std::string& name_ ) :
+BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
+                                 BulletDynamicsWorld* dynamicsWorld_,
+	                             btRigidBody*         rigidBody_,
+                                 const std::string&   name_ ) :
     base_type(pInterface, dynamicsWorld_),
     rigidBody(rigidBody_)
 {

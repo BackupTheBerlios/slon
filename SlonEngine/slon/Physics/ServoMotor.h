@@ -49,7 +49,7 @@ private:
 	void release();
 
 private:
-	const Constraint* constraint;
+	Constraint*       constraint;
 	Constraint::DOF   dof;
 	impl_ptr          impl;
 };

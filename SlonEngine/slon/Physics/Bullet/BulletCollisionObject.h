@@ -8,7 +8,8 @@ namespace physics {
 
 class BulletDynamicsWorld;
 
-class BulletCollisionObject
+class BulletCollisionObject :
+	public boost::noncopyable
 {
 private:
     typedef boost::signal<void (const Contact&)>        contact_signal;
@@ -24,6 +25,9 @@ public:
 
     void handleAppearingContact(const Contact& contact);
     void handleDissappearingContact(const Contact& contact);
+	
+	/** Get interface handling this implementation object. */
+	CollisionObject* getInterface() { return pInterface; }
 
 protected:
 	CollisionObject*        pInterface;

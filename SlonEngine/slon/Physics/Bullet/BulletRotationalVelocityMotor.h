@@ -16,13 +16,13 @@ public:
     ~BulletRotationalVelocityMotor();
 
     // Override VelocityMotor
-    bool enabled() const { return motor->m_enableMotor; }
+    bool enabled() const;
     void toggle(bool toggle);
 
-    real getTargetVelocity() const { return motor->m_targetVelocity; }
+    real getTargetVelocity() const;
     void setTargetVelocity(real velocity);
 
-    real getMaxForce() const { return motor->m_maxMotorForce; }
+    real getMaxForce() const;
     void setMaxForce(real force);
 };
 

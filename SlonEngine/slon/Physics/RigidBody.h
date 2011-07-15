@@ -75,7 +75,7 @@ public:
     };
 
 public:
-	RigidBody(const state_desc& desc);
+	RigidBody(const state_desc& desc = state_desc());
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -89,11 +89,11 @@ public:
     math::Matrix4r        getTransform() const;
     void                  setTransform(const math::Matrix4r& transform);
 
-    connection_type connectContactAppearCallback(const contact_handler& handler) = 0;
-    connection_type connectContactDissapearCallback(const contact_handler& handler) = 0;
+    connection_type connectContactAppearCallback(const contact_handler& handler);
+    connection_type connectContactDissapearCallback(const contact_handler& handler);
 
-    void handleAppearingContact(const Contact& contact) = 0;
-    void handleDissappearingContact(const Contact& contact) = 0;
+    void handleAppearingContact(const Contact& contact);
+    void handleDissappearingContact(const Contact& contact);
 
     /** Apply force to rigid body at the specified position. */
     void applyForce(const math::Vector3r& force, const math::Vector3r& pos);

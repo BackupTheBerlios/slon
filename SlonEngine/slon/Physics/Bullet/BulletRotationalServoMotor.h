@@ -25,8 +25,8 @@ public:
     void setTargetForce(real targetForce);
 
 private:
-    btScalar targetForce;
-    bool     enableMotor;
+    real targetForce;
+    bool enableMotor;
 };
 
 } // namespace physics

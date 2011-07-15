@@ -4,7 +4,7 @@
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
 #include "../Utility/Memory/aligned.hpp"
-#include "Motor.h"
+#include "RigidBody.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <string>
 
@@ -26,6 +26,7 @@ public:
     typedef BulletConstraint             impl_type;
     typedef boost::scoped_ptr<impl_type> impl_ptr;
 #endif
+	typedef boost::scoped_ptr<Motor>     motor_ptr;
 
 public:
     struct state_desc
@@ -67,8 +68,7 @@ public:
     };
 
 public:
-    Constraint(dynamics_world_ptr world,
-               const state_desc&  desc);
+    Constraint(const state_desc& desc = state_desc());
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -92,23 +92,23 @@ public:
      */
     Motor* getMotor(DOF motor);
 
-    /** Setup servo motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup servo motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    ServoMotor* createServoMotor(DOF motor);
+    ServoMotor* createServoMotor(DOF dof);
 
-    /** Setup velocity motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup velocity motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    VelocityMotor* createVelocityMotor(DOF motor);
+    VelocityMotor* createVelocityMotor(DOF dof);
 
-    /** Setup spring motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup spring motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    SpringMotor* createSpringMotor(DOF motor);
+    SpringMotor* createSpringMotor(DOF dof);
 
     /** Get axis in parent coordinate frame.
      * @param axis - 0 - X, 1 - Y, 2 - Z.

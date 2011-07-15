@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#include "Physics/Constraint.h"
 #include "Physics/DynamicsWorld.h"
+#include "Physics/RigidBody.h"
 #ifdef SLON_ENGINE_USE_BULLET
 #	include "Physics/Bullet/BulletDynamicsWorld.h"
 #endif

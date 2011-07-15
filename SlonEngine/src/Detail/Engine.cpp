@@ -6,7 +6,10 @@
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
 #include "Graphics/StaticMesh.h"
-#include "Physics/RigidBodyTransform.h"
+#include "Physics/CollisionShape.h"
+#include "Physics/Constraint.h"
+#include "Physics/RigidBody.h"
+#include "Physics/PhysicsTransform.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/DefaultWorld.h"
 #include "Scene/Camera.h"
@@ -253,25 +256,16 @@ void Engine::init()
 		databaseManager.registerSerializableCreateFunc("Node",                  createSerializable<scene::Node>);
 		databaseManager.registerSerializableCreateFunc("Group",                 createSerializable<scene::Group>);
 		databaseManager.registerSerializableCreateFunc("MatrixTransform",       createSerializable<scene::MatrixTransform>);
-		databaseManager.registerSerializableCreateFunc("RigidBodyTransform",    createSerializable<physics::RigidBodyTransform>);
+		databaseManager.registerSerializableCreateFunc("PhysicsTransform",      createSerializable<physics::PhysicsTransform>);
 		databaseManager.registerSerializableCreateFunc("StaticMesh",            createSerializable<graphics::StaticMesh>);
 		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::Mesh>);
 
         // physics
 #ifdef SLON_ENGINE_USE_BULLET
         {
-            databaseManager.registerSerializableCreateFunc("BulletMotionState", boost::bind(&physics::DynamicsWorld::createRigidBodyTransform, 
-                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager), 
-                                                                                            physics::rigid_body_ptr()));
-            static physics::RigidBody::state_desc rdesc; // avoiding stack alignment
-            databaseManager.registerSerializableCreateFunc("BulletRigidBody",   boost::bind(&physics::DynamicsWorld::createRigidBody, 
-                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
-                                                                                            boost::ref(rdesc)));
-            static physics::Constraint::state_desc cdesc; // avoiding stack alignment
-            databaseManager.registerSerializableCreateFunc("BulletConstraint",  boost::bind(&physics::DynamicsWorld::createConstraint, 
-                                                                                            boost::bind(&physics::PhysicsManager::getDynamicsWorld, &physicsManager),
-                                                                                            boost::ref(cdesc)));
-            
+            databaseManager.registerSerializableCreateFunc("PhysicsTransform",  createSerializable<physics::PhysicsTransform>);
+            databaseManager.registerSerializableCreateFunc("RigidBody",         createSerializable<physics::RigidBody>);
+            databaseManager.registerSerializableCreateFunc("Constraint",        createSerializable<physics::Constraint>);           
             databaseManager.registerSerializableCreateFunc("PlaneShape",        createSerializable<physics::PlaneShape>);
             databaseManager.registerSerializableCreateFunc("SphereShape",       createSerializable<physics::SphereShape>);
             databaseManager.registerSerializableCreateFunc("BoxShape",          createSerializable<physics::BoxShape>);

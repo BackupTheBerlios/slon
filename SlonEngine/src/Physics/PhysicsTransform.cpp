@@ -3,7 +3,9 @@
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Physics/CollisionObject.h"
+#include "Physics/DynamicsWorld.h"
 #include "Physics/PhysicsTransform.h"
+#include <sgl/Math/MatrixFunctions.hpp>
 
 namespace slon {
 namespace physics {
@@ -27,7 +29,7 @@ const char* PhysicsTransform::serialize(database::OArchive& ar) const
 	Transform::serialize(ar);
 
 	// serialize data
-    ar.writeSerializable(rigidBody.get());
+    ar.writeSerializable(collisionObject.get());
     ar.writeChunk("absolute", &absolute);
     return "PhysicsTransform";
 }
@@ -38,7 +40,7 @@ void PhysicsTransform::deserialize(database::IArchive& ar)
 	Transform::deserialize(ar);
 
 	// deserialize data
-    rigidBody = ar.readSerializable<physics::RigidBody>();
+    collisionObject = ar.readSerializable<physics::CollisionObject>();
     ar.readChunk("absolute", &absolute);
 }
 
@@ -53,7 +55,7 @@ const math::Matrix4f& PhysicsTransform::getTransform() const
 			{
 				transform             = collisionObject->getTransform();
 				lastNumSimulatedSteps = numSimulatedSteps;
-				update();
+				const_cast<PhysicsTransform*>(this)->update();
 			}
 		}
 	}

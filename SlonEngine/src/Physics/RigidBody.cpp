@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
+#include "Physics/Constraint.h"
 #include "Physics/DynamicsWorld.h"
 #include "Physics/RigidBody.h"
 #ifdef SLON_ENGINE_USE_BULLET
@@ -176,7 +177,7 @@ void RigidBody::instantiate()
 {
     if (world)
     {
-        impl.reset( new BulletRigidBody(this, world.get()) );
+        impl.reset( new BulletRigidBody(this, world->getImpl()) );
         for (size_t i = 0; i<constraints.size(); ++i) {
             constraints[i]->instantiate();
         }

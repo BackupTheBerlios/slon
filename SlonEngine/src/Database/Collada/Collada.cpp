@@ -12,7 +12,10 @@
 #include "Graphics/StaticMesh.h"
 #include "Graphics/LightingEffect.h"
 #include "Log/LogVisitor.h"
-#include "Physics/RigidBodyTransform.h"
+#include "Physics/Constraint.h"
+#include "Physics/RigidBody.h"
+#include "Physics/PhysicsModel.h"
+#include "Physics/PhysicsTransform.h"
 #include "Scene/Skeleton.h"
 #include "Scene/CullVisitor.h"
 #include "Scene/FilterVisitor.h"
@@ -888,7 +891,7 @@ namespace {
 
 #ifdef SLON_ENGINE_USE_PHYSICS
     class DecomposeTransformVisitor :
-        public scene::FilterVisitor<scene::Visitor, physics::RigidBodyTransform>
+        public scene::FilterVisitor<scene::Visitor, physics::PhysicsTransform>
 	{
 	public:
         DecomposeTransformVisitor(scene::Node& node)
@@ -896,13 +899,27 @@ namespace {
             traverse(node);
         }
 
-		void visit(physics::RigidBodyTransform& rbTransform)
+		void visit(physics::PhysicsTransform& rbTransform)
 		{
 			math::Matrix4f T( rbTransform.getLocalToWorld() );
-			math::Matrix4f R( rbTransform.getRigidBody()->getTransform() );
+			math::Matrix4f R( rbTransform.getCollisionObject()->getTransform() );
 
-			rbTransform.setTransform( math::invert(R) * T ); // physics -> graphics 
-			switch ( rbTransform.getRigidBody()->getDynamicsType() )
+			const physics::RigidBody* rigidBody = static_cast<const physics::RigidBody*>( rbTransform.getCollisionObject() );
+			assert(rigidBody);
+
+			// add additional transformation node to map physics transform to graphics
+			math::Matrix4f physToGraphTransform = math::invert(R) * T;
+			if ( !math::equal(physToGraphTransform, math::make_identity<float, 4>()) )
+			{
+				// link rbTransform children to new transformation node
+				scene::matrix_transform_ptr transform( new scene::MatrixTransform("PhysicsToGraphics", physToGraphTransform) );
+				for ( scene::Node* child = rbTransform.getChild(); child != 0; child = child->getRight() ) {
+					transform->addChild(child);
+				}
+				rbTransform.addChild(transform);
+			}
+
+			switch ( rigidBody->getDynamicsType() )
 			{
 			case physics::RigidBody::DT_STATIC:
 			case physics::RigidBody::DT_DYNAMIC:
@@ -1069,8 +1086,8 @@ namespace {
             }
         }
 
-        physics::Constraint* createRigidConstraintInstance( const collada_instance_rigid_constraint& colladaRigidConstraintInstance,
-                                                            physics::PhysicsModel&                   sceneModel )
+        physics::constraint_ptr createRigidConstraintInstance( const collada_instance_rigid_constraint& colladaRigidConstraintInstance,
+                                                               physics::PhysicsModel&                   sceneModel )
         {
             assert( colladaRigidConstraintInstance.element && "Constraint instance must point to some constraint." );
 
@@ -1082,8 +1099,8 @@ namespace {
             desc.frames[0] = math::Matrix4r(colladaConstraint.refAttachment.transform);
             desc.frames[1] = math::Matrix4r(colladaConstraint.attachment.transform);
 
-            desc.rigidBodies[0] = sceneModel.findRigidBody(colladaConstraint.refAttachment.rigidBody->sid)->get();
-            desc.rigidBodies[1] = sceneModel.findRigidBody(colladaConstraint.attachment.rigidBody->sid)->get();
+            desc.rigidBodies[0] = dynamic_cast<physics::RigidBody*>( sceneModel.findCollisionObjectByName(colladaConstraint.refAttachment.rigidBody->sid)->first.get() );
+            desc.rigidBodies[1] = dynamic_cast<physics::RigidBody*>( sceneModel.findCollisionObjectByName(colladaConstraint.attachment.rigidBody->sid)->first.get() );
 
             desc.linearLimits[0] = math::Vector3r(colladaConstraint.limits.linear[0]);
             desc.linearLimits[1] = math::Vector3r(colladaConstraint.limits.linear[1]);
@@ -1094,23 +1111,22 @@ namespace {
                 desc.angularLimits[1][i] = math::deg_to_rad(colladaConstraint.limits.swingConeTwist[1][i]);
             }
 
-            physics::Constraint* constraint = dynamicsWorld.createConstraint(desc);
+            physics::constraint_ptr constraint( new physics::Constraint(desc) );
             sceneModel.addConstraint(constraint);
 
             return constraint;
         }
 
-        physics::RigidBody* createRigidBodyInstance( const collada_instance_rigid_body&  colladaRigidBodyInstance,
-                                                     physics::PhysicsModel&              sceneModel )
+        physics::rigid_body_ptr createRigidBodyInstance( const collada_instance_rigid_body&  colladaRigidBodyInstance,
+                                                         physics::PhysicsModel&              sceneModel )
         {
             using namespace physics;
 
             collada_rigid_body& colladaRigidBody = *colladaRigidBodyInstance.element;
 
             RigidBody::state_desc desc;
-            desc.target = colladaRigidBodyInstance.target.substr(1);
-            desc.name   = colladaRigidBody.sid;
-            desc.type   = colladaRigidBody.dynamic ? RigidBody::DT_DYNAMIC : RigidBody::DT_STATIC;
+            desc.name = colladaRigidBody.sid;
+            desc.type = colladaRigidBody.dynamic ? RigidBody::DT_DYNAMIC : RigidBody::DT_STATIC;
 
             if (colladaRigidBodyInstance.mass) {
                 desc.mass = colladaRigidBodyInstance.mass;
@@ -1160,8 +1176,8 @@ namespace {
 
             // attach shapes
 
-            physics::RigidBody* rigidBody = dynamicsWorld.createRigidBody(desc);
-            sceneModel.addRigidBody(rigidBody);
+            rigid_body_ptr rigidBody( new RigidBody(desc) );
+            sceneModel.addCollisionObject(rigidBody, colladaRigidBodyInstance.target.substr(1));
 
             return rigidBody;
         }
@@ -1182,7 +1198,7 @@ namespace {
 				{
 					try
 					{
-						physics::RigidBody* rigidBody = createRigidBodyInstance(colladaModel.rigidBodyInstances[i], *physicsModel);
+						createRigidBodyInstance(colladaModel.rigidBodyInstances[i], *physicsModel);
 					}
 					catch(collada_error&)
 					{
@@ -1198,15 +1214,15 @@ namespace {
 				}
 			}
 
-            for (PhysicsModel::rigid_body_iterator iter  = physicsModel->firstRigidBody();
-                                                   iter != physicsModel->endRigidBody();
-                                                   ++iter)
+            for (PhysicsModel::collision_object_iterator iter  = physicsModel->firstCollisionObject();
+                                                         iter != physicsModel->endCollisionObject();
+                                                         ++iter)
             {
                 // insert rigid body into scene graph
-                scene::node_ptr targetNode( findNamedNode( *root, hash_string((*iter)->getTarget()) ) );
+                scene::node_ptr targetNode( findNamedNode( *root, hash_string(iter->second) ) );
                 if (targetNode)
                 {
-                    physics::RigidBodyTransform* rbTransform = (*iter)->getMotionState();
+                    physics::physics_transform_ptr rbTransform( new physics::PhysicsTransform(iter->first) );
                     if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
                     {
                         // relink children
@@ -1224,16 +1240,13 @@ namespace {
                     else 
                     {
                         rbTransform->addChild(targetNode.get());
-                        root.reset(rbTransform);
+                        root = rbTransform;
                     }
                 }
                 else {
-                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << (*iter)->getTarget() << std::endl);
+                    AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << iter->second << std::endl);
                 }
             }
-
-            // enable simulation
-            physicsModel->toggleSimulation(true);
 
             // apply local transform to the shapes
             scene::TransformVisitor tv(*root);

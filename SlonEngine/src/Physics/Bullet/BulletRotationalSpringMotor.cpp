@@ -1,36 +1,53 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
+#include "Physics/Bullet/BulletCommon.h"
+#include "Physics/Bullet/BulletConstraint.h"
+#include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletRotationalSpringMotor.h"
-#include "Physics/Bullet/BulletSolverCollector.h"
 
 namespace slon {
 namespace physics {
 
 BulletRotationalSpringMotor::BulletRotationalSpringMotor(BulletConstraint* constraint, int axis)
-:   BulletRotationalMotor<SpringMotor>(constraint, axis)
+:   BulletRotationalMotor(constraint, axis)
+,	enableMotor(0)
+,	maxForce(1)
+,	equilibrium(0)
+,	stiffness(1)
+,	velocityDamping(0.1)
 {
+}
+
+void BulletRotationalSpringMotor::toggle(bool enableMotor_)
+{
+	if (enableMotor_ && !enableMotor) {
+		constraint->dynamicsWorld->addSolver(this);
+	}
+	else if (!enableMotor_ && enableMotor_) {
+		constraint->dynamicsWorld->removeSolver(this);
+	}
+	enableMotor = enableMotor_;
 }
 
 void BulletRotationalSpringMotor::solve(real /*dt*/)
 {
-    real force              = stiffness * (equilibrium - motor->m_currentPosition) - velocityDamping * velocity;
-    motor->m_maxMotorForce  = fabs(force);
-    motor->m_targetVelocity = force / motor->m_maxMotorForce * btScalar(BT_LARGE_FLOAT);
-}
+    btScalar force = stiffness * (equilibrium - getPosition()) - velocityDamping * getVelocity();
+	if (force > maxForce) {
+		force = maxForce;
+	}
+	else if (force < -maxForce) {
+		force = -maxForce;
+	}
+	
+    btGeneric6DofConstraint& constraint = BulletRotationalMotor::constraint->getBtConstraint();
+    btRigidBody& rbA = constraint.getRigidBodyA();
+    btRigidBody& rbB = constraint.getRigidBodyB();
+    btVector3 torque = constraint.getAxis(axis) * force;
 
-void BulletRotationalSpringMotor::reset(BulletConstraint* constraint, int axis)
-{
-    bool toggle = motor->m_enableMotor;
-    BulletRotationalMotor<SpringMotor>::reset(constraint, axis);
-    motor->m_enableMotor = toggle;
-}
-
-void BulletRotationalSpringMotor::accept(BulletSolverCollector& collector)
-{
-    BulletRotationalMotor<SpringMotor>::accept(collector);
-    if (motor->m_enableMotor) {
-        collector.addSolver(*this);
-    }
+    rbA.applyTorque( torque);
+    rbA.activate(true);
+    rbB.applyTorque(-torque);
+    rbB.activate(true);
 }
 
 } // namespace physics

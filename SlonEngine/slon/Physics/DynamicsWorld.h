@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_PHYSICS_DYNAMICS_WORLD_H__
 
 #include "../Utility/referenced.hpp"
-#include "PhysicsModel.h"
+#include "CollisionObject.h"
 #include <sgl/Math/AABB.hpp>
 #include <vector>
 

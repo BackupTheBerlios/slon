@@ -1,26 +1,27 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
+#include "Physics/CollisionObject.h"
+#include "Physics/Constraint.h"
 #include "Physics/PhysicsModel.h"
-#include <boost/iterator/indirect_iterator.hpp>
 
 DECLARE_AUTO_LOGGER("physics.PhysicsModel")
 
 namespace slon {
 namespace physics {
 
-PhysicsModel::PhysicsModel()
-{
-}
-
-PhysicsModel::~PhysicsModel()
-{
-}
-
 const char* PhysicsModel::serialize(database::OArchive& ar) const
 {
     ar.writeStringChunk("name", name.data(), name.length());
-    ar.openChunk("rigidBodies");
-    std::for_each(rigidBodies.begin(), rigidBodies.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&rigid_body_ptr::get, _1), true, true));
+    ar.openChunk("collisionObjects");
+	for (collision_object_map::const_iterator iter  = collisionObjects.begin(); 
+		                                      iter != collisionObjects.end(); 
+	                                          ++iter)
+	{
+		ar.openChunk("collision_object");
+		ar.writeStringChunk( "target", iter->second.data(), iter->second.length() );
+		ar.writeSerializable( iter->first.get() );
+		ar.closeChunk();
+	}
     ar.closeChunk();
     ar.openChunk("constraints");
     std::for_each(constraints.begin(), constraints.end(), boost::bind(&database::OArchive::writeSerializable, &ar, boost::bind(&constraint_ptr::get, _1), true, true));
@@ -34,16 +35,21 @@ void PhysicsModel::deserialize(database::IArchive& ar)
     ar.readStringChunk("name", name);
 
     database::IArchive::chunk_info info;
-    if ( !ar.openChunk("rigidBodies", info) ) {
-        throw database::serialization_error(AUTO_LOGGER, "Missing rigid bodies chunk");
+    if ( !ar.openChunk("collisionObjects", info) ) {
+        throw database::serialization_error(AUTO_LOGGER, "Missing collision objects chunk");
     }
-    while ( RigidBody* rbody = ar.readSerializable<RigidBody>(false, true) ) {
-        rigidBodies.insert( rigid_body_ptr(rbody) );
-    }
+	while ( ar.openChunk("collision_object", info) )
+	{
+		std::string target;
+		ar.readStringChunk("target", target);
+		collision_object_ptr rbody = ar.readSerializable<CollisionObject>(false, true);
+		addCollisionObject(rbody, target);
+		ar.closeChunk();
+	}
     ar.closeChunk();
 
     if ( !ar.openChunk("constraints", info) ) {
-        throw database::serialization_error(AUTO_LOGGER, "Missing locations chunk");
+        throw database::serialization_error(AUTO_LOGGER, "Missing constraints chunk");
     }
     while ( Constraint* constraint = ar.readSerializable<Constraint>(false, true) ) {
         constraints.insert( constraint_ptr(constraint) );
@@ -51,92 +57,66 @@ void PhysicsModel::deserialize(database::IArchive& ar)
     ar.closeChunk();
 }
 
-bool PhysicsModel::addRigidBody(RigidBody* rigidBody)
+void PhysicsModel::addCollisionObject(const collision_object_ptr& co, const std::string& target)
 {
-    if (rigidBodies.insert(rigidBody).second) 
-    {
-        // add constraints
-        for (RigidBody::constraint_iterator iter  = rigidBody->firstConstraint();
-                                            iter != rigidBody->endConstraint();
-                                            ++iter)
-        {
-            constraints.insert(*iter);
-        }
-
-        return true;
-    }
-
-    return false;
+    collisionObjects.insert( std::make_pair(co, target) );
 }
 
-bool PhysicsModel::removeRigidBody(RigidBody* rigidBody)
+bool PhysicsModel::removeCollisionObject(const collision_object_ptr& co)
 {
-    // can't be in the set if no one use it
-    if (rigidBody->use_count() == 0) {
-        return false;
-    }
-
-    // lock copy
-    rigid_body_ptr rb(rigidBody);
-    if (rigidBodies.erase(rb) == 1) 
-    {
-        // enumerate constraints
-        constraints.clear();
-        for (rigid_body_iterator iter = rigidBodies.begin(); iter != rigidBodies.end(); ++iter) 
-        {
-            for (RigidBody::constraint_iterator constIter  = (*iter)->firstConstraint();
-                                                constIter != (*iter)->endConstraint();
-                                                ++constIter)
-            {
-                constraints.insert(*constIter);
-            }
-        }
-
-        return true;
-    }
-
-    return false;
+	return (collisionObjects.erase(co) == 1);
 }
 
-bool PhysicsModel::addConstraint(Constraint* constraint)
+void PhysicsModel::addConstraint(const constraint_ptr& constraint)
 {
-    return constraints.insert(constraint).second;
+    constraints.insert(constraint);
 }
 
-bool PhysicsModel::removeConstraint(Constraint* constraint)
+bool PhysicsModel::removeConstraint(const constraint_ptr& constraint)
 {
     return (constraints.erase(constraint) == 1);
 }
 
-PhysicsModel::rigid_body_iterator PhysicsModel::findRigidBody(RigidBody* rigidBody)
+PhysicsModel::collision_object_iterator PhysicsModel::findCollisionObjectByName(const std::string& name)
 {
-    return rigidBodies.find(rigidBody);
+	for (collision_object_iterator iter  = collisionObjects.begin();
+								   iter != collisionObjects.end();
+								   ++iter)
+	{
+		if (iter->first->getName() == name) {
+			return iter;
+		}
+	}
+
+	return collisionObjects.end();
 }
 
-PhysicsModel::constraint_iterator PhysicsModel::findConstraint(Constraint* constraint)
+PhysicsModel::collision_object_iterator PhysicsModel::findCollisionObjectByTarget(const std::string& target)
 {
-    return constraints.find(constraint);
+	for (collision_object_iterator iter  = collisionObjects.begin();
+								   iter != collisionObjects.end();
+								   ++iter)
+	{
+		if (iter->second == target) {
+			return iter;
+		}
+	}
+
+	return collisionObjects.end();
 }
 
-PhysicsModel::rigid_body_iterator PhysicsModel::findRigidBody(const std::string& name)
+PhysicsModel::constraint_iterator PhysicsModel::findConstraintByName(const std::string& name)
 {
-    return std::find_if( boost::make_indirect_iterator( rigidBodies.begin() ),
-                         boost::make_indirect_iterator( rigidBodies.end() ),
-                         boost::bind(&RigidBody::getName, _1) == name ).base();
-}
+	for (constraint_iterator iter  = constraints.begin();
+							 iter != constraints.end();
+							 ++iter)
+	{
+		if ((*iter)->getName() == name) {
+			return iter;
+		}
+	}
 
-PhysicsModel::constraint_iterator PhysicsModel::findConstraint(const std::string& name)
-{
-    return std::find_if( boost::make_indirect_iterator( constraints.begin() ),
-                         boost::make_indirect_iterator( constraints.end() ),
-                         boost::bind(&Constraint::getName, _1) == name ).base();
-}
-
-void PhysicsModel::toggleSimulation(bool toggle)
-{
-    std::for_each( boost::make_indirect_iterator( rigidBodies.begin() ),
-                   boost::make_indirect_iterator( rigidBodies.end() ),
-                   boost::bind(&RigidBody::toggleSimulation, _1, toggle) );
+	return constraints.end();
 }
 
 } // namespace physics

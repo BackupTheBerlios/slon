@@ -4,9 +4,14 @@
 #define NOMINMAX
 #include "../DynamicsWorld.h"
 #include <boost/scoped_ptr.hpp>
-#include <bullet/btBulletCollisionCommon.h>
-#include <bullet/btBulletDynamicsCommon.h>
 #include <sgl/Math/Containers.hpp>
+
+// forward bullet
+class btBroadphaseInterface;
+class btCollisionConfiguration;
+class btCollisionDispatcher;
+class btConstraintSolver;
+class btDynamicsWorld;
 
 namespace slon {
 namespace physics {
@@ -32,7 +37,8 @@ class BulletConstraint;
 class BulletSolver;
 
 /* Bullet implementation of the physics dynamics world. */
-class BulletDynamicsWorld
+class BulletDynamicsWorld :
+	public boost::noncopyable
 {
 friend class BulletRigidBody;
 private:
@@ -45,9 +51,15 @@ private:
 	typedef DynamicsWorld::contact_vector               contact_vector;
 	typedef DynamicsWorld::contact_const_iterator       contact_const_iterator;
 	typedef DynamicsWorld::state_desc                   state_desc;
+	
+private:
+    // non copyable
+    BulletDynamicsWorld(const BulletDynamicsWorld&);
+    BulletDynamicsWorld& operator = (const BulletDynamicsWorld&);
 
 public:
     BulletDynamicsWorld(DynamicsWorld* pInterface);
+	~BulletDynamicsWorld();
 
     // implement dynamics world
     void   setGravity(const math::Vector3r& gravity);

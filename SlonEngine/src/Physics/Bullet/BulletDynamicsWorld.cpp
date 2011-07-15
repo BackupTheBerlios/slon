@@ -2,6 +2,7 @@
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletDynamicsWorld.h"
 #include "Physics/Bullet/BulletCommon.h"
+#include "Physics/Bullet/BulletSolver.h"
 #include "Physics/CollisionObject.h"
 #include <sgl/Math/Utility.hpp>
 
@@ -43,6 +44,10 @@ BulletDynamicsWorld::BulletDynamicsWorld(DynamicsWorld* pInterface_)
     }
 
     dynamicsWorld->setGravity( to_bt_vec(desc.gravity) );
+}
+
+BulletDynamicsWorld:~BulletDynamicsWorld()
+{
 }
 
 void BulletDynamicsWorld::setGravity(const math::Vector3r& gravity)

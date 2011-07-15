@@ -23,18 +23,13 @@ public:
     typedef boost::signal<void (const BulletRigidBody&)>    rigid_body_signal;
     typedef boost::signals::connection                      connection_type;
 
-private:
-	// non copyable
-	BulletRigidBody(const BulletRigidBody&);
-	BulletRigidBody& operator = (const BulletRigidBody&);
-
 public:
-    BulletRigidBody(RigidBody*         pInterface,
-                    DynamicsWorld*     dynamicsWorld,
-                    btRigidBody*       rigidBody, 
-                    const std::string& name );
-    BulletRigidBody(RigidBody*         pInterface,
-                    DynamicsWorld*     dynamicsWorld);
+    BulletRigidBody(RigidBody*           pInterface,
+                    BulletDynamicsWorld* dynamicsWorld,
+                    btRigidBody*         rigidBody, 
+                    const std::string&   name );
+    BulletRigidBody(RigidBody*           pInterface,
+                    BulletDynamicsWorld* dynamicsWorld);
     ~BulletRigidBody();
 
     // Implement RigidBody
@@ -56,6 +51,9 @@ public:
 
     /** Get internal bullet rigid body. */
     btRigidBody& getBtRigidBody() const { return (*rigidBody); }
+
+	/** Get interface handling this implementation object. */
+    RigidBody* getInterface() { return pInterface; }
 
 private:
     RigidBody*          pInterface;

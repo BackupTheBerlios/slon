@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_PHYSICS_RIGID_BODY_TRANSFORM_H__
 #define __SLON_ENGINE_PHYSICS_RIGID_BODY_TRANSFORM_H__
 
-#include "../Realm/EventVisitor.hpp"
+#include "../Realm/EventVisitor.h"
 #include "../Scene/Transform.h"
 #include "../Scene/AcceptVisitor.hpp"
 #include "Forward.h"
@@ -43,7 +43,7 @@ public:
 protected:
     collision_object_ptr   collisionObject;
     bool                   absolute;
-	size_t                 lastNumSimulatedSteps;
+	mutable size_t         lastNumSimulatedSteps;
 	mutable math::Matrix4f transform;
 	mutable math::Matrix4f invTransform;
 };
