@@ -5,9 +5,9 @@
 namespace slon {
 namespace physics {
 
-BulletCollisionObject::BulletCollisionObject(CollisionObject* pInterface_, DynamicsWorld* dynamicsWorld_) 
+BulletCollisionObject::BulletCollisionObject(CollisionObject* pInterface_, BulletDynamicsWorld* dynamicsWorld_) 
 :   pInterface(pInterface_)
-,   dynamicsWorld( dynamicsWorld_->getImpl() )
+,   dynamicsWorld(dynamicsWorld_)
 {
 }
 

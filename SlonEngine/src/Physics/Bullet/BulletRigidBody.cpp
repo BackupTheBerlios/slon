@@ -189,8 +189,8 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
 	AUTO_LOGGER_MESSAGE(log::S_FLOOD, "Creating rigid body from btRigidBody:\n" << pInterface_->desc << LOG_FILE_AND_LINE);
 }
 
-BulletRigidBody::BulletRigidBody(RigidBody*		pInterface_,
-								 DynamicsWorld*	dynamicsWorld_)
+BulletRigidBody::BulletRigidBody(RigidBody*             pInterface_,
+								 BulletDynamicsWorld*   dynamicsWorld_)
 :	base_type(pInterface_, dynamicsWorld_)
 {
 	RigidBody::state_desc& desc = pInterface_->desc;

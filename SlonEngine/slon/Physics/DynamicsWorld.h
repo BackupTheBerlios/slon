@@ -53,6 +53,7 @@ public:
 
 public:
     DynamicsWorld(const state_desc& desc);
+    ~DynamicsWorld();
 
     /** Setup world's gravity and its direction. */
     void setGravity(const math::Vector3r& gravity);

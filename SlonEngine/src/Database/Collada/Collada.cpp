@@ -939,10 +939,8 @@ namespace {
 	class PhysicsSceneBuilder
     {
     public:
-        PhysicsSceneBuilder( const ColladaDocument&     document_,
-                             physics::DynamicsWorld&    dynamicsWorld_) :
-            document(document_),
-            dynamicsWorld(dynamicsWorld_)
+        PhysicsSceneBuilder(const ColladaDocument& document_) :
+            document(document_)
         {
         }
 
@@ -1258,8 +1256,7 @@ namespace {
         }
 
     private:
-        const ColladaDocument&  document;
-        physics::DynamicsWorld& dynamicsWorld;
+        const ColladaDocument& document;
     };
 #endif // SLON_ENGINE_USE_PHYSICS
 
@@ -1629,7 +1626,7 @@ library_ptr ColladaLoader::load(filesystem::File* file)
 	}
 
 #ifdef SLON_ENGINE_USE_PHYSICS				
-	PhysicsSceneBuilder physicsBuilder(document, *physics::currentPhysicsManager().getDynamicsWorld());
+	PhysicsSceneBuilder physicsBuilder(document);
 	for ( physics_scene_set::iterator iter  = document.libraryPhysicsScenes.elements.begin();
 										iter != document.libraryPhysicsScenes.elements.end();
 										++iter )

@@ -15,12 +15,15 @@ public:
     typedef boost::signal<void ()>          post_frame_signal;
     typedef boost::signals::connection      connection_type;
 
-public:
-	/** Initialize physics dynamics world. */
-	virtual DynamicsWorld* initDynamicsWorld( const DynamicsWorld::state_desc& dynamicsWorldDesc = DynamicsWorld::state_desc() ) = 0;
+    typedef std::list<DynamicsWorld*>       dynamics_world_list;
+    typedef dynamics_world_list::iterator   dynamics_world_iterator;
 
-	/** Get dynamics world of the manager. */
-	virtual DynamicsWorld* getDynamicsWorld() const = 0;
+public:
+    /** Get iterator pointing first dynamics world. */
+    virtual dynamics_world_iterator firstDynamicsWorld() = 0;
+
+    /** Get iterator pointing after last dynamics world. */
+    virtual dynamics_world_iterator endDynamicsWorld() = 0;
 
     /** Set timer for physics simulation. If timer is 0 simulation will stop. */
     virtual void setTimer(const Timer* timer) = 0;

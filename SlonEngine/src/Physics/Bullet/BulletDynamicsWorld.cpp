@@ -12,6 +12,7 @@ using namespace physics;
 BulletDynamicsWorld::BulletDynamicsWorld(DynamicsWorld* pInterface_)
 :	pInterface(pInterface_)
 ,	numSimulatedSteps(0)
+,   unsimulatedTime(0)
 ,	firstSolver(0)
 {
     const state_desc& desc = pInterface->desc;
@@ -46,7 +47,7 @@ BulletDynamicsWorld::BulletDynamicsWorld(DynamicsWorld* pInterface_)
     dynamicsWorld->setGravity( to_bt_vec(desc.gravity) );
 }
 
-BulletDynamicsWorld:~BulletDynamicsWorld()
+BulletDynamicsWorld::~BulletDynamicsWorld()
 {
 }
 
@@ -60,6 +61,7 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     if (dt < 0) {
         return 0;
     }
+    dt += unsimulatedTime; // unsimulated from last step
 
     real t = 0;
     {
@@ -138,7 +140,7 @@ real BulletDynamicsWorld::stepSimulation(real dt)
         dissapearingContacts[i].collisionObjects[1]->handleDissappearingContact(dissapearingContacts[i]);
     }
 
-    return dt - t;
+    return unsimulatedTime = dt - t;
 }
 
 void BulletDynamicsWorld::addSolver(BulletSolver* solver)

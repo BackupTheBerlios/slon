@@ -54,9 +54,9 @@ physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
 			else {
 				transform = rigidBody->getWorldTransform();
 			}
-			desc.transform       = to_mat( transform );
-			desc.angularVelocity = to_vec( rigidBody->getAngularVelocity() );
-			desc.linearVelocity  = to_vec( rigidBody->getLinearVelocity() );
+            desc.transform       = physics::to_mat( transform );
+			desc.angularVelocity = physics::to_vec( rigidBody->getAngularVelocity() );
+			desc.linearVelocity  = physics::to_vec( rigidBody->getLinearVelocity() );
 			if (rigidBody->getCollisionFlags() & btCollisionObject::CF_KINEMATIC_OBJECT) {
 				desc.type = physics::RigidBody::DT_KINEMATIC;
 			}

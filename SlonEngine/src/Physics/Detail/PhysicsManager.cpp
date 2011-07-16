@@ -20,33 +20,31 @@ PhysicsManager::PhysicsManager()
 {
 }
 
-DynamicsWorld* PhysicsManager::initDynamicsWorld(const DynamicsWorld::state_desc& dynamicsWorldDesc)
-{
-    dynamicsWorld.reset( new DynamicsWorldImpl(dynamicsWorldDesc) );
-    return dynamicsWorld.get();
-}
-
-void PhysicsManager::setTimer(const Timer* _timer)
-{
-    timer.reset(_timer);
-    if (timer) {
-        deltaTimer = delta_timer(_timer);
-    }
-}
-
 void PhysicsManager::handlePhysics()
 {
     assert(timer);
-    if (!dynamicsWorld) {
-        initDynamicsWorld();
-    }
 
     preFrameSignal();
     {
-        thread::lock_ptr lock = dynamicsWorld->lockForWriting();
-        unsimulatedTime = dynamicsWorld->stepSimulation( (float)deltaTimer() + unsimulatedTime );
+        //thread::lock_ptr lock = dynamicsWorld->lockForWriting();
+        for (dynamics_world_iterator it  = firstDynamicsWorld();
+                                     it != endDynamicsWorld();
+                                     ++it)
+        {
+            (*it)->stepSimulation( (real)deltaTimer() );
+        }
     }
     postFrameSignal();
+}
+
+void PhysicsManager::addDynamicsWorld(DynamicsWorld* world)
+{
+    worlds.push_back(world);
+}
+
+void PhysicsManager::removeDynamicsWorld(DynamicsWorld* world)
+{
+    worlds.remove(world);
 }
 
 } // namespace detail

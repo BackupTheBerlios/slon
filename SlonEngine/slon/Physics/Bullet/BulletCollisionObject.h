@@ -16,7 +16,7 @@ private:
     typedef boost::intrusive_ptr<BulletDynamicsWorld>   dynamics_world_ptr;
 
 public:
-    BulletCollisionObject(CollisionObject* pInterface, DynamicsWorld* dynamicsWorld);
+    BulletCollisionObject(CollisionObject* pInterface, BulletDynamicsWorld* dynamicsWorld);
     virtual ~BulletCollisionObject();
 
     // Implement CollisionObject
@@ -33,7 +33,7 @@ protected:
 	CollisionObject*        pInterface;
     contact_signal          contactAppearSignal;
     contact_signal          contactDissapearSignal;
-    dynamics_world_ptr      dynamicsWorld;
+    BulletDynamicsWorld*    dynamicsWorld;
 };
 
 } // namespace physics

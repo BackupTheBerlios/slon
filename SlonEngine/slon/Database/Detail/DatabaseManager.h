@@ -2,7 +2,14 @@
 #define __SLON_ENGINE_DATABASE_DETAIL_DATABASE_MANAGER_H__
 
 #include "../DatabaseManager.h"
+#include "Animation/Animation.h"
+#include "Graphics/Effect.h"
+#include "Realm/Location.h"
+#include "Scene/Node.h"
 #include "Cache.h"
+#ifdef SLON_ENGINE_USE_PHYSICS
+#   include "Physics/PhysicsModel.h"
+#endif
 
 namespace slon {
 namespace database {

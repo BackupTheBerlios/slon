@@ -93,6 +93,7 @@ private:
 
     // settings 
     size_t                      numSimulatedSteps;
+    float                       unsimulatedTime;
 
 	// internal solvers
 	BulletSolver*				firstSolver;

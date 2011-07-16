@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Physics/Constraint.h"
+#include "Physics/Detail/PhysicsManager.h"
 #include "Physics/DynamicsWorld.h"
 #include "Physics/RigidBody.h"
 #ifdef SLON_ENGINE_USE_BULLET
@@ -13,6 +14,12 @@ DynamicsWorld::DynamicsWorld(const state_desc& desc_)
 :	desc(desc_)
 {
 	impl.reset( new BulletDynamicsWorld(this) );
+    static_cast<detail::PhysicsManager&>( currentPhysicsManager() ).addDynamicsWorld(this);
+}
+
+DynamicsWorld::~DynamicsWorld()
+{
+    static_cast<detail::PhysicsManager&>( currentPhysicsManager() ).removeDynamicsWorld(this);
 }
 
 void DynamicsWorld::setGravity(const math::Vector3r& gravity)
