@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_REALM_LOCATION_H__
 
 #include "../Database/Serializable.h"
+#include "../Physics/Forward.h"
 #include "../Scene/Forward.h"
 #include "../Thread/Lock.h"
 #include "../Utility/math.hpp"
@@ -39,6 +40,12 @@ public:
      */
     virtual bool remove(const scene::node_ptr& node) = 0;
 
+    /** Visit location nodes. */
+    virtual void visit(scene::Visitor& nv) = 0;
+
+    /** Visit location nodes. */
+    virtual void visit(scene::ConstVisitor& nv) = 0;
+
     /** Visit objects intersecting body.
      * @param body - body which intersects objects.
      * @param cb - visitor.
@@ -62,6 +69,16 @@ public:
      * @param cb - visitor.
      */
     virtual void visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const = 0;
+
+    /** Set dynamics world for location. Physics entities will be added to dynamics world. */
+    virtual void setDynamicsWorld(const physics::dynamics_world_ptr& world) = 0;
+
+    /** Get location dynamics world. */
+    virtual physics::DynamicsWorld* getDynamicsWorld() = 0;
+
+    /** Get location dynamics world. */
+    virtual const physics::DynamicsWorld* getDynamicsWorld() const = 0;
+
 
     /** Grant thread read access to the location.
      * @return lock object. Lock is freed whether object is deleted.

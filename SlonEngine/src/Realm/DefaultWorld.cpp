@@ -2,7 +2,6 @@
 #include "Database/Archive.h"
 #include "Detail/Engine.h"
 #include "Realm/DefaultWorld.h"
-#include "Realm/EventVisitor.h"
 #include "Scene/Visitor.h"
 #include "Utility/Algorithm/algorithm.hpp"
 #include "Utility/math.hpp"
@@ -68,6 +67,7 @@ WorldVisitor<World, Callback> makeWorldVisitor(World& world, Callback& cb)
 
 DefaultWorld::DefaultWorld()
 {
+    eventVisitor.setWorld(this);
 }
 
 const char* DefaultWorld::serialize(database::OArchive& ar) const
@@ -173,7 +173,8 @@ bool DefaultWorld::removeInfiniteNode(const scene::node_ptr& node)
 {
     if ( quick_remove(infiniteObjects, node) ) 
     {
-        EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
+        eventVisitor.setType(EventVisitor::WORLD_REMOVE);
+        eventVisitor.traverse(*node);
         return true;
     }
 
@@ -183,7 +184,8 @@ bool DefaultWorld::removeInfiniteNode(const scene::node_ptr& node)
 void DefaultWorld::addInfiniteNode(const scene::node_ptr& node)
 {
 	infiniteObjects.push_back(node);
-    EventVisitor ev(EventVisitor::WORLD_ADD, this, 0, *node);
+    eventVisitor.setType(EventVisitor::WORLD_ADD);
+    eventVisitor.traverse(*node);
 }
 
 bool DefaultWorld::haveInfiniteNode(const scene::node_ptr& node) const

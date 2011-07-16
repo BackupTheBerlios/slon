@@ -21,25 +21,37 @@ public:
     };
 
 public:
-    EventVisitor(TYPE type_, const World* world_, const Location* location_)
+    EventVisitor()
+    :   world(0)
+    ,   location(0)
+    {}
+
+    EventVisitor(TYPE type_, const Location* location_)
     :   type(type_)
-    ,   world(world_)
+    ,   world(0)
     ,   location(location_)
     {}
 
-    EventVisitor(TYPE type_, const World* world_, const Location* location_, scene::Node& node)
+    EventVisitor(TYPE type_, const World* world_)
     :   type(type_)
     ,   world(world_)
-    ,   location(location_)
-    {
-        traverse(node);
-    }
+    ,   location(0)
+    {}
+
+    /** Set event type. */
+    void setType(TYPE type_) { type = type_; }
 
     /** Get type of the event. */
     TYPE getType() const { return type; }
 
+    /** Set visitor world. */
+    void setWorld(World* world_) { world = world_; }
+
     /** Get world assigned to visitor. */
     const World* getWorld() const { return world; }
+
+    /** Set visitor location. */
+    void setLocation(Location* location_) { location = location_; }
 
     /** Get location assigned to visitor. */
     const Location* getLocation() const { return location; }

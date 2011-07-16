@@ -479,11 +479,49 @@ void aabb_tree<LeafData, RealType>::clear()
     }
 }
 
+/** Perform function on leafe nodes.
+ * @param tree - tree for gathering elements.
+ * @param functor - perform functor(visitor). Return true to stop traverse.
+ */
+template< typename LeafData,
+          typename RealType,
+          typename Functor >
+void perform_on_leaves( const aabb_tree<LeafData, RealType>& tree,
+                        Functor                              functor )
+{
+    typedef typename aabb_tree<LeafData, RealType>::volume_node volume_node;
+    typedef typename aabb_tree<LeafData, RealType>::leaf_node   leaf_node;
+
+    const volume_node* root = tree.get_root();
+    if (root)
+    {
+        std::queue<const volume_node*> queue;
+        queue.push(root);
+
+        while ( !queue.empty() )
+        {
+            root = queue.front();
+            queue.pop();
+
+            if ( root->is_internal() )
+            {
+                queue.push( root->get_child(0) );
+                queue.push( root->get_child(1) );
+            }
+            else 
+			{
+                if ( functor(static_cast<const leaf_node*>(root)->data) ) {
+					return;
+				}
+            }
+        }
+    }
+}
+
 /** Perform function on elements intersecting specified volume.
  * @tparam Volume - type of the volume body(AABB, Frustum, etc.).
  * @param tree - tree for gathering elements.
  * @param volume - volume for gathering.
- * @param iterator - iterator for adding gathered elements.
  * @param functor - perform functor(visitor). Return true to stop traverse.
  */
 template< typename LeafData,

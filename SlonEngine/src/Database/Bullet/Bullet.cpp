@@ -20,7 +20,7 @@ namespace database {
 namespace detail {
 
 physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
-{
+{/*
     physics::BulletDynamicsWorld& world   = *physics::currentPhysicsManager().getDynamicsWorld()->getImpl();
     btDynamicsWorld*              btWorld = &world.getBtDynamicsWorld();
     	
@@ -34,10 +34,10 @@ physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
     if ( !fileLoader->loadFileFromMemory( (char*)fileContent.data(), fileContent.length() ) ) {
         throw file_error(AUTO_LOGGER, "Can't load bullet physics file");
     }
-
+*/
     // enumerate objects and add them to the scene model
     physics::physics_model_ptr sceneModel(new physics::PhysicsModel);
-    for (int i = 0; i<fileLoader->getNumRigidBodies(); ++i) 
+/*    for (int i = 0; i<fileLoader->getNumRigidBodies(); ++i) 
     {
         btCollisionObject* collisionObject = fileLoader->getRigidBodyByIndex(i);
         if ( btRigidBody* rigidBody = dynamic_cast<btRigidBody*>(collisionObject) ) 
@@ -147,7 +147,7 @@ physics::physics_model_ptr BulletLoader::load(filesystem::File* file)
                 btWorld->removeConstraint( constraint.get() );
                 break;
         };
-    }
+    }*/
 
     return sceneModel;
 }
