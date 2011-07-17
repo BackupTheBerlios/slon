@@ -4,6 +4,8 @@
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
 #include "Forward.h"
+#include <boost/iterator/iterator_facade.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 #include <map>
 #include <set>
 
@@ -15,14 +17,101 @@ class PhysicsModel :
     public Referenced,
     public database::Serializable
 {
-public: 
-    typedef std::map<collision_object_ptr, std::string>  collision_object_map;
-    typedef collision_object_map::iterator               collision_object_iterator;
-    typedef collision_object_map::const_iterator         collision_object_const_iterator;
+private:
+    template <typename RigidBody, typename Iterator>
+    class rigid_body_iterator_impl :
+        public boost::iterator_facade
+        <
+            rigid_body_iterator_impl<RigidBody, Iterator>,
+            RigidBody,
+            boost::bidirectional_traversal_tag
+        >
+    {
+    friend class boost::iterator_core_access;
+    private:
+        void increment()
+        {
+            while (++iter != end)
+            {
+                item = dynamic_cast<RigidBody*>( iter->first.get() );
+                if (item) {
+                    break;
+                }
+            }
+        }
 
-    typedef std::set<constraint_ptr>                     constraint_set;
-    typedef constraint_set::iterator                     constraint_iterator;
-    typedef constraint_set::const_iterator               constraint_const_iterator;
+        void decrement()
+        {
+            while (--iter != begin)
+            {
+                item = dynamic_cast<RigidBody*>( iter->first.get() );
+                if (item) {
+                    break;
+                }
+            }
+        }
+
+        bool equal(const rigid_body_iterator_impl& other) const
+        {
+            return iter == other.iter;
+        }
+
+        RigidBody& dereference() const 
+        { 
+            assert(item);
+            return *item; 
+        }
+
+    public:
+        rigid_body_iterator_impl(Iterator iter_,
+                                 Iterator begin_,
+                                 Iterator end_)
+        :   iter(iter_)
+        ,   begin(begin_)
+        ,   end(end_)
+        ,   item(0)
+        {
+            if (iter != end) 
+            {
+                item = dynamic_cast<RigidBody*>( iter->first.get() );
+                if (!item) {
+                    increment();
+                }
+            }
+        }
+
+    private:
+        Iterator   iter;
+        Iterator   begin;
+        Iterator   end;
+        RigidBody* item;
+    };
+
+    template<typename T>
+    struct dereference :
+        public std::unary_function<boost::intrusive_ptr<T>, T&>
+    {
+        T& operator () (const boost::intrusive_ptr<T>& value) const { return *value; }
+    };
+
+    typedef dereference<Constraint>         constraint_dereference;
+    typedef dereference<const Constraint>   const_constraint_dereference;
+
+public: 
+    typedef std::map<collision_object_ptr, std::string>                 collision_object_map;
+    typedef collision_object_map::iterator                              collision_object_iterator;
+    typedef collision_object_map::const_iterator                        collision_object_const_iterator;
+
+    typedef rigid_body_iterator_impl<RigidBody, 
+                                     collision_object_iterator>         rigid_body_iterator;
+    typedef rigid_body_iterator_impl<const RigidBody, 
+                                     collision_object_const_iterator>   rigid_body_const_iterator;
+
+    typedef std::set<constraint_ptr>                                    constraint_set;
+    typedef boost::transform_iterator<constraint_dereference, 
+                                      constraint_set::iterator>         constraint_iterator;
+    typedef boost::transform_iterator<const_constraint_dereference, 
+                                      constraint_set::const_iterator>   constraint_const_iterator;
 
 public:
     // Override Serializable
@@ -71,17 +160,29 @@ public:
     /** Get iterator addressing end of collision objects. */
     collision_object_const_iterator endCollisionObject() const { return collisionObjects.end(); }
 
-    /** Get iterator addressing first constraint. */
-    constraint_iterator firstConstraint() { return constraints.begin(); }
+    /** Get iterator addressing first rigid body. */
+    rigid_body_iterator firstRigidBody();
+
+    /** Get iterator addressing first rigid body. */
+    rigid_body_const_iterator firstRigidBody() const;
+
+    /** Get iterator addressing end of rigid bodies. */
+    rigid_body_iterator endRigidBody();
+
+    /** Get iterator addressing end of rigid bodies. */
+    rigid_body_const_iterator endRigidBody() const;
 
     /** Get iterator addressing first constraint. */
-    constraint_const_iterator firstConstraint() const { return constraints.begin(); }
+    constraint_iterator firstConstraint();
+
+    /** Get iterator addressing first constraint. */
+    constraint_const_iterator firstConstraint() const;
 
     /** Get iterator addressing end of constraints. */
-    constraint_iterator endConstraint() { return constraints.end(); }
+    constraint_iterator endConstraint();
 
     /** Get iterator addressing end of constraints. */
-    constraint_const_iterator endConstraint() const { return constraints.end(); }
+    constraint_const_iterator endConstraint() const;
 
 private:
 	std::string          name;

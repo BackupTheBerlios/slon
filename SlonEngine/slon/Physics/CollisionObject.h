@@ -85,16 +85,6 @@ public:
      */
     virtual connection_type connectContactDissapearCallback(const contact_handler& handler) = 0;
 
-    /** Call appearing contact handlers. This function is called from DynamicsWorld
-     * during update.
-     */
-    virtual void handleAppearingContact(const Contact& contact) = 0;
-
-    /** Call dissapearing contact handlers. This function is called from DynamicsWorld
-     * during update.
-     */
-    virtual void handleDissappearingContact(const Contact& contact) = 0;
-
     virtual ~CollisionObject() {}
 };
 

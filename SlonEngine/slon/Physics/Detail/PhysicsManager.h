@@ -15,9 +15,9 @@ public:
 
     // Override PhysicsManager
     dynamics_world_iterator firstDynamicsWorld() { return worlds.begin(); }
-    dynamics_world_iterator endDynamicsWorld() { return worlds.end(); }
+    dynamics_world_iterator endDynamicsWorld()   { return worlds.end(); }
 
-    void         setTimer(const Timer* _timer);
+    void         setTimer(const const_timer_ptr& timer);
     const Timer* getTimer() const { return timer.get(); }
 
     /** Step simulation. This is called by engine. */

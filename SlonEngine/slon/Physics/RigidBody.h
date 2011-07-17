@@ -92,9 +92,6 @@ public:
     connection_type connectContactAppearCallback(const contact_handler& handler);
     connection_type connectContactDissapearCallback(const contact_handler& handler);
 
-    void handleAppearingContact(const Contact& contact);
-    void handleDissappearingContact(const Contact& contact);
-
     /** Apply force to rigid body at the specified position. */
     void applyForce(const math::Vector3r& force, const math::Vector3r& pos);
 

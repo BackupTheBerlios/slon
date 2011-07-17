@@ -37,6 +37,11 @@ void PhysicsManager::handlePhysics()
     postFrameSignal();
 }
 
+void PhysicsManager::setTimer(const const_timer_ptr& timer_)
+{
+    timer = timer_;
+}
+
 void PhysicsManager::addDynamicsWorld(DynamicsWorld* world)
 {
     worlds.push_back(world);

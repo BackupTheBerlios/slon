@@ -107,16 +107,56 @@ PhysicsModel::collision_object_iterator PhysicsModel::findCollisionObjectByTarge
 
 PhysicsModel::constraint_iterator PhysicsModel::findConstraintByName(const std::string& name)
 {
-	for (constraint_iterator iter  = constraints.begin();
-							 iter != constraints.end();
+	for (constraint_iterator iter  = firstConstraint();
+							 iter != endConstraint();
 							 ++iter)
 	{
-		if ((*iter)->getName() == name) {
+		if (iter->getName() == name) {
 			return iter;
 		}
 	}
 
-	return constraints.end();
+	return endConstraint();
+}
+
+PhysicsModel::rigid_body_iterator PhysicsModel::firstRigidBody() 
+{ 
+    return rigid_body_iterator( collisionObjects.begin(), collisionObjects.begin(), collisionObjects.end() ); 
+}
+
+PhysicsModel::rigid_body_const_iterator PhysicsModel::firstRigidBody() const
+{ 
+    return rigid_body_const_iterator( collisionObjects.begin(), collisionObjects.begin(), collisionObjects.end() );
+}
+
+PhysicsModel::rigid_body_iterator PhysicsModel::endRigidBody()
+{
+    return rigid_body_iterator( collisionObjects.begin(), collisionObjects.end(), collisionObjects.end() );
+}
+
+PhysicsModel::rigid_body_const_iterator PhysicsModel::endRigidBody() const
+{
+    return rigid_body_const_iterator( collisionObjects.begin(), collisionObjects.end(), collisionObjects.end() );
+}
+
+PhysicsModel::constraint_iterator PhysicsModel::firstConstraint()
+{
+    return constraint_iterator( constraints.begin(), constraint_dereference() );
+}
+
+PhysicsModel::constraint_const_iterator PhysicsModel::firstConstraint() const
+{
+    return constraint_const_iterator( constraints.begin(), const_constraint_dereference() );
+}
+
+PhysicsModel::constraint_iterator PhysicsModel::endConstraint()
+{
+    return constraint_iterator( constraints.end(), constraint_dereference() );
+}
+
+PhysicsModel::constraint_const_iterator PhysicsModel::endConstraint() const
+{
+    return constraint_const_iterator( constraints.end(), const_constraint_dereference() );
 }
 
 } // namespace physics

@@ -26,7 +26,7 @@ public:
     virtual dynamics_world_iterator endDynamicsWorld() = 0;
 
     /** Set timer for physics simulation. If timer is 0 simulation will stop. */
-    virtual void setTimer(const Timer* timer) = 0;
+    virtual void setTimer(const const_timer_ptr& timer) = 0;
 
     /** Get physics timer */
     virtual const Timer* getTimer() const = 0;
