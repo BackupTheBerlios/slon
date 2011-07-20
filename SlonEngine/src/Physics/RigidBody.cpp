@@ -46,7 +46,7 @@ void RigidBody::deserialize(database::IArchive& ar)
     reset(desc);
 }
 
-CollisionObject::COLLISION_TYPE RigidBody::getCollisionType() const
+CollisionObject::COLLISION_TYPE RigidBody::getType() const
 {
 	return CT_RIGID_BODY;
 }

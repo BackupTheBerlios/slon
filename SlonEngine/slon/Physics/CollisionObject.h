@@ -44,6 +44,11 @@ class CollisionObject :
     public Referenced,
     public database::Serializable
 {
+private:
+#ifdef SLON_ENGINE_USE_BULLET
+    friend class BulletCollisionObject;
+	typedef BulletCollisionObject impl_type;
+#endif
 public:
     typedef boost::function<void (const Contact& c)>    contact_handler;
     typedef boost::signals::connection                  connection_type;
@@ -56,7 +61,7 @@ public:
 
 public:
     /** Get behaviour of the object collision. */
-    virtual COLLISION_TYPE getCollisionType() const = 0;
+    virtual COLLISION_TYPE getType() const = 0;
 
     /** Get objects collision shape. */
     virtual const CollisionShape* getCollisionShape() const = 0;
@@ -84,6 +89,12 @@ public:
      * @param handler - contact handler.
      */
     virtual connection_type connectContactDissapearCallback(const contact_handler& handler) = 0;
+
+	/** Get implementation object. */
+    impl_type* getImpl();
+
+	/** Get implementation object. */
+    const impl_type* getImpl() const;
 
     virtual ~CollisionObject() {}
 };

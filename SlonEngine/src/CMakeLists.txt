@@ -484,6 +484,7 @@ SET ( TARGET_LOG_DETAIL_SOURCES
 )
 
 SET ( TARGET_PHYSICS_SOURCES
+    Physics/CollisionObject.cpp
     Physics/CollisionShape.cpp
     Physics/Constraint.cpp
     Physics/DynamicsWorld.cpp

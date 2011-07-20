@@ -23,7 +23,6 @@ private:
     friend class BulletRigidBody;
 	typedef BulletRigidBody              impl_type;
     typedef boost::scoped_ptr<impl_type> impl_ptr;
-
 #endif
 public:
     typedef std::vector<Constraint*>    constraint_vector;
@@ -82,7 +81,7 @@ public:
     void        deserialize(database::IArchive& ar);
 
 	// Override CollisionObject
-	COLLISION_TYPE        getCollisionType() const;
+	COLLISION_TYPE        getType() const;
     const CollisionShape* getCollisionShape() const;
     const DynamicsWorld*  getDynamicsWorld() const;
     const std::string&    getName() const;

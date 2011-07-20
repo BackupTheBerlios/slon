@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletDynamicsWorld.h"
+#include "Physics/Bullet/BulletCollisionObject.h"
 #include "Physics/Bullet/BulletCommon.h"
 #include "Physics/Bullet/BulletSolver.h"
 #include "Physics/CollisionObject.h"
@@ -130,14 +131,14 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     // call callbacks
     for (size_t i = 0; i<appearingContacts.size(); ++i) 
     {
-        appearingContacts[i].collisionObjects[0]->handleAppearingContact(appearingContacts[i]);
-        appearingContacts[i].collisionObjects[1]->handleAppearingContact(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[0]->getImpl()->handleAppearingContact(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[1]->getImpl()->handleAppearingContact(appearingContacts[i]);
     }
 
     for (size_t i = 0; i<dissapearingContacts.size(); ++i) 
     {
-        dissapearingContacts[i].collisionObjects[0]->handleDissappearingContact(dissapearingContacts[i]);
-        dissapearingContacts[i].collisionObjects[1]->handleDissappearingContact(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[0]->getImpl()->handleDissappearingContact(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[1]->getImpl()->handleDissappearingContact(dissapearingContacts[i]);
     }
 
     return unsimulatedTime = dt - t;
