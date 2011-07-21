@@ -411,7 +411,7 @@ Engine* Engine::Instance()
 void Engine::Free()
 {
     delete detail::Engine::engineInstance;
-#ifdef _DEBUG
+#ifdef SLON_ENGINE_FORCE_DEBUG_NEW
     freopen("leaks.txt", "w", stderr);
     check_mem_corruption();
     check_leaks();
