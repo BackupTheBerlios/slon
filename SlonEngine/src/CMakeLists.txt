@@ -148,6 +148,7 @@ SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Constraint.h
     ${TARGET_HEADER_PATH}/Physics/CollisionObject.h
     ${TARGET_HEADER_PATH}/Physics/CollisionShape.h
+    ${TARGET_HEADER_PATH}/Physics/ConstraintNode.h
     ${TARGET_HEADER_PATH}/Physics/DynamicsWorld.h
     ${TARGET_HEADER_PATH}/Physics/Forward.h
     ${TARGET_HEADER_PATH}/Physics/PhysicsManager.h
@@ -487,6 +488,7 @@ SET ( TARGET_PHYSICS_SOURCES
     Physics/CollisionObject.cpp
     Physics/CollisionShape.cpp
     Physics/Constraint.cpp
+    Physics/ConstraintNode.cpp
     Physics/DynamicsWorld.cpp
     Physics/PhysicsMaterial.cpp
     Physics/PhysicsModel.cpp

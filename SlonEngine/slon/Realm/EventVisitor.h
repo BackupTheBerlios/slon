@@ -26,13 +26,13 @@ public:
     ,   location(0)
     {}
 
-    EventVisitor(TYPE type_, const Location* location_)
+    EventVisitor(TYPE type_, Location* location_)
     :   type(type_)
     ,   world(0)
     ,   location(location_)
     {}
 
-    EventVisitor(TYPE type_, const World* world_)
+    EventVisitor(TYPE type_, World* world_)
     :   type(type_)
     ,   world(world_)
     ,   location(0)
@@ -48,18 +48,18 @@ public:
     void setWorld(World* world_) { world = world_; }
 
     /** Get world assigned to visitor. */
-    const World* getWorld() const { return world; }
+    World* getWorld() { return world; }
 
     /** Set visitor location. */
     void setLocation(Location* location_) { location = location_; }
-
+	
     /** Get location assigned to visitor. */
-    const Location* getLocation() const { return location; }
+    Location* getLocation() { return location; }
 
 private:
-    TYPE            type;
-    const World*    world;
-    const Location* location;
+    TYPE      type;
+    World*    world;
+    Location* location;
 };
 
 } // namespace realm

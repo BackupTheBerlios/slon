@@ -114,7 +114,7 @@ LocationVisitor<Location, Visitor> makeLocationVisitor(Location& location, Visit
 
 BVHLocation::BVHLocation()
 {
-    eventVisitor.setLocation(0);
+    eventVisitor.setLocation(this);
 }
 
 const char* BVHLocation::serialize(database::OArchive& ar) const

@@ -58,6 +58,7 @@ namespace physics {
 class CollisionObject;
 class CollisionShape;
 class Constraint;
+class ConstraintNode;
 class DynamicsWorld;
 class Motor;
 class PhysicsMaterial;
@@ -74,6 +75,8 @@ typedef boost::intrusive_ptr<CollisionShape>			collision_shape_ptr;
 typedef boost::intrusive_ptr<const CollisionShape>		const_collision_shape_ptr;
 typedef boost::intrusive_ptr<Constraint>				constraint_ptr;
 typedef boost::intrusive_ptr<const Constraint>			const_constraint_ptr;
+typedef boost::intrusive_ptr<ConstraintNode>			constraint_node_ptr;
+typedef boost::intrusive_ptr<const ConstraintNode>		const_constraint_node_ptr;
 typedef boost::intrusive_ptr<DynamicsWorld>				dynamics_world_ptr;
 typedef boost::intrusive_ptr<const DynamicsWorld>		const_dynamics_world_ptr;
 typedef boost::intrusive_ptr<PhysicsMaterial>			physics_material_ptr;

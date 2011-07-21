@@ -131,12 +131,12 @@ PhysicsModel::rigid_body_const_iterator PhysicsModel::firstRigidBody() const
 
 PhysicsModel::rigid_body_iterator PhysicsModel::endRigidBody()
 {
-    return rigid_body_iterator( collisionObjects.begin(), collisionObjects.end(), collisionObjects.end() );
+    return rigid_body_iterator( collisionObjects.end(), collisionObjects.end(), collisionObjects.end() );
 }
 
 PhysicsModel::rigid_body_const_iterator PhysicsModel::endRigidBody() const
 {
-    return rigid_body_const_iterator( collisionObjects.begin(), collisionObjects.end(), collisionObjects.end() );
+    return rigid_body_const_iterator( collisionObjects.end(), collisionObjects.end(), collisionObjects.end() );
 }
 
 PhysicsModel::constraint_iterator PhysicsModel::firstConstraint()

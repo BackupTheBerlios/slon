@@ -2,9 +2,10 @@
 #include "Database/Archive.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
-#include "Physics/CollisionObject.h"
+#include "Physics/RigidBody.h"
 #include "Physics/DynamicsWorld.h"
 #include "Physics/PhysicsTransform.h"
+#include "Realm/Location.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 
 namespace slon {
@@ -96,14 +97,20 @@ void PhysicsTransform::accept(log::LogVisitor& visitor) const
     visitor << log::unindent() << "}\n";
 }
 
-void PhysicsTransform::accept(realm::EventVisitor& visitor)
+void PhysicsTransform::accept(realm::EventVisitor& ev)
 {
-    //if (ev.getType() == realm::EventVisitor::WORLD_ADD) {
-    //    rigidBody->toggleSimulation(true);
-    //}
-    //else if (ev.getType() == realm::EventVisitor::WORLD_REMOVE) {
-    //    rigidBody->toggleSimulation(false);
-    //}
+	if ( realm::Location* location = ev.getLocation() )
+	{
+		if ( physics::DynamicsWorld* world = location->getDynamicsWorld() )
+		{
+			if (ev.getType() == realm::EventVisitor::WORLD_ADD) {
+				world->addRigidBody( static_cast<RigidBody*>(collisionObject.get()) );
+			}
+			else if (ev.getType() == realm::EventVisitor::WORLD_REMOVE) {
+				world->removeRigidBody( static_cast<RigidBody*>(collisionObject.get()) );
+			}
+		}
+	}
 }
 
 } // namespace physics

@@ -15,6 +15,8 @@ namespace physics {
 Constraint::Constraint(const state_desc& desc_)
 :   desc(desc_)
 {
+    desc.rigidBodies[0]->addConstraint(this);
+    desc.rigidBodies[1]->addConstraint(this);
 }
 
 // Override Serializable
@@ -34,6 +36,8 @@ const char* Constraint::serialize(database::OArchive& ar) const
 
 void Constraint::deserialize(database::IArchive& ar)
 {
+	desc.rigidBodies[0]->removeConstraint(this);
+    desc.rigidBodies[1]->removeConstraint(this);
     ar.readStringChunk("name", desc.name);
     desc.rigidBodies[0] = ar.readSerializable<RigidBody>();
     desc.rigidBodies[1] = ar.readSerializable<RigidBody>();
@@ -43,6 +47,8 @@ void Constraint::deserialize(database::IArchive& ar)
     ar.readChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    desc.rigidBodies[0]->addConstraint(this);
+    desc.rigidBodies[1]->addConstraint(this);
     instantiate();
 }
 
@@ -70,6 +76,9 @@ ServoMotor* Constraint::createServoMotor(DOF dof)
 {
 	assert( getRestriction(dof) != AXIS_LOCKED );
 	motors[dof].reset( new ServoMotor(this, dof) );
+	if (world) {
+		motors[dof]->instantiate();
+	}
 	return static_cast<ServoMotor*>(motors[dof].get());
 }
 
@@ -77,6 +86,9 @@ VelocityMotor* Constraint::createVelocityMotor(DOF dof)
 {
 	assert( getRestriction(dof) != AXIS_LOCKED );
 	motors[dof].reset( new VelocityMotor(this, dof) );
+	if (world) {
+		motors[dof]->instantiate();
+	}
 	return static_cast<VelocityMotor*>(motors[dof].get());
 }
 
@@ -140,14 +152,17 @@ const DynamicsWorld* Constraint::getDynamicsWorld() const
 
 void Constraint::reset(const state_desc& desc_)
 {
+	desc.rigidBodies[0]->removeConstraint(this);
+    desc.rigidBodies[1]->removeConstraint(this);
 	desc = desc_;
+    desc.rigidBodies[0]->addConstraint(this);
+    desc.rigidBodies[1]->addConstraint(this);
+	instantiate();
 }
 
 void Constraint::setWorld(const dynamics_world_ptr& world_)
 {
     assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies."); 
-    desc.rigidBodies[0]->removeConstraint(this);
-    desc.rigidBodies[1]->removeConstraint(this);
     for (int i = 0; i<6; ++i) 
     {
         if (motors[i]) {
@@ -159,8 +174,6 @@ void Constraint::setWorld(const dynamics_world_ptr& world_)
     world = world_;
     if (world) 
     {
-        desc.rigidBodies[0]->addConstraint(this);
-        desc.rigidBodies[1]->addConstraint(this);
         if ( desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) {
             instantiate();
         }

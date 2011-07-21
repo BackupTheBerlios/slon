@@ -68,7 +68,7 @@ const std::string& RigidBody::getName() const
 
 math::Matrix4r RigidBody::getTransform() const
 {
-	return impl->getTransform();
+	return impl ? impl->getTransform() : desc.transform;
 }
 
 void RigidBody::setTransform(const math::Matrix4r& transform)
@@ -153,9 +153,12 @@ RigidBody::DYNAMICS_TYPE RigidBody::getDynamicsType() const
 
 const RigidBody::state_desc& RigidBody::getStateDesc() const
 {
-	desc.transform       = impl->getTransform();
-	desc.linearVelocity  = impl->getLinearVelocity();
-	desc.angularVelocity = impl->getAngularVelocity();
+	if (impl)
+	{
+		desc.transform       = impl->getTransform();
+		desc.linearVelocity  = impl->getLinearVelocity();
+		desc.angularVelocity = impl->getAngularVelocity();
+	}
 	return desc;
 }
 

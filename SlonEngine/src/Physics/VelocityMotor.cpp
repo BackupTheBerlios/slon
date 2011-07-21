@@ -92,7 +92,7 @@ void VelocityMotor::setMaxForce(real force)
 
 void VelocityMotor::instantiate()
 {
-	impl.reset( new impl_type(constraint->getImpl(), dof) );
+	impl.reset( new impl_type(constraint->getImpl(), dof - 3) );
 }
 
 void VelocityMotor::release()

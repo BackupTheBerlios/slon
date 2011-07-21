@@ -13,6 +13,7 @@
 #include "Graphics/LightingEffect.h"
 #include "Log/LogVisitor.h"
 #include "Physics/Constraint.h"
+#include "Physics/ConstraintNode.h"
 #include "Physics/RigidBody.h"
 #include "Physics/PhysicsModel.h"
 #include "Physics/PhysicsTransform.h"
@@ -1240,6 +1241,18 @@ namespace {
                         rbTransform->addChild(targetNode.get());
                         root = rbTransform;
                     }
+
+					// add constraint nodes
+					if ( physics::RigidBody* rigidBody = dynamic_cast<physics::RigidBody*>(iter->first.get()) )
+					{
+						for (RigidBody::constraint_iterator cIt  = rigidBody->firstConstraint();
+															cIt != rigidBody->endConstraint();
+															++cIt)
+						{
+							constraint_node_ptr constraintNode( new physics::ConstraintNode(*cIt) );
+							rbTransform->addChild(constraintNode);
+						}
+					}
                 }
                 else {
                     AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << iter->second << std::endl);
@@ -1252,7 +1265,7 @@ namespace {
         
             // print scene graph
             log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);
-			return physicsModel;
+            return physicsModel;
         }
 
     private:
