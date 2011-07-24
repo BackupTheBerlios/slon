@@ -62,7 +62,7 @@ void BulletRotationalServoMotor::setTargetForce(real targetForce_)
 	if (enableMotor_ && !enableMotor) {
 		constraint->dynamicsWorld->addSolver(this);
 	}
-	else if (!enableMotor_ && enableMotor_) {
+	else if (!enableMotor_ && enableMotor) {
 		constraint->dynamicsWorld->removeSolver(this);
 	}
 	enableMotor = enableMotor_;

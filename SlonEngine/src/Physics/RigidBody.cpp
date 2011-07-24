@@ -199,10 +199,10 @@ void RigidBody::instantiate()
 
 void RigidBody::release()
 {
-    impl.reset();
     for (size_t i = 0; i<constraints.size(); ++i) {
         constraints[i]->release();
     }
+    impl.reset();
 }
 
 void RigidBody::addConstraint(Constraint* constraint)

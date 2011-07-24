@@ -77,7 +77,7 @@ void ServoMotor::setTargetForce(real force)
 
 void ServoMotor::instantiate()
 {
-	impl.reset( new impl_type(constraint->getImpl(), dof) );
+	impl.reset( new impl_type(constraint->getImpl(), dof - 3) );
 }
 
 void ServoMotor::release()

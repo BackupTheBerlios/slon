@@ -147,6 +147,9 @@ real BulletDynamicsWorld::stepSimulation(real dt)
 void BulletDynamicsWorld::addSolver(BulletSolver* solver)
 {
 	solver->next = firstSolver;
+    if (firstSolver) {
+        firstSolver->prev = solver;
+    }
 	firstSolver = solver;
 }
 

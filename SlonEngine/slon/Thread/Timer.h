@@ -24,7 +24,7 @@ typedef boost::intrusive_ptr<const Timer>   const_timer_ptr;
 struct delta_timer
 {
     delta_timer() {}
-    delta_timer(const Timer* _timer) :
+    delta_timer(const const_timer_ptr& _timer) :
         timer(_timer),
         lastMeasurement( timer->getTime() )
     {}

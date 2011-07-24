@@ -161,7 +161,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
 		motionState->setWorldTransform(transform);
 		rigidBody->setMotionState( motionState.get() );
 	}
-    rigidBody->setUserPointer(this);
+    rigidBody->setUserPointer( pInterface );
 
     // fill up desc
 	pInterface_->desc.transform = getTransform();
@@ -192,12 +192,13 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
 BulletRigidBody::BulletRigidBody(RigidBody*             pInterface_,
 								 BulletDynamicsWorld*   dynamicsWorld_)
 :	base_type(pInterface_, dynamicsWorld_)
+,   pInterface(pInterface_)
 {
 	RigidBody::state_desc& desc = pInterface_->desc;
 	motionState.reset(new btDefaultMotionState);
 
 	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
-    rigidBody->setUserPointer(this);
+    rigidBody->setUserPointer( pInterface );
 	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
 	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );
 

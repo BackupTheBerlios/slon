@@ -39,7 +39,8 @@ void PhysicsManager::handlePhysics()
 
 void PhysicsManager::setTimer(const const_timer_ptr& timer_)
 {
-    timer = timer_;
+    timer      = timer_;
+    deltaTimer = delta_timer(timer);
 }
 
 void PhysicsManager::addDynamicsWorld(DynamicsWorld* world)
