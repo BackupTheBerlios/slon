@@ -146,6 +146,7 @@ real BulletDynamicsWorld::stepSimulation(real dt)
 
 void BulletDynamicsWorld::addSolver(BulletSolver* solver)
 {
+    assert(solver && solver->prev == 0 && solver->next == 0);
 	solver->next = firstSolver;
     if (firstSolver) {
         firstSolver->prev = solver;
@@ -156,6 +157,7 @@ void BulletDynamicsWorld::addSolver(BulletSolver* solver)
 /** Remove solver from dynamics world. */
 void BulletDynamicsWorld::removeSolver(BulletSolver* solver)
 {
+    assert(solver);
 	if (solver->prev) 
 	{
 		solver->prev->next = solver->next;
@@ -167,6 +169,11 @@ void BulletDynamicsWorld::removeSolver(BulletSolver* solver)
 	{
 		assert(firstSolver == solver);
 		firstSolver = solver->next;
-		firstSolver->prev = 0;
+        if (firstSolver) {
+		    firstSolver->prev = 0;
+        }
 	}
+
+    solver->next = 0;
+    solver->prev = 0;
 }

@@ -16,6 +16,13 @@ BulletRotationalServoMotor::BulletRotationalServoMotor(BulletConstraint* constra
 {
 }
 
+BulletRotationalServoMotor::~BulletRotationalServoMotor()
+{
+    if (enableMotor) {
+		constraint->dynamicsWorld->removeSolver(this);
+	}
+}
+
 void BulletRotationalServoMotor::solve(real dt)
 {
     btGeneric6DofConstraint& constraint = BulletRotationalMotor::constraint->getBtConstraint();

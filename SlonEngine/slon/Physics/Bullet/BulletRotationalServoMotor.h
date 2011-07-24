@@ -15,6 +15,7 @@ class BulletRotationalServoMotor :
 {
 public:
     BulletRotationalServoMotor(BulletConstraint* constraint, int axis);
+    ~BulletRotationalServoMotor();
 
     // Override BulletSolver
     void solve(real dt);
