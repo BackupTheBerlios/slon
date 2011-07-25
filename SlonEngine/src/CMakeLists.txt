@@ -250,12 +250,16 @@ SET ( TARGET_THREAD_DETAIL_HEADERS
 SET ( TARGET_UTILITY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/base64.hpp
     ${TARGET_HEADER_PATH}/Utility/cached_value.hpp
-    ${TARGET_HEADER_PATH}/Utility/callback.hpp
+    ${TARGET_HEADER_PATH}/Utility/connection.hpp
     ${TARGET_HEADER_PATH}/Utility/error.hpp
     ${TARGET_HEADER_PATH}/Utility/if_then_else.hpp
     ${TARGET_HEADER_PATH}/Utility/math.hpp
+    ${TARGET_HEADER_PATH}/Utility/function.hpp
+    ${TARGET_HEADER_PATH}/Utility/functor_slot.hpp
     ${TARGET_HEADER_PATH}/Utility/referenced.hpp
+    ${TARGET_HEADER_PATH}/Utility/signal.hpp
     ${TARGET_HEADER_PATH}/Utility/singleton.hpp
+    ${TARGET_HEADER_PATH}/Utility/slot.hpp
     ${TARGET_HEADER_PATH}/Utility/tmp_file.hpp
     ${TARGET_HEADER_PATH}/Utility/handle.hpp
     ${TARGET_HEADER_PATH}/Utility/hash_string.hpp

@@ -5,6 +5,7 @@
 #include <sgl/Math/Matrix.hpp>
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
+#include "../Utility/signal.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -50,8 +51,13 @@ private:
 	typedef BulletCollisionObject impl_type;
 #endif
 public:
-    typedef boost::function<void (const Contact& c)>    contact_handler;
-    typedef boost::signals::connection                  connection_type;
+    typedef slot<void (const math::Matrix4f&)>          transform_handler;
+    typedef slot<void (const Contact&)>                 contact_handler;
+
+    typedef signal<void (const math::Matrix4f&)>        transform_signal;
+    typedef signal_base<void (const math::Matrix4f&)>   transform_signal_base;
+    typedef signal<void (const Contact&)>               contact_signal;
+    typedef signal_base<void (const Contact&)>          contact_signal_base;
 
     enum COLLISION_TYPE
     {
@@ -78,17 +84,14 @@ public:
     /** Set world transform for the object. Works only for ghost objects and kinematic rigid bodies */
     virtual void setTransform(const math::Matrix4r& transform) = 0;
 
-    /** Connect callback for handling contact occuring. Callback is called for
-     * every appearing contact pair.
-     * @param handler - contact handler.
-     */
-    virtual connection_type connectContactAppearCallback(const contact_handler& handler) = 0;
+    /** Get signal for connecting trasnform handlers. */
+    transform_signal_base& getTransformSignal() { return transformSignal; }
 
-    /** Connect callback for handling contact dissapearing. Callback is called for every
-     * dissapearing contact.
-     * @param handler - contact handler.
-     */
-    virtual connection_type connectContactDissapearCallback(const contact_handler& handler) = 0;
+    /** Get signal for connecting contact appear handlers. */
+    contact_signal_base& getContactAppearSignal() { return contactAppearSignal; }
+
+    /** Get signal for connecting contact dissapear handlers. */
+    contact_signal_base& getContactDissapearSignal() { return contactDissapearSignal; }
 
 	/** Get implementation object. */
     impl_type* getImpl();
@@ -97,6 +100,11 @@ public:
     const impl_type* getImpl() const;
 
     virtual ~CollisionObject() {}
+
+protected:
+    transform_signal    transformSignal;
+    contact_signal      contactAppearSignal;
+    contact_signal      contactDissapearSignal;
 };
 
 // ptr typedef

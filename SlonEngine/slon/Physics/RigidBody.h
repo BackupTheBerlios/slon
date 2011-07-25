@@ -88,9 +88,6 @@ public:
     math::Matrix4r        getTransform() const;
     void                  setTransform(const math::Matrix4r& transform);
 
-    connection_type connectContactAppearCallback(const contact_handler& handler);
-    connection_type connectContactDissapearCallback(const contact_handler& handler);
-
     /** Apply force to rigid body at the specified position. */
     void applyForce(const math::Vector3r& force, const math::Vector3r& pos);
 

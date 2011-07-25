@@ -76,16 +76,6 @@ void RigidBody::setTransform(const math::Matrix4r& transform)
 	impl->setTransform(transform);
 }
 
-CollisionObject::connection_type RigidBody::connectContactAppearCallback(const contact_handler& handler)
-{
-    return impl->connectContactAppearCallback(handler);
-}
-
-CollisionObject::connection_type RigidBody::connectContactDissapearCallback(const contact_handler& handler)
-{
-    return impl->connectContactDissapearCallback(handler);
-}
-
 void RigidBody::applyForce(const math::Vector3r& force, const math::Vector3r& pos)
 {
     impl->applyForce(force, pos);

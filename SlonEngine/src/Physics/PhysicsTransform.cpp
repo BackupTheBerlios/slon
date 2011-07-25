@@ -6,22 +6,22 @@
 #include "Physics/DynamicsWorld.h"
 #include "Physics/PhysicsTransform.h"
 #include "Realm/Location.h"
+#include "Utility/functor_slot.hpp"
 #include <sgl/Math/MatrixFunctions.hpp>
 
 namespace slon {
 namespace physics {
 
 PhysicsTransform::PhysicsTransform(const collision_object_ptr& collisionObject_) :
-    collisionObject(collisionObject_),
-    absolute(false),
-	lastNumSimulatedSteps(0)
+    absolute(false)
 {
-	if (collisionObject) {
-		transform = collisionObject->getTransform();
+	if (collisionObject_) {
+		transform = collisionObject_->getTransform();
 	}
 	else {
 		transform = math::make_identity<float, 4>();
 	}
+    setCollisionObject(collisionObject_);
 }
 
 const char* PhysicsTransform::serialize(database::OArchive& ar) const
@@ -47,20 +47,6 @@ void PhysicsTransform::deserialize(database::IArchive& ar)
 
 const math::Matrix4f& PhysicsTransform::getTransform() const
 {
-	if (collisionObject)
-	{
-		if ( const DynamicsWorld* world = collisionObject->getDynamicsWorld() )
-		{
-			size_t numSimulatedSteps = world->getNumSimulatedSteps();
-			if (numSimulatedSteps < lastNumSimulatedSteps)
-			{
-				transform             = collisionObject->getTransform();
-				lastNumSimulatedSteps = numSimulatedSteps;
-				const_cast<PhysicsTransform*>(this)->update();
-			}
-		}
-	}
-
 	return transform;
 }
 
@@ -68,6 +54,24 @@ const math::Matrix4f& PhysicsTransform::getInverseTransform() const
 {
 	invTransform = math::invert( getTransform() );
 	return invTransform;
+}
+
+void PhysicsTransform::setCollisionObject(const collision_object_ptr& collisionObject_)
+{
+    collisionObject = collisionObject_;
+    if (collisionObject) {
+        transformConnection.reset( collisionObject->getTransformSignal(), make_slot<void (const math::Matrix4f&)>(boost::bind(&PhysicsTransform::setWorldTransform, this, _1)) );
+    }
+    else {
+        transformConnection.reset();
+    }
+}
+
+void PhysicsTransform::setWorldTransform(const math::Matrix4f& transform_)
+{
+    transform = transform_;
+    ++modifiedCount;
+    update();
 }
 
 void PhysicsTransform::accept(log::LogVisitor& visitor) const

@@ -11,28 +11,25 @@ class BulletDynamicsWorld;
 class BulletCollisionObject :
 	public boost::noncopyable
 {
-private:
-    typedef boost::signal<void (const Contact&)>        contact_signal;
-    typedef boost::intrusive_ptr<BulletDynamicsWorld>   dynamics_world_ptr;
+friend class BulletMotionState;
+public:
+    typedef signal<void (const math::Matrix4f&)>  transform_signal;
+    typedef signal<void (const Contact&)>         contact_signal;
 
 public:
     BulletCollisionObject(CollisionObject* pInterface, BulletDynamicsWorld* dynamicsWorld);
     virtual ~BulletCollisionObject();
 
     // Implement CollisionObject
-    CollisionObject::connection_type connectContactAppearCallback(const CollisionObject::contact_handler& handler);
-    CollisionObject::connection_type connectContactDissapearCallback(const CollisionObject::contact_handler& handler);
-
-    void handleAppearingContact(const Contact& contact);
-    void handleDissappearingContact(const Contact& contact);
+    transform_signal&   getTransformSignal()         { return pInterface->transformSignal; }
+    contact_signal&     getContactAppearSignal()     { return pInterface->contactAppearSignal; }
+    contact_signal&     getContactDissapearSignal()  { return pInterface->contactDissapearSignal; }
 	
 	/** Get interface handling this implementation object. */
 	CollisionObject* getInterface() { return pInterface; }
 
 protected:
 	CollisionObject*        pInterface;
-    contact_signal          contactAppearSignal;
-    contact_signal          contactDissapearSignal;
     BulletDynamicsWorld*    dynamicsWorld;
 };
 

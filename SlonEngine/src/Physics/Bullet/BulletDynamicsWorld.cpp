@@ -131,14 +131,14 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     // call callbacks
     for (size_t i = 0; i<appearingContacts.size(); ++i) 
     {
-        appearingContacts[i].collisionObjects[0]->getImpl()->handleAppearingContact(appearingContacts[i]);
-        appearingContacts[i].collisionObjects[1]->getImpl()->handleAppearingContact(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[0]->getImpl()->getContactAppearSignal()(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[1]->getImpl()->getContactAppearSignal()(appearingContacts[i]);
     }
 
     for (size_t i = 0; i<dissapearingContacts.size(); ++i) 
     {
-        dissapearingContacts[i].collisionObjects[0]->getImpl()->handleDissappearingContact(dissapearingContacts[i]);
-        dissapearingContacts[i].collisionObjects[1]->getImpl()->handleDissappearingContact(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[0]->getImpl()->getContactDissapearSignal()(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[1]->getImpl()->getContactDissapearSignal()(dissapearingContacts[i]);
     }
 
     return unsimulatedTime = dt - t;

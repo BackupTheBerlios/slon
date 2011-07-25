@@ -10,6 +10,8 @@ class btRigidBody;
 namespace slon {
 namespace physics {
 
+class BulletMotionState;
+
 class BulletRigidBody :
 	public BulletCollisionObject
 {
@@ -17,7 +19,7 @@ friend class BulletConstraint;
 public:
     typedef BulletCollisionObject                           base_type;
 
-	typedef boost::scoped_ptr<btMotionState>                motion_state_ptr;
+	typedef boost::scoped_ptr<BulletMotionState>            motion_state_ptr;
 	typedef boost::scoped_ptr<btRigidBody>                  rigid_body_ptr;
 
     typedef boost::signal<void (const BulletRigidBody&)>    rigid_body_signal;

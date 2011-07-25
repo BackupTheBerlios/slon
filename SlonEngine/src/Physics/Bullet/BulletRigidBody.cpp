@@ -12,6 +12,31 @@ DECLARE_AUTO_LOGGER("physics.BulletRigidBody")
 namespace slon {
 namespace physics {
 
+class BulletMotionState :
+    public btMotionState
+{
+public:
+    BulletMotionState(BulletRigidBody* rbody_)
+    :   rbody(rbody_)
+    {
+    }
+
+	void getWorldTransform(btTransform& worldTrans_) const
+    {
+        worldTrans_ = worldTrans;
+    }
+
+	void setWorldTransform(const btTransform& worldTrans_)
+    {
+        worldTrans = worldTrans_;
+        rbody->getTransformSignal()( to_mat(worldTrans) );
+    }
+
+private:
+    BulletRigidBody* rbody;
+    btTransform      worldTrans;
+};
+
 namespace {
 
 	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(RigidBody::state_desc& desc, btMotionState& motionState)
@@ -149,7 +174,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
     rigidBody(rigidBody_)
 {
     assert(rigidBody);
-	motionState.reset(new btDefaultMotionState);
+	motionState.reset( new BulletMotionState(this) );
 	{
 		btTransform transform;
 		if (btMotionState* ms = rigidBody->getMotionState() ) {
@@ -195,7 +220,8 @@ BulletRigidBody::BulletRigidBody(RigidBody*             pInterface_,
 ,   pInterface(pInterface_)
 {
 	RigidBody::state_desc& desc = pInterface_->desc;
-	motionState.reset(new btDefaultMotionState);
+	motionState.reset( new BulletMotionState(this) );
+    motionState->setWorldTransform( to_bt_mat(desc.transform) );
 
 	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
     rigidBody->setUserPointer( pInterface );
@@ -222,8 +248,8 @@ BulletRigidBody::~BulletRigidBody()
         Contact& contact = dynamicsWorld->contacts[i];
         if (contact.collisionObjects[0] == pInterface || contact.collisionObjects[1] == pInterface)
         {
-            contact.collisionObjects[0]->getImpl()->handleDissappearingContact(contact);
-            contact.collisionObjects[1]->getImpl()->handleDissappearingContact(contact);
+            contact.collisionObjects[0]->getImpl()->getContactDissapearSignal()(contact);
+            contact.collisionObjects[1]->getImpl()->getContactDissapearSignal()(contact);
             std::swap( contact, dynamicsWorld->contacts.back() );
             dynamicsWorld->contacts.pop_back();
             --i;

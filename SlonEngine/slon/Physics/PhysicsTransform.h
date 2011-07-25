@@ -4,6 +4,7 @@
 #include "../Realm/EventVisitor.h"
 #include "../Scene/Transform.h"
 #include "../Scene/AcceptVisitor.hpp"
+#include "../Utility/connection.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -32,7 +33,7 @@ public:
     const math::Matrix4f& getInverseTransform() const;
 
     /** Set rigid body which handles transform. */
-    void setCollisionObject(const collision_object_ptr& collisionObject_) { collisionObject = collisionObject_; }
+    void setCollisionObject(const collision_object_ptr& collisionObject_);
 
     /** Get rigid body which handles transformation for this node. */
     CollisionObject* getCollisionObject() { return collisionObject.get(); }
@@ -40,12 +41,15 @@ public:
     /** Get rigid body which handles transformation for this node. */
     const CollisionObject* getCollisionObject() const { return collisionObject.get(); }
 
+private:
+    void setWorldTransform(const math::Matrix4f& transform);
+
 protected:
-    collision_object_ptr   collisionObject;
-    bool                   absolute;
-	mutable size_t         lastNumSimulatedSteps;
-	mutable math::Matrix4f transform;
-	mutable math::Matrix4f invTransform;
+    collision_object_ptr        collisionObject;
+    bool                        absolute;
+    connection                  transformConnection;
+    math::Matrix4f              transform;
+    mutable math::Matrix4f      invTransform;
 };
 
 } // namespace physics
