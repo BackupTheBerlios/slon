@@ -73,26 +73,35 @@ math::Matrix4r RigidBody::getTransform() const
 
 void RigidBody::setTransform(const math::Matrix4r& transform)
 {
-	impl->setTransform(transform);
+    if (impl) {
+	    impl->setTransform(transform);
+    }
+    else {
+        desc.transform = transform;
+    }
 }
 
 void RigidBody::applyForce(const math::Vector3r& force, const math::Vector3r& pos)
 {
+    assert(impl);
     impl->applyForce(force, pos);
 }
 
 void RigidBody::applyTorque(const math::Vector3r& torque)
 {
+    assert(impl);
 	impl->applyTorque(torque);
 }
 
 void RigidBody::applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos)
 {
+    assert(impl);
 	impl->applyImpulse(impulse, pos);
 }
 
 void RigidBody::applyTorqueImpulse(const math::Vector3r& torqueImpulse)
 {
+    assert(impl);
 	impl->applyTorqueImpulse(torqueImpulse);
 }
 
@@ -118,21 +127,25 @@ math::Vector3r RigidBody::getInertiaTensor() const
 
 RigidBody::ACTIVATION_STATE RigidBody::getActivationState() const
 {
+    assert(impl);
 	return impl->getActivationState();
 }
 
 void RigidBody::setActivationState(ACTIVATION_STATE state)
 {
+    assert(impl);
 	impl->setActivationState(state);
 }
 
 math::Vector3r RigidBody::getLinearVelocity() const
 {
+    assert(impl);
 	return impl->getLinearVelocity();
 }
 
 math::Vector3r RigidBody::getAngularVelocity() const
 {
+    assert(impl);
 	return impl->getAngularVelocity();
 }
 

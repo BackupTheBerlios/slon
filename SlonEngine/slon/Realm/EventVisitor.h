@@ -16,24 +16,29 @@ class EventVisitor :
 public:
     enum TYPE
     {
+        UNDEFINED,      /// for debug
         WORLD_ADD,      /// node added into the world
         WORLD_REMOVE    /// node removed from the world
     };
 
 public:
     EventVisitor()
-    :   world(0)
+    :   type(UNDEFINED)
+    ,   togglePhysics(false)
+    ,   world(0)
     ,   location(0)
     {}
 
     EventVisitor(TYPE type_, Location* location_)
     :   type(type_)
+    ,   togglePhysics(false)
     ,   world(0)
     ,   location(location_)
     {}
 
     EventVisitor(TYPE type_, World* world_)
     :   type(type_)
+    ,   togglePhysics(false)
     ,   world(world_)
     ,   location(0)
     {}
@@ -43,6 +48,12 @@ public:
 
     /** Get type of the event. */
     TYPE getType() const { return type; }
+
+    /** Set flag for notifying physics objects. */
+    void setPhysicsToggle(bool togglePhysics_) { togglePhysics = togglePhysics_; }
+
+    /** Get flag for notifying physics objects. */
+    bool getPhysicsToggle() const { return togglePhysics; }
 
     /** Set visitor world. */
     void setWorld(World* world_) { world = world_; }
@@ -58,6 +69,7 @@ public:
 
 private:
     TYPE      type;
+    bool      togglePhysics;
     World*    world;
     Location* location;
 };

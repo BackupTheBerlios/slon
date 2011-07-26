@@ -79,9 +79,9 @@ public:
     void visitVisible(const math::Frustumf& frustum, scene::ConstVisitor& nv) const;
 	
 	bool have(const scene::node_ptr& node) const;
-    void add(const scene::node_ptr& node, bool dynamic);
+    void add(const scene::node_ptr& node, bool dynamic, bool activatePhysics);
     void update(const scene::node_ptr& node);
-    bool remove(const scene::node_ptr& node);
+    bool remove(const scene::node_ptr& node, bool deactivatePhysics);
 
     void                          setDynamicsWorld(const physics::dynamics_world_ptr& world);
     physics::DynamicsWorld*       getDynamicsWorld()        { return dynamicsWorld.get(); }

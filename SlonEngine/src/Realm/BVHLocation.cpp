@@ -227,7 +227,7 @@ bool BVHLocation::have(const scene::node_ptr& node) const
 	return locNode->getLocation() == this;
 }
 
-void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
+void BVHLocation::add(const scene::node_ptr& node, bool dynamic, bool activatePhysics)
 {
     assert( node && !node->getParent() );
 	bvh_location_node_ptr locNode( new BVHLocationNode(this, 0, dynamic) );
@@ -246,10 +246,11 @@ void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
 
     eventVisitor.setType(EventVisitor::WORLD_ADD);
+    eventVisitor.setPhysicsToggle(activatePhysics);
     eventVisitor.traverse(*node);
 }
 
-bool BVHLocation::remove(const scene::node_ptr& node)
+bool BVHLocation::remove(const scene::node_ptr& node, bool deactivatePhysics)
 {
 	assert(node);
 
@@ -270,6 +271,7 @@ bool BVHLocation::remove(const scene::node_ptr& node)
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
     
     eventVisitor.setType(EventVisitor::WORLD_REMOVE);
+    eventVisitor.setPhysicsToggle(deactivatePhysics);
     eventVisitor.traverse(*node);
     return true;
 }

@@ -103,6 +103,10 @@ void PhysicsTransform::accept(log::LogVisitor& visitor) const
 
 void PhysicsTransform::accept(realm::EventVisitor& ev)
 {
+    if ( !ev.getPhysicsToggle() ) {
+        return;
+    }
+
 	if ( realm::Location* location = ev.getLocation() )
 	{
 		if ( physics::DynamicsWorld* world = location->getDynamicsWorld() )

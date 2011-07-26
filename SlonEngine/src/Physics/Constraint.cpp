@@ -76,7 +76,7 @@ ServoMotor* Constraint::createServoMotor(DOF dof)
 {
 	assert( getRestriction(dof) != AXIS_LOCKED );
 	motors[dof].reset( new ServoMotor(this, dof) );
-	if (world) {
+	if (impl) {
 		motors[dof]->instantiate();
 	}
 	return static_cast<ServoMotor*>(motors[dof].get());
@@ -86,7 +86,7 @@ VelocityMotor* Constraint::createVelocityMotor(DOF dof)
 {
 	assert( getRestriction(dof) != AXIS_LOCKED );
 	motors[dof].reset( new VelocityMotor(this, dof) );
-	if (world) {
+	if (impl) {
 		motors[dof]->instantiate();
 	}
 	return static_cast<VelocityMotor*>(motors[dof].get());

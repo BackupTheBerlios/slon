@@ -59,6 +59,10 @@ void ConstraintNode::accept(log::LogVisitor& visitor) const
 
 void ConstraintNode::accept(realm::EventVisitor& ev)
 {
+    if ( !ev.getPhysicsToggle() ) {
+        return;
+    }
+
 	if ( realm::Location* location = ev.getLocation() )
 	{
 		if ( physics::DynamicsWorld* world = location->getDynamicsWorld() )
@@ -67,7 +71,7 @@ void ConstraintNode::accept(realm::EventVisitor& ev)
 				world->addConstraint( static_cast<Constraint*>(constraint.get()) );
 			}
 			else if (ev.getType() == realm::EventVisitor::WORLD_REMOVE) {
-				world->addConstraint( static_cast<Constraint*>(constraint.get()) );
+				world->removeConstraint( static_cast<Constraint*>(constraint.get()) );
 			}
 		}
 	}

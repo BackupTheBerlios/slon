@@ -37,56 +37,77 @@ math::Vector3r VelocityMotor::getAxis() const
 
 real VelocityMotor::getLoLimit() const
 {
-	return impl->getLoLimit();
+    if (impl) {
+        return impl->getLoLimit();
+    }
+    else if (dof > 3) {
+        return constraint->getStateDesc().angularLimits[0][dof - 3];
+    }
+    else {
+        return constraint->getStateDesc().linearLimits[0][dof];
+    }
 }
 
 real VelocityMotor::getHiLimit() const
 {
-	return impl->getHiLimit();
+    if (impl) {
+        return impl->getHiLimit();
+    }
+    else if (dof > 3) {
+        return constraint->getStateDesc().angularLimits[1][dof - 3];
+    }
+    else {
+        return constraint->getStateDesc().linearLimits[1][dof];
+    }
 }
 
 real VelocityMotor::getPosition() const
 {
-	return impl->getPosition();
+    return impl ?impl->getPosition() : 0;
 }
 
 real VelocityMotor::getVelocity() const
 {
-	return impl->getVelocity();
+    return impl ? impl->getVelocity() : 0;
 }
 
 real VelocityMotor::getForce() const
 {
-	return impl->getForce();
+    return impl ? getForce() : 0;
 }
 
 bool VelocityMotor::enabled() const
 {
-	return impl->enabled();
+    return impl ? impl->enabled() : false;
 }
 
 void VelocityMotor::toggle(bool toggle)
 {
+    assert(impl);
 	impl->toggle(toggle);
 }
 
 real VelocityMotor::getTargetVelocity() const
 {
+    assert(impl);
 	return impl->getTargetVelocity();
 }
 
 void VelocityMotor::setTargetVelocity(real force)
 {
+    assert(impl);
 	impl->setTargetVelocity(force);
 }
 
 real VelocityMotor::getMaxForce() const
 {
+    assert(impl);
 	return impl->getMaxForce();
 }
 
 void VelocityMotor::setMaxForce(real force)
 {
+    assert(impl);
 	impl->setMaxForce(force);
 }
 

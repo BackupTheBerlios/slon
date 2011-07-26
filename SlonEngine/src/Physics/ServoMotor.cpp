@@ -32,46 +32,64 @@ Constraint::DOF ServoMotor::getDOF() const
 
 math::Vector3r ServoMotor::getAxis() const
 {
-	return impl->getAxis();
+    return constraint->getAxis(dof >= 3 ? dof - 3 : dof);
 }
 
 real ServoMotor::getLoLimit() const
 {
-	return impl->getLoLimit();
+    if (impl) {
+        return impl->getLoLimit();
+    }
+    else if (dof > 3) {
+        return constraint->getStateDesc().angularLimits[0][dof - 3];
+    }
+    else {
+        return constraint->getStateDesc().linearLimits[0][dof];
+    }
 }
 
 real ServoMotor::getHiLimit() const
 {
-	return impl->getHiLimit();
+    if (impl) {
+        return impl->getHiLimit();
+    }
+    else if (dof > 3) {
+        return constraint->getStateDesc().angularLimits[1][dof - 3];
+    }
+    else {
+        return constraint->getStateDesc().linearLimits[1][dof];
+    }
 }
 
 real ServoMotor::getPosition() const
 {
-	return impl->getPosition();
+    return impl ? impl->getPosition() : 0;
 }
 
 real ServoMotor::getVelocity() const
 {
-	return impl->getVelocity();
+    return impl ? impl->getVelocity() : 0;
 }
 
 real ServoMotor::getForce() const
 {
-	return impl->getForce();
+    return impl ? impl->getForce() : 0;
 }
 
 bool ServoMotor::enabled() const
 {
-	return impl->enabled();
+    return (abs(getForce()) > 0);
 }
 
 real ServoMotor::getTargetForce() const
 {
+    assert(impl);
 	return impl->getTargetForce();
 }
 
 void ServoMotor::setTargetForce(real force)
 {
+    assert(impl);
 	impl->setTargetForce(force);
 }
 
