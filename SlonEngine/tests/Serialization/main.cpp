@@ -5,7 +5,11 @@
 #include "Graphics/Mesh.h"
 #include "Graphics/StaticMesh.h"
 #ifdef SLON_ENGINE_USE_PHYSICS
+#   include "Physics/Constraint.h"
 #   include "Physics/PhysicsManager.h"
+#   include "Physics/PhysicsModel.h"
+#   include "Physics/PhysicsTransform.h"
+#   include "Physics/RigidBody.h"
 #endif
 #include <boost/iostreams/stream_buffer.hpp>
 
@@ -151,7 +155,6 @@ BOOST_AUTO_TEST_CASE(physics_serialization)
 
     // world
     PhysicsManager& physManager = currentPhysicsManager();
-    DynamicsWorld*  dynWorld    = physManager.initDynamicsWorld();
 
     // physics scene
     rigid_body_ptr    rb0;
@@ -164,18 +167,16 @@ BOOST_AUTO_TEST_CASE(physics_serialization)
         desc.name           = "rb0";
         desc.collisionShape = new ConeShape(1.0f, 2.0f);
         desc.mass           = 1.0f;
-        desc.target         = "node0";
         desc.transform      = math::make_translation(-1.0f, 0.0f, 0.0f);
-        rb0 = dynWorld->createRigidBody(desc);
-        model->addRigidBody(rb0.get());
+        rb0.reset(new RigidBody(desc));
+        model->addCollisionObject(rb0, "node0");
 
         desc.name           = "rb1";
         desc.collisionShape = new BoxShape(0.5f, 0.5f, 0.5f);
         desc.mass           = 2.0f;
-        desc.target         = "node1";
         desc.transform      = math::make_translation(1.0f, 0.0f, 0.0f);
-        rb1 = dynWorld->createRigidBody(desc);
-        model->addRigidBody(rb1.get());
+        rb1.reset(new RigidBody(desc));
+        model->addCollisionObject(rb1, "node1");
     }
 
     // constraint
@@ -188,12 +189,12 @@ BOOST_AUTO_TEST_CASE(physics_serialization)
         desc.angularLimits[0].x =  0.5f;
         desc.frames[0]          = math::make_translation(1.0f, 0.0f, 0.0f);
         desc.frames[1]          = math::make_translation(-1.0f, 0.0f, 0.0f);
-        model->addConstraint( dynWorld->createConstraint(desc) );
+        model->addConstraint( new Constraint(desc) );
     }
 
     // scene
-    scene::group_ptr root( new physics::RigidBodyTransform(rb0.get()) );
-    root->addChild( new physics::RigidBodyTransform(rb1.get()) );
+    scene::group_ptr root( new PhysicsTransform(rb0) );
+    root->addChild( new PhysicsTransform(rb1) );
 
     // check
 	database::library_ptr library(new database::Library);
