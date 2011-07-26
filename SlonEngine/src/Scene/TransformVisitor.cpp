@@ -74,9 +74,17 @@ bool TransformVisitor::visitTransform(Transform& transform)
     {
         if (currentNode->transform)
         {
-            // if transform have parent, get transformation from it
-            transform.localToWorld = currentNode->transform->getLocalToWorld() * transform.getTransform();
-            transform.worldToLocal = transform.getInverseTransform() * currentNode->transform->getWorldToLocal();
+            if ( currentNode->transform->isAbsolute() )
+            {
+                transform.localToWorld = currentNode->transform->getTransform() * transform.getTransform();
+                transform.worldToLocal = transform.getInverseTransform() * currentNode->transform->getInverseTransform();
+            }
+            else
+            {
+                // if transform have parent, get transformation from it
+                transform.localToWorld = currentNode->transform->getLocalToWorld() * transform.getTransform();
+                transform.worldToLocal = transform.getInverseTransform() * currentNode->transform->getWorldToLocal();
+            }
         }
         else
         {

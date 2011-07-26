@@ -891,52 +891,6 @@ namespace {
 	};
 
 #ifdef SLON_ENGINE_USE_PHYSICS
-    class DecomposeTransformVisitor :
-        public scene::FilterVisitor<scene::Visitor, physics::PhysicsTransform>
-	{
-	public:
-        DecomposeTransformVisitor(scene::Node& node)
-        {
-            traverse(node);
-        }
-
-		void visit(physics::PhysicsTransform& rbTransform)
-		{
-			math::Matrix4f T( rbTransform.getLocalToWorld() );
-			math::Matrix4f R( rbTransform.getCollisionObject()->getTransform() );
-
-			const physics::RigidBody* rigidBody = static_cast<const physics::RigidBody*>( rbTransform.getCollisionObject() );
-			assert(rigidBody);
-
-			// add additional transformation node to map physics transform to graphics
-			math::Matrix4f physToGraphTransform = math::invert(R) * T;
-			if ( !math::equal(physToGraphTransform, math::make_identity<float, 4>()) )
-			{
-				// link rbTransform children to new transformation node
-				scene::matrix_transform_ptr transform( new scene::MatrixTransform("PhysicsToGraphics", physToGraphTransform) );
-				for ( scene::Node* child = rbTransform.getChild(); child != 0; child = child->getRight() ) {
-					transform->addChild(child);
-				}
-				rbTransform.addChild(transform);
-			}
-
-			switch ( rigidBody->getDynamicsType() )
-			{
-			case physics::RigidBody::DT_STATIC:
-			case physics::RigidBody::DT_DYNAMIC:
-                rbTransform.setAbsolute(true);
-				break;
-				
-			case physics::RigidBody::DT_KINEMATIC:
-                rbTransform.setAbsolute(false);
-				break;
-
-			default:
-				assert(!"Can't get here");
-			}
-		}
-	};
-
 	class PhysicsSceneBuilder
     {
     public:
@@ -1213,6 +1167,10 @@ namespace {
 				}
 			}
 
+            // calculate shape transforms
+            scene::TransformVisitor tv(*root);
+
+            // insert physics transformation nodes
             for (PhysicsModel::collision_object_iterator iter  = physicsModel->firstCollisionObject();
                                                          iter != physicsModel->endCollisionObject();
                                                          ++iter)
@@ -1221,12 +1179,48 @@ namespace {
                 scene::node_ptr targetNode( findNamedNode( *root, hash_string(iter->second) ) );
                 if (targetNode)
                 {
+                    // find parent transform
+                    scene::Node* transformNode = targetNode.get();
+                    while ( !(transformNode->getNodeType() & scene::Node::TRANSFORM_BIT) ) {
+                        transformNode = transformNode->getParent();
+                    }
+
+                    math::Matrix4f T = math::make_identity<float, 4>();
+                    if (transformNode) {
+                        T = static_cast<scene::Transform*>(transformNode)->localToWorld;
+                    }
+                    math::Matrix4f R( iter->first->getTransform() );
+
+			        // add additional transformation node to map physics transform to graphics
                     physics::physics_transform_ptr rbTransform( new physics::PhysicsTransform(iter->first) );
+                    scene::group_ptr               rbNode = rbTransform;
+			        math::Matrix4f                 invRT  = math::invert(R) * T;
+                    if ( !math::equal(invRT, math::make_identity<float, 4>()) ) 
+                    {
+                        rbNode.reset( new scene::MatrixTransform("PhysicsToGraphics", invRT) );
+			            rbTransform->addChild(rbNode);
+                    }
+
+			        switch ( static_cast<const physics::RigidBody&>(*iter->first).getDynamicsType() )
+			        {
+			        case physics::RigidBody::DT_STATIC:
+			        case physics::RigidBody::DT_DYNAMIC:
+                        rbTransform->setAbsolute(true);
+				        break;
+        				
+			        case physics::RigidBody::DT_KINEMATIC:
+                        rbTransform->setAbsolute(false);
+				        break;
+
+			        default:
+				        assert(!"Can't get here");
+			        }
+
                     if ( scene::Group* group = dynamic_cast<scene::Group*>( targetNode.get() ) )
                     {
                         // relink children
                         while ( scene::Node* child = group->getChild() ) {
-                            rbTransform->addChild(child);
+                            rbNode->addChild(child);
                         }
 
                         group->addChild(rbTransform);
@@ -1234,11 +1228,11 @@ namespace {
                     else if ( targetNode->getParent() != 0 )
                     {
                         targetNode->getParent()->addChild(rbTransform);
-                        rbTransform->addChild(targetNode.get());
+                        rbNode->addChild(targetNode);
                     }
                     else 
                     {
-                        rbTransform->addChild(targetNode.get());
+                        rbNode->addChild(targetNode);
                         root = rbTransform;
                     }
 
@@ -1258,10 +1252,6 @@ namespace {
                     AUTO_LOGGER_MESSAGE(log::S_WARNING, "Can't find node corresponding rigid body: " << iter->second << std::endl);
                 }
             }
-
-            // apply local transform to the shapes
-            scene::TransformVisitor tv(*root);
-            DecomposeTransformVisitor dv(*root);
         
             // print scene graph
             log::LogVisitor lv(AUTO_LOGGER, log::S_FLOOD, *root);

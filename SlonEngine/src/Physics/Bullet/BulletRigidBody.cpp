@@ -248,8 +248,12 @@ BulletRigidBody::~BulletRigidBody()
         Contact& contact = dynamicsWorld->contacts[i];
         if (contact.collisionObjects[0] == pInterface || contact.collisionObjects[1] == pInterface)
         {
-            contact.collisionObjects[0]->getImpl()->getContactDissapearSignal()(contact);
-            contact.collisionObjects[1]->getImpl()->getContactDissapearSignal()(contact);
+            if ( BulletCollisionObject* co = contact.collisionObjects[0]->getImpl() ) {
+                co->getContactDissapearSignal()(contact);
+            }
+            if ( BulletCollisionObject* co = contact.collisionObjects[1]->getImpl() ) {
+                co->getContactDissapearSignal()(contact);
+            }
             std::swap( contact, dynamicsWorld->contacts.back() );
             dynamicsWorld->contacts.pop_back();
             --i;

@@ -2,11 +2,11 @@
 #define __SLON_ENGINE_REALM_LOCATION_DBVT_LOCATION_H__
 
 #ifdef _DEBUG
-//#define DEBUG_DBVT_LOCATION
+//#   define DEBUG_DBVT_LOCATION
 #endif
 
 #ifdef DEBUG_DBVT_LOCATION
-#   include "../Graphics/Renderable/DebugMesh.h"
+#   include "../Graphics/DebugMesh.h"
 #endif
 #include "Location.h"
 #include "BVHLocationNode.h"

@@ -163,28 +163,9 @@ void Constraint::reset(const state_desc& desc_)
 void Constraint::setWorld(const dynamics_world_ptr& world_)
 {
     assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies."); 
-    for (int i = 0; i<6; ++i) 
-    {
-        if (motors[i]) {
-            motors[i]->release();
-        }
-    }
-    impl.reset();
-
+    release();
     world = world_;
-    if (world) 
-    {
-        if ( desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) {
-            instantiate();
-        }
-
-		for (int i = 0; i<6; ++i) 
-		{
-			if (motors[i]) {
-				motors[i]->instantiate();
-			}
-		}
-    }
+    instantiate();
 }
 
 void Constraint::instantiate()
@@ -195,12 +176,24 @@ void Constraint::instantiate()
                 && desc.rigidBodies[0]->getDynamicsWorld() == desc.rigidBodies[0]->getDynamicsWorld() 
                 && "Linked bodies and constraint should be in same dynamics world." );
         impl.reset( new BulletConstraint(this, world->getImpl()) );
+		for (int i = 0; i<6; ++i) 
+		{
+			if (motors[i]) {
+				motors[i]->instantiate();
+			}
+		}
 	}
 }
 
 void Constraint::release()
 {
-	impl.reset();
+    for (int i = 0; i<6; ++i) 
+    {
+        if (motors[i]) {
+            motors[i]->release();
+        }
+    }
+    impl.reset();
 }
 
 } // namespace physics
