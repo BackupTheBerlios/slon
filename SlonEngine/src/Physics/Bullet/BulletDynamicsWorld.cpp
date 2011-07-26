@@ -1,32 +1,33 @@
 #include "stdafx.h"
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include "Physics/Bullet/BulletDynamicsWorld.h"
+#include "Physics/Bullet/BulletCollisionObject.h"
 #include "Physics/Bullet/BulletCommon.h"
-#include "Physics/Bullet/BulletConstraint.h"
-#include "Physics/Bullet/BulletRigidBody.h"
+#include "Physics/Bullet/BulletSolver.h"
 #include "Physics/CollisionObject.h"
-#include <boost/thread/locks.hpp>
 #include <sgl/Math/Utility.hpp>
 
 using namespace slon;
 using namespace physics;
 
-BulletDynamicsWorld::BulletDynamicsWorld(const state_desc& _desc) :
-    maxSubSteps(3),
-	numSimulatedSteps(0)
+BulletDynamicsWorld::BulletDynamicsWorld(DynamicsWorld* pInterface_)
+:	pInterface(pInterface_)
+,	numSimulatedSteps(0)
+,   unsimulatedTime(0)
+,	firstSolver(0)
 {
-    desc = _desc;
+    const state_desc& desc = pInterface->desc;
 
     // if world have zero size autodetect
-    if ( length(_desc.worldSize.maxVec - _desc.worldSize.minVec) < math::EPS_3f ) {
+    if ( length(desc.worldSize.maxVec - desc.worldSize.minVec) < math::EPS_3f ) {
         broadPhase.reset( new btDbvtBroadphase() );
     }
     else {
-        broadPhase.reset( new btAxisSweep3( to_bt_vec(_desc.worldSize.minVec), to_bt_vec(_desc.worldSize.maxVec) ) );
+        broadPhase.reset( new btAxisSweep3( to_bt_vec(desc.worldSize.minVec), to_bt_vec(desc.worldSize.maxVec) ) );
     }
 
     collisionConfiguration.reset( new btDefaultCollisionConfiguration() );
-	collisionDispatcher.reset( new btCollisionDispatcher( collisionConfiguration.get() ) );
+    collisionDispatcher.reset( new btCollisionDispatcher( collisionConfiguration.get() ) );
     constraintSolver.reset( new btSequentialImpulseConstraintSolver() );
 
     if (desc.collisionType == DynamicsWorld::CT_DISCRETE)
@@ -47,27 +48,13 @@ BulletDynamicsWorld::BulletDynamicsWorld(const state_desc& _desc) :
     dynamicsWorld->setGravity( to_bt_vec(desc.gravity) );
 }
 
+BulletDynamicsWorld::~BulletDynamicsWorld()
+{
+}
+
 void BulletDynamicsWorld::setGravity(const math::Vector3r& gravity)
 {
-	desc.gravity = gravity;
 	dynamicsWorld->setGravity( to_bt_vec(gravity) );
-}
-
-math::Vector3r BulletDynamicsWorld::getGravity() const
-{
-	return desc.gravity;
-}
-
-const DynamicsWorld::state_desc& BulletDynamicsWorld::getStateDesc() const
-{
-    return desc;
-}
-
-void BulletDynamicsWorld::accept(BulletSolverCollector& collector)
-{
-    std::for_each( constraints.begin(),
-                   constraints.end(),
-                   boost::bind(&BulletConstraint::accept, _1, boost::ref(collector)) );
 }
 
 real BulletDynamicsWorld::stepSimulation(real dt)
@@ -75,23 +62,23 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     if (dt < 0) {
         return 0;
     }
-
-    // simulate
-    accept(solverCollector);
+    dt += unsimulatedTime; // unsimulated from last step
 
     real t = 0;
     {
-        for (unsigned i = 0; i<maxSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
+        const state_desc& desc = pInterface->desc;
+        for (unsigned i = 0; i<desc.maxNumSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
         {
-            solverCollector.solve(desc.fixedTimeStep); // run proprietary solvers
+			BulletSolver* solver = firstSolver;
+			while (solver) 
+			{
+				solver->solve(desc.fixedTimeStep);
+				solver = solver->next;
+			}
+
             dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
         }
     }
-    solverCollector.clear();
-
-    // calculate angle info after
-    accept(solverCollector);
-    solverCollector.clear();
 
     // enumerate contacts
     contact_vector              currentContacts;
@@ -144,43 +131,49 @@ real BulletDynamicsWorld::stepSimulation(real dt)
     // call callbacks
     for (size_t i = 0; i<appearingContacts.size(); ++i) 
     {
-        appearingContacts[i].collisionObjects[0]->handleAppearingContact(appearingContacts[i]);
-        appearingContacts[i].collisionObjects[1]->handleAppearingContact(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[0]->getImpl()->getContactAppearSignal()(appearingContacts[i]);
+        appearingContacts[i].collisionObjects[1]->getImpl()->getContactAppearSignal()(appearingContacts[i]);
     }
 
     for (size_t i = 0; i<dissapearingContacts.size(); ++i) 
     {
-        dissapearingContacts[i].collisionObjects[0]->handleDissappearingContact(dissapearingContacts[i]);
-        dissapearingContacts[i].collisionObjects[1]->handleDissappearingContact(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[0]->getImpl()->getContactDissapearSignal()(dissapearingContacts[i]);
+        dissapearingContacts[i].collisionObjects[1]->getImpl()->getContactDissapearSignal()(dissapearingContacts[i]);
     }
 
-    return dt - t;
+    return unsimulatedTime = dt - t;
 }
 
-RigidBodyTransform* BulletDynamicsWorld::createRigidBodyTransform(const rigid_body_ptr& rigidBody)
+void BulletDynamicsWorld::addSolver(BulletSolver* solver)
 {
-    return new BulletMotionState(rigidBody);
+    assert(solver && solver->prev == 0 && solver->next == 0);
+	solver->next = firstSolver;
+    if (firstSolver) {
+        firstSolver->prev = solver;
+    }
+	firstSolver = solver;
 }
 
-RigidBody* BulletDynamicsWorld::createRigidBody(const RigidBody::state_desc& rigidBodyDesc)
+/** Remove solver from dynamics world. */
+void BulletDynamicsWorld::removeSolver(BulletSolver* solver)
 {
-    BulletRigidBody* rigidBody = new BulletRigidBody(rigidBodyDesc, this);
-    return rigidBody;
-}
+    assert(solver);
+	if (solver->prev) 
+	{
+		solver->prev->next = solver->next;
+		if (solver->next) {
+			solver->next->prev = solver->prev;
+		}
+	}
+	else 
+	{
+		assert(firstSolver == solver);
+		firstSolver = solver->next;
+        if (firstSolver) {
+		    firstSolver->prev = 0;
+        }
+	}
 
-Constraint* BulletDynamicsWorld::createConstraint(const Constraint::state_desc& constraintDesc)
-{
-    BulletConstraint* constraint = new BulletConstraint(constraintDesc);
-    constraints.push_front(*constraint);
-    return constraint;
-}
-
-thread::lock_ptr BulletDynamicsWorld::lockForReading() const
-{
-    return thread::create_lock( new boost::shared_lock<boost::shared_mutex>(accessMutex) );
-}
-
-thread::lock_ptr BulletDynamicsWorld::lockForWriting()
-{
-    return thread::create_lock( new boost::unique_lock<boost::shared_mutex>(accessMutex) );
+    solver->next = 0;
+    solver->prev = 0;
 }

@@ -5,6 +5,7 @@
 #include <sgl/Math/Matrix.hpp>
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
+#include "../Utility/signal.hpp"
 #include "Forward.h"
 
 namespace slon {
@@ -44,9 +45,19 @@ class CollisionObject :
     public Referenced,
     public database::Serializable
 {
+private:
+#ifdef SLON_ENGINE_USE_BULLET
+    friend class BulletCollisionObject;
+	typedef BulletCollisionObject impl_type;
+#endif
 public:
-    typedef boost::function<void (const Contact& c)>    contact_handler;
-    typedef boost::signals::connection                  connection_type;
+    typedef slot<void (const math::Matrix4f&)>          transform_handler;
+    typedef slot<void (const Contact&)>                 contact_handler;
+
+    typedef signal<void (const math::Matrix4f&)>        transform_signal;
+    typedef signal_base<void (const math::Matrix4f&)>   transform_signal_base;
+    typedef signal<void (const Contact&)>               contact_signal;
+    typedef signal_base<void (const Contact&)>          contact_signal_base;
 
     enum COLLISION_TYPE
     {
@@ -56,13 +67,13 @@ public:
 
 public:
     /** Get behaviour of the object collision. */
-    virtual COLLISION_TYPE getCollisionType() const = 0;
+    virtual COLLISION_TYPE getType() const = 0;
 
     /** Get objects collision shape. */
     virtual const CollisionShape* getCollisionShape() const = 0;
 
     /** Get dynamics world where object is created. */
-    virtual const DynamicsWorld& getDynamicsWorld() const = 0;
+    virtual const DynamicsWorld* getDynamicsWorld() const = 0;
 
     /** Get name of the objecty */
     virtual const std::string& getName() const = 0;
@@ -73,29 +84,27 @@ public:
     /** Set world transform for the object. Works only for ghost objects and kinematic rigid bodies */
     virtual void setTransform(const math::Matrix4r& transform) = 0;
 
-    /** Connect callback for handling contact occuring. Callback is called for
-     * every appearing contact pair.
-     * @param handler - contact handler.
-     */
-    virtual connection_type connectContactAppearCallback(const contact_handler& handler) = 0;
+    /** Get signal for connecting trasnform handlers. */
+    transform_signal_base& getTransformSignal() { return transformSignal; }
 
-    /** Connect callback for handling contact dissapearing. Callback is called for every
-     * dissapearing contact.
-     * @param handler - contact handler.
-     */
-    virtual connection_type connectContactDissapearCallback(const contact_handler& handler) = 0;
+    /** Get signal for connecting contact appear handlers. */
+    contact_signal_base& getContactAppearSignal() { return contactAppearSignal; }
 
-    /** Call appearing contact handlers. This function is called from DynamicsWorld
-     * during update.
-     */
-    virtual void handleAppearingContact(const Contact& contact) = 0;
+    /** Get signal for connecting contact dissapear handlers. */
+    contact_signal_base& getContactDissapearSignal() { return contactDissapearSignal; }
 
-    /** Call dissapearing contact handlers. This function is called from DynamicsWorld
-     * during update.
-     */
-    virtual void handleDissappearingContact(const Contact& contact) = 0;
+	/** Get implementation object. */
+    impl_type* getImpl();
+
+	/** Get implementation object. */
+    const impl_type* getImpl() const;
 
     virtual ~CollisionObject() {}
+
+protected:
+    transform_signal    transformSignal;
+    contact_signal      contactAppearSignal;
+    contact_signal      contactDissapearSignal;
 };
 
 // ptr typedef

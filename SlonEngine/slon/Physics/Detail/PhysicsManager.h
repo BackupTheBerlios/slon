@@ -13,16 +13,11 @@ class PhysicsManager :
 public:
 	PhysicsManager();
 
-	/** Initialize physics dynamics world. */
-	DynamicsWorld* initDynamicsWorld( const DynamicsWorld::state_desc& dynamicsWorldDesc = DynamicsWorld::state_desc() );
+    // Override PhysicsManager
+    dynamics_world_iterator firstDynamicsWorld() { return worlds.begin(); }
+    dynamics_world_iterator endDynamicsWorld()   { return worlds.end(); }
 
-	/** Get dynamics world of the manager. */
-	DynamicsWorld* getDynamicsWorld() const { return dynamicsWorld.get(); }
-
-    /** Set timer for physics simulation. If timer is 0 simulation will stop. */
-    void setTimer(const Timer* _timer);
-
-    /** Get physics timer */
+    void         setTimer(const const_timer_ptr& timer);
     const Timer* getTimer() const { return timer.get(); }
 
     /** Step simulation. This is called by engine. */
@@ -38,8 +33,14 @@ public:
         return postFrameSignal.connect(slot);
     }
 
+    /** Add dynamics world into update queue. */
+    void addDynamicsWorld(DynamicsWorld* world);
+
+    /** Remove dynamics world from update queue. */
+    void removeDynamicsWorld(DynamicsWorld* world);
+
 private:
-	dynamics_world_ptr  dynamicsWorld;
+	dynamics_world_list worlds;
     const_timer_ptr     timer;
     delta_timer         deltaTimer;
     real                unsimulatedTime;

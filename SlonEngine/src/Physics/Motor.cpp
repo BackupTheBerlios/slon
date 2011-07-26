@@ -7,26 +7,28 @@
 namespace slon {
 namespace physics {
 
+class Constraint;
+
 /** Interface for rotational or translational motor. For rotational motor force means torque. */
 class Motor
 {
-private:
-	friend class Constraint;
+public:
+    enum TYPE
+    {
+        MOTOR_X_TRANS,
+        MOTOR_Y_TRANS,
+        MOTOR_Z_TRANS,
+        MOTOR_X_ROT,
+        MOTOR_Y_ROT,
+        MOTOR_Z_ROT
+    };
 
 public:
-	enum TYPE
-	{
-		MOTOR_SERVO,
-		MOTOR_SPRING,
-		MOTOR_VELOCITY
-	};
-
-public:
-	/** Get type of the motor */
-	virtual TYPE getType() const = 0;
-
     /** Get constraint to which motor is attached */
     virtual const Constraint* getConstraint() const = 0;
+
+    /** Get motor type */
+    virtual TYPE getType() const = 0;
 
     /** Get working axis of the motor. For rotational motor it axis along which the rotation is performed,
      * for translational motor it is axis where motor is translating.
@@ -49,13 +51,6 @@ public:
     virtual real getForce() const = 0;
 
     virtual ~Motor() {} 
-
-protected:
-	/** Create motor implementation, should be called by constraint. */
-	virtual void instantiate() = 0;
-
-	/** Release motor implementation, should be called by constraint. */
-	virtual void release() = 0;
 };
 
 } // namespace physics

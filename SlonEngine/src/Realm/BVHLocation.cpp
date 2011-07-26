@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Database/Detail/UtilitySerialization.h"
 #include "Graphics/DebugDrawCommon.h"
+#include "Physics/DynamicsWorld.h"
 #include "Realm/BVHLocation.h"
-#include "Realm/EventVisitor.h"
 #include "Realm/World.h"
 #include "Scene/TransformVisitor.h"
 #include "Utility/math.hpp"
@@ -112,6 +112,11 @@ LocationVisitor<Location, Visitor> makeLocationVisitor(Location& location, Visit
 	return LocationVisitor<Location, Visitor>(location, visitor);
 }
 
+BVHLocation::BVHLocation()
+{
+    eventVisitor.setLocation(this);
+}
+
 const char* BVHLocation::serialize(database::OArchive& ar) const
 {
     struct write_object
@@ -163,6 +168,16 @@ const math::AABBf& BVHLocation::getBounds() const
     return aabb;
 }
 
+void BVHLocation::visit(scene::Visitor& nv)
+{
+    perform_on_leaves(staticAABBTree, visit_node(nv));
+}
+
+void BVHLocation::visit(scene::ConstVisitor& nv)
+{
+    perform_on_leaves(staticAABBTree, visit_node(nv));
+}
+
 void BVHLocation::visit(const body_variant& body, scene::Visitor& nv)
 {
 	boost::apply_visitor(makeLocationVisitor(*this, nv), body);
@@ -212,7 +227,7 @@ bool BVHLocation::have(const scene::node_ptr& node) const
 	return locNode->getLocation() == this;
 }
 
-void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
+void BVHLocation::add(const scene::node_ptr& node, bool dynamic, bool activatePhysics)
 {
     assert( node && !node->getParent() );
 	bvh_location_node_ptr locNode( new BVHLocationNode(this, 0, dynamic) );
@@ -230,10 +245,12 @@ void BVHLocation::add(const scene::node_ptr& node, bool dynamic)
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
 
-    EventVisitor ev(EventVisitor::WORLD_ADD, 0, this, *node);
+    eventVisitor.setType(EventVisitor::WORLD_ADD);
+    eventVisitor.setPhysicsToggle(activatePhysics);
+    eventVisitor.traverse(*node);
 }
 
-bool BVHLocation::remove(const scene::node_ptr& node)
+bool BVHLocation::remove(const scene::node_ptr& node, bool deactivatePhysics)
 {
 	assert(node);
 
@@ -253,8 +270,27 @@ bool BVHLocation::remove(const scene::node_ptr& node)
     aabb = math::merge( staticAABBTree.get_bounds(), dynamicAABBTree.get_bounds() );
     DEBUG_UPDATE_TREE(debugMesh, aabb, staticAABBTree, dynamicAABBTree)
     
-    EventVisitor ev(EventVisitor::WORLD_REMOVE, 0, this, *node);
+    eventVisitor.setType(EventVisitor::WORLD_REMOVE);
+    eventVisitor.setPhysicsToggle(deactivatePhysics);
+    eventVisitor.traverse(*node);
     return true;
+}
+
+void BVHLocation::setDynamicsWorld(const physics::dynamics_world_ptr& dynamicsWorld_)
+{
+    if (dynamicsWorld)
+    {
+        dynamicsWorld.reset();
+        eventVisitor.setType(EventVisitor::WORLD_REMOVE);
+        visit(eventVisitor);
+    }
+
+    if (dynamicsWorld_)
+    {
+        dynamicsWorld = dynamicsWorld_;
+        eventVisitor.setType(EventVisitor::WORLD_ADD);
+        visit(eventVisitor);
+    }
 }
 
 } // namespace realm

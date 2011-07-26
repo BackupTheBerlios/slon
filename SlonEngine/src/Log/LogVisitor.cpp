@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
-#include "Physics/RigidBodyTransform.h"
+#include "Scene/Group.h"
 
 namespace slon {
 namespace log {

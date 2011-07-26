@@ -110,7 +110,7 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
 
     switch ( m.mot.getType() ) 
     {
-        case physics::Motor::MOTOR_X_ROT:
+        case physics::Constraint::DOF_X_ROT:
             if ( m.mot.getLoLimit() <= m.mot.getHiLimit() )
             {
                 mesh << color(1.0f, 0.0f, 0.0f)
@@ -127,7 +127,7 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
             }
             break;
 
-        case physics::Motor::MOTOR_Y_ROT:
+        case physics::Constraint::DOF_Y_ROT:
             if ( m.mot.getLoLimit() <= m.mot.getHiLimit() )
             {
                 mesh << color(0.0f, 1.0f, 0.0f)
@@ -144,7 +144,7 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
             }
             break;
 
-        case physics::Motor::MOTOR_Z_ROT:
+        case physics::Constraint::DOF_Z_ROT:
             if ( m.mot.getLoLimit() <= m.mot.getHiLimit() )
             {
                 mesh << color(0.0f, 0.0f, 1.0f)
@@ -182,13 +182,13 @@ DebugMesh& operator << (DebugMesh& mesh, const constraint& c)
          << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 1.0f, 0.0f) )
          << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) );
 
-    if ( const physics::Motor* m = c.cons.getMotor(physics::Motor::MOTOR_X_ROT) ) {
+    if ( const physics::Motor* m = c.cons.getMotor(physics::Constraint::DOF_X_ROT) ) {
         mesh << motor(*m, c.scale, c.forceScale, c.forceSectorScale);
     }
-    if ( const physics::Motor* m = c.cons.getMotor(physics::Motor::MOTOR_Y_ROT) ) {
+    if ( const physics::Motor* m = c.cons.getMotor(physics::Constraint::DOF_Y_ROT) ) {
         mesh << motor(*m, c.scale, c.forceScale, c.forceSectorScale);
     }
-    if ( const physics::Motor* m = c.cons.getMotor(physics::Motor::MOTOR_Z_ROT) ) {
+    if ( const physics::Motor* m = c.cons.getMotor(physics::Constraint::DOF_Z_ROT) ) {
         mesh << motor(*m, c.scale, c.forceScale, c.forceSectorScale);
     }
 

@@ -148,6 +148,7 @@ SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Constraint.h
     ${TARGET_HEADER_PATH}/Physics/CollisionObject.h
     ${TARGET_HEADER_PATH}/Physics/CollisionShape.h
+    ${TARGET_HEADER_PATH}/Physics/ConstraintNode.h
     ${TARGET_HEADER_PATH}/Physics/DynamicsWorld.h
     ${TARGET_HEADER_PATH}/Physics/Forward.h
     ${TARGET_HEADER_PATH}/Physics/PhysicsManager.h
@@ -155,7 +156,7 @@ SET ( TARGET_PHYSICS_HEADERS
     ${TARGET_HEADER_PATH}/Physics/PhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Motor.h
     ${TARGET_HEADER_PATH}/Physics/RigidBody.h
-    ${TARGET_HEADER_PATH}/Physics/RigidBodyTransform.h
+    ${TARGET_HEADER_PATH}/Physics/PhysicsTransform.h
     ${TARGET_HEADER_PATH}/Physics/ServoMotor.h
     ${TARGET_HEADER_PATH}/Physics/SpringMotor.h
     ${TARGET_HEADER_PATH}/Physics/VelocityMotor.h
@@ -166,7 +167,6 @@ SET ( TARGET_PHYSICS_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletConstraint.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletCollisionObject.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletDynamicsWorld.h
-    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletMotionState.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsMaterial.h
 #    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletPhysicsModel.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRigidBody.h
@@ -175,7 +175,6 @@ SET ( TARGET_PHYSICS_BULLET_HEADERS
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRotationalSpringMotor.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletRotationalVelocityMotor.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletSolver.h
-    ${TARGET_HEADER_PATH}/Physics/Bullet/BulletSolverCollector.h
     ${TARGET_HEADER_PATH}/Physics/Bullet/BulletTranslationalMotor.h
 )
 
@@ -251,12 +250,16 @@ SET ( TARGET_THREAD_DETAIL_HEADERS
 SET ( TARGET_UTILITY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/base64.hpp
     ${TARGET_HEADER_PATH}/Utility/cached_value.hpp
-    ${TARGET_HEADER_PATH}/Utility/callback.hpp
+    ${TARGET_HEADER_PATH}/Utility/connection.hpp
     ${TARGET_HEADER_PATH}/Utility/error.hpp
     ${TARGET_HEADER_PATH}/Utility/if_then_else.hpp
     ${TARGET_HEADER_PATH}/Utility/math.hpp
+    ${TARGET_HEADER_PATH}/Utility/function.hpp
+    ${TARGET_HEADER_PATH}/Utility/functor_slot.hpp
     ${TARGET_HEADER_PATH}/Utility/referenced.hpp
+    ${TARGET_HEADER_PATH}/Utility/signal.hpp
     ${TARGET_HEADER_PATH}/Utility/singleton.hpp
+    ${TARGET_HEADER_PATH}/Utility/slot.hpp
     ${TARGET_HEADER_PATH}/Utility/tmp_file.hpp
     ${TARGET_HEADER_PATH}/Utility/handle.hpp
     ${TARGET_HEADER_PATH}/Utility/hash_string.hpp
@@ -486,19 +489,24 @@ SET ( TARGET_LOG_DETAIL_SOURCES
 )
 
 SET ( TARGET_PHYSICS_SOURCES
+    Physics/CollisionObject.cpp
     Physics/CollisionShape.cpp
-#    Physics/DynamicsWorld.cpp
-#    Physics/PhysicsMaterial.cpp
+    Physics/Constraint.cpp
+    Physics/ConstraintNode.cpp
+    Physics/DynamicsWorld.cpp
+    Physics/PhysicsMaterial.cpp
     Physics/PhysicsModel.cpp
-    Physics/RigidBodyTransform.cpp
-#    Physics/RigidBody.cpp
+    Physics/PhysicsTransform.cpp
+    Physics/RigidBody.cpp
+    Physics/ServoMotor.cpp
+    Physics/SpringMotor.cpp
+    Physics/VelocityMotor.cpp  
 )
 
 SET ( TARGET_PHYSICS_BULLET_SOURCES
     Physics/Bullet/BulletConstraint.cpp
     Physics/Bullet/BulletCollisionObject.cpp
     Physics/Bullet/BulletDynamicsWorld.cpp
-    Physics/Bullet/BulletMotionState.cpp
     Physics/Bullet/BulletPhysicsMaterial.cpp
 #    Physics/Bullet/BulletPhysicsModel.cpp
     Physics/Bullet/BulletRigidBody.cpp
@@ -506,7 +514,6 @@ SET ( TARGET_PHYSICS_BULLET_SOURCES
     Physics/Bullet/BulletRotationalServoMotor.cpp
     Physics/Bullet/BulletRotationalSpringMotor.cpp
     Physics/Bullet/BulletRotationalVelocityMotor.cpp  
-    Physics/Bullet/BulletSolverCollector.cpp
     Physics/Bullet/BulletTranslationalMotor.cpp
 )
 

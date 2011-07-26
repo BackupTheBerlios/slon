@@ -4,24 +4,21 @@
 #define NOMINMAX
 #include "../ServoMotor.h"
 #include "BulletRotationalMotor.h"
+#include "BulletSolver.h"
 
 namespace slon {
 namespace physics {
 
 class BulletRotationalServoMotor :
-    public BulletRotationalMotor<ServoMotor>,
-    public BulletSolver
+    public BulletRotationalMotor,
+	public BulletSolver
 {
-typedef BulletRotationalMotor<ServoMotor> motor_base;
 public:
     BulletRotationalServoMotor(BulletConstraint* constraint, int axis);
+    ~BulletRotationalServoMotor();
 
     // Override BulletSolver
     void solve(real dt);
-    void accept(BulletSolverCollector& collector);
-
-    // Override BulletRotationalMotor
-    void reset(BulletConstraint* constraint, int axis);
 
     // Override ServoMotor
     bool enabled() const                   { return enableMotor; }
@@ -29,8 +26,8 @@ public:
     void setTargetForce(real targetForce);
 
 private:
-    btScalar targetForce;
-    bool     enableMotor;
+    real targetForce;
+    bool enableMotor;
 };
 
 } // namespace physics

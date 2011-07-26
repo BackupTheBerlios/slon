@@ -3,14 +3,15 @@
 
 #define NOMINMAX
 #include "../DynamicsWorld.h"
-#include "BulletConstraint.h"
-#include "BulletSolverCollector.h"
-#include <boost/intrusive/slist.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <bullet/btBulletCollisionCommon.h>
-#include <bullet/btBulletDynamicsCommon.h>
+#include <boost/scoped_ptr.hpp>
 #include <sgl/Math/Containers.hpp>
+
+// forward bullet
+class btBroadphaseInterface;
+class btCollisionConfiguration;
+class btCollisionDispatcher;
+class btConstraintSolver;
+class btDynamicsWorld;
 
 namespace slon {
 namespace physics {
@@ -33,93 +34,73 @@ struct compare_contact
 };
 
 class BulletConstraint;
+class BulletSolver;
 
 /* Bullet implementation of the physics dynamics world. */
 class BulletDynamicsWorld :
-    public DynamicsWorld
+	public boost::noncopyable
 {
 friend class BulletRigidBody;
 private:
-    typedef boost::shared_ptr<btBroadphaseInterface>    broadphase_ptr;
-    typedef boost::shared_ptr<btCollisionConfiguration> collision_configuration_ptr;
-    typedef boost::shared_ptr<btCollisionDispatcher>    collision_dispatcher_ptr;
-    typedef boost::shared_ptr<btConstraintSolver>       constraint_solver_ptr;
-    typedef boost::shared_ptr<btDynamicsWorld>          dynamics_world_ptr;
+    typedef boost::scoped_ptr<btBroadphaseInterface>    broadphase_ptr;
+    typedef boost::scoped_ptr<btCollisionConfiguration> collision_configuration_ptr;
+    typedef boost::scoped_ptr<btCollisionDispatcher>    collision_dispatcher_ptr;
+    typedef boost::scoped_ptr<btConstraintSolver>       constraint_solver_ptr;
+    typedef boost::scoped_ptr<btDynamicsWorld>          dynamics_world_ptr;
 
-    typedef boost::intrusive::member_hook
-    < 
-        BulletConstraint, 
-        BulletConstraint::slist_hook, 
-        &BulletConstraint::dynamicsWorldHook 
-    > constraint_hook;
-
-    typedef boost::intrusive::slist
-    <
-        BulletConstraint, 
-        constraint_hook,
-        boost::intrusive::constant_time_size<false> 
-    > constraint_list;
-
+	typedef DynamicsWorld::contact_vector               contact_vector;
+	typedef DynamicsWorld::contact_const_iterator       contact_const_iterator;
+	typedef DynamicsWorld::state_desc                   state_desc;
+	
 private:
     // non copyable
     BulletDynamicsWorld(const BulletDynamicsWorld&);
     BulletDynamicsWorld& operator = (const BulletDynamicsWorld&);
 
 public:
-    BulletDynamicsWorld(const state_desc& desc);
+    BulletDynamicsWorld(DynamicsWorld* pInterface);
+	~BulletDynamicsWorld();
 
-    //
-    void                accept(BulletSolverCollector& collector);
+    // implement dynamics world
+    void   setGravity(const math::Vector3r& gravity);
+    void   setFixedTimeStep(const real dt)            { /* nothing */ }
+    void   setMaxNumSubSteps(unsigned maxSubSteps_)   { /* nothing */ }
+    size_t getNumSimulatedSteps() const               { return numSimulatedSteps; }
+    real   stepSimulation(real dt);
 
-    // Override dynamics world
-    void                setGravity(const math::Vector3r& gravity);
-    math::Vector3r      getGravity() const;
-    void                setFixedTimeStep(const real dt)             { desc.fixedTimeStep = dt; }
-    real                getFixedTimeStep() const                    { return desc.fixedTimeStep; }
-    const state_desc&   getStateDesc() const;
-    real                stepSimulation(real dt);
-    void                setMaxNumSubSteps(unsigned maxSubSteps_)    { maxSubSteps = maxSubSteps_; }
-    unsigned            getMaxNumSubSteps() const                   { return maxSubSteps; }
-	size_t				getNumSimulatedSteps() const				{ return numSimulatedSteps; }
-
-    RigidBodyTransform* createRigidBodyTransform(const rigid_body_ptr& rigidBody = rigid_body_ptr());
-    RigidBody*          createRigidBody(const RigidBody::state_desc& rigidBodyDesc);
-    Constraint*         createConstraint(const Constraint::state_desc& constraintDesc);
-
-    /** Get maximum number of substeps in the simulation step. */
     contact_const_iterator firstActiveContact() const   { return contacts.begin(); }
     contact_const_iterator endActiveContact() const     { return contacts.end(); }
-
-    thread::lock_ptr    lockForReading() const;
-    thread::lock_ptr    lockForWriting();
 
     // get bullet dynamics world
     btDynamicsWorld& getBtDynamicsWorld() { return *dynamicsWorld; }
 
+	/** Get interface to dynamics world */
+	DynamicsWorld* getInterface() { return pInterface; }
+
+	/** Add solver to dynamics world. */
+	void addSolver(BulletSolver* solver);
+
+	/** Remove solver from dynamics world. */
+	void removeSolver(BulletSolver* solver);
+
 private:
-    state_desc                  desc;
+    DynamicsWorld*              pInterface;
     broadphase_ptr              broadPhase;
     collision_configuration_ptr collisionConfiguration;
     collision_dispatcher_ptr    collisionDispatcher;
     constraint_solver_ptr       constraintSolver;
     dynamics_world_ptr          dynamicsWorld;
 
-    // items
-    constraint_list             constraints;
-
-    // proprietary solvers
-    BulletSolverCollector       solverCollector;
-
     // settings 
-    unsigned                    maxSubSteps;
-	size_t						numSimulatedSteps;
+    size_t                      numSimulatedSteps;
+    float                       unsimulatedTime;
+
+	// internal solvers
+	BulletSolver*				firstSolver;
 
     // for handling contact callbacks
     contact_vector              contacts;
     std::vector<math::Vector3r> contactPoints;
-
-    // mutex locks any camera modification
-    mutable boost::shared_mutex accessMutex;
 };
 
 } // namespace physics

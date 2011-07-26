@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 #define __SLON_ENGINE_REALM_WORLD_SCALABLE_WORLD_H__
 
+#include "EventVisitor.h"
 #include "Location.h"
 #include "World.h"
 #include <boost/thread/shared_mutex.hpp>
@@ -79,6 +80,7 @@ public:
 
 private:
     location_vector locations;
+    EventVisitor    eventVisitor;
 
     // infinite object
     object_vector	infiniteObjects;

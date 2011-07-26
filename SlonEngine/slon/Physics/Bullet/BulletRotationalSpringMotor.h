@@ -11,7 +11,7 @@ namespace physics {
 
 /** Bullet constraint implementation */
 class BulletRotationalSpringMotor :
-    public BulletRotationalMotor<SpringMotor>,
+    public BulletRotationalMotor,
     public BulletSolver
 {
 public:
@@ -20,15 +20,11 @@ public:
     // override BulletSolver
     void solve(real dt);
 
-    // override BulletRotationalMotor
-    void reset(BulletConstraint* constraint, int axis);
-    void accept(BulletSolverCollector& collector);
-
     // override SpringMotor
-    bool enabled() const                            { return motor->m_enableMotor; }
-    void toggle(bool toggle)                        { motor->m_enableMotor = toggle; }
-    real getMaxForce() const                        { return motor->m_maxMotorForce; }
-    void setMaxForce(real maxForce)                 { motor->m_maxMotorForce = maxForce; }
+    bool enabled() const                            { enableMotor; }
+    void toggle(bool toggle);
+    real getMaxForce() const                        { return maxForce; }
+    void setMaxForce(real maxForce_)                { maxForce = maxForce_; }
     real getVelocityDamping() const                 { return velocityDamping; }
     void setVelocityDamping(real velocityDamping_)  { velocityDamping = velocityDamping_; }
     real getStiffness() const                       { return stiffness; }
@@ -37,9 +33,11 @@ public:
     void setEquilibriumPoint(real equilibrium_)     { equilibrium = equilibrium_; }
 
 private:
-    real   equilibrium;
-    real   stiffness;
-    real   velocityDamping;
+	bool enableMotor;
+	real maxForce;
+    real equilibrium;
+    real stiffness;
+    real velocityDamping;
 };
 
 } // namespace physics

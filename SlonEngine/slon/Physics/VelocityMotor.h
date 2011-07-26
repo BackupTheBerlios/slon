@@ -13,26 +13,55 @@ namespace physics {
 class VelocityMotor :
     public Motor
 {
+private:
+	friend class Constraint;
+#ifdef SLON_ENGINE_USE_BULLET
+	friend class BulletRotationalVelocityMotor;
+	typedef BulletRotationalVelocityMotor impl_type;
+	typedef boost::scoped_ptr<impl_type>  impl_ptr;
+#endif
+
 public:
-    /** Check wether motor is enabled. */
-    virtual bool enabled() const = 0;
+    // Override Motor
+    TYPE              getType() const;
+    const Constraint* getConstraint() const;
+    Constraint::DOF   getDOF() const;
+    math::Vector3r    getAxis() const;
+    real              getLoLimit() const;
+    real              getHiLimit() const;
+    real              getPosition() const;
+    real              getVelocity() const;
+    real              getForce() const;
+
+    /** Check whether motor is enabled. */
+    bool enabled() const;
 
     /** Enable/Disable motor. */
-    virtual void toggle(bool toggle) = 0;
+    void toggle(bool toggle);
 
     /** Get velocity(angular velocity) which motor is trying to reach. */
-    virtual real getTargetVelocity() const = 0;
+    real getTargetVelocity() const;
 
     /** Set velocity(angular velocity) which motor will try to reach. */
-    virtual void setTargetVelocity(real velocity) = 0;
+    void setTargetVelocity(real velocity);
 
     /** Get maximum force(torque) the motor can apply. Must be non negative. */
-    virtual real getMaxForce() const = 0;
+    real getMaxForce() const;
 
     /** Set maximum force(torque) the motor can apply. Must be non negative. */
-    virtual void setMaxForce(real force) = 0;
+    void setMaxForce(real force);
 
-    virtual ~VelocityMotor() {} 
+private:
+	VelocityMotor(Constraint* constraint, Constraint::DOF dof);
+
+	// Override Motor
+	void instantiate();
+	void release();
+
+private:
+	Constraint*       constraint;
+	Constraint::DOF   dof;
+	impl_ptr          impl;
 };
 
 } // namespace physics

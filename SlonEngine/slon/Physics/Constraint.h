@@ -4,16 +4,12 @@
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
 #include "../Utility/Memory/aligned.hpp"
-#include "Forward.h"
-#include "Motor.h"
+#include "RigidBody.h"
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <string>
 
 namespace slon {
 namespace physics {
-
-// forward decl
-class RigidBody;
 
 /** Generic 6DOF constraint. Implementation will choose most
  * suitable constraint for every case.
@@ -23,16 +19,26 @@ class Constraint :
     public database::Serializable
 {
 public:
+    friend class DynamicsWorld;
+	friend class RigidBody;
+#ifdef SLON_ENGINE_USE_BULLET
+    friend class BulletConstraint;
+    typedef BulletConstraint             impl_type;
+    typedef boost::scoped_ptr<impl_type> impl_ptr;
+#endif
+	typedef boost::scoped_ptr<Motor>     motor_ptr;
+
+public:
     struct state_desc
 #ifdef SLON_ENGINE_USE_SSE
        : public aligned<0x10>
 #endif
     {
-        RigidBody*      rigidBodies[2];
-        math::Matrix4r  frames[2];
-        math::Vector3r  linearLimits[2];
-        math::Vector3r  angularLimits[2];
         std::string     name;
+        rigid_body_ptr  rigidBodies[2];     /// affected rigid bodies
+        math::Matrix4r  frames[2];          /// translational matrices from constraint coordinate frame to rigid bodies coordianate frames
+        math::Vector3r  linearLimits[2];    /// translational limits, set -INF, +INF for free axes
+        math::Vector3r  angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
 
         state_desc(const std::string& _name = "") :
             name(_name)
@@ -51,73 +57,104 @@ public:
         AXIS_LOCKED,
     };
 
+	enum DOF
+    {
+        DOF_X_TRANS,
+        DOF_Y_TRANS,
+        DOF_Z_TRANS,
+        DOF_X_ROT,
+        DOF_Y_ROT,
+        DOF_Z_ROT
+    };
+
 public:
+    Constraint(const state_desc& desc = state_desc());
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Get first rigid body affecting by the constraint. */
-    virtual RigidBody* getRigidBodyA() const = 0;
+    RigidBody* getRigidBodyA() const;
 
     /** Get second rigid body affecting by the constraint. */
-    virtual RigidBody* getRigidBodyB() const = 0;
+    RigidBody* getRigidBodyB() const;
 
     /** Get motor of the constraint per axis. 
      * @param motor - motor id.
      * @return pointer to the angular motor for specified axis or 0 if it was not created.
      */
-    virtual const Motor* getMotor(Motor::TYPE motor) const = 0;
+    const Motor* getMotor(DOF motor) const;
 
     /** Get motor of the constraint per axis. 
      * @param motor - motor id.
      * @return pointer to the angular motor for specified axis or 0 if it was not created.
      */
-    virtual Motor* getMotor(Motor::TYPE motor) = 0;
+    Motor* getMotor(DOF motor);
 
-    /** Setup servo motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup servo motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    virtual ServoMotor* createServoMotor(Motor::TYPE motor) = 0;
+    ServoMotor* createServoMotor(DOF dof);
 
-    /** Setup velocity motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup velocity motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    virtual VelocityMotor* createVelocityMotor(Motor::TYPE motor) = 0;
+    VelocityMotor* createVelocityMotor(DOF dof);
 
-    /** Setup spring motor of the constraint per axis. Previous motor on specified axis will be deleted.
-     * @param motor - motor id.
-     * @return pointer to the angular motor for specified axis or 0 is axis is locked.
+    /** Setup spring motor of the constraint. Previous motor on specified axis will be deleted.
+     * @param dof - dof motor should affect.
+     * @return pointer to the motor for specified axis or 0 is axis is locked.
      */
-    virtual SpringMotor* createSpringMotor(Motor::TYPE motor) = 0;
+    SpringMotor* createSpringMotor(DOF dof);
 
     /** Get axis in parent coordinate frame.
      * @param axis - 0 - X, 1 - Y, 2 - Z.
      */
-    virtual math::Vector3r getAxis(unsigned int axis) const = 0;
+    math::Vector3r getAxis(unsigned int axis) const;
 
-    /** Get current angle of the rotational axis. 
-     * @param axis - 0 - X, 1 - Y, 2 - Z.
-     */
-    virtual real getRotationAngle(unsigned int axis) const = 0;
+    /** Get current angle of the rotational axis or current offset of translational axis. */
+    real getPosition(DOF dof) const;
 
-    /** Check wether specified axis is locked.
-     * @param axis - 0 - X, 1 - Y, 2 - Z.
-     */
-    virtual AXIS_RESTRICTION getAxisRestriction(unsigned int axis) const = 0;
+    /** Check whether specified degree of freedom is locked, restricted or free.  */
+    AXIS_RESTRICTION getRestriction(DOF dof) const;
 
     /** Get name of the constraint */
-    virtual const std::string& getName() const = 0;
+    const std::string& getName() const;
 
     /** Get description of the constraint. */
-    virtual const state_desc& getStateDesc() const = 0;
+    const state_desc& getStateDesc() const;
+
+    /** Get dynamics world where constraint is. */
+    const DynamicsWorld* getDynamicsWorld() const;
 
     /** Recreate constraint from description. */
-    virtual void reset(const state_desc& desc) = 0;
+    void reset(const state_desc& desc);
 
-    virtual ~Constraint() {}
+	/** Get implementation object */
+	impl_type* getImpl() { return impl.get(); }
+
+	/** Get implementation object */
+	const impl_type* getImpl() const { return impl.get(); }
+
+private:
+	/** Add constraint into the world, should be called by DynamicsWorld. */
+	void setWorld(const dynamics_world_ptr& world);
+
+	/** Create constraint implementation, should be called by RigidBody. */
+	void instantiate();
+
+	/** Release constraint implementation, should be called by RigidBody. */
+	void release();
+
+private:
+	dynamics_world_ptr world;
+	state_desc         desc;
+	impl_ptr           impl;
+	motor_ptr          motors[6];
 };
-
-// ptr typedefs
-typedef boost::intrusive_ptr<Constraint>        constraint_ptr;
-typedef boost::intrusive_ptr<const Constraint>  const_constraint_ptr;
 
 } // namespace physics
 } // namespace slon
