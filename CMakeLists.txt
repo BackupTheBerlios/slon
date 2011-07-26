@@ -34,6 +34,8 @@ IF (WIN32)
 
         LIST ( APPEND CMAKE_PROGRAM_PATH
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/gnuplot
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Python
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/GCCXML/bin
         )
 
         # copy dlls into target binary dir

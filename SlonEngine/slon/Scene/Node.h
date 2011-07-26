@@ -2,9 +2,8 @@
 #define __SLON_ENGINE_SCENE_NODE_H__
 
 #include "../Database/Serializable.h"
-#include "../Log/LogVisitor.h"
 #include "../Utility/hash_string.hpp"
-#include "AcceptVisitor.hpp"
+#include "../Log/Forward.h"
 #include "Forward.h"
 
 namespace slon {

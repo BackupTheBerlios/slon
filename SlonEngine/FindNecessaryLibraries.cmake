@@ -11,6 +11,8 @@ FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS signals thread system filesyste
 FIND_PACKAGE ( SDL              REQUIRED )
 FIND_PACKAGE ( Doxygen )
 FIND_PACKAGE ( Bullet  )
+FIND_PACKAGE ( PythonInterp  )
+FIND_PACKAGE ( GCCXML  )
 
 IF (NOT XMLPP_CONFIGURE_INTRUSIVE)
 	FIND_PACKAGE ( XML++        REQUIRED )
