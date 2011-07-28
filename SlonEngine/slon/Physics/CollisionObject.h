@@ -40,6 +40,10 @@ struct Contact
     }
 };
 
+#ifdef SLON_ENGINE_USE_BULLET
+    class BulletCollisionObject;
+#endif
+
 /** Rigid body in the phyics world */
 class CollisionObject :
     public Referenced,

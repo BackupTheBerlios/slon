@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __GNUC__
+#   include <emmintrin.h>
+#endif
+
 namespace slon {
 
 /** Allocate aligned data.

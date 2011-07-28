@@ -12,6 +12,10 @@ namespace physics {
 
 class Constraint;
 
+#ifdef SLON_ENGINE_USE_BULLET
+    class BulletRigidBody;
+#endif
+
 /** Rigid body in the physics world */
 class RigidBody :
     public CollisionObject
