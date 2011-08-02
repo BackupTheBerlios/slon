@@ -332,24 +332,6 @@ public:
     collada_mesh_ptr    mesh;
 };
 
-template<>
-void collada_library<collada_geometry>::load(const ColladaDocument& document, const xmlpp::element& elem)
-{
-	element_ptr		   geometry;
-	collada_serializer serializer;
-    serializer &= xmlpp::make_nvp( "mesh",          xmlpp::as_element<collada_mesh>(geometry) );
-	serializer &= xmlpp::make_nvp( "convex_mesh",   xmlpp::as_element<collada_convex_mesh>(geometry) );
-    //serializer &= xmlpp::make_nvp( "spline",        warning(logger, "Usupported <geometry> type: spline") );
-
-	for (xmlpp::element_iterator iter  = elem.first_child_element();
-								 iter != elem.end_child_element();
-								 ++iter)
-	{
-		serializer.load(document, *iter);
-		elements.insert( element_set::value_type(geometry->id, geometry) );
-	}
-}
-
 /** Represents <node> element */
 class collada_node :
     public aligned<0x10>

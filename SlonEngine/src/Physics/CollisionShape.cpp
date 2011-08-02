@@ -158,7 +158,7 @@ const char* CompoundShape::serialize(database::OArchive& ar) const
     for (size_t i = 0; i<shapes.size(); ++i)
     {
         ar.openChunk("shape");
-        ar.writeChunk("transform", shapes[i].transform.data(), shapes[i].transform.num_elements);
+        ar.writeChunk("transform", shapes[i].transform.data(), 16);
         ar.writeSerializable(shapes[i].shape.get());
         ar.closeChunk();
     }

@@ -366,7 +366,7 @@ const char* Mesh::serialize(database::OArchive& ar) const
 	ar.writeCustomSerializable( vertexLayout.get() );
 	ar.writeCustomSerializable( vertexBuffer.get() );
 	ar.writeCustomSerializable( indexBuffer.get() );
-	ar.writeChunk( "vertexSize", &vertexSize );
+    ar.writeChunk( "vertexSize", &vertexSize );
 	
 	ar.openChunk("subsets");
 	{

@@ -18,7 +18,7 @@ namespace {
                     const std::string&                                keyPrefix,
                     bool                                              ignoreDuplicates)
     {
-        typedef database::Library::storage_type<T>::type::iterator iterator;
+        typedef typename database::Library::storage_type<T>::type::iterator iterator;
         for (iterator it = container.begin(); it != container.end(); ++it)
         {
             std::string key = keyPrefix + it->first;
