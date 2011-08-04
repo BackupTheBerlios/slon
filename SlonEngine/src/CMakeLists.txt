@@ -551,6 +551,10 @@ SET ( TARGET_SCENE_SOURCES
 	Scene/Visitor.cpp
 )
 
+SET ( TARGET_SCENE_PYTHON_SOURCES
+	Scene/Python/PyNode.cpp
+)
+
 SET ( TARGET_THREAD_SOURCES
     Thread/StartStopTimer.cpp
     Thread/Utility.cpp
@@ -596,6 +600,7 @@ SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( sources\\Realm FILES                         ${TARGET_REALM_SOURCES} )
 SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
+SOURCE_GROUP( sources\\Scene\\Python FILES                 ${TARGET_SCENE_PYTHON_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -622,6 +627,7 @@ SET ( TARGET_SOURCES
     ${TARGET_REALM_SOURCES}
     ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
+    ${TARGET_SCENE_PYTHON_SOURCES}
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}
