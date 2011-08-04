@@ -5,7 +5,7 @@ import getopt
 from pyplusplus import module_builder
 
 def main():
-    opts, args = getopt.getopt(sys.argv[1:], 'I:C:')
+    opts, args = getopt.getopt(sys.argv[1:], 'I:C:F:')
 
     sourceDir = args[0]
     gccxmlPath = args[1]
@@ -16,10 +16,14 @@ def main():
             includePaths.append(p)
         elif o in ['-C', '--compiler']:
             compiler = p
-    
-    print compiler
-    mb = module_builder.module_builder_t( files = [sourceDir + '/slon/scene/Node.h'], 
+        elif o in ['-F', '--compiler-flags']:
+            flags = "--gccxml-cxxflags \"" + p.replace('\\','')[2:] + "\"";
+
+    print flags
+
+    mb = module_builder.module_builder_t( files = [sourceDir + '/slon/Scene/Node.h'], 
                                           gccxml_path = gccxmlPath,
+                                          cflags = flags,
                                           include_paths = includePaths,
                                           compiler = compiler )
 
