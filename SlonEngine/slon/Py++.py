@@ -18,7 +18,7 @@ def main():
             compiler = p
     
     print compiler
-    mb = module_builder.module_builder_t( files = [sourceDir + '/slon/scene/Node.h'], 
+    mb = module_builder.module_builder_t( files = [sourceDir + '/slon/Utility/Memory/block_allocator.hpp'], 
                                           gccxml_path = gccxmlPath,
                                           include_paths = includePaths,
                                           compiler = compiler )

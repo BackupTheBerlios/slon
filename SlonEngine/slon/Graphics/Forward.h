@@ -2,7 +2,6 @@
 #define __SLON_ENGINE_GRAPHICS_FORWARD_H__
 
 #include "../Config.h"
-#include <list>
 
 namespace sgl
 {
@@ -14,6 +13,15 @@ namespace sgl
     class TextureCube;
     class Shader;
     class Program;
+}
+
+namespace std
+{
+    template<typename T>
+    class allocator;
+
+    template<typename T, typename A = allocator<T> >
+    class list;
 }
 
 namespace boost
