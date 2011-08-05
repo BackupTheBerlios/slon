@@ -236,6 +236,14 @@ SET ( TARGET_SCENE_HEADERS
     ${TARGET_HEADER_PATH}/Scene/VisitorImpl.hpp
 )
 
+SET ( TARGET_SCRIPT_HEADERS
+    ${TARGET_HEADER_PATH}/Script/ScriptManager.h
+)
+
+SET ( TARGET_SCRIPT_DETAIL_HEADERS
+    ${TARGET_HEADER_PATH}/Script/Detail/ScriptManager.h
+)
+
 SET ( TARGET_THREAD_HEADERS
     ${TARGET_HEADER_PATH}/Thread/Lock.h
     ${TARGET_HEADER_PATH}/Thread/StartStopTimer.h
@@ -317,6 +325,8 @@ SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( headers\\Realm FILES                         ${TARGET_REALM_HEADERS} )
 SOURCE_GROUP( headers\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Scene FILES                         ${TARGET_SCENE_HEADERS} )
+SOURCE_GROUP( headers\\Script FILES                        ${TARGET_SCRIPT_HEADERS} )
+SOURCE_GROUP( headers\\Script\\Detail FILES                ${TARGET_SCRIPT_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Thread FILES                        ${TARGET_THREAD_HEADERS} )
 SOURCE_GROUP( headers\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Utility FILES                       ${TARGET_UTILITY_HEADERS} )
@@ -345,6 +355,8 @@ SET ( TARGET_HEADERS
     ${TARGET_REALM_HEADERS}
     ${TARGET_REALM_DETAIL_HEADERS}
     ${TARGET_SCENE_HEADERS}
+    ${TARGET_SCRIPT_HEADERS}
+    ${TARGET_SCRIPT_DETAIL_HEADERS}
     ${TARGET_THREAD_HEADERS}
     ${TARGET_THREAD_DETAIL_HEADERS}
     ${TARGET_UTILITY_HEADERS}
@@ -551,6 +563,13 @@ SET ( TARGET_SCENE_SOURCES
 	Scene/Visitor.cpp
 )
 
+SET ( TARGET_SCRIPT_SOURCES
+)
+
+SET ( TARGET_SCRIPT_DETAIL_SOURCES
+    Script/Detail/ScriptManager.cpp
+)
+
 SET ( TARGET_THREAD_SOURCES
     Thread/StartStopTimer.cpp
     Thread/Utility.cpp
@@ -596,6 +615,8 @@ SOURCE_GROUP( sources\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETA
 SOURCE_GROUP( sources\\Realm FILES                         ${TARGET_REALM_SOURCES} )
 SOURCE_GROUP( sources\\Realm\\Detail FILES                 ${TARGET_REALM_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Scene FILES                         ${TARGET_SCENE_SOURCES} )
+SOURCE_GROUP( sources\\Script FILES                        ${TARGET_SCRIPT_SOURCES} )
+SOURCE_GROUP( sources\\Script\\Detail FILES                ${TARGET_SCRIPT_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Thread FILES                        ${TARGET_THREAD_SOURCES} )
 SOURCE_GROUP( sources\\Thread\\Detail FILES                ${TARGET_THREAD_DETAIL_SOURCES} )
 SOURCE_GROUP( sources\\Utility FILES                       ${TARGET_UTILITY_SOURCES} )
@@ -623,6 +644,9 @@ SET ( TARGET_SOURCES
     ${TARGET_REALM_DETAIL_SOURCES}
     ${TARGET_SCENE_SOURCES}
     ${TARGET_SCENE_PYTHON_SOURCES}
+    ${TARGET_SCRIPT_SOURCES}
+    ${TARGET_SCRIPT_DETAIL_SOURCES}
+    ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_THREAD_SOURCES}
     ${TARGET_THREAD_DETAIL_SOURCES}
     ${TARGET_UTILITY_SOURCES}
@@ -684,6 +708,12 @@ IF (SLON_ENGINE_USE_BULLET)
         ${Bullet_LIBRARIES}
     )
 ENDIF (SLON_ENGINE_USE_BULLET)
+
+IF (SLON_ENGINE_USE_PYTHON)
+    TARGET_LINK_LIBRARIES ( ${TARGET_UNIX_NAME}
+        ${PYTHON_LIBRARY}
+    )
+ENDIF (SLON_ENGINE_USE_PYTHON)
 
 SET( TARGET_PUBLIC_HEADERS ${TARGET_HEADERS} )
 

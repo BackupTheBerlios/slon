@@ -1,13 +1,7 @@
-# find boost python
-FIND_PACKAGE ( Boost 1.42.0 REQUIRED COMPONENTS python)
-
 # global parameters
 INCLUDE_DIRECTORIES (
     include
 )
-
-# boost python special settings
-ADD_DEFINITIONS (-DBOOST_PYTHON_STATIC_LIB)
 
 SET ( PYBIND_SOURCES
 	stdafx.h
@@ -33,12 +27,13 @@ ADD_PRECOMPILED_HEADER( PythonBindings "stdafx.h" "stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PythonBindings PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"
-    FOLDER                    ${EXTENSIONS_PROJECT_GROUP}
+    FOLDER                   ${EXTENSIONS_PROJECT_GROUP}
+    DEBUG_POSTFIX            ""
+    OUTPUT_NAME              "slon"
+    SUFFIX                   ".pyd"
 )
 
 TARGET_LINK_LIBRARIES( PythonBindings
     ${TARGET_UNIX_NAME}
-    ${Boost_LIBRARIES}
-    ${PYTHON_LIBRARY}
 )
 
