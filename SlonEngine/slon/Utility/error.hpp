@@ -6,6 +6,11 @@
 #ifdef __GNUC__
 #   include <signal.h>
 #endif
+#ifdef WIN32
+#   define NOMINMAX
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#endif
 
 namespace slon {
 
