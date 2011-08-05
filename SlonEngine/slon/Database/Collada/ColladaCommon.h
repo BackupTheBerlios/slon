@@ -217,11 +217,6 @@ public:
 	element_set		elements;
 };
 
-class collada_geometry;
-
-template<>
-void collada_library<collada_geometry>::load(const ColladaDocument& document, const xmlpp::element& elem);
-
 template<typename value_type>
 inline void extract(const xmlpp::node& node, value_type& value)
 {

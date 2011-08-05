@@ -254,6 +254,7 @@ void collada_instance_geometry::load(const ColladaDocument& document,
     }
 }
 
+#ifndef _MSC_VER
 template<>
 void collada_library<collada_geometry>::load(const ColladaDocument& document, const xmlpp::element& elem)
 {
@@ -271,6 +272,7 @@ void collada_library<collada_geometry>::load(const ColladaDocument& document, co
         elements.insert( element_set::value_type(geometry->id, geometry) );
     }
 }
+#endif
 
 void collada_geometry::serialize( ColladaDocument&  document, 
                                   xmlpp::element&   elem, 
