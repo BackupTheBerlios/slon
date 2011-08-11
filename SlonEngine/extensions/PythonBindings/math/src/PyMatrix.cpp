@@ -35,7 +35,7 @@ struct matrix_item
             return mat[i];
         }
 
-        IndexError();
+        IndexError(i, 0, n-1);
         return mat[0];
     }
 
@@ -49,7 +49,7 @@ struct matrix_item
             mat[i] = r;
         }
 
-        IndexError();
+        IndexError(i, 0, n-1);
     }
 };
 
@@ -58,7 +58,7 @@ void exportMatrix()
     class_<Matrix4f, boost::shared_ptr<Matrix4f>, boost::noncopyable>("Matrix4f", init<>())
         .def(init<float>())
         .def(init<const Matrix4f&>())
-        .def("__getitem__", &matrix_item<float, 4, 4>::get, return_value_policy<copy_non_const_reference>())
+        .def("__getitem__", &matrix_item<float, 4, 4>::get, return_value_policy<reference_existing_object>())
         .def("__setitem__", &matrix_item<float, 4, 4>::set)
         .def(self += self)
         .def(self +  self)

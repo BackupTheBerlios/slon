@@ -2,7 +2,7 @@
 #include "PyLibrary.h"
 #include "PyDatabaseManager.h"
 
-BOOST_PYTHON_MODULE(graphics)
+BOOST_PYTHON_MODULE(database)
 {
     exportLibrary();
     exportDatabaseManager();

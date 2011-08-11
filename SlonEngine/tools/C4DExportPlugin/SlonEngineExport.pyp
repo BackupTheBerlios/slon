@@ -1,16 +1,30 @@
 import c4d
 import os
+import sys
 import time
 import datetime
+import traceback
 
 from c4d import plugins, documents, utils, gui
 from c4d.plugins import GeLoadString
 
-from slon import database
-from slon import graphics
-from slon import math
-from slon import scene
+folder = os.path.dirname(__file__)
+if folder not in sys.path:
+    sys.path.insert(0, folder)
+    sys.path.insert(0, folder+"/slon")
+   
+try:
+    from slon import database
+    from slon import graphics
+    from slon import math
+    from slon import scene
+except ImportError:
+    f = open('c:/Program Files/MAXON/CINEMA 4D R12/plugins/C4D_Plugin/output.txt', 'w')
+    f.write(traceback.format_exc())
+    f.write(sys.version)
+    print unicode(traceback.format_exc(), "utf-8")
 
+    
 #be sure to use a unique ID obtained from 'plugincafe.com'
 PLUGIN_ID = 1025282
     
@@ -34,27 +48,27 @@ def dumpVector(v):
     return "%f %f %f" % (v.x, v.y, v.z)
     
 def convertMatrix(m):
-    mat = math.Matrix()
+    mat = math.Matrix4f()
     
     mat[0][0] = m.v1.x
     mat[1][0] = m.v1.y
     mat[2][0] = m.v1.z
-    mat[4][0] = 0
+    mat[3][0] = 0
     
     mat[0][1] = m.v2.x
     mat[1][1] = m.v2.y
     mat[2][1] = m.v2.z
-    mat[2][1] = 0
+    mat[3][1] = 0
     
     mat[0][2] = m.v3.x
     mat[1][2] = m.v3.y
     mat[2][2] = m.v3.z
-    mat[2][2] = 0
+    mat[3][2] = 0
     
     mat[0][3] = m.off.x
     mat[1][3] = m.off.y
     mat[2][3] = m.off.z
-    mat[2][3] = 1
+    mat[3][3] = 1
     
     return mat
     
@@ -117,19 +131,21 @@ class SlonExporter(plugins.SceneSaverData):
         return
         
     def convertNode(self, c4dNode):
-        if not node: 
+        if not c4dNode: 
             return None
         
-        transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4Node.GetRelMl()) )
+        transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl()) )
         #if (node.GetType() == c4d.Opolygon): 
         #    self.dumpPolygonObject(nodeEl, node)
         #elif (node.GetType() == c4d.Olight): 
         #    self.dumpLightObject(nodeEl, node)
         
-        c4dChildObj = node.GetDown()
+        c4dChildObj = c4dNode.GetDown()
         while c4dChildObj != None:
-            transform.addChild( self.convertNode(nodeEl, c4dChildObj) )
+            transform.addChild( self.convertNode(c4dChildObj) )
             c4dChildObj = c4dChildObj.GetNext()
+            
+        return transform
 
     def dumpPhysics(self, node):
         if not node: return

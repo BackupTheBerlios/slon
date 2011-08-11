@@ -24,9 +24,11 @@ struct vector_item
         if (i >= 0 && i < m) {
             return mat[i];
         }
-
-        IndexError();
-        return mat[0];
+        else
+        {
+            IndexError(i, 0, m-1);
+            return mat[0];
+        }
     }
 
     static void set(matrix_type& mat, int i, const value_type& r)
@@ -38,8 +40,9 @@ struct vector_item
         if (i >= 0 && i < m) {
             mat[i] = r;
         }
-
-        IndexError();
+        else {
+            IndexError(i, 0, m-1);
+        }
     }
 };
 
