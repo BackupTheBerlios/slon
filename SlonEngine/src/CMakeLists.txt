@@ -108,6 +108,7 @@ SET ( TARGET_GRAPHICS_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/LightingMaterial.h
     ${TARGET_HEADER_PATH}/Graphics/Material.h
     ${TARGET_HEADER_PATH}/Graphics/Mesh.h
+    ${TARGET_HEADER_PATH}/Graphics/MeshConstructor.h
     ${TARGET_HEADER_PATH}/Graphics/ParameterBinding.h
     ${TARGET_HEADER_PATH}/Graphics/Pass.h
     ${TARGET_HEADER_PATH}/Graphics/PhillipsSpectrum.h
@@ -459,6 +460,7 @@ SET ( TARGET_GRAPHICS_SOURCES
     Graphics/LightingEffect.cpp
     Graphics/LightingMaterial.cpp
 	Graphics/Mesh.cpp
+	Graphics/MeshConstructor.cpp
     Graphics/PhillipsSpectrum.cpp
     Graphics/PostProcessCommon.cpp
     Graphics/ProjectedGrid.cpp

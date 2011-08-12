@@ -37,7 +37,7 @@ namespace graphics {
     class Effect;
     class Renderable;
     class Mesh;
-    class MeshData;
+    class MeshConstructor;
     class PostProcessFilter;
     class SkinnedMesh;
     class SkyBox;
@@ -63,17 +63,17 @@ namespace graphics {
     typedef boost::intrusive_ptr<Shader>        shader_ptr;
     typedef boost::intrusive_ptr<Program>       program_ptr;
 
-    typedef boost::intrusive_ptr<Effect>            effect_ptr;
-    typedef boost::intrusive_ptr<Renderable>        renderable_ptr;
-    typedef boost::intrusive_ptr<Mesh>              mesh_ptr;
-    typedef boost::intrusive_ptr<MeshData>          mesh_data_ptr;
-    typedef boost::intrusive_ptr<const MeshData>    const_mesh_data_ptr;
-    typedef boost::intrusive_ptr<SkinnedMesh>       skinned_mesh_ptr;
-    typedef boost::intrusive_ptr<const SkinnedMesh> const_skinned_mesh_ptr;
-    typedef boost::intrusive_ptr<SkyBox>            sky_box_ptr;
-    typedef boost::intrusive_ptr<const SkyBox>      const_sky_box_ptr;
-    typedef boost::intrusive_ptr<StaticMesh>        static_mesh_ptr;
-    typedef boost::intrusive_ptr<const StaticMesh>  const_static_mesh_ptr;
+    typedef boost::intrusive_ptr<Effect>                    effect_ptr;
+    typedef boost::intrusive_ptr<Renderable>                renderable_ptr;
+    typedef boost::intrusive_ptr<Mesh>                      mesh_ptr;
+    typedef boost::intrusive_ptr<MeshConstructor>           mesh_constructor_ptr;
+    typedef boost::intrusive_ptr<const MeshConstructor>     const_mesh_constructor_ptr;
+    typedef boost::intrusive_ptr<SkinnedMesh>               skinned_mesh_ptr;
+    typedef boost::intrusive_ptr<const SkinnedMesh>         const_skinned_mesh_ptr;
+    typedef boost::intrusive_ptr<SkyBox>                    sky_box_ptr;
+    typedef boost::intrusive_ptr<const SkyBox>              const_sky_box_ptr;
+    typedef boost::intrusive_ptr<StaticMesh>                static_mesh_ptr;
+    typedef boost::intrusive_ptr<const StaticMesh>          const_static_mesh_ptr;
 
     typedef boost::intrusive_ptr<PostProcessFilter>        post_process_filter_ptr;
     typedef boost::intrusive_ptr<const PostProcessFilter>  const_post_process_filter_ptr;

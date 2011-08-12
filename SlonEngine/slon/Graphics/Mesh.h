@@ -1,5 +1,5 @@
-#ifndef SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_SUBSET
-#define SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_SUBSET
+#ifndef __SLON_ENGINE_GRAPHICS_MESH_H__
+#define __SLON_ENGINE_GRAPHICS_MESH_H__
 
 #include <boost/shared_array.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -16,87 +16,6 @@
 
 namespace slon {
 namespace graphics {
-	
-/** Mesh representation convenient for storing. */
-class MeshData :
-    public Referenced
-{
-friend class Mesh;
-public:
-    static const int MAX_NUM_ATTRIBUTES = 16;
-
-    struct attribute_array
-    {
-        std::string                 name;
-        unsigned                    size;
-        unsigned                    count;
-        sgl::SCALAR_TYPE            type;
-        boost::shared_array<char>   data;
-
-        attribute_array(unsigned            _size   = 0,
-                        unsigned            _count  = 0,
-                        sgl::SCALAR_TYPE    _type   = sgl::UNKNOWN ) :
-            size(_size),
-            count(_count),
-            type(_type)
-        {}
-
-        size_t attribute_size() const
-        {
-            return size * sgl::SCALAR_TYPE_TRAITS[type].sizeInBits / 8;
-        }
-    };
-
-    struct indices_array
-    {
-        unsigned                        count;
-        boost::shared_array<unsigned>   indices;
-
-        indices_array(unsigned _count = 0) :
-            count(_count)
-        {}
-    };
-
-public:
-	/** Get attributes array by index */
-	const attribute_array& getAttributes(unsigned index) const;
-	
-	/** Get indices array by index */
-	const indices_array& getIndices(unsigned index) const;
-
-    /** Append attribute array to the vertex array.
-     * @param index - attribute index.
-     * @param size - number of attribute components.
-     * @param count - number of attributes in the array.
-     * @param type - type of the attribute component.
-     * @param data - attribute data.
-     */
-    void setAttributes( const std::string&  name,
-                        unsigned            index,
-                        unsigned            size,
-                        unsigned            count,
-                        sgl::SCALAR_TYPE    type,
-                        const void*         data );
-
-    /** Setup indices of attributes.
-     * @param attribute - attribute for indexing.
-     * @param indices - indices for attribute.
-     */
-    void setIndices( unsigned           attribute,
-                     unsigned           numIndices,
-                     const unsigned*    indices );
-
-    /** Get number of specified attributes. */
-    unsigned getcount(unsigned attribute);
-
-    /** Try convert attribute array to specified type. */
-    template<typename AttributeType>
-    const AttributeType* queryAttributeData(unsigned attribute) const;
-
-private:
-    attribute_array     attributeArrays[MAX_NUM_ATTRIBUTES];
-    indices_array       indicesArrays[MAX_NUM_ATTRIBUTES];
-};
 
 /** Mesh representation convinient for rendering */
 class Mesh :
@@ -156,8 +75,8 @@ public:
         size_t                          numAttributes;  /// Number of attributes in the mesh vertex buffer
         const attribute*                attributes;     /// Array of attributes
         sgl::IndexBuffer::INDEX_TYPE    indexType;      /// Type of the indices in the index buffer
-        sgl::VertexBuffer*              vertexBuffer;
-        sgl::IndexBuffer*               indexBuffer;
+        sgl::ref_ptr<sgl::VertexBuffer> vertexBuffer;   /// Vertex buffer storing vertices
+        sgl::ref_ptr<sgl::IndexBuffer>  indexBuffer;    /// Index buffer storing indices (can be NULL)
     };
 
     struct subset :
@@ -376,7 +295,6 @@ private:
 
 public:
     Mesh();
-	explicit Mesh(const const_mesh_data_ptr& meshData);
     explicit Mesh(const DESC& desc);
 		
 	// Override Serializable
@@ -448,13 +366,12 @@ public:
     /** Lock mesh index data. Lock fails if buffer is already locked. */
     buffer_lock lockIndexBuffer(int mask)   { return buffer_lock(new buffer_lock_impl(indexBuffer.get(), mask)); }
 
-    /** Create shallow copy of the mesh. This includes copying
-     * pointers to the IBO, VBO and cloning subsets.
+    /** Clone mesh.
+     * @param copyVBO - copy vertex buffer data (otherwise hold pointer).
+     * @param copyIBO - copy index buffer data (otherwise hold pointer).
      */
-    Mesh* shallowCopy() const;
-
-	/** Get data used to contruct mesh */
-	const MeshData* getData() const { return data.get(); }
+    mesh_ptr clone(bool copyVBO = false, 
+                   bool copyIBO = false) const;
 
 private:
     void dirtyVertexLayout();
@@ -469,10 +386,9 @@ private:
     size_t                              vertexSize;
 	subset_vector                       subsets;
     attribute_vector                    attributes;
-	const_mesh_data_ptr					data;
 };
 
 } // namespace graphics
 } // namespace slon
 
-#endif // SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_SUBSET
+#endif // __SLON_ENGINE_GRAPHICS_MESH_H__
