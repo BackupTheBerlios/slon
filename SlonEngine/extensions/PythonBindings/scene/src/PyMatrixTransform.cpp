@@ -27,5 +27,8 @@ void exportMatrixTransform()
     class_<MatrixTransform, bases<Group>, boost::intrusive_ptr<MatrixTransform>, boost::noncopyable>("MatrixTransform", init<>())
         .def("__init__", make_constructor(MatrixTransformCreate1))
         .def("__init__", make_constructor(MatrixTransformCreate2))
-        .def("__init__", make_constructor(MatrixTransformCreate3));
+        .def("__init__", make_constructor(MatrixTransformCreate3));  
+    
+    implicitly_convertible< boost::intrusive_ptr<MatrixTransform>, boost::intrusive_ptr<Group> >();
+    implicitly_convertible< boost::intrusive_ptr<MatrixTransform>, boost::intrusive_ptr<Node> >();
 }

@@ -208,10 +208,6 @@ public:
 /** Get engines database manager */
 DatabaseManager& currentDatabaseManager();
 
-/** Get current cache of the specified item */
-template<typename T>
-Cache<T>& currentCache();
-
 /** Load library, add all loaded items into corresponding cache. 
  * @param path - path to the library file.
  * @param keyPrefix - prefix for item keys to avoid duplicates.

@@ -87,8 +87,8 @@ namespace {
 		public sgl::ErrorHandler
     {
     public:
-        LogErrorHandler(const std::string& logName, bool breakOnError_)
-        :   logger( log::currentLogManager().createLogger(logName) )
+        LogErrorHandler(log::LogManager& lm, const std::string& logName, bool breakOnError_)
+        :   logger( lm.createLogger(logName) )
 		,	breakOnError(breakOnError_)
         {}
 
@@ -175,19 +175,17 @@ Engine* Engine::engineInstance = 0;
 Engine::Engine() :
     working(false)
 {
-    filesystemManager.reset(new filesystem::detail::FileSystemManager);
+    // init world
     world.reset(new realm::DefaultWorld);
-}
 
-void Engine::init()
-{
 	namespace fs = boost::filesystem;
 
 	// Init filesystem
+    filesystemManager.reset(new filesystem::detail::FileSystemManager);
     filesystemManager->mount( fs::system_complete( fs::current_path() ).file_string().c_str(), "/" );
 
     // Setup error logger
-    logErrorHandler = new LogErrorHandler("graphics.sgl", true);
+    logErrorHandler = new LogErrorHandler(logManager, "graphics.sgl", true);
     sglSetErrorHandler(logErrorHandler);
 
     // redirect loggers
@@ -205,14 +203,14 @@ void Engine::init()
             {"COLLADA", 2, {".*\\.(?i:dae)", ".*"}, new database::ColladaLoader},
             {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLLoader}
         };
-        database::detail::registerLoaders<database::Library>(numLibraryLoaders, libraryLoaders);
+        database::detail::registerLoaders<database::Library>(databaseManager, numLibraryLoaders, libraryLoaders);
 
         const size_t                    numLibrarySavers = 1;
         fmt_saver<database::Library>    librarySavers[numLibrarySavers] = 
         {
             {"SXML", 2, {".*\\.(?i:sxml)", ".*"}, new database::SXMLSaver}
         };
-        database::detail::registerSavers<database::Library>(numLibrarySavers, librarySavers);
+        database::detail::registerSavers<database::Library>(databaseManager, numLibrarySavers, librarySavers);
     
         const size_t                    numImageFormats = 11;
         fmt_loader<graphics::Texture>   imageLoaders[numImageFormats] =
@@ -229,7 +227,7 @@ void Engine::init()
             { "TGA",    2, {".*\\.(?i:tga)", ".*"},     new ImageLoader<sgl::Image::TGA>},
             { "TIF",    2, {".*\\.(?i:tiff?)", ".*"},   new ImageLoader<sgl::Image::TIF>}
         };
-        database::detail::registerLoaders<graphics::Texture>(numImageFormats, imageLoaders);
+        database::detail::registerLoaders<graphics::Texture>(databaseManager, numImageFormats, imageLoaders);
 
 #ifdef SLON_ENGINE_USE_BULLET
         const size_t                      numPhysicsSceneLoaders = 1;
@@ -237,14 +235,14 @@ void Engine::init()
         {
             {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletLoader}
         };
-        database::detail::registerLoaders<physics::PhysicsModel>(numPhysicsSceneLoaders, physicsSceneLoaders);
+        database::detail::registerLoaders<physics::PhysicsModel>(databaseManager, numPhysicsSceneLoaders, physicsSceneLoaders);
 
         const size_t                      numPhysicsSceneSavers = 1;
         fmt_saver<physics::PhysicsModel>  physicsSceneSavers[numPhysicsSceneSavers] = 
         {
             {"BULLET",  2, {".*\\.(?i:bullet)", ".*"}, new database::detail::BulletSaver}
         };
-        database::detail::registerSavers<physics::PhysicsModel>(numPhysicsSceneSavers, physicsSceneSavers);
+        database::detail::registerSavers<physics::PhysicsModel>(databaseManager, numPhysicsSceneSavers, physicsSceneSavers);
 #endif
     }
 
@@ -297,6 +295,10 @@ void Engine::init()
 #ifdef SLON_ENGINE_USE_PHYSICS
     physicsManager.setTimer( simulationTimer.get() );
 #endif
+}
+
+void Engine::init()
+{
 }
 
 void Engine::run(const DESC& desc_)

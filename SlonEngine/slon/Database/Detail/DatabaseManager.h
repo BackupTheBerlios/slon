@@ -138,10 +138,18 @@ struct fmt_loader
     loader_type*    fmtLoader;
 };
 
+template<typename T> inline database::Cache<T>&                     currentCache(database::DatabaseManager& dm);
+template<>           inline database::Cache<graphics::Effect>&      currentCache(database::DatabaseManager& dm) { return dm.getEffectCache(); }
+template<>           inline database::Cache<graphics::Texture>&     currentCache(database::DatabaseManager& dm) { return dm.getTextureCache(); }
+template<>           inline database::Cache<scene::Node>&           currentCache(database::DatabaseManager& dm) { return dm.getVisualSceneCache(); }
+#ifdef SLON_ENGINE_USE_PHYSICS
+template<>           inline database::Cache<physics::PhysicsModel>& currentCache(database::DatabaseManager& dm) { return dm.getPhysicsSceneCache(); }
+#endif
+
 template<typename T>
-inline void registerLoaders(size_t numLoaders, fmt_loader<T>* loaders)
+inline void registerLoaders(database::DatabaseManager& dm, size_t numLoaders, fmt_loader<T>* loaders)
 {
-    database::Cache<T>& cache = currentCache<T>();
+    database::Cache<T>& cache = currentCache<T>(dm);
     for (size_t i = 0; i<numLoaders; ++i)
     {
         std::vector<std::string> fmtExpr(loaders[i].fmtExpr, loaders[i].fmtExpr + loaders[i].numExpr);
@@ -152,9 +160,8 @@ inline void registerLoaders(size_t numLoaders, fmt_loader<T>* loaders)
 }
 
 template<>
-inline void registerLoaders<database::Library>(size_t numLoaders, fmt_loader<database::Library>* loaders)
+inline void registerLoaders<database::Library>(database::DatabaseManager& dm, size_t numLoaders, fmt_loader<database::Library>* loaders)
 {
-    database::DatabaseManager& dm = currentDatabaseManager();
     for (size_t i = 0; i<numLoaders; ++i)
     {
         std::vector<std::string> fmtExpr(loaders[i].fmtExpr, loaders[i].fmtExpr + loaders[i].numExpr);
@@ -178,9 +185,9 @@ struct fmt_saver
 };
 
 template<typename T>
-inline void registerSavers(size_t numSavers, fmt_saver<T>* savers)
+inline void registerSavers(database::DatabaseManager& dm, size_t numSavers, fmt_saver<T>* savers)
 {
-    database::Cache<T>& cache = currentCache<T>();
+    database::Cache<T>& cache = currentCache<T>(dm);
     for (size_t i = 0; i<numSavers; ++i)
     {
         std::vector<std::string> fmtExpr(savers[i].fmtExpr, savers[i].fmtExpr + savers[i].numExpr);
@@ -191,15 +198,14 @@ inline void registerSavers(size_t numSavers, fmt_saver<T>* savers)
 }
 
 template<>
-inline void registerSavers<database::Library>(size_t numSavers, fmt_saver<database::Library>* savers)
+inline void registerSavers<database::Library>(database::DatabaseManager& dm, size_t numSavers, fmt_saver<database::Library>* savers)
 {
-    database::DatabaseManager& manager = currentDatabaseManager();
     for (size_t i = 0; i<numSavers; ++i)
     {
         std::vector<std::string> fmtExpr(savers[i].fmtExpr, savers[i].fmtExpr + savers[i].numExpr);
         
-        format_id fmtId = manager.registerLibraryFormat(fmtExpr);
-        manager.registerLibrarySaver(fmtId, fmt_saver<database::Library>::saver_ptr(savers[i].fmtSaver));
+        format_id fmtId = dm.registerLibraryFormat(fmtExpr);
+        dm.registerLibrarySaver(fmtId, fmt_saver<database::Library>::saver_ptr(savers[i].fmtSaver));
     }
 }
 

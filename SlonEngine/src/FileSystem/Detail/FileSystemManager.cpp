@@ -78,33 +78,41 @@ filesystem::Node* FileSystemManager::getNode(const char* path)
         pathStr = workingDir->getPath() + pathStr;
     }
 
-    path_list_prefix_tree::iterator pathListIter = mountPoints.find_nearest(pathStr);
-    if ( pathListIter != mountPoints.end() )
+    boost::fs::path virtualPath(path);
+    boost::fs::path systemPath(path);
+    if ( !systemPath.is_complete() )
     {
-        for (path_list::iterator iter  = pathListIter->second.begin();
-                                 iter != pathListIter->second.end();
-                                 ++iter)
+        path_list_prefix_tree::iterator pathListIter = mountPoints.find_nearest(pathStr);
+        if ( pathListIter != mountPoints.end() )
         {
-            boost::fs::path systemPath(*iter);
-            systemPath /= pathStr;
-
-            // try to find active node
-            if ( boost::fs::exists(systemPath) )
+            for (path_list::iterator iter  = pathListIter->second.begin();
+                                     iter != pathListIter->second.end();
+                                     ++iter)
             {
-                std::string systemPathStr = systemPath.string();
-                node_prefix_tree::iterator activeIter = activeNodes.find(systemPathStr);
-                if ( activeIter != activeNodes.end() ) {
-                    return activeIter->second;
-                }
+                systemPath  = boost::fs::path(*iter);
+                systemPath /= pathStr;
 
-                // create node
-                if ( boost::fs::is_regular_file(systemPath) ) {
-                    return new NativeFile(this, systemPath, boost::fs::path(path));
-                }
-                else if ( boost::fs::is_directory(systemPath) ) {
-                    return new NativeDirectory(this, systemPath, boost::fs::path(path), true);
+                // try to find active node
+                if ( boost::fs::exists(systemPath) )
+                {
+                    node_prefix_tree::iterator activeIter = activeNodes.find(systemPath.string());
+                    if ( activeIter != activeNodes.end() ) {
+                        return activeIter->second;
+                    }
+
+                    break;
                 }
             }
+        }
+    }
+
+    if ( boost::fs::exists(systemPath) )
+    {
+        if ( boost::fs::is_regular_file(path) ) {
+            return new NativeFile(this, systemPath, virtualPath);
+        }
+        else if ( boost::fs::is_directory(path) ) {
+            return new NativeDirectory(this, systemPath, virtualPath, true);
         }
     }
 
