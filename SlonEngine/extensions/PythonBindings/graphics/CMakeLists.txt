@@ -33,7 +33,7 @@ SET_TARGET_PROPERTIES( PyGraphics PROPERTIES
     FOLDER                   ${PYTHON_BINDINGS_PROJECT_GROUP}
     DEBUG_POSTFIX            ""
     OUTPUT_NAME              "graphics"
-    PREFIX                   "slon/"
+    PREFIX                   "extensions/PythonBindings/slon/"
     SUFFIX                   ".pyd"
 )
 

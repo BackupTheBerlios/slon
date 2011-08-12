@@ -39,7 +39,7 @@ SET_TARGET_PROPERTIES( PyScene PROPERTIES
     FOLDER                   ${PYTHON_BINDINGS_PROJECT_GROUP}
     DEBUG_POSTFIX            ""
     OUTPUT_NAME              "scene"
-    PREFIX                   "slon/"
+    PREFIX                   "extensions/PythonBindings/slon/"
     SUFFIX                   ".pyd"
 )
 

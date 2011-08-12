@@ -13,17 +13,10 @@ if folder not in sys.path:
     sys.path.insert(0, folder)
     sys.path.insert(0, folder+"/slon")
    
-try:
-    from slon import database
-    from slon import graphics
-    from slon import math
-    from slon import scene
-except ImportError:
-    f = open('c:/Program Files/MAXON/CINEMA 4D R12/plugins/C4D_Plugin/output.txt', 'w')
-    f.write(traceback.format_exc())
-    f.write(sys.version)
-    print unicode(traceback.format_exc(), "utf-8")
-
+from slon import database
+from slon import graphics
+from slon import math
+from slon import scene
     
 #be sure to use a unique ID obtained from 'plugincafe.com'
 PLUGIN_ID = 1025282
@@ -50,25 +43,10 @@ def dumpVector(v):
 def convertMatrix(m):
     mat = math.Matrix4f()
     
-    mat[0][0] = m.v1.x
-    mat[1][0] = m.v1.y
-    mat[2][0] = m.v1.z
-    mat[3][0] = 0
-    
-    mat[0][1] = m.v2.x
-    mat[1][1] = m.v2.y
-    mat[2][1] = m.v2.z
-    mat[3][1] = 0
-    
-    mat[0][2] = m.v3.x
-    mat[1][2] = m.v3.y
-    mat[2][2] = m.v3.z
-    mat[3][2] = 0
-    
-    mat[0][3] = m.off.x
-    mat[1][3] = m.off.y
-    mat[2][3] = m.off.z
-    mat[3][3] = 1
+    mat[0] = math.VectorRow4f(m.v1.x, m.v2.x, m.v3.x, m.off.x)
+    mat[1] = math.VectorRow4f(m.v1.y, m.v2.y, m.v3.y, m.off.y)
+    mat[2] = math.VectorRow4f(m.v1.z, m.v2.z, m.v3.z, m.off.z)
+    mat[3] = math.VectorRow4f(     0,      0,      0,       1)
     
     return mat
     
@@ -162,7 +140,7 @@ class SlonExporter(plugins.SceneSaverData):
         self.dumpPhysics(node.GetDown())
         self.dumpPhysics(node.GetNext())
 
-    def writeToFile(self, name, root):
+    def writeToFile(self, name):
         database.saveLibrary(name, self.library)
         return c4d.FILEERROR_NONE
         
@@ -175,7 +153,7 @@ class SlonExporter(plugins.SceneSaverData):
         #self.dumpPhysics(doc.GetFirstObject())
         self.library.visualScenes["root"] = root
         
-        return self.writeToFile(name)
+        return self.writeToFile(fileName)
 
 if __name__=='__main__':
-    plugins.RegisterSceneSaverPlugin(id=PLUGIN_ID, str="SLON exporter (*.xml)", info=0, g=SlonExporter, description="", suffix="xml")
+    plugins.RegisterSceneSaverPlugin(id=PLUGIN_ID, str="SLON exporter (*.sxml)", info=0, g=SlonExporter, description="", suffix="sxml")

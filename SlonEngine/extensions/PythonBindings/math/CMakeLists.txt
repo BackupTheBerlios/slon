@@ -35,7 +35,7 @@ SET_TARGET_PROPERTIES( PyMath PROPERTIES
     FOLDER                   ${PYTHON_BINDINGS_PROJECT_GROUP}
     DEBUG_POSTFIX            ""
     OUTPUT_NAME              "math"
-    PREFIX                   "slon/"
+    PREFIX                   "extensions/PythonBindings/slon/"
     SUFFIX                   ".pyd"
 )
 

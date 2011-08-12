@@ -23,6 +23,9 @@ ENDIF (SLON_ENGINE_BUILD_TESTS)
 # extensions
 ADD_SUBDIRECTORY (extensions)
 
+# tools
+ADD_SUBDIRECTORY (tools)
+
 IF (INSTALL_EXAMPLES)
     INSTALL ( DIRECTORY Data
         DESTINATION     ${INSTALL_BINDIR}/examples
