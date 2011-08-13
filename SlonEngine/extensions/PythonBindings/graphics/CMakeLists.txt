@@ -8,11 +8,15 @@ SET ( SOURCES
 )
 
 SET ( GRAPHICS_HEADERS
+	include/PyGraphicsManager.h
 	include/PyMesh.h
+	include/PySGL.h
 )
 
 SET ( GRAPHICS_SOURCES
+	src/PyGraphicsManager.cpp
 	src/PyMesh.cpp
+	src/PySGL.cpp
     src/Export.cpp
 )
 

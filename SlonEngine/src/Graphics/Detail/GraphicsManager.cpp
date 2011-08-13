@@ -195,7 +195,7 @@ void GraphicsManager::setRenderingSurface(Surface& surface)
     }
 }
 
-const Surface& GraphicsManager::resolveRenderingSurface()
+const Surface& GraphicsManager::getCurrentRenderingSurface()
 {
 #ifdef _WIN32
     surface.hWnd = GetForegroundWindow();

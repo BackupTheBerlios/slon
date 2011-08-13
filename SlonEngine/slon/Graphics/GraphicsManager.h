@@ -96,12 +96,12 @@ public:
      */
     virtual void setRenderingSurface(Surface& surface) = 0;
 
-    /** Get rendering surface from current thread. Call this funtion, when you updated rendering
+    /** Get rendering surface from current thread. Use this function, if you created(updated) rendering
      * surface manually.
      */
-    virtual const Surface& resolveRenderingSurface() = 0;
+    virtual const Surface& getCurrentRenderingSurface() = 0;
 
-    /** Get current rendering surface. */
+    /** Get graphics manager rendering surface. */
     virtual const Surface& getRenderingSurface() const = 0;
 
     /** Get sgl device for rendering */
