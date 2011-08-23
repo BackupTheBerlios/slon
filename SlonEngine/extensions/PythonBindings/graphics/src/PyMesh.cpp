@@ -50,6 +50,10 @@ void exportMesh()
     }
 
     // StaticMesh
-    class_<StaticMesh, bases<scene::Node>, boost::intrusive_ptr<StaticMesh>, boost::noncopyable>("StaticMesh", init<>())
-        .def(init<const mesh_ptr&>());
+    {
+        class_<StaticMesh, bases<scene::Node>, boost::intrusive_ptr<StaticMesh>, boost::noncopyable>("StaticMesh", init<>())
+            .def(init<const mesh_ptr&>());
+
+        implicitly_convertible< boost::intrusive_ptr<StaticMesh>, boost::intrusive_ptr<scene::Node> >();
+    }
 }

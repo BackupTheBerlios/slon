@@ -95,10 +95,6 @@ namespace {
         // Override error handler
 	    void HandleError(SGL_HRESULT result, const char* msg)
 	    {
-			if (breakOnError) {
-				debug_break();
-			}
-
 		    switch(result)
 		    {
 		    case SGLERR_INVALID_CALL:
@@ -121,6 +117,10 @@ namespace {
 			    (*logger) << log::S_ERROR << "Unknown error: " << msg << std::endl;
 			    break;
 		    }
+
+			if (breakOnError) {
+				debug_break();
+			}
 	    }
 
     private:

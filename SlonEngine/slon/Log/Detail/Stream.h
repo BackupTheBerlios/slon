@@ -64,6 +64,14 @@ public:
 			++s; --n;
 		}
 
+    #if defined(_DEBUG) && defined(MSVC)
+        if (written > 0)
+        {
+            std::string msg(s, written);
+            OutputDebugStringA(msg.c_str());
+        }
+    #endif
+
 		return written;
 	}
 	

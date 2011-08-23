@@ -1,9 +1,9 @@
 import c4d
+import datetime
 import os
+import struct
 import sys
 import time
-import datetime
-import traceback
 
 from c4d import plugins, documents, utils, gui
 from c4d.plugins import GeLoadString
@@ -12,11 +12,12 @@ folder = os.path.dirname(__file__)
 if folder not in sys.path:
     sys.path.insert(0, folder)
     sys.path.insert(0, folder+"/slon")
-   
-from slon import database
-from slon import graphics
+
+import slon
 from slon import math
 from slon import scene
+from slon import graphics
+from slon import database
     
 #be sure to use a unique ID obtained from 'plugincafe.com'
 PLUGIN_ID = 1025282
@@ -101,9 +102,36 @@ class SlonExporter(plugins.SceneSaverData):
         subsetEl = etree.SubElement(meshEl, "subsets")
         etree.SubElement(subsetEl, "indexed_subset", primitiveType="TRIANGLES", startIndex="0", numIndices=str(len(indices)), effect=effectName)
         
-    def dumpPolygonObject(self, parentEl, polygonObj):
-        polyEl = etree.SubElement(parentEl, "StaticMesh")
-        self.dumpMesh(polyEl, polygonObj)
+    def convertPolygonObject(self, c4dPolygonObj):
+        meshConstructor = graphics.MeshConstructor()
+        
+        # gather points
+        points = c4dPolygonObj.GetAllPoints()
+        pointsArr = slon.Vector3fArray()
+        for point in points:
+            pointsArr.append( math.Vector3f(point.x, point.y, point.z) )
+        
+        if (len(pointsArr) == 0):
+            return None
+        meshConstructor.setAttributes("position", 0, pointsArr)
+        
+        # gather polygons
+        polygons = c4dPolygonObj.GetAllPolygons()
+        polygonsArr = slon.UIntArray()
+        indexCount = 0
+        for poly in polygons:
+            if hasattr(poly, "d"):
+                polygonsArr.extend( [poly.a, poly.b, poly.c, poly.a, poly.c, poly.d] )
+            else:
+                polygonsArr.extend( [poly.a, poly.b, poly.c] )
+        
+        if (len(polygonsArr) == 0):
+            return None
+        meshConstructor.setIndices(0, polygonsArr)
+        
+        # construct mesh
+        mesh = meshConstructor.createMesh()
+        return graphics.StaticMesh(mesh)
         
     def dumpLightObject(self, parentEl, node):
         return
@@ -113,8 +141,10 @@ class SlonExporter(plugins.SceneSaverData):
             return None
         
         transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl()) )
-        #if (node.GetType() == c4d.Opolygon): 
-        #    self.dumpPolygonObject(nodeEl, node)
+        if (c4dNode.GetType() == c4d.Opolygon):
+            polyObj = self.convertPolygonObject(c4dNode)
+            if (polyObj != None):
+                transform.addChild(polyObj)
         #elif (node.GetType() == c4d.Olight): 
         #    self.dumpLightObject(nodeEl, node)
         
@@ -145,6 +175,10 @@ class SlonExporter(plugins.SceneSaverData):
         return c4d.FILEERROR_NONE
         
     def Save(self, c4dNode, fileName, c4dDocument, filterflags):
+        # init graphics
+        graphics.setVideoMode(640, 480, 32, False, False, 0)
+        
+        # do save
         root = scene.Group()
         c4dObj = c4dDocument.GetFirstObject()
         while c4dObj != None:
