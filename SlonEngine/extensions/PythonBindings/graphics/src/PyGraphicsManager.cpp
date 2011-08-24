@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Engine.h"
 #include "PyGraphicsManager.h"
 #include "Graphics/GraphicsManager.h"
 #include <boost/python.hpp>
@@ -18,7 +19,13 @@ void setVideoMode( unsigned     width,
     currentGraphicsManager().initRenderer( FFPRendererDesc() );
 }
 
+void closeWindow()
+{
+    slon::Engine::Free();
+}
+
 void exportGraphicsManager()
 {
     def("setVideoMode", setVideoMode);
+    def("closeWindow", closeWindow);
 }

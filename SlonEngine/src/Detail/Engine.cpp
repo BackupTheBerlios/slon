@@ -365,7 +365,6 @@ void Engine::run(const DESC& desc_)
     threadManager.joinThread(thread::SIMULATION_THREAD);
 
     sglSetErrorHandler(0);
-    SDL_Quit();
 }
 
 
@@ -401,6 +400,7 @@ void Engine::frame()
 
 Engine::~Engine()
 {
+    SDL_Quit();
 	sglSetErrorHandler(0);
 	delete logErrorHandler;
 }
