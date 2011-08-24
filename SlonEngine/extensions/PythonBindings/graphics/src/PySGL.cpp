@@ -21,4 +21,16 @@ void exportSGL()
         .value("UINT",    UINT)
         .value("FLOAT",   FLOAT)
         .value("DOUBLE",  DOUBLE);
+
+    enum_<PRIMITIVE_TYPE>("PRIMITIVE_TYPE")
+        .value("POINTS",            POINTS)
+        .value("LINES",             LINES)
+        .value("LINE_STRIP",        LINE_STRIP)
+        .value("LINE_LOOP",         LINE_LOOP)
+        .value("TRIANGLES",         TRIANGLES)
+        .value("TRIANGLE_STRIP",    TRIANGLE_STRIP)
+        .value("TRIANGLE_FAN",      TRIANGLE_FAN)
+        .value("QUADS",             QUADS)
+        .value("QUAD_STRIP",        QUAD_STRIP)
+        .value("POLYGON",           POLYGON);
 }

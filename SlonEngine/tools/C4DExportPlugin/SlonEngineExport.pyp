@@ -38,8 +38,8 @@ def indent(elem, level=0):
             elem.tail = i
     return
     
-def dumpVector(v):
-    return "%f %f %f" % (v.x, v.y, v.z)
+def convertVector3(v):
+    return math.Vector3f(v.x, v.y, v.z)
     
 def convertMatrix(m):
     mat = math.Matrix4f()
@@ -129,8 +129,19 @@ class SlonExporter(plugins.SceneSaverData):
             return None
         meshConstructor.setIndices(0, polygonsArr)
         
+        # create material
+        textureTag = c4dPolygonObj.GetTag(c4d.Ttexture)
+        if (textureTag == None):
+            return None
+        
+        material = textureTag.GetMaterial()
+        diffuse = convertVector3(material.GetAverageColor(c4d.CHANNEL_COLOR))
+        shininess = material.GetAverageColor(c4d.CHANNEL_SPECULAR).x
+        effect = graphics.createLightingEffect(diffuse, shininess)
+        
         # construct mesh
         mesh = meshConstructor.createMesh()
+        mesh.addIndexedSubset(effect, graphics.PRIMITIVE_TYPE.TRIANGLES, 0, len(polygonsArr))
         return graphics.StaticMesh(mesh)
         
     def dumpLightObject(self, parentEl, node):

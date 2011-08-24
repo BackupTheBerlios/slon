@@ -8,12 +8,14 @@ SET ( SOURCES
 )
 
 SET ( GRAPHICS_HEADERS
+	include/PyEffect.h
 	include/PyGraphicsManager.h
 	include/PyMesh.h
 	include/PySGL.h
 )
 
 SET ( GRAPHICS_SOURCES
+	src/PyEffect.cpp
 	src/PyGraphicsManager.cpp
 	src/PyMesh.cpp
 	src/PySGL.cpp

@@ -44,9 +44,13 @@ void exportMesh()
 
     // Mesh
     {
-        scope classScope = class_<Mesh, boost::intrusive_ptr<Mesh>, boost::noncopyable>("Mesh", init<const Mesh::DESC&>());
+        scope classScope = class_<Mesh, boost::intrusive_ptr<Mesh>, boost::noncopyable>("Mesh", init<const Mesh::DESC&>())
+            .def("addIndexedSubset", &Mesh::addIndexedSubset, return_value_policy<reference_existing_object>())
+            .def("addPlainSubset", &Mesh::addPlainSubset, return_value_policy<reference_existing_object>());
         
         class_<Mesh::DESC>("DESC", init<>());
+        class_<Mesh::indexed_subset>("indexed_subset", no_init);
+        class_<Mesh::plain_subset>("plain_subset", no_init);
     }
 
     // StaticMesh

@@ -43,6 +43,14 @@ void StaticMesh::deserialize(database::IArchive& ar)
 {
 	Node::deserialize(ar);
 	mesh = static_cast<Mesh*>( ar.readSerializable() );
+
+    // bind parameters
+    for (Mesh::subset_iterator iter  = mesh->firstSubset();
+                               iter != mesh->endSubset();
+                               ++iter)
+    {
+        (*iter)->getEffect()->bindParameter( hash_string("worldMatrix"), new parameter_binding<math::Matrix4f>(&worldMatrix, 1, true) );
+    }
 }
 
 // Override node

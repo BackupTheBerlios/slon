@@ -108,7 +108,7 @@ const char* Mesh::serialize(database::OArchive& ar) const
 			if ( indexed_subset* s = dynamic_cast<indexed_subset*>(subsets[i].get()) ) 
 			{
 				ar.openChunk( "indexed_subset" );
-				//ar.writeSerializable( s->effect.get() );
+				ar.writeSerializable( s->effect.get() );
 				ar.writeChunk( "primitiveType", reinterpret_cast<const int*>(&s->primitiveType) );
 				ar.writeChunk( "startIndex", &s->startIndex );
 				ar.writeChunk( "numIndices", &s->numIndices );
@@ -117,7 +117,7 @@ const char* Mesh::serialize(database::OArchive& ar) const
 			else if ( plain_subset* s = dynamic_cast<plain_subset*>(subsets[i].get()) ) 
 			{
 				ar.openChunk( "plain_subset" );
-				//ar.writeSerializable( s->effect.get() );
+				ar.writeSerializable( s->effect.get() );
 				ar.writeChunk( "primitiveType", reinterpret_cast<const int*>(&s->primitiveType) );
 				ar.writeChunk( "startVertex", &s->startVertex );
 				ar.writeChunk( "numVertices", &s->numVertices );
@@ -152,7 +152,7 @@ void Mesh::deserialize(database::IArchive& ar)
 			if ( ar.openChunk("indexed_subset", info) )
 			{
 				indexed_subset_ptr subset( new indexed_subset(this) );
-				//subset->effect = ar.readSerializable();
+				subset->effect = ar.readSerializable<Effect>();
 				ar.readChunk("primitiveType", reinterpret_cast<int*>(&subset->primitiveType));
 				ar.readChunk("startIndex", &subset->startIndex);
 				ar.readChunk("numIndices", &subset->numIndices);
@@ -162,7 +162,7 @@ void Mesh::deserialize(database::IArchive& ar)
 			else if ( ar.openChunk("plain_subset", info) ) 
 			{
 				plain_subset_ptr subset( new plain_subset(this) );
-				//subset->effect = ar.readSerializable();
+				subset->effect = ar.readSerializable<Effect>();
 				ar.readChunk("primitiveType", reinterpret_cast<int*>(&subset->primitiveType));
 				ar.readChunk("startVertex", &subset->startVertex);
 				ar.readChunk("numVertices", &subset->numVertices);

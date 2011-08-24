@@ -5,6 +5,8 @@
 #include "Detail/Engine.h"
 #include "FileSystem/File.h"
 #include "Graphics/Common.h"
+#include "Graphics/LightingEffect.h"
+#include "Graphics/StaticMesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Physics/CollisionShape.h"
 #include "Physics/Constraint.h"
@@ -276,13 +278,17 @@ Engine::Engine() :
         }
 #endif
         // realm
-        databaseManager.registerSerializableCreateFunc("BVHLocation",       createSerializable<realm::BVHLocation>);
-        databaseManager.registerSerializableCreateFunc("BVHLocationNode",   createSerializable<realm::BVHLocationNode>);
+        databaseManager.registerSerializableCreateFunc("BVHLocation",           createSerializable<realm::BVHLocation>);
+        databaseManager.registerSerializableCreateFunc("BVHLocationNode",       createSerializable<realm::BVHLocationNode>);
 
         // sgl
-		databaseManager.registerSerializableCreateFunc("VertexLayout",      createSerializableWrapper<sgl::VertexLayout>);
-		databaseManager.registerSerializableCreateFunc("VertexBuffer",      createSerializableWrapper<sgl::VertexBuffer>);
-		databaseManager.registerSerializableCreateFunc("IndexBuffer",       createSerializableWrapper<sgl::IndexBuffer>);
+		databaseManager.registerSerializableCreateFunc("VertexLayout",          createSerializableWrapper<sgl::VertexLayout>);
+		databaseManager.registerSerializableCreateFunc("VertexBuffer",          createSerializableWrapper<sgl::VertexBuffer>);
+		databaseManager.registerSerializableCreateFunc("IndexBuffer",           createSerializableWrapper<sgl::IndexBuffer>);
+        
+        // graphics
+		databaseManager.registerSerializableCreateFunc("LightingMaterial",      createSerializable<graphics::LightingMaterial>);
+		databaseManager.registerSerializableCreateFunc("LightingEffect",        createSerializable<graphics::LightingEffect>);
 	}
 
     // init SDL

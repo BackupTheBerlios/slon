@@ -21,9 +21,14 @@ public:
     typedef TransformEffect base_type;
 
 public:
+    LightingEffect();
     LightingEffect(const LightingMaterial*          material,
                    LightingMaterial::dirty_signal&  dirtySignal);
     ~LightingEffect();
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
 
     // Override Effect
     int                               present(render_group_handle renderGroup, render_pass_handle renderPass, Pass** passes);
