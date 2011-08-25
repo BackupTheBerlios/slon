@@ -1,5 +1,6 @@
 #define _DEBUG_NEW_REDEFINE_NEW 0
 #include <boost/bind.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <sgl/State.h>
 #include <sgl/Font.h>

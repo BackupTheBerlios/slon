@@ -11,6 +11,10 @@
 namespace slon {
 namespace physics {
 
+#ifdef SLON_ENGINE_USE_BULLET
+    class BulletConstraint;
+#endif
+
 /** Generic 6DOF constraint. Implementation will choose most
  * suitable constraint for every case.
  */

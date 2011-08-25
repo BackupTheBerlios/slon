@@ -1,16 +1,22 @@
+# find packages
 SET (Boost_USE_MULTITHREADED  ON)
 SET (Boost_USE_STATIC_RUNTIME OFF)
 IF (WIN32)
     SET (Boost_USE_STATIC_LIBS ON)
+    FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS signals thread system filesystem iostreams unit_test_framework )
+    SET (Boost_USE_STATIC_LIBS OFF)
+    FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS python )
 ELSE (WIN32)
     SET (Boost_USE_STATIC_LIBS OFF)
+    FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS signals thread system filesystem iostreams unit_test_framework python )
 ENDIF (WIN32)
 
-# find packages
-FIND_PACKAGE ( Boost 1.42.0 	REQUIRED	COMPONENTS signals thread system filesystem iostreams)
 FIND_PACKAGE ( SDL              REQUIRED )
 FIND_PACKAGE ( Doxygen )
 FIND_PACKAGE ( Bullet  )
+FIND_PACKAGE ( PythonInterp  )
+FIND_PACKAGE ( PythonLibs  )
+FIND_PACKAGE ( GCCXML  )
 
 IF (NOT XMLPP_CONFIGURE_INTRUSIVE)
 	FIND_PACKAGE ( XML++        REQUIRED )

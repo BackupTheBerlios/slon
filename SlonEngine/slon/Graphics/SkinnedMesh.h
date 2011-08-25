@@ -3,7 +3,7 @@
 
 #include <sgl/Math/Containers.hpp>
 #include "../Scene/Entity.h"
-#include "Mesh.h"
+#include "GPUSideMesh.h"
 
 namespace slon {
 
@@ -42,7 +42,7 @@ public:
 public:
     struct DESC
     {
-        graphics::Mesh* mesh;
+        graphics::GPUSideMesh* mesh;
         const unsigned* jointCountArray;
         const int*      jointArray;
         const float*    weightArray;
@@ -87,21 +87,21 @@ public:
 	virtual void SetShadowReceiver(bool toggle) { shadowReceiver = toggle; }
 
 	/** Get mesh holding geometry */
-	const Mesh* getMesh() const { return mesh.get(); }
+	const GPUSideMesh* getMesh() const { return mesh.get(); }
 
 private:
 	// geometry
-	mesh_ptr            mesh;
+	gpu_side_mesh_ptr            mesh;
     scene::skeleton_ptr skeleton;
     joint_vector        joints;
 	bool				cpuSkinning;
 
     // helpers for animation
-    Mesh::attribute_const_iterator    positionIter;
-    Mesh::attribute_const_iterator    normalIter;
-    Mesh::attribute_const_iterator    tangentIter;
-    Mesh::attribute_const_iterator    boneIndexIter;
-    Mesh::attribute_const_iterator    boneWeightIter;
+    GPUSideMesh::attribute_const_iterator    positionIter;
+    GPUSideMesh::attribute_const_iterator    normalIter;
+    GPUSideMesh::attribute_const_iterator    tangentIter;
+    GPUSideMesh::attribute_const_iterator    boneIndexIter;
+    GPUSideMesh::attribute_const_iterator    boneWeightIter;
 
     math::vector_of_matrix4f    boneMatrices;
     math::vector_of_vector4f    boneRotations;

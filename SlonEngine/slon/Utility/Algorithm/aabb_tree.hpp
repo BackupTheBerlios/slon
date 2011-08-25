@@ -416,7 +416,7 @@ typename aabb_tree<LeafData, RealType>::iterator aabb_tree<LeafData, RealType>::
 }
 
 template<typename LeafData, typename RealType>
-typename aabb_tree<LeafData, RealType>::iterator aabb_tree<LeafData, RealType>::insert(volume_node& parent, const aabb_type& volume, const LeafData& leafData, bool asLeft = false)
+typename aabb_tree<LeafData, RealType>::iterator aabb_tree<LeafData, RealType>::insert(volume_node& parent, const aabb_type& volume, const LeafData& leafData, bool asLeft)
 {
     assert( parent.is_internal() );
 

@@ -1,7 +1,7 @@
 #ifndef __SLON_ENGINE_DATABASE_PROPRIETARY_SXML_ARCHIVE_H__
 #define __SLON_ENGINE_DATABASE_PROPRIETARY_SXML_ARCHIVE_H__
 
-#include "../../Filesystem/Forward.h"
+#include "../../FileSystem/Forward.h"
 #include "../Archive.h"
 #include <xml++/document.h>
 #include <xml++/element.h>

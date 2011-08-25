@@ -147,7 +147,8 @@ class function :
     public function_base<Signature>
 {
 private:
-    template<typename Signature>
+    typedef function_base<Signature> base_type;
+
     struct no_destructor
     {
         void operator () (slot<Signature>* /*s*/) {}
@@ -159,9 +160,9 @@ private:
         virtual ~holder() {}
     };
 
-    template<typename Signature, typename SlotDestructor>
+    template<typename SlotDestructor>
     class ptr_holder :
-        public object_in_pool<ptr_holder<Signature, SlotDestructor>, holder>
+        public object_in_pool<ptr_holder<SlotDestructor>, holder>
     {
     public:
         ptr_holder( slot<Signature>* s_,
@@ -198,21 +199,21 @@ private:
 public:
     function()
     {
-        slt = 0;
+        base_type::slt = 0;
     }
 
     function(slot<Signature>* slt_)
     {
-        slt = slt_;
-        hld.reset( new holder<Signature, no_destructor<Signature> >(slt_) );
+        base_type::slt = slt_;
+        hld.reset( new ptr_holder<no_destructor>(slt_) );
     }
 
     template<typename SlotDestructor>
     function(slot<Signature>* slt_,
              SlotDestructor   destr)
     {
-        slt = slt_;
-        hld.reset( new holder<Signature, SlotDestructor>(slt_, destr) );
+        base_type::slt = slt_;
+        hld.reset( new ptr_holder<SlotDestructor>(slt_, destr) );
     }
 
     template<typename SlotFunctor>
@@ -220,11 +221,11 @@ public:
              typename boost::is_base_of<slot<Signature>, SlotFunctor>::type* tag = 0)
     {
         boost::shared_ptr<stack_holder<SlotFunctor> > sHld( new stack_holder<SlotFunctor>(slt_) );
-        slt = sHld->s;
+        base_type::slt = sHld->s;
         hld = sHld;
     }
 
-    slot<Signature>* get_slot() { return slt; }
+    slot<Signature>* get_slot() { return base_type::slt; }
 
 private:
     boost::shared_ptr<holder> hld;

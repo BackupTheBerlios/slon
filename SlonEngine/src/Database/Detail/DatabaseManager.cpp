@@ -18,7 +18,7 @@ namespace {
                     const std::string&                                keyPrefix,
                     bool                                              ignoreDuplicates)
     {
-        typedef database::Library::storage_type<T>::type::iterator iterator;
+        typedef typename database::Library::storage_type<T>::type::iterator iterator;
         for (iterator it = container.begin(); it != container.end(); ++it)
         {
             std::string key = keyPrefix + it->first;
@@ -170,13 +170,6 @@ DatabaseManager& currentDatabaseManager()
 { 
     return Engine::Instance()->getDatabaseManager(); 
 }
-
-template<> Cache<graphics::Effect>&         currentCache() { return currentDatabaseManager().getEffectCache(); }
-template<> Cache<graphics::Texture>&        currentCache() { return currentDatabaseManager().getTextureCache(); }
-template<> Cache<scene::Node>&              currentCache() { return currentDatabaseManager().getVisualSceneCache(); }
-#ifdef SLON_ENGINE_USE_PHYSICS
-template<> Cache<physics::PhysicsModel>&    currentCache() { return currentDatabaseManager().getPhysicsSceneCache(); }
-#endif
 
 library_ptr loadLibrary(const std::string& path,
                         const std::string& keyPrefix,

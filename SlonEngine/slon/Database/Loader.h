@@ -4,7 +4,7 @@
 #include <istream>
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
-#include "../Filesystem/Forward.h"
+#include "../FileSystem/Forward.h"
 #include "Forward.h"
 
 namespace slon {

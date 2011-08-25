@@ -6,6 +6,9 @@
 namespace slon {
 namespace physics {
 
+// forward
+class BulletRotationalVelocityMotor;
+
 /** The motor controlled by velocity. Usually underlying physics engine trying
  * to solve multi-rigid-body simulation problem, keeping the provided velocity constraints,
  * using LCP solver or some similar staff.

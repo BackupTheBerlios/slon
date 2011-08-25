@@ -2,8 +2,7 @@
 #define SLON_ENGINE_GRAPHICS_RENDERABLE_MESH_H
 
 #include "../Scene/Entity.h"
-#include "Forward.h"
-#include "Mesh.h"
+#include "GPUSideMesh.h"
 
 namespace slon {
 namespace graphics {
@@ -17,7 +16,7 @@ public:
 
 public:
 	StaticMesh();
-    StaticMesh(const mesh_ptr& mesh);
+    StaticMesh(const gpu_side_mesh_ptr& mesh);
     ~StaticMesh();
 
 	// Override Serializable
@@ -45,11 +44,11 @@ public:
 	virtual void SetShadowReceiver(bool toggle) { shadowReceiver = toggle; }
 
 	/** Get geometry of the mesh */
-	virtual const Mesh* getMesh() const { return mesh.get(); }
+	virtual const GPUSideMesh* getMesh() const { return mesh.get(); }
 
 private:
 	// geometry
-	mesh_ptr mesh;
+	gpu_side_mesh_ptr mesh;
 
     // spatial
     mutable math::Matrix4f worldMatrix;
