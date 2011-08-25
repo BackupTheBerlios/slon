@@ -2,12 +2,12 @@
 #include "Database/Archive.h"
 #include "Database/Detail/SGLSerialization.h"
 #include "Graphics/Common.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/GPUSideMesh.h"
 #include "Graphics/Renderer.h"
 #include "Utility/error.hpp"
 #include "Utility/math.hpp"
 
-DECLARE_AUTO_LOGGER("graphics.Mesh")
+DECLARE_AUTO_LOGGER("graphics.GPUSideMesh")
 
 namespace 
 {
@@ -29,7 +29,7 @@ namespace
 namespace slon {
 namespace graphics {
 
-Mesh::buffer_lock_impl::buffer_lock_impl(sgl::Buffer* buffer_,
+GPUSideMesh::buffer_lock_impl::buffer_lock_impl(sgl::Buffer* buffer_,
                                          const int    mask) :
     buffer(buffer_)
 {
@@ -39,12 +39,12 @@ Mesh::buffer_lock_impl::buffer_lock_impl(sgl::Buffer* buffer_,
     }
 }
 
-Mesh::buffer_lock_impl::~buffer_lock_impl()
+GPUSideMesh::buffer_lock_impl::~buffer_lock_impl()
 {
     buffer->Unmap();
 }
 
-Mesh::plain_subset* Mesh::addPlainSubset( Effect*             effect,
+GPUSideMesh::plain_subset* GPUSideMesh::addPlainSubset( Effect*             effect,
                                           sgl::PRIMITIVE_TYPE primitiveType,
                                           unsigned            startVertex,
                                           unsigned            numVertices )
@@ -54,7 +54,7 @@ Mesh::plain_subset* Mesh::addPlainSubset( Effect*             effect,
     return subset;
 }
 
-Mesh::indexed_subset* Mesh::addIndexedSubset( Effect*             effect,
+GPUSideMesh::indexed_subset* GPUSideMesh::addIndexedSubset( Effect*             effect,
                                               sgl::PRIMITIVE_TYPE primitiveType,
                                               unsigned            startIndex,
                                               unsigned            numIndices )
@@ -64,24 +64,24 @@ Mesh::indexed_subset* Mesh::addIndexedSubset( Effect*             effect,
     return subset;
 }
 
-void Mesh::plain_subset::render() const
+void GPUSideMesh::plain_subset::render() const
 {
     mesh->vertexBuffer->Bind( mesh->vertexLayout.get() );
     currentDevice()->Draw(primitiveType, startVertex, numVertices);
 }
 
-void Mesh::indexed_subset::render() const
+void GPUSideMesh::indexed_subset::render() const
 {
     mesh->vertexBuffer->Bind( mesh->vertexLayout.get() );
     mesh->indexBuffer->Bind( mesh->indexType );
     currentDevice()->DrawIndexed(primitiveType, startIndex, numIndices);
 }
 
-Mesh::Mesh()
+GPUSideMesh::GPUSideMesh()
 {
 }
 
-Mesh::Mesh(const DESC& desc) :
+GPUSideMesh::GPUSideMesh(const DESC& desc) :
     aabb(desc.aabb),
     indexType(desc.indexType),
     vertexBuffer(desc.vertexBuffer),
@@ -92,11 +92,10 @@ Mesh::Mesh(const DESC& desc) :
     dirtyVertexLayout();
 }
 
-const char* Mesh::serialize(database::OArchive& ar) const
+const char* GPUSideMesh::serialize(database::OArchive& ar) const
 {
 	database::serialize( ar, "aabb", aabb );
 	ar.writeChunk( "indexType", reinterpret_cast<const int*>(&indexType) );
-	ar.writeCustomSerializable( vertexLayout.get() );
 	ar.writeCustomSerializable( vertexBuffer.get() );
 	ar.writeCustomSerializable( indexBuffer.get() );
     ar.writeChunk( "vertexSize", &vertexSize );
@@ -130,16 +129,30 @@ const char* Mesh::serialize(database::OArchive& ar) const
 	}
 	ar.closeChunk();
 
+    ar.openChunk("attributes");
+    {
+		for (size_t i = 0; i<attributes.size(); ++i)
+		{
+            ar.openChunk("attribute");
+            ar.writeStringChunk("name", attributes[i].binding->name.c_str(), attributes[i].binding->name.str().length() );
+            ar.writeChunk("size", &attributes[i].size);
+            ar.writeChunk("offset", &attributes[i].offset);
+            ar.writeChunk("semantic", (int*)&attributes[i].semantic);
+            ar.writeChunk("type", (int*)&attributes[i].type);
+            ar.closeChunk();
+        }
+    }
+    ar.closeChunk();
+
     return "Mesh";
 }
 
-void Mesh::deserialize(database::IArchive& ar)
+void GPUSideMesh::deserialize(database::IArchive& ar)
 {
 	using namespace database;
 
     database::deserialize( ar, "aabb", aabb );
 	ar.readChunk( "indexType", reinterpret_cast<int*>(&indexType) );
-    vertexLayout.reset( ar.readCustomSerializable<sgl::VertexLayout>() );
 	vertexBuffer.reset( ar.readCustomSerializable<sgl::VertexBuffer>() );
 	indexBuffer.reset( ar.readCustomSerializable<sgl::IndexBuffer>() );
 	ar.readChunk( "vertexSize", &vertexSize );
@@ -176,9 +189,31 @@ void Mesh::deserialize(database::IArchive& ar)
 	
 		ar.closeChunk();
 	}
+
+	if ( ar.openChunk("attributes", info) )
+    {
+        std::string bindingName;
+        attribute   attr;
+		while ( ar.openChunk("attribute", info) )
+		{
+            ar.readStringChunk("name", bindingName);
+            ar.readChunk("size", &attr.size);
+            ar.readChunk("offset", &attr.offset);
+            ar.readChunk("semantic", (int*)&attr.semantic);
+            ar.readChunk("type", (int*)&attr.type);
+            ar.closeChunk();
+
+            attr.binding = detail::currentAttributeTable().queryAttribute(bindingName);
+            attributes.push_back(attr);
+        }
+
+		ar.closeChunk();
+    }
+
+    dirtyVertexLayout();
 }
 
-void Mesh::dirtyVertexLayout()
+void GPUSideMesh::dirtyVertexLayout()
 {
     // generate vertex layout
     std::vector<sgl::VertexLayout::ELEMENT> elements;
@@ -199,8 +234,8 @@ void Mesh::dirtyVertexLayout()
     vertexLayout.reset( currentDevice()->CreateVertexLayout(elements.size(), &elements[0]) );
 }
 
-mesh_ptr Mesh::clone(bool copyVBO, 
-                     bool copyIBO) const
+gpu_side_mesh_ptr GPUSideMesh::clone(bool copyVBO, 
+                                     bool copyIBO) const
 {
     DESC desc;
     desc.aabb           = aabb;
@@ -225,7 +260,7 @@ mesh_ptr Mesh::clone(bool copyVBO,
         desc.vertexBuffer = vertexBuffer;
     }
 
-    mesh_ptr copy(new Mesh(desc));
+    gpu_side_mesh_ptr copy(new GPUSideMesh(desc));
     for (size_t i = 0; i<subsets.size(); ++i)
     {
         if ( const plain_subset* subset = dynamic_cast<const plain_subset*>(subsets[i].get()) )

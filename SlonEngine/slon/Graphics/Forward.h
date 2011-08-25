@@ -36,8 +36,9 @@ namespace graphics {
     // forward types
     class Effect;
     class Renderable;
-    class Mesh;
-    class MeshConstructor;
+    class GPUSideMesh;
+    class CPUSideMesh;
+    class CPUSideTriangleMesh;
     class PostProcessFilter;
     class SkinnedMesh;
     class SkyBox;
@@ -65,9 +66,12 @@ namespace graphics {
 
     typedef boost::intrusive_ptr<Effect>                    effect_ptr;
     typedef boost::intrusive_ptr<Renderable>                renderable_ptr;
-    typedef boost::intrusive_ptr<Mesh>                      mesh_ptr;
-    typedef boost::intrusive_ptr<MeshConstructor>           mesh_constructor_ptr;
-    typedef boost::intrusive_ptr<const MeshConstructor>     const_mesh_constructor_ptr;
+    typedef boost::intrusive_ptr<GPUSideMesh>               gpu_side_mesh_ptr;
+    typedef boost::intrusive_ptr<const GPUSideMesh>         const_gpu_side_mesh_ptr;
+    typedef boost::intrusive_ptr<CPUSideMesh>               cpu_side_mesh_ptr;
+    typedef boost::intrusive_ptr<const CPUSideMesh>         const_cpu_side_mesh_ptr;
+    typedef boost::intrusive_ptr<CPUSideTriangleMesh>       cpu_side_triangle_mesh_ptr;
+    typedef boost::intrusive_ptr<const CPUSideTriangleMesh> const_cpu_side_triangle_mesh_ptr;
     typedef boost::intrusive_ptr<SkinnedMesh>               skinned_mesh_ptr;
     typedef boost::intrusive_ptr<const SkinnedMesh>         const_skinned_mesh_ptr;
     typedef boost::intrusive_ptr<SkyBox>                    sky_box_ptr;

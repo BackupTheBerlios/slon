@@ -258,7 +258,7 @@ Engine::Engine() :
 		databaseManager.registerSerializableCreateFunc("MatrixTransform",       createSerializable<scene::MatrixTransform>);
 		databaseManager.registerSerializableCreateFunc("PhysicsTransform",      createSerializable<physics::PhysicsTransform>);
 		databaseManager.registerSerializableCreateFunc("StaticMesh",            createSerializable<graphics::StaticMesh>);
-		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::Mesh>);
+		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::GPUSideMesh>);
 
         // physics
 #ifdef SLON_ENGINE_USE_BULLET

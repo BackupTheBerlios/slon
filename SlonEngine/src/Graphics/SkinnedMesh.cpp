@@ -171,7 +171,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 
     // bind parameters
 	const_binding_mat4x4f_ptr worldMatrixBinder( new parameter_binding<math::Matrix4f>(&worldMatrix, true) );
-    for (Mesh::subset_iterator iter  = mesh->firstSubset();
+    for (GPUSideMesh::subset_iterator iter  = mesh->firstSubset();
                                iter != mesh->endSubset();
                                ++iter)
     {
@@ -186,7 +186,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 		{
 			// toggle to CPU skinning
 			cpuSkinning = true;
-			for (Mesh::subset_iterator j  = mesh->firstSubset();
+			for (GPUSideMesh::subset_iterator j  = mesh->firstSubset();
 									   j != iter;
 									   ++j)
 			{
@@ -208,23 +208,23 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 		tangentIter    = mesh->endAttribute();
 		boneIndexIter  = mesh->endAttribute();
 		boneWeightIter = mesh->endAttribute();
-		for (Mesh::attribute_const_iterator iter  = mesh->firstAttribute();
+		for (GPUSideMesh::attribute_const_iterator iter  = mesh->firstAttribute();
 											iter != mesh->endAttribute();
 											++iter)
 		{
-			if ( iter->semantic == Mesh::POSITION ) {
+			if ( iter->semantic == GPUSideMesh::POSITION ) {
 				positionIter = iter;
 			}
-			else if ( iter->semantic == Mesh::NORMAL ) {
+			else if ( iter->semantic == GPUSideMesh::NORMAL ) {
 				normalIter = iter;
 			}
-			else if ( iter->semantic == Mesh::TANGENT ) {
+			else if ( iter->semantic == GPUSideMesh::TANGENT ) {
 				tangentIter = iter;
 			}
-			else if ( iter->semantic == Mesh::BONE_INDEX ) {
+			else if ( iter->semantic == GPUSideMesh::BONE_INDEX ) {
 				boneIndexIter = iter;
 			}
-			else if ( iter->semantic == Mesh::BONE_WEIGHT ) {
+			else if ( iter->semantic == GPUSideMesh::BONE_WEIGHT ) {
 				boneWeightIter = iter;
 			}
 		}
@@ -239,7 +239,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 			throw slon_error(AUTO_LOGGER, "Skinned mesh bone_weight and bone_index attributes have different sizes.");
 		}
 
-		Mesh::buffer_lock lock = mesh->lockVertexBuffer(Mesh::LOCK_READ);
+		GPUSideMesh::buffer_lock lock = mesh->lockVertexBuffer(GPUSideMesh::LOCK_READ);
 		{
 			// query positions
 			if ( positionIter != mesh->endAttribute() )
@@ -250,7 +250,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 					{
 						if (positionIter->size == 3)
 						{
-							Mesh::vec3f_accessor positionAccessor(mesh.get(), positionIter, lock);
+							GPUSideMesh::vec3f_accessor positionAccessor(mesh.get(), positionIter, lock);
 							positions.resize( mesh->getNumVertices() );
 							for (size_t i = 0; i<positions.size(); ++i) {
 								positions[i] = math::make_vec(positionAccessor[i], 1.0f);
@@ -258,7 +258,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 						}
 						else if (positionIter->size == 4)
 						{
-							Mesh::vec4f_accessor positionAccessor(mesh.get(), positionIter, lock);
+							GPUSideMesh::vec4f_accessor positionAccessor(mesh.get(), positionIter, lock);
 							positions.resize( mesh->getNumVertices() );
 							std::copy( positionAccessor.begin(), positionAccessor.end(), positions.begin() );
 						}
@@ -284,7 +284,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 					{
 						if (normalIter->size == 3)
 						{
-							Mesh::vec3f_accessor normalAccessor(mesh.get(), normalIter, lock);
+							GPUSideMesh::vec3f_accessor normalAccessor(mesh.get(), normalIter, lock);
 							normals.resize( mesh->getNumVertices() );
 							std::copy( normalAccessor.begin(), normalAccessor.end(), normals.begin() );
 						}
@@ -310,7 +310,7 @@ SkinnedMesh::SkinnedMesh(const DESC& desc)
 					{
 						if (tangentIter->size == 3)
 						{
-							Mesh::vec3f_accessor tangentAccessor(mesh.get(), tangentIter, lock);
+							GPUSideMesh::vec3f_accessor tangentAccessor(mesh.get(), tangentIter, lock);
 							normals.resize( mesh->getNumVertices() );
 							std::copy( tangentAccessor.begin(), tangentAccessor.end(), tangents.begin() );
 						}
@@ -492,7 +492,7 @@ void SkinnedMesh::setSkeleton(scene::Skeleton* skeleton_)
             const_binding_vec4f_ptr     boneRotationsBinder;
             const_binding_vec3f_ptr     boneTranslationsBinder;
 
-			for (Mesh::subset_iterator iter  = mesh->firstSubset();
+			for (GPUSideMesh::subset_iterator iter  = mesh->firstSubset();
 									   iter != mesh->endSubset();
 									   ++iter)
 			{
@@ -569,13 +569,13 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
     // perform CPU skinning
 	if (cpuSkinning)
     {
-        Mesh::buffer_lock lock = mesh->lockVertexBuffer(Mesh::LOCK_WRITE);
+        GPUSideMesh::buffer_lock lock = mesh->lockVertexBuffer(GPUSideMesh::LOCK_WRITE);
 
         if ( positionIter != mesh->endAttribute() )
         {
             if (positionIter->size == 4)
             {
-                Mesh::vec4f_accessor positionAccessor(mesh.get(), positionIter, lock);
+                GPUSideMesh::vec4f_accessor positionAccessor(mesh.get(), positionIter, lock);
                 transform_attributes4f( positions,
                                         weightCount,
                                         weights,
@@ -585,7 +585,7 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
             }
             else 
             {
-                Mesh::vec3f_accessor positionAccessor(mesh.get(), positionIter, lock);
+                GPUSideMesh::vec3f_accessor positionAccessor(mesh.get(), positionIter, lock);
                 transform_attributes3f( positions,
                                         weightCount,
                                         weights,
@@ -597,7 +597,7 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
 
         if ( normalIter != mesh->endAttribute() )
         {
-            Mesh::vec3f_accessor normalAccessor(mesh.get(), normalIter, lock);
+            GPUSideMesh::vec3f_accessor normalAccessor(mesh.get(), normalIter, lock);
             transform_attributes3f( normals,
                                     weightCount,
                                     weights,
@@ -608,7 +608,7 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
 
         if ( tangentIter != mesh->endAttribute() )
         {
-            Mesh::vec3f_accessor tangentAccessor(mesh.get(), tangentIter, lock);
+            GPUSideMesh::vec3f_accessor tangentAccessor(mesh.get(), tangentIter, lock);
             transform_attributes3f( tangents,
                                     weightCount,
                                     weights,
@@ -618,7 +618,7 @@ void SkinnedMesh::accept(scene::CullVisitor& visitor) const
         }
     }
 
-    for( Mesh::subset_const_iterator subsetIter  = mesh->firstSubset();
+    for( GPUSideMesh::subset_const_iterator subsetIter  = mesh->firstSubset();
                                      subsetIter != mesh->endSubset();
                                      ++subsetIter )
     {

@@ -12,7 +12,7 @@ StaticMesh::StaticMesh()
 {
 }
 
-StaticMesh::StaticMesh(const mesh_ptr& _mesh) :
+StaticMesh::StaticMesh(const gpu_side_mesh_ptr& _mesh) :
 	mesh(_mesh),
 	shadowCaster(true),
 	shadowReceiver(true)
@@ -20,7 +20,7 @@ StaticMesh::StaticMesh(const mesh_ptr& _mesh) :
     assert(mesh);
 
     // bind parameters
-    for (Mesh::subset_iterator iter  = mesh->firstSubset();
+    for (GPUSideMesh::subset_iterator iter  = mesh->firstSubset();
                                iter != mesh->endSubset();
                                ++iter)
     {
@@ -42,10 +42,10 @@ const char* StaticMesh::serialize(database::OArchive& ar) const
 void StaticMesh::deserialize(database::IArchive& ar)
 {
 	Node::deserialize(ar);
-	mesh = static_cast<Mesh*>( ar.readSerializable() );
+	mesh = static_cast<GPUSideMesh*>( ar.readSerializable() );
 
     // bind parameters
-    for (Mesh::subset_iterator iter  = mesh->firstSubset();
+    for (GPUSideMesh::subset_iterator iter  = mesh->firstSubset();
                                iter != mesh->endSubset();
                                ++iter)
     {
@@ -56,7 +56,7 @@ void StaticMesh::deserialize(database::IArchive& ar)
 // Override node
 void StaticMesh::accept(scene::CullVisitor& visitor) const
 {
-    for( Mesh::subset_const_iterator subsetIter  = mesh->firstSubset();
+    for( GPUSideMesh::subset_const_iterator subsetIter  = mesh->firstSubset();
                                      subsetIter != mesh->endSubset();
                                      ++subsetIter )
     {

@@ -90,6 +90,8 @@ SET ( TARGET_FILESYSTEM_DETAIL_HEADERS
 )
 
 SET ( TARGET_GRAPHICS_HEADERS
+    ${TARGET_HEADER_PATH}/Graphics/CPUSideMesh.h
+    ${TARGET_HEADER_PATH}/Graphics/CPUSideTriangleMesh.h
     ${TARGET_HEADER_PATH}/Graphics/Common.h
     ${TARGET_HEADER_PATH}/Graphics/DebugDrawCommon.h
     ${TARGET_HEADER_PATH}/Graphics/DebugDrawSkinned.h
@@ -103,12 +105,11 @@ SET ( TARGET_GRAPHICS_HEADERS
     ${TARGET_HEADER_PATH}/Graphics/Forward.h  
     ${TARGET_HEADER_PATH}/Graphics/ForwardRenderer.h
     ${TARGET_HEADER_PATH}/Graphics/FrequencySpectrum.h
+    ${TARGET_HEADER_PATH}/Graphics/GPUSideMesh.h
     ${TARGET_HEADER_PATH}/Graphics/GraphicsManager.h
     ${TARGET_HEADER_PATH}/Graphics/LightingEffect.h
     ${TARGET_HEADER_PATH}/Graphics/LightingMaterial.h
     ${TARGET_HEADER_PATH}/Graphics/Material.h
-    ${TARGET_HEADER_PATH}/Graphics/Mesh.h
-    ${TARGET_HEADER_PATH}/Graphics/MeshConstructor.h
     ${TARGET_HEADER_PATH}/Graphics/ParameterBinding.h
     ${TARGET_HEADER_PATH}/Graphics/Pass.h
     ${TARGET_HEADER_PATH}/Graphics/PhillipsSpectrum.h
@@ -447,6 +448,8 @@ SET ( TARGET_INPUT_DETAIL_SOURCES
 )
 
 SET ( TARGET_GRAPHICS_SOURCES
+	Graphics/CPUSideMesh.cpp
+	Graphics/CPUSideTriangleMesh.cpp
     Graphics/Common.cpp
     Graphics/DebugDrawCommon.cpp
     Graphics/DebugDrawSkinned.cpp
@@ -457,10 +460,9 @@ SET ( TARGET_GRAPHICS_SOURCES
     Graphics/FixedPipelineRenderer.cpp
     Graphics/FogFilter.cpp
     Graphics/ForwardRenderer.cpp
+	Graphics/GPUSideMesh.cpp
     Graphics/LightingEffect.cpp
     Graphics/LightingMaterial.cpp
-	Graphics/Mesh.cpp
-	Graphics/MeshConstructor.cpp
     Graphics/PhillipsSpectrum.cpp
     Graphics/PostProcessCommon.cpp
     Graphics/ProjectedGrid.cpp

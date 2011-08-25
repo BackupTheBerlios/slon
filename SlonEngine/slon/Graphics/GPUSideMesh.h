@@ -1,5 +1,5 @@
-#ifndef __SLON_ENGINE_GRAPHICS_MESH_H__
-#define __SLON_ENGINE_GRAPHICS_MESH_H__
+#ifndef __SLON_ENGINE_GRAPHICS_GPU_SIDE_MESH_H__
+#define __SLON_ENGINE_GRAPHICS_GPU_SIDE_MESH_H__
 
 #include <boost/shared_array.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -17,8 +17,8 @@
 namespace slon {
 namespace graphics {
 
-/** Mesh representation convinient for rendering */
-class Mesh :
+/** Mesh representation convenient for rendering */
+class GPUSideMesh :
     public Referenced,
 	public database::Serializable
 {
@@ -83,13 +83,13 @@ public:
         public Referenced,
         public Renderable
     {
-    friend class Mesh;
+    friend class GPUSideMesh;
     protected:
-	    subset(Mesh* _mesh) :
+	    subset(GPUSideMesh* _mesh) :
             mesh(_mesh)
         {}
 
-	    subset( Mesh*   _mesh,
+	    subset( GPUSideMesh*   _mesh,
 			    Effect* _effect) :
             mesh(_mesh),
             effect(_effect)
@@ -102,7 +102,7 @@ public:
         Effect* getEffect() const { return effect.get(); }
 
     public:
-        Mesh*       mesh;
+        GPUSideMesh*       mesh;
         effect_ptr  effect;
     };
 
@@ -115,13 +115,13 @@ public:
     struct plain_subset :
         public subset
     {
-    friend class Mesh;
+    friend class GPUSideMesh;
     private:
-        plain_subset( Mesh* mesh )
+        plain_subset( GPUSideMesh* mesh )
         :   subset(mesh)
         {}
 
-	    plain_subset( Mesh*                 mesh,
+	    plain_subset( GPUSideMesh*                 mesh,
 				      Effect*               effect,
                       sgl::PRIMITIVE_TYPE   _primitiveType,
                       unsigned              _startVertex,
@@ -145,13 +145,13 @@ public:
     struct indexed_subset :
         public subset
     {
-    friend class Mesh;
+    friend class GPUSideMesh;
     private:
-        indexed_subset( Mesh* mesh )
+        indexed_subset( GPUSideMesh* mesh )
         :   subset(mesh)
         {}
 
-	    indexed_subset( Mesh*               mesh,
+	    indexed_subset( GPUSideMesh*               mesh,
 				        Effect*             effect,
                         sgl::PRIMITIVE_TYPE _primitiveType,
                         unsigned            _startIndex,
@@ -228,7 +228,7 @@ public:
         typedef iterator_impl<const T>  const_iterator;
 
     public:
-        accessor( Mesh*                     mesh_, 
+        accessor( GPUSideMesh*                     mesh_, 
                   attribute_const_iterator  attr,
                   const buffer_lock&        lock_ ) :
             mesh(mesh_),
@@ -238,7 +238,7 @@ public:
             stride = mesh->getVertexSize();
         }
 
-        accessor( Mesh*                 mesh_, 
+        accessor( GPUSideMesh*                 mesh_, 
                   const buffer_lock&    lock_ ) :
             mesh(mesh_),
             lock(lock_),
@@ -259,7 +259,7 @@ public:
         size_t          size() const    { return mesh->getNumVertices(); }
 
     private:
-        Mesh*       mesh;
+        GPUSideMesh*       mesh;
         buffer_lock lock;
         size_t      stride;
         size_t      offset;
@@ -290,12 +290,12 @@ public:
 
 private:
     // noncopyable
-    Mesh(const Mesh&);
-    Mesh& operator = (const Mesh&);
+    GPUSideMesh(const GPUSideMesh&);
+    GPUSideMesh& operator = (const GPUSideMesh&);
 
 public:
-    Mesh();
-    explicit Mesh(const DESC& desc);
+    GPUSideMesh();
+    explicit GPUSideMesh(const DESC& desc);
 		
 	// Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -324,7 +324,7 @@ public:
                                       unsigned            numIndices );
 
     /** Remove subset from the mesh.
-     * @return true if mesh succesfully removed.
+     * @return true if mesh successfully removed.
      */
     bool removeSubset(subset* meshSubset);
 
@@ -370,8 +370,8 @@ public:
      * @param copyVBO - copy vertex buffer data (otherwise hold pointer).
      * @param copyIBO - copy index buffer data (otherwise hold pointer).
      */
-    mesh_ptr clone(bool copyVBO = false, 
-                   bool copyIBO = false) const;
+    gpu_side_mesh_ptr clone(bool copyVBO = false, 
+                            bool copyIBO = false) const;
 
 private:
     void dirtyVertexLayout();
@@ -391,4 +391,4 @@ private:
 } // namespace graphics
 } // namespace slon
 
-#endif // __SLON_ENGINE_GRAPHICS_MESH_H__
+#endif // __SLON_ENGINE_GRAPHICS_GPU_SIDE_MESH_H__

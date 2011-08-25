@@ -1,6 +1,7 @@
 import c4d
 import datetime
 import os
+import math as pmath
 import struct
 import sys
 import time
@@ -103,7 +104,7 @@ class SlonExporter(plugins.SceneSaverData):
         etree.SubElement(subsetEl, "indexed_subset", primitiveType="TRIANGLES", startIndex="0", numIndices=str(len(indices)), effect=effectName)
         
     def convertPolygonObject(self, c4dPolygonObj):
-        meshConstructor = graphics.MeshConstructor()
+        cpuSideMesh = graphics.CPUSideTriangleMesh()
         
         # gather points
         points = c4dPolygonObj.GetAllPoints()
@@ -113,8 +114,8 @@ class SlonExporter(plugins.SceneSaverData):
         
         if (len(pointsArr) == 0):
             return None
-        meshConstructor.setAttributes("position", 0, pointsArr)
-        
+        cpuSideMesh.setAttributes("position", 0, pointsArr)
+                
         # gather polygons
         polygons = c4dPolygonObj.GetAllPolygons()
         polygonsArr = slon.UIntArray()
@@ -127,8 +128,27 @@ class SlonExporter(plugins.SceneSaverData):
         
         if (len(polygonsArr) == 0):
             return None
-        meshConstructor.setIndices(0, polygonsArr)
+        cpuSideMesh.setIndices(0, polygonsArr)
         
+        # gather normals
+        normalTag = c4dPolygonObj.GetTag(c4d.Tnormal)
+        if (normalTag != None):
+            print "abacaba"
+            normalsArr = slon.Vector3fArray()
+            normalsInds = slon.UIntArray()
+            normalData = normalTag.GetAllHighlevelData()
+            for i in range(0, GetDataCount() - 1):
+                rawNormal = normalData[i]
+                normalsArr.append( math.Vector3f(rawNormal.x / 32000.0, rawNormal.y / 32000.0, rawNormal.z / 32000.0) )
+                normalsInds.append(i)
+                
+            if (len(normalsArr) > 0):
+                cpuSideMesh.setAttributes("normal", 1, normalsArr)
+                cpuSideMesh.setIndices(1, normalsInds)
+        else:
+            cpuSideMesh.generateSmoothingGroups(pmath.pi / 4, True, True)
+            cpuSideMesh.generatePhongNormals()
+            
         # create material
         textureTag = c4dPolygonObj.GetTag(c4d.Ttexture)
         if (textureTag == None):
@@ -140,9 +160,9 @@ class SlonExporter(plugins.SceneSaverData):
         effect = graphics.createLightingEffect(diffuse, shininess)
         
         # construct mesh
-        mesh = meshConstructor.createMesh()
-        mesh.addIndexedSubset(effect, graphics.PRIMITIVE_TYPE.TRIANGLES, 0, len(polygonsArr))
-        return graphics.StaticMesh(mesh)
+        gpuSideMesh = cpuSideMesh.createGPUSideMesh()
+        gpuSideMesh.addIndexedSubset(effect, graphics.PRIMITIVE_TYPE.TRIANGLES, 0, len(polygonsArr))
+        return graphics.StaticMesh(gpuSideMesh)
         
     def dumpLightObject(self, parentEl, node):
         return
@@ -198,7 +218,9 @@ class SlonExporter(plugins.SceneSaverData):
         #self.dumpPhysics(doc.GetFirstObject())
         self.library.visualScenes["root"] = root
         
-        return self.writeToFile(fileName)
-
+        result = self.writeToFile(fileName)
+        graphics.closeWindow()
+        return result
+        
 if __name__=='__main__':
     plugins.RegisterSceneSaverPlugin(id=PLUGIN_ID, str="SLON exporter (*.sxml)", info=0, g=SlonExporter, description="", suffix="sxml")

@@ -1,18 +1,19 @@
 #include "stdafx.h"
 #include "Graphics/Common.h"
 #include "Graphics/Detail/AttributeTable.h"
-#include "Graphics/MeshConstructor.h"
+#include "Graphics/CPUSideMesh.h"
+#include "Graphics/GPUSideMesh.h"
 #include "Log/Logger.h"
 #include "Utility/math.hpp"
 
-DECLARE_AUTO_LOGGER("graphics.MeshConstructor")
+DECLARE_AUTO_LOGGER("graphics.CPUSideMesh")
 
 namespace slon {
 namespace graphics {
 
 #define QUERY_ATTRIBUTE_DATA(Type, SglType, Size)\
 template<>\
-const Type* MeshConstructor::queryAttributeData<Type>(unsigned attribute) const\
+const Type* CPUSideMesh::queryAttributeData<Type>(unsigned attribute) const\
 {\
     assert(attribute < MAX_NUM_ATTRIBUTES);\
     if (attributeArrays[attribute].count > 0\
@@ -41,25 +42,49 @@ QUERY_ATTRIBUTE_DATA(math::Vector2d,    sgl::DOUBLE,    4)
 */
 #undef QUERY_ATTRIBUTE_DATA
 
-unsigned MeshConstructor::getAttributeCount(unsigned attribute)
+unsigned CPUSideMesh::getAttributeCount(unsigned attribute)
 {
     assert(attribute < MAX_NUM_ATTRIBUTES);
     return attributeArrays[attribute].count;
 }
 
-const MeshConstructor::attribute_array& MeshConstructor::getAttributes(unsigned index) const
+const CPUSideMesh::attribute_array& CPUSideMesh::getAttributes(unsigned index) const
 {
     assert(index < MAX_NUM_ATTRIBUTES);
 	return attributeArrays[index];
 }
 
-const MeshConstructor::indices_array& MeshConstructor::getIndices(unsigned index) const
+const CPUSideMesh::indices_array& CPUSideMesh::getIndices(unsigned index) const
 {
     assert(index < MAX_NUM_ATTRIBUTES);
 	return indicesArrays[index];
 }
 
-void MeshConstructor::setAttributes( const std::string&  name,
+int CPUSideMesh::getAttributeIndex(const std::string& name) const
+{
+    for (int i = 0; i < MAX_NUM_ATTRIBUTES; ++i)
+    {
+        if (attributeArrays[i].name == name) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+int CPUSideMesh::getFreeAttributeIndex() const
+{
+    for (int i = 0; i < MAX_NUM_ATTRIBUTES; ++i)
+    {
+        if (attributeArrays[i].count == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void CPUSideMesh::setAttributes( const std::string&  name,
                                      unsigned            index,
                                      unsigned            size,
                                      unsigned            count,
@@ -83,7 +108,7 @@ void MeshConstructor::setAttributes( const std::string&  name,
     attributeArrays[index].count = count;
 }
 
-void MeshConstructor::setIndices( unsigned           attribute,
+void CPUSideMesh::setIndices( unsigned           attribute,
                                   unsigned           count,
                                   const unsigned*    indices )
 {
@@ -95,9 +120,9 @@ void MeshConstructor::setIndices( unsigned           attribute,
     std::copy( indices, indices + count, indicesArrays[attribute].indices.get() );
 }
 
-mesh_ptr MeshConstructor::createMesh() const
+gpu_side_mesh_ptr CPUSideMesh::createGPUSideMesh() const
 {
-    Mesh::DESC desc;
+    GPUSideMesh::DESC desc;
 	assert(attributeArrays[0].count > 0 && "constructor should have zero(position) attribute");
 
     // calculate size of the buffer
@@ -231,28 +256,28 @@ mesh_ptr MeshConstructor::createMesh() const
     }
 
     // list attributes
-    std::vector<Mesh::attribute> attributes;
+    std::vector<GPUSideMesh::attribute> attributes;
     {
         size_t offset = 0;
         for (int i = 0; i<MAX_NUM_ATTRIBUTES; ++i)
         {
             if (attributeArrays[i].count > 0)
             {
-                Mesh::attribute attribute;
+                GPUSideMesh::attribute attribute;
                 {
                     attribute.binding   = detail::currentAttributeTable().queryAttribute( hash_string(attributeArrays[i].name) );
                     attribute.size      = attributeArrays[i].size;
                     attribute.type      = attributeArrays[i].type;
                     attribute.offset    = offset;
 
-                    if (attributeArrays[i].name == "position")          attribute.semantic = Mesh::POSITION;
-                    else if (attributeArrays[i].name == "normal")       attribute.semantic = Mesh::NORMAL;
-                    else if (attributeArrays[i].name == "tangent")      attribute.semantic = Mesh::TANGENT;
-                    else if (attributeArrays[i].name == "color")        attribute.semantic = Mesh::COLOR;
-                    else if (attributeArrays[i].name == "texcoord")     attribute.semantic = Mesh::TEXCOORD;
-                    else if (attributeArrays[i].name == "bone_index")   attribute.semantic = Mesh::BONE_INDEX;
-                    else if (attributeArrays[i].name == "bone_weight")  attribute.semantic = Mesh::BONE_WEIGHT;
-                    else attribute.semantic = Mesh::ATTRIBUTE;
+                    if (attributeArrays[i].name == "position")          attribute.semantic = GPUSideMesh::POSITION;
+                    else if (attributeArrays[i].name == "normal")       attribute.semantic = GPUSideMesh::NORMAL;
+                    else if (attributeArrays[i].name == "tangent")      attribute.semantic = GPUSideMesh::TANGENT;
+                    else if (attributeArrays[i].name == "color")        attribute.semantic = GPUSideMesh::COLOR;
+                    else if (attributeArrays[i].name == "texcoord")     attribute.semantic = GPUSideMesh::TEXCOORD;
+                    else if (attributeArrays[i].name == "bone_index")   attribute.semantic = GPUSideMesh::BONE_INDEX;
+                    else if (attributeArrays[i].name == "bone_weight")  attribute.semantic = GPUSideMesh::BONE_WEIGHT;
+                    else attribute.semantic = GPUSideMesh::ATTRIBUTE;
                 }
                 attributes.push_back(attribute);
 
@@ -263,7 +288,7 @@ mesh_ptr MeshConstructor::createMesh() const
     desc.numAttributes = attributes.size();
     desc.attributes    = &attributes[0];
 
-    return mesh_ptr( new Mesh(desc) );
+    return gpu_side_mesh_ptr( new GPUSideMesh(desc) );
 }
 
 

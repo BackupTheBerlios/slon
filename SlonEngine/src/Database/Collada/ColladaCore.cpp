@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "Database/DatabaseManager.h"
 #include "Database/Collada/Collada.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/CPUSideMesh.h"
+#include "Graphics/GPUSideMesh.h"
 #include "Utility/URI/file_uri.hpp"
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
@@ -57,32 +58,32 @@ void collada_input::serialize( ColladaDocument&     document,
 
         if ( semantic == "POSITION" ) 
         {
-            attributeIndex = graphics::Mesh::POSITION;
+            attributeIndex = graphics::GPUSideMesh::POSITION;
             attributeName  = "position";
         }
         else if ( semantic == "NORMAL" ) 
         {
-            attributeIndex = graphics::Mesh::NORMAL;
+            attributeIndex = graphics::GPUSideMesh::NORMAL;
             attributeName  = "normal";
         }
         else if ( semantic == "TEXCOORD" ) 
         {
-            attributeIndex = graphics::Mesh::TEXCOORD + set;
+            attributeIndex = graphics::GPUSideMesh::TEXCOORD + set;
             attributeName  = "texcoord";
         }
         else if ( semantic == "COLOR" )
         {
-            attributeIndex = graphics::Mesh::COLOR;
+            attributeIndex = graphics::GPUSideMesh::COLOR;
             attributeName  = "color";
         }
         else if ( semantic == "JOINT" )
         {
-            attributeIndex = graphics::Mesh::BONE_INDEX;
+            attributeIndex = graphics::GPUSideMesh::BONE_INDEX;
             attributeName  = "joint";
         }
         else if ( semantic == "WEIGHT" )
         {
-            attributeIndex = graphics::Mesh::BONE_WEIGHT;
+            attributeIndex = graphics::GPUSideMesh::BONE_WEIGHT;
             attributeName  = "weight";
         }
         else

@@ -1,7 +1,8 @@
 #ifndef __SLON_ENGINE_GRAPHICS_MESH_CONSTRUCTOR_H__
 #define __SLON_ENGINE_GRAPHICS_MESH_CONSTRUCTOR_H__
 
-#include "Mesh.h"
+#include "Forward.h"
+#include "../Utility/referenced.hpp"
 #include <boost/scoped_array.hpp>
 #include <sgl/Types.h>
 #include <string>
@@ -9,8 +10,13 @@
 namespace slon {
 namespace graphics {
 	
-/** Helper class for constructing meshes. */
-class MeshConstructor :
+/** CPU side mesh. Knows nothing about topology and semantic of the attributes,
+ * except that zero attribute should be position attribute and attribute names
+ * have to be specified in order to provide necessary binding information for
+ * constructing GPUSideMesh. For processing algorithms see CPUSideTriangleMesh. 
+ * @see GPUSideMesh, CPUSideTriangleMesh
+ */
+class CPUSideMesh :
     public Referenced
 {
 public:
@@ -37,6 +43,8 @@ public:
         {
             return size * sgl::SCALAR_TYPE_TRAITS[type].sizeInBits / 8;
         }
+
+        bool empty() { return count == 0; }
     };
 
     /// Array of the indices for attributes
@@ -48,6 +56,8 @@ public:
         indices_array(unsigned _count = 0) :
             count(_count)
         {}
+
+        bool empty() { return count == 0; }
     };
 
 public:
@@ -57,6 +67,16 @@ public:
 	/** Get indices array by index */
 	const indices_array& getIndices(unsigned index) const;
 
+    /** Get index for named attribute. 
+     * @return index of the attribute with specified name if it exist and -1 otherwise.
+     */
+    int getAttributeIndex(const std::string& name) const;
+
+    /** Get first free attribute slot.
+     * @return index of the free slot or -1 if all slots are occupied.
+     */
+    int getFreeAttributeIndex() const;
+
     /** Append attribute array to the vertex array.
      * @param index - attribute index.
      * @param size - number of attribute components.
@@ -64,20 +84,20 @@ public:
      * @param type - type of the attribute component.
      * @param data - attribute data.
      */
-    void setAttributes( const std::string&  name,
-                        unsigned            index,
-                        unsigned            size,
-                        unsigned            count,
-                        sgl::SCALAR_TYPE    type,
-                        const void*         data );
+    virtual void setAttributes( const std::string&  name,
+                                unsigned            index,
+                                unsigned            size,
+                                unsigned            count,
+                                sgl::SCALAR_TYPE    type,
+                                const void*         data );
 
     /** Setup indices of attributes.
      * @param attribute - attribute for indexing.
      * @param indices - indices for attribute.
      */
-    void setIndices( unsigned           attribute,
-                     unsigned           numIndices,
-                     const unsigned*    indices );
+    virtual void setIndices( unsigned           attribute,
+                             unsigned           numIndices,
+                             const unsigned*    indices );
 
     /** Get number of specified attributes. */
     unsigned getAttributeCount(unsigned attribute);
@@ -87,9 +107,9 @@ public:
     const AttributeType* queryAttributeData(unsigned attribute) const;
 
     /** Create mesh */
-    mesh_ptr createMesh() const;
+    virtual gpu_side_mesh_ptr createGPUSideMesh() const;
 
-private:
+protected:
     attribute_array     attributeArrays[MAX_NUM_ATTRIBUTES];
     indices_array       indicesArrays[MAX_NUM_ATTRIBUTES];
 };

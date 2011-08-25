@@ -47,8 +47,9 @@ void SerializableWrapper<sgl::VertexLayout>::deserialize(sgl::VertexLayout*& vl,
 			ar.readChunk("type", reinterpret_cast<int*>(&elem.type));
 			ar.readChunk("semantic", reinterpret_cast<int*>(&elem.semantic));
 			ar.closeChunk();
+		    
+            elements.push_back(elem);
 		}
-		elements.push_back(elem);
 		ar.closeChunk();
 	}
 

@@ -9,7 +9,7 @@
 #include "FileSystem/FileSystemManager.h"
 #include "Graphics/Common.h"
 #include "Graphics/LightingEffect.h"
-#include "Graphics/MeshConstructor.h"
+#include "Graphics/CPUSideMesh.h"
 #include "Graphics/SkinnedMesh.h"
 #include "Graphics/StaticMesh.h"
 #include "Log/LogVisitor.h"
@@ -136,7 +136,7 @@ namespace {
 	class SceneBuilder
 	{
     public:
-        typedef std::map<std::string, graphics::mesh_ptr>       mesh_map;
+        typedef std::map<std::string, graphics::gpu_side_mesh_ptr>       mesh_map;
         typedef std::vector<collada_instance_controller_ptr>    controller_vector;
 
 	public:
@@ -265,14 +265,14 @@ namespace {
 		}
 
 		// loads mesh from collada mesh
-        graphics::mesh_ptr createMesh(const collada_mesh&               colladaMesh,
+        graphics::gpu_side_mesh_ptr createMesh(const collada_mesh&               colladaMesh,
 						        	  const collada_bind_material_ptr&  bindMaterial,
                                       const collada_skin*               skin = 0)
 		{
 			using namespace sgl;
 
 			// make geometry mesh
-            graphics::mesh_ptr mesh;
+            graphics::gpu_side_mesh_ptr mesh;
             mesh_map::iterator iter = meshMap.find(colladaMesh.id);
 			if ( !colladaMesh.id.empty() && iter != meshMap.end() ) {
                 mesh = (*iter).second->clone();
@@ -281,7 +281,7 @@ namespace {
             {
                 // mesh without primitives elements is empty for SlonEngine
                 if ( colladaMesh.primitives.empty() ) {
-                    return graphics::mesh_ptr();
+                    return graphics::gpu_side_mesh_ptr();
                 }
 
 		        // merge inputs
@@ -374,7 +374,7 @@ namespace {
 		        }
 
                 // create mesh
-                graphics::mesh_constructor_ptr meshConstructor(new graphics::MeshConstructor);
+                graphics::cpu_side_mesh_ptr meshConstructor(new graphics::CPUSideMesh);
                 {
 		            // setup data
 		            for (size_t i = 0; i<inputs.size(); ++i)
@@ -482,14 +482,14 @@ namespace {
                         }
 
                         meshConstructor->setAttributes( "bone_index",
-                                                        graphics::Mesh::BONE_INDEX,
+                                                        graphics::GPUSideMesh::BONE_INDEX,
 								                        4,
                                                         boneIndices.size(),
 								                        sgl::FLOAT,
 								                        &boneIndices[0] );
 
                         meshConstructor->setAttributes( "bone_weight",
-                                                        graphics::Mesh::BONE_WEIGHT,
+                                                        graphics::GPUSideMesh::BONE_WEIGHT,
 								                        4,
                                                         boneWeights.size(),
 								                        sgl::FLOAT,
@@ -497,7 +497,7 @@ namespace {
                         
                     }
                 }
-                mesh = meshConstructor->createMesh();
+                mesh = meshConstructor->createGPUSideMesh();
 
 		        // setup subsets
 		        size_t stride = 0;
@@ -573,7 +573,7 @@ namespace {
 						        			    const collada_bind_material_ptr& 	bindMaterial )
 		{
 			// make mesh
-            graphics::mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
+            graphics::gpu_side_mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
             if (mesh)
             {
                 graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
@@ -635,7 +635,7 @@ namespace {
             {
 				case collada_geometry::MESH:
 				{
-					graphics::mesh_ptr mesh = createMesh(static_cast<const collada_mesh&>(*skin.source), bindMaterial, &skin);
+					graphics::gpu_side_mesh_ptr mesh = createMesh(static_cast<const collada_mesh&>(*skin.source), bindMaterial, &skin);
                     desc.mesh	= mesh.get();
                     skinnedMesh = new graphics::SkinnedMesh(desc);
 					break;
