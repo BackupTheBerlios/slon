@@ -23,52 +23,24 @@ from slon import database
 #be sure to use a unique ID obtained from 'plugincafe.com'
 PLUGIN_ID = 1025282
     
-def indent(elem, level=0):
-    i = "\n" + level*"\t"
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "\t"
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            indent(elem, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-    return
+def convertVector3(v, scale = 1.0):
+    return math.Vector3f(v.x * scale, v.y * scale, v.z * scale)
     
-def convertVector3(v):
-    return math.Vector3f(v.x, v.y, v.z)
-    
-def convertMatrix(m):
+def convertMatrix(m, scale = 1.0):
     mat = math.Matrix4f()
     
-    mat[0] = math.VectorRow4f(m.v1.x, m.v2.x, m.v3.x, m.off.x)
-    mat[1] = math.VectorRow4f(m.v1.y, m.v2.y, m.v3.y, m.off.y)
-    mat[2] = math.VectorRow4f(m.v1.z, m.v2.z, m.v3.z, m.off.z)
-    mat[3] = math.VectorRow4f(     0,      0,      0,       1)
+    mat[0] = math.VectorRow4f(m.v1.x, m.v2.x, m.v3.x, m.off.x * scale)
+    mat[1] = math.VectorRow4f(m.v1.y, m.v2.y, m.v3.y, m.off.y * scale)
+    mat[2] = math.VectorRow4f(m.v1.z, m.v2.z, m.v3.z, m.off.z * scale)
+    mat[3] = math.VectorRow4f(     0,      0,      0,               1)
     
     return mat
-    
-def dumpVectorArray(vecs):
-    text = ""
-    for vec in vecs:
-        text += "%f %f %f " % (vec.x, vec.y, vec.z)
-    return text
-            
-def dumpArray(arr):
-    text = ""
-    for v in arr:
-        text += str(v) + " "
-    return text
     
 class SlonExporter(plugins.SceneSaverData):
         
     def __init__(self):
         self.library = database.Library()
-        self.materials = set()
+        self.documentScale = 0.01
         
     def dumpMaterial(self, material):
         if material.GetName() in self.materials:
@@ -110,7 +82,7 @@ class SlonExporter(plugins.SceneSaverData):
         points = c4dPolygonObj.GetAllPoints()
         pointsArr = slon.Vector3fArray()
         for point in points:
-            pointsArr.append( math.Vector3f(point.x, point.y, point.z) )
+            pointsArr.append( convertVector3(point, self.documentScale) )
         
         if (len(pointsArr) == 0):
             return None
@@ -133,7 +105,6 @@ class SlonExporter(plugins.SceneSaverData):
         # gather normals
         normalTag = c4dPolygonObj.GetTag(c4d.Tnormal)
         if (normalTag != None):
-            print "abacaba"
             normalsArr = slon.Vector3fArray()
             normalsInds = slon.UIntArray()
             normalData = normalTag.GetAllHighlevelData()
@@ -171,7 +142,7 @@ class SlonExporter(plugins.SceneSaverData):
         if not c4dNode: 
             return None
         
-        transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl()) )
+        transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl(), self.documentScale) )
         if (c4dNode.GetType() == c4d.Opolygon):
             polyObj = self.convertPolygonObject(c4dNode)
             if (polyObj != None):
