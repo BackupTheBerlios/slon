@@ -3,6 +3,9 @@
 
 #include "../Log/Logger.h"
 #include <stdexcept>
+#ifdef __linux__
+#   include <signal.h>
+#endif
 
 namespace slon {
 

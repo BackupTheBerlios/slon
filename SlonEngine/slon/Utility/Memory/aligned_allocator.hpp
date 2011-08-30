@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mm_malloc.h>
+
 namespace slon {
 
 /** Allocate aligned data.
