@@ -119,7 +119,7 @@ public:
 
             // create scene
             {
-                database::library_ptr library = database::loadLibrary("Data/Models/troll.dae");
+                database::library_ptr library = database::loadLibrary("Data/Models/human.sxml");
                 location->add(library->visualScenes.begin()->second.get());
 
 				database::Library::key_animation_map animations = library->animations;

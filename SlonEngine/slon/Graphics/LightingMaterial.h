@@ -20,6 +20,10 @@ public:
 public:
     LightingMaterial();
 
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
     /** Setup emission material color for the effect */
     void setEmission(const math::Vector4f& emission);
 

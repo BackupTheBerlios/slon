@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_GRAPHICS_MATERIAL_H__
 #define __SLON_ENGINE_GRAPHICS_MATERIAL_H__
 
+#include "../Database/Serializable.h"
 #include "Effect.h"
 
 namespace slon {
@@ -11,9 +12,14 @@ namespace graphics {
  * and map it onto rigid and onto skinned geometry. 
  */
 class Material :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
+    // Override serializable
+    const char* serialize(database::OArchive& ar) const { return "Effect"; }
+    void deserialize(database::IArchive& ar)            {}
+
     /** Create effect for attaching onto geometry. Make different effect
      * for every geometry.
      * @return effect for rendering geometry with this material.

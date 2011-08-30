@@ -4,6 +4,7 @@
 #include <sgl/Device.h>
 #include <sgl/Math/AABB.hpp>
 #include "../Archive.h"
+#include "../../Graphics/Common.h"
 
 namespace slon {
 namespace database {

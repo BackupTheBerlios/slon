@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_GRAPHICS_EFFECT_H__
 #define __SLON_ENGINE_GRAPHICS_EFFECT_H__
 
+#include "../Database/Serializable.h"
 #include "../Utility/hash_string.hpp"
 #include "ParameterBinding.h"
 
@@ -29,12 +30,17 @@ typedef hash_string attribute_handle;
  * \uncode
  */
 class Effect :
-    public Referenced
+    public Referenced,
+    public database::Serializable
 {
 public:
     static const int MAX_NUM_PASSES = 5; /// maximum number of passes allowed for effect per render pass
 
 public:
+    // Override serializable
+    const char* serialize(database::OArchive& ar) const { return "Effect"; }
+    void deserialize(database::IArchive& ar)            {}
+
     /** Present effect in the render pass. Get technique used to render objects. 
      * Render passes are grouped in render groups for convenience and some performance speed up.
      * E.g. ForwardRenderer have render group "Reflect" for rendering scene into reflect texture with

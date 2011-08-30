@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_ALGORITHM_HASH_STRING_H__
 #define __SLON_ENGINE_ALGORITHM_HASH_STRING_H__
 
+#include <algorithm>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>

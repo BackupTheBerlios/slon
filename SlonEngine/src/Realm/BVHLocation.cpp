@@ -106,6 +106,22 @@ private:
 	Visitor&  visitor;
 };
 
+struct write_object
+{
+    void operator () (database::OArchive& ar, const bvh_location_node_ptr& obj)
+    {
+        ar.writeSerializable(obj.get());
+    }
+};
+
+struct read_object
+{
+    bvh_location_node_ptr operator () (database::IArchive& ar)
+    {
+        return bvh_location_node_ptr(ar.readSerializable<BVHLocationNode>());
+    }
+};
+
 template<typename Location, typename Visitor>
 LocationVisitor<Location, Visitor> makeLocationVisitor(Location& location, Visitor& visitor)
 {
@@ -119,14 +135,6 @@ BVHLocation::BVHLocation()
 
 const char* BVHLocation::serialize(database::OArchive& ar) const
 {
-    struct write_object
-    {
-        void operator () (database::OArchive& ar, const bvh_location_node_ptr& obj)
-        {
-            ar.writeSerializable(obj.get());
-        }
-    };
-
     database::serialize(ar, "aabb", aabb);
     database::serialize(ar, "staticAABBTree", staticAABBTree, write_object() );
     database::serialize(ar, "dynamicAABBTree", dynamicAABBTree, write_object() );
@@ -136,14 +144,6 @@ const char* BVHLocation::serialize(database::OArchive& ar) const
 
 void BVHLocation::deserialize(database::IArchive& ar)
 {
-    struct read_object
-    {
-        bvh_location_node_ptr operator () (database::IArchive& ar)
-        {
-            return bvh_location_node_ptr(ar.readSerializable<BVHLocationNode>());
-        }
-    };
-
     database::deserialize(ar, "aabb", aabb);
     database::deserialize(ar, "staticAABBTree", staticAABBTree, read_object() );
     database::deserialize(ar, "dynamicAABBTree", dynamicAABBTree, read_object() );

@@ -6,6 +6,9 @@
 namespace slon {
 namespace physics {
 
+// forward
+class BulletRotationalServoMotor;
+
 /** The simpliest motor, can apply force(torque). */
 class ServoMotor :
     public Motor

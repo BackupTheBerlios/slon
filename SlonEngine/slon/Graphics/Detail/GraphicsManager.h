@@ -31,7 +31,7 @@ public:
     graphics::Renderer* initRenderer(const FFPRendererDesc& desc);
 
     void            setRenderingSurface(Surface& surface);
-    const Surface&  resolveRenderingSurface();
+    const Surface&  getCurrentRenderingSurface();
     const Surface&  getRenderingSurface() const;
 
     graphics::Renderer* getRenderer()   { return renderer.get(); }

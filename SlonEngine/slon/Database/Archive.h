@@ -4,6 +4,7 @@
 #include "../Utility/error.hpp"
 #include "../Utility/referenced.hpp"
 #include "Serializable.h"
+#include <boost/static_assert.hpp>
 
 namespace slon {
 namespace database {
@@ -26,11 +27,28 @@ public:
     typedef unsigned int        uint32;
 
     typedef long long           int64;
+#ifdef __GNUC__
+    typedef unsigned long int   uint64;
+#else
     typedef unsigned long long  uint64;
-
+#endif
     typedef float               float32;
     typedef double              float64;
 
+    BOOST_STATIC_ASSERT( sizeof(int8)    == 1 );
+    BOOST_STATIC_ASSERT( sizeof(uint8)   == 1 );
+
+    BOOST_STATIC_ASSERT( sizeof(int16)   == 2 );
+    BOOST_STATIC_ASSERT( sizeof(uint16)  == 2 );
+
+    BOOST_STATIC_ASSERT( sizeof(int32)   == 4 );
+    BOOST_STATIC_ASSERT( sizeof(uint32)  == 4 );
+
+    BOOST_STATIC_ASSERT( sizeof(int64)   == 8 );
+    BOOST_STATIC_ASSERT( sizeof(uint64)  == 8 );
+
+    BOOST_STATIC_ASSERT( sizeof(float32) == 4 );
+    BOOST_STATIC_ASSERT( sizeof(float64) == 8 );
 public:
     /** Get version of the format for serialization. */
     virtual unsigned getVersion() const = 0;

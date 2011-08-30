@@ -11,7 +11,7 @@ namespace database {
 template<typename LeafData, typename RealType, typename Func>
 void serialize(OArchive& ar, const char* name, const aabb_tree<LeafData, RealType>& tree, Func leafSerializer)
 {
-    typedef aabb_tree<LeafData, RealType>::volume_node volume_node;
+    typedef typename aabb_tree<LeafData, RealType>::volume_node volume_node;
 
     ar.openChunk(name);
     const volume_node* node = tree.get_root();
@@ -53,9 +53,9 @@ void serialize(OArchive& ar, const char* name, const aabb_tree<LeafData, RealTyp
 template<typename LeafData, typename RealType, typename Func>
 typename aabb_tree<LeafData, RealType>::volume_node* deserialize_aabb_tree_node(IArchive& ar, Func leafDeserializer)
 {
-    typedef aabb_tree<LeafData, RealType>::volume_node volume_node;
-    typedef aabb_tree<LeafData, RealType>::leaf_node   leaf_node;
-    typedef aabb_tree<LeafData, RealType>::aabb_type   aabb_type;
+    typedef typename aabb_tree<LeafData, RealType>::volume_node volume_node;
+    typedef typename aabb_tree<LeafData, RealType>::leaf_node   leaf_node;
+    typedef typename aabb_tree<LeafData, RealType>::aabb_type   aabb_type;
 
     volume_node* node = 0;
     aabb_type    volume;
@@ -89,7 +89,7 @@ void deserialize(IArchive& ar, const char* name, aabb_tree<LeafData, RealType>& 
         throw serialization_error("Can't open AABB tree chunk");
     }
 
-    aabb_tree<LeafData, RealType>::volume_node* root = 0;
+    typename aabb_tree<LeafData, RealType>::volume_node* root = 0;
     if ( ar.openChunk("volume_node", info) )
     {
         root = deserialize_aabb_tree_node<LeafData, RealType>(ar, leafDeserializer);

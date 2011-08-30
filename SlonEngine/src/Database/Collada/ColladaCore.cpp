@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "Database/DatabaseManager.h"
 #include "Database/Collada/Collada.h"
-#include "Graphics/Mesh.h"
+#include "Graphics/CPUSideMesh.h"
+#include "Graphics/GPUSideMesh.h"
 #include "Utility/URI/file_uri.hpp"
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
@@ -57,32 +58,32 @@ void collada_input::serialize( ColladaDocument&     document,
 
         if ( semantic == "POSITION" ) 
         {
-            attributeIndex = graphics::Mesh::POSITION;
+            attributeIndex = graphics::GPUSideMesh::POSITION;
             attributeName  = "position";
         }
         else if ( semantic == "NORMAL" ) 
         {
-            attributeIndex = graphics::Mesh::NORMAL;
+            attributeIndex = graphics::GPUSideMesh::NORMAL;
             attributeName  = "normal";
         }
         else if ( semantic == "TEXCOORD" ) 
         {
-            attributeIndex = graphics::Mesh::TEXCOORD + set;
+            attributeIndex = graphics::GPUSideMesh::TEXCOORD + set;
             attributeName  = "texcoord";
         }
         else if ( semantic == "COLOR" )
         {
-            attributeIndex = graphics::Mesh::COLOR;
+            attributeIndex = graphics::GPUSideMesh::COLOR;
             attributeName  = "color";
         }
         else if ( semantic == "JOINT" )
         {
-            attributeIndex = graphics::Mesh::BONE_INDEX;
+            attributeIndex = graphics::GPUSideMesh::BONE_INDEX;
             attributeName  = "joint";
         }
         else if ( semantic == "WEIGHT" )
         {
-            attributeIndex = graphics::Mesh::BONE_WEIGHT;
+            attributeIndex = graphics::GPUSideMesh::BONE_WEIGHT;
             attributeName  = "weight";
         }
         else
@@ -253,6 +254,26 @@ void collada_instance_geometry::load(const ColladaDocument& document,
         material->load(document, *bindMaterialIter);
     }
 }
+
+#ifndef _MSC_VER
+template<>
+void collada_library<collada_geometry>::load(const ColladaDocument& document, const xmlpp::element& elem)
+{
+    element_ptr		   geometry;
+    collada_serializer serializer;
+    serializer &= xmlpp::make_nvp( "mesh",          xmlpp::as_element<collada_mesh>(geometry) );
+    serializer &= xmlpp::make_nvp( "convex_mesh",   xmlpp::as_element<collada_convex_mesh>(geometry) );
+    //serializer &= xmlpp::make_nvp( "spline",        warning(logger, "Usupported <geometry> type: spline") );
+
+    for (xmlpp::element_iterator iter  = elem.first_child_element();
+                                 iter != elem.end_child_element();
+                                 ++iter)
+    {
+        serializer.load(document, *iter);
+        elements.insert( element_set::value_type(geometry->id, geometry) );
+    }
+}
+#endif
 
 void collada_geometry::serialize( ColladaDocument&  document, 
                                   xmlpp::element&   elem, 

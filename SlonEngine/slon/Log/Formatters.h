@@ -8,7 +8,7 @@
 
 namespace slon {
 namespace log {
-	
+
 /** Setup indent filter to the ostream. */
 struct indent
 {
@@ -34,6 +34,10 @@ struct skip_info
 
     bool skip;
 };
+
+std::ostream& operator << (std::ostream& os, const indent& it);
+std::ostream& operator << (std::ostream& os, const unindent& uit);
+std::ostream& operator << (std::ostream& os, const skip_info& si);
 
 template<typename T>
 struct detailed_fmt;
@@ -188,10 +192,6 @@ detailed_fmt< math::Matrix<T, n, m> > detailed(const math::Matrix<T, n, m>& mat,
 {
     return detailed_fmt< math::Matrix<T, n, m> >(mat, decorated, fixed, width);
 }
-
-std::ostream& operator << (std::ostream& os, const indent& it);
-std::ostream& operator << (std::ostream& os, const unindent& uit);
-std::ostream& operator << (std::ostream& os, const skip_info& si);
 
 } // namespace log
 } // namespace slon

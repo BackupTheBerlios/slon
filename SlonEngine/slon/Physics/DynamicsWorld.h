@@ -9,6 +9,10 @@
 namespace slon {
 namespace physics {
 
+#ifdef SLON_ENGINE_USE_BULLET
+    class BulletDynamicsWorld;
+#endif
+
 /** Dynamics world or physics scene, as you wish. */
 class DynamicsWorld :
     public Referenced

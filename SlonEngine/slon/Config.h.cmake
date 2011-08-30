@@ -7,6 +7,7 @@
 #endif
 
 #cmakedefine SLON_ENGINE_USE_BULLET
+#cmakedefine SLON_ENGINE_USE_PYTHON
 #cmakedefine SLON_ENGINE_USE_SSE2
 #cmakedefine SLON_ENGINE_USE_SSE3
 #cmakedefine SLON_ENGINE_USE_SSE4

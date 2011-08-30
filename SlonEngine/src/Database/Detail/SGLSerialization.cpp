@@ -8,6 +8,7 @@ DECLARE_AUTO_LOGGER("database.SGLSerialization")
 namespace slon {
 namespace database {
 
+template<>
 const char* SerializableWrapper<sgl::VertexLayout>::serialize(const sgl::VertexLayout& vl, OArchive& ar)
 {
 	ar.openChunk("elements");
@@ -28,6 +29,7 @@ const char* SerializableWrapper<sgl::VertexLayout>::serialize(const sgl::VertexL
     return "VertexLayout";
 }
 
+template<>
 void SerializableWrapper<sgl::VertexLayout>::deserialize(sgl::VertexLayout*& vl, IArchive& ar)
 {
 	std::vector<sgl::VertexLayout::ELEMENT> elements;
@@ -45,14 +47,16 @@ void SerializableWrapper<sgl::VertexLayout>::deserialize(sgl::VertexLayout*& vl,
 			ar.readChunk("type", reinterpret_cast<int*>(&elem.type));
 			ar.readChunk("semantic", reinterpret_cast<int*>(&elem.semantic));
 			ar.closeChunk();
+		    
+            elements.push_back(elem);
 		}
-		elements.push_back(elem);
 		ar.closeChunk();
 	}
 
 	vl = graphics::currentDevice()->CreateVertexLayout(elements.size(), &elements[0]);
 }
 
+template<>
 const char* SerializableWrapper<sgl::Buffer>::serialize(const sgl::Buffer& buffer, OArchive& ar)
 {
 	void* data = malloc( buffer.Size() );
@@ -72,6 +76,7 @@ const char* SerializableWrapper<sgl::Buffer>::serialize(const sgl::Buffer& buffe
     return "Buffer";
 }
 
+template<>
 void SerializableWrapper<sgl::Buffer>::deserialize(sgl::Buffer*& buffer, IArchive& ar)
 {
     assert(buffer);
@@ -89,12 +94,14 @@ void SerializableWrapper<sgl::Buffer>::deserialize(sgl::Buffer*& buffer, IArchiv
 	}
 }
 
+template<>
 const char* SerializableWrapper<sgl::VertexBuffer>::serialize(const sgl::VertexBuffer& buffer, OArchive& ar)
 {
     SerializableWrapper<sgl::Buffer>::serialize(buffer, ar);
     return "VertexBuffer";
 }
 
+template<>
 void SerializableWrapper<sgl::VertexBuffer>::deserialize(sgl::VertexBuffer*& buffer, IArchive& ar)
 {
 	buffer = graphics::currentDevice()->CreateVertexBuffer();
@@ -102,12 +109,14 @@ void SerializableWrapper<sgl::VertexBuffer>::deserialize(sgl::VertexBuffer*& buf
     SerializableWrapper<sgl::Buffer>::deserialize(pBuf, ar);
 }
 
+template<>
 const char* SerializableWrapper<sgl::IndexBuffer>::serialize(const sgl::IndexBuffer& buffer, OArchive& ar)
 {
     SerializableWrapper<sgl::Buffer>::serialize(buffer, ar);
     return "IndexBuffer";
 }
 
+template<>
 void SerializableWrapper<sgl::IndexBuffer>::deserialize(sgl::IndexBuffer*& buffer, IArchive& ar)
 {
 	buffer = graphics::currentDevice()->CreateIndexBuffer();

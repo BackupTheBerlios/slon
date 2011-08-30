@@ -8,9 +8,10 @@
 #include "FileSystem/File.h"
 #include "FileSystem/FileSystemManager.h"
 #include "Graphics/Common.h"
+#include "Graphics/LightingEffect.h"
+#include "Graphics/CPUSideMesh.h"
 #include "Graphics/SkinnedMesh.h"
 #include "Graphics/StaticMesh.h"
-#include "Graphics/LightingEffect.h"
 #include "Log/LogVisitor.h"
 #include "Physics/Constraint.h"
 #include "Physics/ConstraintNode.h"
@@ -135,7 +136,7 @@ namespace {
 	class SceneBuilder
 	{
     public:
-        typedef std::map<std::string, graphics::mesh_ptr>       mesh_map;
+        typedef std::map<std::string, graphics::gpu_side_mesh_ptr>       mesh_map;
         typedef std::vector<collada_instance_controller_ptr>    controller_vector;
 
 	public:
@@ -264,23 +265,23 @@ namespace {
 		}
 
 		// loads mesh from collada mesh
-        graphics::mesh_ptr createMesh(const collada_mesh&               colladaMesh,
+        graphics::gpu_side_mesh_ptr createMesh(const collada_mesh&               colladaMesh,
 						        	  const collada_bind_material_ptr&  bindMaterial,
                                       const collada_skin*               skin = 0)
 		{
 			using namespace sgl;
 
 			// make geometry mesh
-            graphics::mesh_ptr mesh;
+            graphics::gpu_side_mesh_ptr mesh;
             mesh_map::iterator iter = meshMap.find(colladaMesh.id);
 			if ( !colladaMesh.id.empty() && iter != meshMap.end() ) {
-                mesh.reset( (*iter).second->shallowCopy() );
+                mesh = (*iter).second->clone();
 			}
             else
             {
                 // mesh without primitives elements is empty for SlonEngine
                 if ( colladaMesh.primitives.empty() ) {
-                    return graphics::mesh_ptr();
+                    return graphics::gpu_side_mesh_ptr();
                 }
 
 		        // merge inputs
@@ -373,7 +374,7 @@ namespace {
 		        }
 
                 // create mesh
-                graphics::mesh_data_ptr meshData(new graphics::MeshData);
+                graphics::cpu_side_mesh_ptr meshConstructor(new graphics::CPUSideMesh);
                 {
 		            // setup data
 		            for (size_t i = 0; i<inputs.size(); ++i)
@@ -403,16 +404,16 @@ namespace {
 
                         if ( !inputs[i].source->floatArray.empty() )
                         {
-			                meshData->setAttributes( inputs[i].attributeName,
-                                                     inputs[i].attributeIndex,
-								                     inputs[i].source->stride,
-                                                     inputs[i].source->floatArray.size() / inputs[i].source->stride,
-								                     sgl::FLOAT,
-								                     &inputs[i].source->floatArray[0] );
+			                meshConstructor->setAttributes( inputs[i].attributeName,
+                                                            inputs[i].attributeIndex,
+								                            inputs[i].source->stride,
+                                                            inputs[i].source->floatArray.size() / inputs[i].source->stride,
+								                            sgl::FLOAT,
+								                            &inputs[i].source->floatArray[0] );
 
-			                meshData->setIndices( inputs[i].attributeIndex,
-								                  indices[i].size(),
-									              &indices[i][0] );
+			                meshConstructor->setIndices( inputs[i].attributeIndex,
+								                         indices[i].size(),
+									                     &indices[i][0] );
                         }
 		            }
 
@@ -480,23 +481,23 @@ namespace {
                             }
                         }
 
-                        meshData->setAttributes( "bone_index",
-                                                 graphics::Mesh::BONE_INDEX,
-								                 4,
-                                                 boneIndices.size(),
-								                 sgl::FLOAT,
-								                 &boneIndices[0] );
+                        meshConstructor->setAttributes( "bone_index",
+                                                        graphics::GPUSideMesh::BONE_INDEX,
+								                        4,
+                                                        boneIndices.size(),
+								                        sgl::FLOAT,
+								                        &boneIndices[0] );
 
-                        meshData->setAttributes( "bone_weight",
-                                                 graphics::Mesh::BONE_WEIGHT,
-								                 4,
-                                                 boneWeights.size(),
-								                 sgl::FLOAT,
-								                 &boneWeights[0] );
+                        meshConstructor->setAttributes( "bone_weight",
+                                                        graphics::GPUSideMesh::BONE_WEIGHT,
+								                        4,
+                                                        boneWeights.size(),
+								                        sgl::FLOAT,
+								                        &boneWeights[0] );
                         
                     }
                 }
-                mesh.reset( new graphics::Mesh(meshData.get()) );
+                mesh = meshConstructor->createGPUSideMesh();
 
 		        // setup subsets
 		        size_t stride = 0;
@@ -572,7 +573,7 @@ namespace {
 						        			    const collada_bind_material_ptr& 	bindMaterial )
 		{
 			// make mesh
-            graphics::mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
+            graphics::gpu_side_mesh_ptr mesh = createMesh(colladaMesh, bindMaterial);
             if (mesh)
             {
                 graphics::StaticMesh* staticMesh = new graphics::StaticMesh( mesh.get() );
@@ -634,7 +635,7 @@ namespace {
             {
 				case collada_geometry::MESH:
 				{
-					graphics::mesh_ptr mesh = createMesh(static_cast<const collada_mesh&>(*skin.source), bindMaterial, &skin);
+					graphics::gpu_side_mesh_ptr mesh = createMesh(static_cast<const collada_mesh&>(*skin.source), bindMaterial, &skin);
                     desc.mesh	= mesh.get();
                     skinnedMesh = new graphics::SkinnedMesh(desc);
 					break;
@@ -1262,309 +1263,6 @@ namespace {
         const ColladaDocument& document;
     };
 #endif // SLON_ENGINE_USE_PHYSICS
-
-	class ColladaSceneBuilder
-	{
-	private:
-		typedef std::set<std::string>									string_set;
-		typedef std::map<const scene::Entity*, collada_geometry_ptr>	geode_geometry_map;
-		typedef std::map<const graphics::Effect*, collada_material_ptr>	effect_material_map;
-
-		std::string getUniqueId(const std::string& name)
-		{
-			int counter = 0;
-			std::string id = name;
-			string_set::iterator iter = nodeIds.find(id);
-			while ( iter != nodeIds.end() )
-			{
-				++counter;
-				id = name + boost::lexical_cast<std::string>(counter);
-				iter = nodeIds.find(id);
-			}
-
-			nodeIds.insert(id);
-			return id;
-		}
-
-		const graphics::Mesh* getMesh(const scene::Entity* geode)
-		{
-			if ( const graphics::StaticMesh* mesh = dynamic_cast<const graphics::StaticMesh*>(geode) ) {
-				return mesh->getMesh();
-			}
-			else if ( const graphics::SkinnedMesh* mesh = dynamic_cast<const graphics::SkinnedMesh*>(geode) ) {
-				return mesh->getMesh();
-			}
-
-			return 0;
-		}
-
-	public:
-		collada_geometry_ptr createGeometry(const scene::Entity* geode)
-		{
-			geode_geometry_map::iterator geomIter = geometries.find(geode);
-			if ( geomIter != geometries.end() ) {
-				return geomIter->second;
-			}
-
-			// attach renderables
-			collada_geometry_ptr geometry;
-			if ( const graphics::Mesh* mesh = getMesh(geode) )
-			{
-				collada_mesh_ptr							cMesh(new collada_mesh);
-				std::vector<collada_input>					inputs;
-				std::vector<collada_primitives::int_vector>	inputIndices;
-
-				if ( const graphics::MeshData* meshData = mesh->getData() ) 
-				{
-					unsigned offsetCounter = 0;
-					for (size_t i = 1; i<graphics::MeshData::MAX_NUM_ATTRIBUTES; ++i)
-					{
-						const graphics::MeshData::attribute_array& attributes = meshData->getAttributes(i);
-						if (attributes.count > 0)
-						{
-							collada_source_ptr source(new collada_source);
-							source->floatArray.resize( attributes.count * attributes.attribute_size() / sizeof(float) );
-							std::copy( (const float*)attributes.data.get(), 
-									   (const float*)attributes.data.get() + source->floatArray.size(), 
-									   source->floatArray.begin() );
-							source->id = getUniqueId(attributes.name);
-							cMesh->sources.push_back(source);
-
-							collada_input input;
-							input.source         = source;
-							input.sourceId       = source->id;
-							input.semantic       = toupper(attributes.name);
-							input.attributeIndex = i;
-							input.attributeName  = attributes.name;
-							if (attributes.name == "position")
-							{
-								input.offset = cMesh->vertices.inputs.size();
-								cMesh->vertices.inputs.push_back(input);
-							}
-							input.offset = offsetCounter++;
-							inputs.push_back(input);
-
-							const graphics::MeshData::indices_array& indices = meshData->getIndices(i);
-							collada_primitives::int_vector indicesArray(indices.indices.get(), indices.indices.get() + indices.count);
-							inputIndices.push_back(indicesArray);
-						}
-					}
-
-					for (graphics::Mesh::subset_const_iterator iter  = mesh->firstSubset();
-															   iter != mesh->endSubset();
-															   ++iter)
-					{
-						collada_material_ptr material = createMaterial( (*iter)->getEffect() );
-					
-						collada_primitives primitives;
-						if ( const graphics::Mesh::indexed_subset* subset = dynamic_cast<const graphics::Mesh::indexed_subset*>( (*iter).get() ) )
-						{
-							primitives.primType     = subset->getPrimitiveType();
-							primitives.material     = material->id;
-							primitives.inputs       = inputs;
-
-							primitives.inputIndices.resize( subset->getNumIndices() );
-							std::copy( inputIndices.begin() + subset->getStartIndex(),
-									   inputIndices.begin() + subset->getStartIndex() + subset->getNumIndices(),
-									   primitives.inputIndices.begin() );
-						}
-						else if ( const graphics::Mesh::plain_subset* subset = dynamic_cast<const graphics::Mesh::plain_subset*>( (*iter).get() ) )
-						{
-							assert(!"supported");
-							/*
-							primitives.primType = subset->getPrimitiveType();
-							primitives.material = material->id;
-							primitives.inputs   = inputs;
-							*/
-						}
-
-						cMesh->primitives.push_back(primitives);
-					}
-
-					geometry = cMesh;
-				}
-			}
-			
-			geometries.insert( geode_geometry_map::value_type(geode, geometry) );
-			return geometry;
-		}
-
-		collada_material_ptr createMaterial(const graphics::Effect* effect)
-		{
-			effect_material_map::iterator matIter = materials.find(effect);
-			if ( matIter != materials.end() ) {
-				return matIter->second;
-			}
-
-			collada_material_ptr material(new collada_material);
-			material->id = getUniqueId("material");
-			material->effect.element.reset(new collada_effect);
-			material->effect.target = getUniqueId("effect");
-				
-			collada_effect_ptr cEffect = material->effect.element;
-			cEffect->id = material->effect.target;
-
-			if ( const graphics::LightingEffect* lightingEffect = dynamic_cast<const graphics::LightingEffect*>(effect) )
-			{
-				const graphics::abstract_parameter_binding* parameter = 0;
-				collada_phong_technique_ptr					technique(new collada_phong_technique);
-				
-				parameter = lightingEffect->getParameter( hash_string("materialDiffuseSpecular") );
-				if (const graphics::binding_vec4f* diffuseSpecular = graphics::cast_binding<math::Vector4f>(parameter) ) 
-				{					
-					technique->ambient.setColor(diffuseSpecular->value());
-					technique->diffuse.setColor(diffuseSpecular->value());
-					technique->emission.setColor( math::Vector4f(0.0f, 0.0f, 0.0f, 0.0f) );
-					technique->specular.setColor( math::Vector4f(1.0f, 1.0f, 1.0f, 1.0f) );
-				}
-				
-				parameter = lightingEffect->getParameter( hash_string("materialShininess") );
-				if (const graphics::binding_float* shininess = graphics::cast_binding<float>(parameter) ) {					
-					technique->shininess = shininess->value();
-				}
-
-				parameter = lightingEffect->getParameter( hash_string("opacity") );
-				if (const graphics::binding_float* opacity = graphics::cast_binding<float>(parameter) ) {					
-					technique->opacity = opacity->value();
-				}
-
-				parameter = lightingEffect->getParameter( hash_string("diffuseSpecularMap") );
-				if (const graphics::binding_tex_2d* diffuseSpecular = graphics::cast_binding<sgl::Texture2D>(parameter) ) 
-				{
-					/*
-					collada_texture texture;
-					texture.texcoord = diffuseSpecular->value();
-					technique->diffuse.setColor(diffuseSpecular->value());
-					technique->emission.setColor( math::Vector4f(0.0f, 0.0f, 0.0f, 0.0f) );
-					technique->specular.setColor( math::Vector4f(1.0f, 1.0f, 1.0f, 1.0f) );
-					*/
-				}
-
-				cEffect->techniques.push_back(technique);
-			}
-		}
-
-		collada_instance_material_ptr createMaterialInstance(const graphics::Effect* effect)
-		{
-			collada_instance_material_ptr materialInstance(new collada_instance_material);
-			materialInstance->element = createMaterial(effect);
-			materialInstance->symbol  = materialInstance->element->id;
-			materialInstance->target  = materialInstance->element->id;
-			return materialInstance;
-		}
-
-		collada_bind_material_ptr createBindMaterial(const scene::Entity* geode)
-		{
-			scene::CullVisitor visitor;
-			geode->accept(visitor);
-
-			collada_bind_material_ptr bindMaterial(new collada_bind_material);
-			for (scene::CullVisitor::renderable_iterator iter  = visitor.beginRenderable();
-														 iter != visitor.endRenderable();
-														 ++iter)
-			{
-				collada_instance_material_ptr material = createMaterialInstance( (*iter)->getEffect() );
-				bindMaterial->materials.push_back(*material);
-			}
-		}
-
-		collada_instance_geometry_ptr createGeometryInstance(const scene::Entity* geode)
-		{
-			collada_instance_geometry_ptr geometry(new collada_instance_geometry);
-			geometry->geometry = createGeometry(geode);
-			geometry->material = createBindMaterial(geode);
-			return geometry;
-		}
-
-		void attachEntity(collada_node& cNode, const scene::Entity* entity)
-		{
-			switch ( entity->getNodeType() )
-			{
-			case scene::Entity::GEODE:
-				cNode.geometries.push_back( createGeometryInstance(entity) );
-				break;
-
-			default:
-				AUTO_LOGGER_MESSAGE(log::S_WARNING, "Node '" << entity->getName() << "' will not be exported. Unsupported type.");
-				break;
-			}
-		}
-
-		collada_node_ptr createNode(const scene::Node* node)
-		{
-			collada_node_ptr cNode(new collada_node);
-            if ( const scene::Entity* entity = dynamic_cast<const scene::Entity*>(node) )
-            {
-				cNode->id   = getUniqueId( node->getName().str() ); 
-				cNode->name = node->getName().str();
-				attachEntity(*cNode, entity);
-            }
-            else
-            {
-				cNode->id   = getUniqueId( node->getName().str() ); 
-				cNode->name = node->getName().str();
-
-				// setup transform
-				if ( const scene::Transform* transform = dynamic_cast<const scene::Transform*>(node) ) 
-				{
-					cNode->transform = transform->getTransform();
-					if ( dynamic_cast<const scene::Joint*>(transform) ) {
-						cNode->type = collada_node::JOINT;
-					}
-				}
-
-				// add children
-				if ( const scene::Group* group = dynamic_cast<const scene::Group*>(node) )
-				{
-					for ( const scene::Node* i = group->getChild(); i; i = i->getRight() ) 
-					{
-						if ( const scene::Entity* entity = dynamic_cast<const scene::Entity*>(i) ) {
-							attachEntity(*cNode, entity);
-						}
-						else {
-							cNode->children.push_back( createNode(i) );
-						}
-					}
-				}
-            }
-
-			return cNode;
-		}
-
-		collada_visual_scene_ptr createVisualScene(ColladaDocument& document, const scene::Group& graphicsModel)
-		{
-			collada_visual_scene_ptr visualScene(new collada_visual_scene);
-			for ( const scene::Node* i = graphicsModel.getChild(); i; i = i->getRight() )
-			{
-				// create node hierarchy
-				visualScene->nodes.push_back( createNode(i) );
-			}
-			document.libraryVisualScenes.elements.insert( std::make_pair(visualScene->id, visualScene) );
-
-			for (geode_geometry_map::iterator iter  = geometries.begin();
-											  iter != geometries.end();
-											  ++iter)
-			{
-                document.libraryGeometries.elements.insert( std::make_pair(iter->second->id, iter->second) );
-			}
-
-			for (effect_material_map::iterator iter  = materials.begin();
-											   iter != materials.end();
-											   ++iter)
-			{
-				collada_material_ptr material = iter->second;
-				document.libraryMaterials.elements.insert( std::make_pair(material->id, material) );
-                document.libraryEffects.elements.insert( std::make_pair(material->effect->id, material->effect.element) );
-			}
-
-			return visualScene;
-		}
-
-	private:
-		string_set				nodeIds;
-		geode_geometry_map		geometries;
-		effect_material_map		materials;
-	};
 
 } // anonymous namespace
 

@@ -2,6 +2,16 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 PROJECT (SlonEngine)
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules;${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/FindModules;${CMAKE_MODULE_PATH}")
 
+IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
+    SET (RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+ENDIF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
+
+IF (MSVC)
+    SET (CFG_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR})
+ELSE (MSVC)
+    SET (CFG_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY})
+ENDIF (MSVC)
+
 IF (WIN32)
     # setup 3rd party directory as search path
     SET ( SLON_ENGINE_3RD_PARTY_FOUND FALSE )
@@ -16,24 +26,33 @@ IF (WIN32)
     ENDIF ( MSVC AND (MSVC_VERSION EQUAL 1600) )
     
     IF (SLON_ENGINE_3RD_PARTY_FOUND)
-        SET ( BOOST_ROOT        ${3RD_PARTY_DIRECTORY}/boost )
-        SET ( BOOST_INCLUDEDIR  ${3RD_PARTY_DIRECTORY}/boost/boost )
-        SET ( BOOST_LIBRARYDIR  ${3RD_PARTY_DIRECTORY}/boost/lib )
+        #SET ( Boost_DEBUG                   TRUE)
+        SET ( ENV{BOOST_LIBRARYDIR}         "") # trick to force FindBoost ignore environment BOOST_LIBRARYDIR variable
+        SET ( Boost_NO_SYSTEM_PATHS         TRUE)
+        SET ( BOOST_ROOT                    ${3RD_PARTY_DIRECTORY}/boost )
+        SET ( BOOST_INCLUDEDIR              ${3RD_PARTY_DIRECTORY}/boost/boost )
+        SET ( BOOST_LIBRARYDIR              ${3RD_PARTY_DIRECTORY}/boost/lib )
         
+        SET ( Python_ADDITIONAL_VERSIONS    2.6 ) # trick to find builtin python 2.6
+
         LIST ( APPEND CMAKE_INCLUDE_PATH 
             ${3RD_PARTY_DIRECTORY}/boost/ 
             ${3RD_PARTY_DIRECTORY}/BULLET_PHYSICS/include
             ${3RD_PARTY_DIRECTORY}/SDL/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Python26/include
         )
 
         LIST ( APPEND CMAKE_LIBRARY_PATH 
             ${3RD_PARTY_DIRECTORY}/boost/lib
             ${3RD_PARTY_DIRECTORY}/BULLET_PHYSICS/lib
             ${3RD_PARTY_DIRECTORY}/SDL/lib
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Python26/libs
         )
 
         LIST ( APPEND CMAKE_PROGRAM_PATH
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/gnuplot
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Python26
+            ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/GCCXML/bin
         )
 
         # copy dlls into target binary dir
@@ -46,7 +65,7 @@ IF (WIN32)
         MACRO (COPY_DLLS SOURCE DESTINATION COPY_FILES)
             FOREACH(FILENAME ${${COPY_FILES}})
                 ADD_CUSTOM_COMMAND( TARGET ${3RD_PARTY_TARGET}
-                                    COMMAND ${CMAKE_COMMAND} -E copy "${SOURCE}/${FILENAME}" "${DESTINATION}/${FILENAME}")
+                                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE}/${FILENAME}" "${DESTINATION}/${FILENAME}")
             ENDFOREACH(FILENAME)
         ENDMACRO (COPY_DLLS)
 
@@ -54,12 +73,14 @@ IF (WIN32)
             SDL.dll
             SDL_image.dll
         )
-
-        IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
-            SET (RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-            SET (3RD_PARTY_TARGET_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR})
-        ENDIF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
-        COPY_DLLS(${3RD_PARTY_DIRECTORY}/SDL/bin ${3RD_PARTY_TARGET_DIRECTORY} SDL_DLLS)
+        
+        SET (BOOST_DLLS
+            boost_python-vc90-mt-gd-1_45.dll
+            boost_python-vc90-mt-1_45.dll
+        )
+        
+        COPY_DLLS(${3RD_PARTY_DIRECTORY}/SDL/bin ${CFG_RUNTIME_OUTPUT_DIRECTORY} SDL_DLLS)
+        COPY_DLLS(${3RD_PARTY_DIRECTORY}/boost/bin ${CFG_RUNTIME_OUTPUT_DIRECTORY} BOOST_DLLS)
     ENDIF (SLON_ENGINE_3RD_PARTY_FOUND)
 ENDIF (WIN32)
 

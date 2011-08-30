@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Graphics/Common.h"
 #include "Graphics/LightingEffect.h"
 #include "Graphics/Detail/Pass.h"
@@ -14,6 +15,16 @@ DECLARE_AUTO_LOGGER("graphics.LightingEffect")
 
 namespace slon {
 namespace graphics {
+
+LightingEffect::LightingEffect()
+:   opacity(1.0f)
+{
+    opacityOneBinder.reset( new binding_float(&opacity, 1, false) );
+
+    // bind parameters
+    detail::ParameterTable& parameterTable = detail::currentParameterTable();
+    lightCountBinder = parameterTable.getParameterBinding<int>( hash_string("lightCount") );
+}
 
 LightingEffect::LightingEffect(const LightingMaterial*          material_,
                                LightingMaterial::dirty_signal&  dirtySignal)
@@ -32,6 +43,20 @@ LightingEffect::LightingEffect(const LightingMaterial*          material_,
 
 LightingEffect::~LightingEffect()
 {
+}
+
+// Override Serializable
+const char* LightingEffect::serialize(database::OArchive& ar) const
+{
+    ar.writeSerializable(material.get());
+    return "LightingEffect";
+}
+
+void LightingEffect::deserialize(database::IArchive& ar)
+{
+    material = ar.readSerializable<LightingMaterial>(true);
+    dirtyConnection = material->dirtyProxies.connect( boost::bind(&LightingEffect::dirty, this, _1) );
+    dirty(material.get());
 }
 
 // Override Effect

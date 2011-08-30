@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Database/Archive.h"
 #include "Graphics/LightingEffect.h"
 #include "Graphics/LightingMaterial.h"
 
@@ -18,6 +19,23 @@ LightingMaterial::LightingMaterial() :
     emissionMapBinder.reset( new parameter_binding<sgl::Texture2D>(0, 1, false) );
     diffuseSpecularMapBinder.reset( new parameter_binding<sgl::Texture2D>(0, 1, false) );
     normalHeightMapBinder.reset( new parameter_binding<sgl::Texture2D>(0, 1, false) );
+}
+
+const char* LightingMaterial::serialize(database::OArchive& ar) const
+{
+    ar.writeChunk("emission",           emission.arr,           emission.num_elements);
+    ar.writeChunk("diffuseSpecular",    diffuseSpecular.arr,    diffuseSpecular.num_elements);
+    ar.writeChunk("opacity",            &opacity);
+    ar.writeChunk("shininess",          &shininess);
+    return "LightingMaterial";
+}
+
+void LightingMaterial::deserialize(database::IArchive& ar)
+{
+    ar.readChunk("emission",           emission.arr,           emission.num_elements);
+    ar.readChunk("diffuseSpecular",    diffuseSpecular.arr,    diffuseSpecular.num_elements);
+    ar.readChunk("opacity",            &opacity);
+    ar.readChunk("shininess",          &shininess);
 }
 
 void LightingMaterial::setEmission(const math::Vector4f& emission_)               
