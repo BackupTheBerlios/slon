@@ -62,7 +62,7 @@ public:
     virtual TYPE getNodeType() const { return NODE; }
 
     /** Helper function outputs information about node. */
-    void accept(log::LogVisitor& visitor) const;
+    virtual void accept(log::LogVisitor& visitor) const;
 
     /** Get parent node in the hierarchy. */
     Group* getParent() { return parent; }

@@ -16,7 +16,7 @@ LogVisitor::LogVisitor(const log::logger_ptr&	logger_,
 
 LogVisitor::LogVisitor(const log::logger_ptr&	logger_, 
                        log::SEVERITY			severity_, 
-                       scene::Node&				node)
+                       const scene::Node&		node)
 :   logger(logger_)
 ,   severity(severity_)
 {
