@@ -31,7 +31,7 @@ public:
         CT_CONTINUOUS   /// capture collision as if they were continous in time
     };
 
-    struct state_desc
+    struct DESC
 #ifdef SLON_ENGINE_USE_SSE
        : public aligned<0x10>
 #endif
@@ -42,7 +42,7 @@ public:
         real            fixedTimeStep;
         size_t          maxNumSubSteps;
 
-        state_desc() :
+        DESC() :
             worldSize( math::Vector3r(0), math::Vector3r(0) ),
             collisionType(CT_DISCRETE),
             gravity(0, real(-9.8), 0),
@@ -56,7 +56,7 @@ public:
     typedef contact_vector::const_iterator  contact_const_iterator;
 
 public:
-    DynamicsWorld(const state_desc& desc);
+    DynamicsWorld(const DESC& desc);
     ~DynamicsWorld();
 
     /** Setup world's gravity and its direction. */
@@ -75,7 +75,7 @@ public:
     size_t getNumSimulatedSteps() const;
 
     /** Get description of the world. */
-    const state_desc& getStateDesc() const;
+    const DESC& getDesc() const;
 
     /** Step simulation. 
      * @return "unsimulated" time < fixedTimeStep
@@ -113,7 +113,7 @@ public:
 	const impl_type* getImpl() const { return impl.get(); }
 
 private:
-	state_desc desc;
+	DESC desc;
 	impl_ptr   impl;
 };
 

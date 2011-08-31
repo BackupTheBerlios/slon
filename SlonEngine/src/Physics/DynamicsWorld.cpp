@@ -10,7 +10,7 @@
 namespace slon {
 namespace physics {
 
-DynamicsWorld::DynamicsWorld(const state_desc& desc_)
+DynamicsWorld::DynamicsWorld(const DESC& desc_)
 :	desc(desc_)
 {
 	impl.reset( new BulletDynamicsWorld(this) );
@@ -60,7 +60,7 @@ size_t DynamicsWorld::getNumSimulatedSteps() const
 	return impl->getNumSimulatedSteps();
 }
 
-const DynamicsWorld::state_desc& DynamicsWorld::getStateDesc() const
+const DynamicsWorld::DESC& DynamicsWorld::getDesc() const
 {
 	return desc;
 }

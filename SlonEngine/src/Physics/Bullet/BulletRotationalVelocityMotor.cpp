@@ -60,7 +60,7 @@ real BulletRotationalVelocityMotor::getMaxForce() const
 
 void BulletRotationalVelocityMotor::setMaxForce(real force) 
 { 
-    motor->m_maxMotorForce = force * BulletRotationalMotor::constraint->dynamicsWorld->getInterface()->getStateDesc().fixedTimeStep; 
+    motor->m_maxMotorForce = force * BulletRotationalMotor::constraint->dynamicsWorld->getInterface()->getDesc().fixedTimeStep; 
 }
 
 } // namespace physics

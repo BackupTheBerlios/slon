@@ -50,7 +50,7 @@ private:
 
 	typedef DynamicsWorld::contact_vector               contact_vector;
 	typedef DynamicsWorld::contact_const_iterator       contact_const_iterator;
-	typedef DynamicsWorld::state_desc                   state_desc;
+	typedef DynamicsWorld::DESC                   state_desc;
 	
 private:
     // non copyable
