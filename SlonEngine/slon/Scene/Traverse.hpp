@@ -23,7 +23,7 @@ void traverseDFS(NodeT& root,
     {
         func(*node);
 
-        if (node->getNodeType() & scene::Node::GROUP) {
+        if ( (node->getNodeType() & scene::Node::GROUP) && static_cast<group_type*>(node)->getChild() ) {
             node = static_cast<group_type*>(node)->getChild();
         }
         else if ( node->getRight() ) {
