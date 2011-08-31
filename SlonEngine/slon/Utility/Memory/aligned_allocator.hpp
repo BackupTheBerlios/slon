@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef __GNUC__
 #include <mm_malloc.h>
+#endif
 
 namespace slon {
 
