@@ -8,11 +8,13 @@ SET ( SOURCES
 )
 
 SET ( MATH_HEADERS
+	include/PyAABB.h
 	include/PyMatrix.h
 	include/PyVector.h
 )
 
 SET ( MATH_SOURCES
+	src/PyAABB.cpp
 	src/PyMatrix.cpp
 	src/PyVector.cpp
     src/Export.cpp

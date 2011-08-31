@@ -266,8 +266,8 @@ namespace {
 
 		// loads mesh from collada mesh
         graphics::gpu_side_mesh_ptr createMesh(const collada_mesh&               colladaMesh,
-						        	  const collada_bind_material_ptr&  bindMaterial,
-                                      const collada_skin*               skin = 0)
+						        	           const collada_bind_material_ptr&  bindMaterial,
+                                               const collada_skin*               skin = 0)
 		{
 			using namespace sgl;
 

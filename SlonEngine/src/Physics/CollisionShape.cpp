@@ -98,7 +98,7 @@ void ConvexShape::deserialize(database::IArchive& ar)
     if (info.size > 0)
     {
         vertices.resize(info.size / 3);
-        ar.read(&vertices[0].arr);
+        ar.read(vertices[0].arr);
     }
     else {
         vertices.clear();
