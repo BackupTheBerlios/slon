@@ -1,5 +1,6 @@
 import c4d
 import datetime
+import inspect
 import os
 import math as pmath
 import struct
@@ -18,6 +19,7 @@ import slon
 from slon import math
 from slon import scene
 from slon import graphics
+from slon import physics
 from slon import database
     
 #be sure to use a unique ID obtained from 'plugincafe.com'
@@ -28,11 +30,21 @@ def convertVector3(v, scale = 1.0):
     
 def convertMatrix(m, scale = 1.0):
     mat = math.Matrix4f()
-    
     mat[0] = math.VectorRow4f(m.v1.x, m.v2.x, m.v3.x, m.off.x * scale)
     mat[1] = math.VectorRow4f(m.v1.y, m.v2.y, m.v3.y, m.off.y * scale)
     mat[2] = math.VectorRow4f(m.v1.z, m.v2.z, m.v3.z, m.off.z * scale)
     mat[3] = math.VectorRow4f(     0,      0,      0,               1)
+    
+    return mat
+    
+def convertPhysicsTransform(rot, trans, scale = 1.0):
+    rotMat = utils.HPBToMatrix(rot)
+    
+    mat = math.Matrix4f()
+    mat[0] = math.VectorRow4f(rotMat.v1.x, rotMat.v2.x, rotMat.v3.x, trans.x * scale)
+    mat[1] = math.VectorRow4f(rotMat.v1.y, rotMat.v2.y, rotMat.v3.y, trans.y * scale)
+    mat[2] = math.VectorRow4f(rotMat.v1.z, rotMat.v2.z, rotMat.v3.z, trans.z * scale)
+    mat[3] = math.VectorRow4f(          0,           0,           0,               1)
     
     return mat
     
@@ -141,37 +153,88 @@ class SlonExporter(plugins.SceneSaverData):
     def convertNode(self, c4dNode):
         if not c4dNode: 
             return None
+       
+        dynTag = c4dNode.GetTag(180000102)
+        if c4dNode.GetTag(180000102):
+            parent, current = self.convertPhysicsNode(c4dNode)
+        else:
+            parent = current = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl(), self.documentScale) )
         
-        transform = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl(), self.documentScale) )
         if (c4dNode.GetType() == c4d.Opolygon):
             polyObj = self.convertPolygonObject(c4dNode)
             if (polyObj != None):
-                transform.addChild(polyObj)
+                current.addChild(polyObj)
         #elif (node.GetType() == c4d.Olight): 
         #    self.dumpLightObject(nodeEl, node)
         
         c4dChildObj = c4dNode.GetDown()
         while c4dChildObj != None:
-            transform.addChild( self.convertNode(c4dChildObj) )
+            current.addChild( self.convertNode(c4dChildObj) )
             c4dChildObj = c4dChildObj.GetNext()
             
-        return transform
-
-    def dumpPhysics(self, node):
-        if not node: return
+        return parent
+               
+    def computeBoxShape(self, c4dNode):
+        return physics.BoxShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-        dynTag = node.GetTag(180000102)
-        if dynTag:
-            rbEl = etree.SubElement(self.physicsEl, "RigidBody")
-            etree.SubElement(rbEl, "mass").text = str(dynTag[c4d.RIGID_BODY_MASS])
-            etree.SubElement(rbEl, "margin").text = str(dynTag[c4d.RIGID_BODY_MARGIN])
-            etree.SubElement(rbEl, "target").text = node.GetName()
-            etree.SubElement(rbEl, "shape").text = str(dynTag[c4d.RIGID_BODY_SHAPE])
-            etree.SubElement(rbEl, "ref_shape").text = str(dynTag[c4d.RIGID_BODY_REFERENCE_SHAPE])
+    def computeCylinderXShape(self, c4dNode):
+        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-        self.dumpPhysics(node.GetDown())
-        self.dumpPhysics(node.GetNext())
+    def computeCylinderYShape(self, c4dNode):
+        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        
+    def computeCylinderZShape(self, c4dNode):
+        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        
+    def computeConvexHullShape(self, c4dNode):
+        pointsArr = slon.Vector3fArray()    
+        for point in c4dNode.GetAllPoints():
+            pointsArr.append( convertVector3(point, self.documentScale) )
+        
+        shape = physics.ConvexShape()
+        shape.buildConvexHull(pointsArr)
+        return shape
+            
+    def convertPhysicsNode(self, c4dNode):       
+        dynTag = c4dNode.GetTag(180000102)
 
+        desc = physics.RigidBody.DESC()
+        desc.transform = convertPhysicsTransform(c4dNode.GetAbsRot(), c4dNode.GetAbsPos(), self.documentScale)
+        desc.type = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
+        desc.mass = dynTag[c4d.RIGID_BODY_MASS]
+        desc.margin = dynTag[c4d.RIGID_BODY_MARGIN]
+        shape = dynTag[c4d.RIGID_BODY_SHAPE]
+        if shape == c4d.RIGID_BODY_SHAPE_BOX:
+            desc.collisionShape = self.computeBoxShape(c4dNode)
+        elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_X:
+            desc.collisionShape = self.computeCylinderXShape(c4dNode)
+        elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_Y:
+            desc.collisionShape = self.computeCylinderYShape(c4dNode)
+        elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_Z:
+            desc.collisionShape = self.computeCylinderZShape(c4dNode)
+        elif shape == c4d.RIGID_BODY_SHAPE_CONVEX_HULL:
+            desc.collisionShape = self.computeConvexHullShape(c4dNode)
+        else:
+            print c4dNode.GetName(), " : physics shape not converted"
+            desc.collisionShape = physics.SphereShape(1.0)
+        rigidBody = physics.RigidBody(desc)
+
+        physicsTransform = physics.PhysicsTransform(rigidBody)
+        physicsTransform.absolute = True
+        
+        # physics to graphics transformation convertion       
+        transform = math.invert(desc.transform) * convertMatrix(c4dNode.GetMg(), self.documentScale) 
+        physToGraphics = scene.MatrixTransform("PhysicsToGraphics", transform)
+        physicsTransform.addChild(physToGraphics)
+        
+        return physicsTransform, physToGraphics
+        #rbEl = etree.SubElement(self.physicsEl, "RigidBody")
+        #etree.SubElement(rbEl, "mass").text = str(dynTag[c4d.RIGID_BODY_MASS])
+        #etree.SubElement(rbEl, "margin").text = str(dynTag[c4d.RIGID_BODY_MARGIN])
+        #etree.SubElement(rbEl, "target").text = node.GetName()
+        #etree.SubElement(rbEl, "shape").text = str(dynTag[c4d.RIGID_BODY_SHAPE])
+        #etree.SubElement(rbEl, "ref_shape").text = str(dynTag[c4d.RIGID_BODY_REFERENCE_SHAPE])
+        
     def writeToFile(self, name):
         database.saveLibrary(name, self.library)
         return c4d.FILEERROR_NONE

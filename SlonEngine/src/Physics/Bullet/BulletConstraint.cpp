@@ -12,7 +12,7 @@ namespace {
     using namespace slon;
     using namespace physics;
 
-    btGeneric6DofConstraint* createBulletConstraint(const Constraint::state_desc& desc)
+    btGeneric6DofConstraint* createBulletConstraint(const Constraint::DESC& desc)
     {
         assert(desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies");
 
@@ -59,7 +59,7 @@ BulletConstraint::BulletConstraint(Constraint*              pInterface_,
 ,	constraint(constraint_)
 {
     assert(constraint);
-	Constraint::state_desc& desc = pInterface->desc;
+	Constraint::DESC& desc = pInterface->desc;
 
     desc.name           = name_;
     desc.rigidBodies[0] = reinterpret_cast<RigidBody*>( constraint->getRigidBodyA().getUserPointer() );
@@ -89,7 +89,7 @@ BulletConstraint::BulletConstraint(Constraint*          pInterface_,
 ,	dynamicsWorld(dynamicsWorld_)
 {
 	assert(dynamicsWorld);
-    const Constraint::state_desc& desc = pInterface->desc;
+    const Constraint::DESC& desc = pInterface->desc;
 
     // get bodies
     assert( desc.rigidBodies[0] && desc.rigidBodies[1] && "Constraint must specify affected rigid bodies.");  

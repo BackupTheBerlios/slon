@@ -12,7 +12,7 @@
 namespace slon {
 namespace physics {
 
-Constraint::Constraint(const state_desc& desc_)
+Constraint::Constraint(const DESC& desc_)
 :   desc(desc_)
 {
     desc.rigidBodies[0]->addConstraint(this);
@@ -140,7 +140,7 @@ const std::string& Constraint::getName() const
 	return desc.name;
 }
 
-const Constraint::state_desc& Constraint::getStateDesc() const
+const Constraint::DESC& Constraint::getDesc() const
 {
 	return desc;
 }
@@ -150,7 +150,7 @@ const DynamicsWorld* Constraint::getDynamicsWorld() const
 	return world.get();
 }
 
-void Constraint::reset(const state_desc& desc_)
+void Constraint::reset(const DESC& desc_)
 {
 	desc.rigidBodies[0]->removeConstraint(this);
     desc.rigidBodies[1]->removeConstraint(this);

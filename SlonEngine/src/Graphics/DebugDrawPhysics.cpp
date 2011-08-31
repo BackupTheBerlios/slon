@@ -106,7 +106,7 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
 {
     math::Matrix4f transformA( m.mot.getConstraint()->getRigidBodyA()->getTransform() );
     math::Matrix4f transformB( m.mot.getConstraint()->getRigidBodyB()->getTransform() );
-    math::Matrix4f transformC( m.mot.getConstraint()->getRigidBodyA()->getTransform() * m.mot.getConstraint()->getStateDesc().frames[0] );
+    math::Matrix4f transformC( m.mot.getConstraint()->getRigidBodyA()->getTransform() * m.mot.getConstraint()->getDesc().frames[0] );
 
     switch ( m.mot.getType() ) 
     {
@@ -170,8 +170,8 @@ DebugMesh& operator << (DebugMesh& mesh, const motor& m)
 
 DebugMesh& operator << (DebugMesh& mesh, const constraint& c)
 {
-    math::Matrix4f trA( c.cons.getRigidBodyA()->getTransform() * c.cons.getStateDesc().frames[0] );
-    math::Matrix4f trB( c.cons.getRigidBodyB()->getTransform() * c.cons.getStateDesc().frames[1] );
+    math::Matrix4f trA( c.cons.getRigidBodyA()->getTransform() * c.cons.getDesc().frames[0] );
+    math::Matrix4f trB( c.cons.getRigidBodyB()->getTransform() * c.cons.getDesc().frames[1] );
 
     mesh << transform(trA)
          << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(1.0f, 0.0f, 0.0f) )

@@ -3,6 +3,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <sgl/Math/Matrix.hpp>
+#include <sgl/Math/MatrixFunctions.hpp>
 
 using namespace boost::python;
 using namespace math;
@@ -48,27 +49,68 @@ struct matrix_item
         if (i >= 0 && i < n) {
             mat[i] = r;
         }
-
-        IndexError(i, 0, n-1);
+        else {
+            IndexError(i, 0, n-1);
+        }
     }
 };
 
+// because of alignment implications with boost::python we need all these wrappers
+
+inline boost::shared_ptr<Matrix4f> invert4x4f(const math::Matrix4f& mat)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(invert(mat)) );
+}
+
+inline boost::shared_ptr<Matrix4f> add4x4f(const math::Matrix4f& m0, const math::Matrix4f& m1)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(m0 + m1) );
+}
+
+inline boost::shared_ptr<Matrix4f> sub4x4f(const math::Matrix4f& m0, const math::Matrix4f& m1)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(m0 - m1) );
+}
+
+inline boost::shared_ptr<Matrix4f> mul4x4f(const math::Matrix4f& m, float v)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(m * v) );
+}
+
+inline boost::shared_ptr<Matrix4f> mul4x4x4f(const math::Matrix4f& m0, const math::Matrix4f& m1)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(m0 * m1) );
+}
+
+inline boost::shared_ptr<Vector4f> mul4x4x1f(const math::Matrix4f& m, const math::Vector4f& v)
+{
+    return boost::shared_ptr<Vector4f>( new Vector4f(m * v) );
+}
+
+inline boost::shared_ptr<Matrix4f> div4x4f(const math::Matrix4f& m, float v)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f(m / v) );
+}
+
 void exportMatrix()
 {
-    class_<Matrix4f, boost::shared_ptr<Matrix4f>, boost::noncopyable>("Matrix4f", init<>())
+    class_<Matrix4f, boost::shared_ptr<Matrix4f>, boost::noncopyable>("Matrix4f")
+        .def(init<>())
         .def(init<float>())
         .def(init<const Matrix4f&>())
         .def("__getitem__", &matrix_item<float, 4, 4>::get, return_value_policy<reference_existing_object>())
         .def("__setitem__", &matrix_item<float, 4, 4>::set)
         .def(self += self)
-        .def(self +  self)
         .def(self -= self)
-        .def(self -  self)
         .def(self *= float())
-        .def(self *  float())
         .def(self *= self)
-        .def(self *  self)
-        .def(self *  Vector4f())
         .def(self /= float())
-        .def(self /  float());
+        .def("__add__",     add4x4f)
+        .def("__sub__",     sub4x4f)
+        .def("__div__",     div4x4f)
+        .def("__mul__",     mul4x4f)
+        .def("__mul__",     mul4x4x4f)
+        .def("__mul__",     mul4x4x1f);
+
+    def("invert", invert4x4f);
 }

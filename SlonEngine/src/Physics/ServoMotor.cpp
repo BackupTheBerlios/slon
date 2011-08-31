@@ -41,10 +41,10 @@ real ServoMotor::getLoLimit() const
         return impl->getLoLimit();
     }
     else if (dof > 3) {
-        return constraint->getStateDesc().angularLimits[0][dof - 3];
+        return constraint->getDesc().angularLimits[0][dof - 3];
     }
     else {
-        return constraint->getStateDesc().linearLimits[0][dof];
+        return constraint->getDesc().linearLimits[0][dof];
     }
 }
 
@@ -54,10 +54,10 @@ real ServoMotor::getHiLimit() const
         return impl->getHiLimit();
     }
     else if (dof > 3) {
-        return constraint->getStateDesc().angularLimits[1][dof - 3];
+        return constraint->getDesc().angularLimits[1][dof - 3];
     }
     else {
-        return constraint->getStateDesc().linearLimits[1][dof];
+        return constraint->getDesc().linearLimits[1][dof];
     }
 }
 

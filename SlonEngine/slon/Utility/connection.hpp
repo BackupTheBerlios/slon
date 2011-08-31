@@ -1,8 +1,10 @@
 #ifndef __SLON_ENGINE_UTILITY_CONNECTION_HPP__
 #define __SLON_ENGINE_UTILITY_CONNECTION_HPP__
 
+#include <boost/scoped_ptr.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include "function.hpp"
+#include "signal.hpp"
 
 namespace slon {
 

@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_PHYSICS_COLLISION_SHAPE_H__
 
 #include <boost/intrusive_ptr.hpp>
+#include <sgl/Math/Containers.hpp>
 #include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Plane.hpp>
 #include <vector>
@@ -236,9 +237,17 @@ public:
     }
 
 	/** Build convex hull of the point cloud and store it as shape.
+	 * @param vertices - vertices of point cloud.
+	 */
+	void buildConvexHull(const math::vector_of_vector3f& vertices)
+	{
+	    buildConvexHull( vertices.begin(), vertices.end() );
+	}
+
+	/** Build convex hull of the point cloud and store it as shape.
 	 * @tparam Iterator - iterator type referencing 3-component floating tuple.
-	 * @param beginIter - begin iterator.
-	 * @param beginIter - end iterator.
+	 * @param beginIter - iterator addressing first vertex in point cloud.
+	 * @param beginIter - iterator addressing end vertex in point cloud.
 	 * @see build_convex_hull
 	 */
 	template<typename Iterator>
@@ -251,7 +260,7 @@ public:
 	}
 
 public:
-	std::vector<math::Vector3r>	vertices;
+    math::vector_of_vector3f vertices;
 };
 
 /** Arbitrary triangle mesh collision shape */

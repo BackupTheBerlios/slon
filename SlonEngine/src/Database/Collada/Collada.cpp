@@ -266,8 +266,8 @@ namespace {
 
 		// loads mesh from collada mesh
         graphics::gpu_side_mesh_ptr createMesh(const collada_mesh&               colladaMesh,
-						        	  const collada_bind_material_ptr&  bindMaterial,
-                                      const collada_skin*               skin = 0)
+						        	           const collada_bind_material_ptr&  bindMaterial,
+                                               const collada_skin*               skin = 0)
 		{
 			using namespace sgl;
 
@@ -1048,7 +1048,7 @@ namespace {
             collada_rigid_constraint& colladaConstraint = *colladaRigidConstraintInstance.element;
 
             // create constraint
-            physics::Constraint::state_desc desc(colladaConstraint.sid);
+            physics::Constraint::DESC desc(colladaConstraint.sid);
 
             desc.frames[0] = math::Matrix4r(colladaConstraint.refAttachment.transform);
             desc.frames[1] = math::Matrix4r(colladaConstraint.attachment.transform);
@@ -1078,7 +1078,7 @@ namespace {
 
             collada_rigid_body& colladaRigidBody = *colladaRigidBodyInstance.element;
 
-            RigidBody::state_desc desc;
+            RigidBody::DESC desc;
             desc.name = colladaRigidBody.sid;
             desc.type = colladaRigidBody.dynamic ? RigidBody::DT_DYNAMIC : RigidBody::DT_STATIC;
 

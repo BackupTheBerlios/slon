@@ -33,7 +33,7 @@ public:
 	typedef boost::scoped_ptr<Motor>     motor_ptr;
 
 public:
-    struct state_desc
+    struct DESC
 #ifdef SLON_ENGINE_USE_SSE
        : public aligned<0x10>
 #endif
@@ -44,7 +44,7 @@ public:
         math::Vector3r  linearLimits[2];    /// translational limits, set -INF, +INF for free axes
         math::Vector3r  angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
 
-        state_desc(const std::string& _name = "") :
+        DESC(const std::string& _name = "") :
             name(_name)
         {
             rigidBodies[0]   = rigidBodies[1]   = 0;
@@ -72,7 +72,7 @@ public:
     };
 
 public:
-    Constraint(const state_desc& desc = state_desc());
+    Constraint(const DESC& desc = DESC());
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -129,13 +129,13 @@ public:
     const std::string& getName() const;
 
     /** Get description of the constraint. */
-    const state_desc& getStateDesc() const;
+    const DESC& getDesc() const;
 
     /** Get dynamics world where constraint is. */
     const DynamicsWorld* getDynamicsWorld() const;
 
     /** Recreate constraint from description. */
-    void reset(const state_desc& desc);
+    void reset(const DESC& desc);
 
 	/** Get implementation object */
 	impl_type* getImpl() { return impl.get(); }
@@ -155,7 +155,7 @@ private:
 
 private:
 	dynamics_world_ptr world;
-	state_desc         desc;
+	DESC               desc;
 	impl_ptr           impl;
 	motor_ptr          motors[6];
 };

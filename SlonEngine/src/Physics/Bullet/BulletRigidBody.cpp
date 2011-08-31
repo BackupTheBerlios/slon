@@ -39,7 +39,7 @@ private:
 
 namespace {
 
-	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(RigidBody::state_desc& desc, btMotionState& motionState)
+	btRigidBody::btRigidBodyConstructionInfo makeRigidBodyDesc(RigidBody::DESC& desc, btMotionState& motionState)
 	{
 		btCollisionShape* collisionShape = 0;
         btVector3         localInertia   = to_bt_vec(desc.inertia);
@@ -137,7 +137,7 @@ std::ostream& operator << (std::ostream& os, const CollisionShape& shape)
 	return os;
 }
 
-std::ostream& operator << (std::ostream& os, const RigidBody::state_desc& desc)
+std::ostream& operator << (std::ostream& os, const RigidBody::DESC& desc)
 {
 	os << "{\n" 
 	   << log::indent()
@@ -219,7 +219,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*             pInterface_,
 :	base_type(pInterface_, dynamicsWorld_)
 ,   pInterface(pInterface_)
 {
-	RigidBody::state_desc& desc = pInterface_->desc;
+	RigidBody::DESC& desc = pInterface_->desc;
 	motionState.reset( new BulletMotionState(this) );
     motionState->setWorldTransform( to_bt_mat(desc.transform) );
 

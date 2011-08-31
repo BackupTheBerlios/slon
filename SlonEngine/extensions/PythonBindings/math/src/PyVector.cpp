@@ -51,7 +51,7 @@ struct vector_item
 
 void exportVector()
 {
-    class_<Vector3f, boost::shared_ptr<Vector3f>, boost::noncopyable>("Vector3f", init<>())
+    class_<Vector3f, boost::shared_ptr<Vector3f> >("Vector3f", init<>())
         .def(init<float>())
         .def(init<float, float, float>())
         .def(init<const Vector3f&>())
@@ -66,7 +66,7 @@ void exportVector()
         .def(self /= float())
         .def(self /  float());
 
-    class_<VectorRow3f, boost::shared_ptr<VectorRow3f>, boost::noncopyable>("VectorRow3f", init<>())
+    class_<VectorRow3f, boost::shared_ptr<VectorRow3f> >("VectorRow3f", init<>())
         .def(init<float>())
         .def(init<float, float, float>())
         .def(init<const VectorRow3f&>())
