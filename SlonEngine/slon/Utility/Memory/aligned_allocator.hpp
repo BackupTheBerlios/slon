@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef __GNUC__
-#   include <emmintrin.h>
+#include <mm_malloc.h>
 #endif
 
 namespace slon {

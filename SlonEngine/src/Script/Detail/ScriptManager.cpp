@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Script/Detail/ScriptManager.h"
 #ifdef SLON_ENGINE_USE_PYTHON
-#   include <python.h>
+#   include <Python.h>
 #endif
 
 namespace slon {

@@ -3,10 +3,9 @@
 
 #include "../Log/Logger.h"
 #include <stdexcept>
-#ifdef __GNUC__
+#ifdef __linux__
 #   include <signal.h>
-#endif
-#ifdef WIN32
+#elif defined(WIN32)
 #   define NOMINMAX
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
