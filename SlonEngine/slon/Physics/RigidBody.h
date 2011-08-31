@@ -48,7 +48,7 @@ public:
         AS_DISABLE_SIMULATION
     };
 
-    struct state_desc
+    struct DESC
 #ifdef SLON_ENGINE_USE_SSE
        : public aligned<0x10>
 #endif
@@ -64,7 +64,7 @@ public:
         std::string               name;               /// name of the rigid body
         const_collision_shape_ptr collisionShape;
 
-        state_desc(const std::string& _name = "") :
+        DESC(const std::string& _name = "") :
             transform( math::make_identity<float, 4>() ),
             type(DT_DYNAMIC),
             mass(0),
@@ -78,7 +78,7 @@ public:
     };
 
 public:
-	RigidBody(const state_desc& desc = state_desc());
+	RigidBody(const DESC& desc = DESC());
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -135,10 +135,10 @@ public:
     DYNAMICS_TYPE getDynamicsType() const;
 
     /** Get rigid body description structure state. */
-    const state_desc& getStateDesc() const;
+    const DESC& getDesc() const;
 
     /** Recreate rigid body from desc */
-    void reset(const state_desc& desc);
+    void reset(const DESC& desc);
 
     /** Get iterator addressing first constraint attached to this rigid body */
     constraint_iterator firstConstraint();
@@ -170,7 +170,7 @@ private:
 
 private:
     dynamics_world_ptr world;
-    mutable state_desc desc;
+    mutable DESC desc;
     impl_ptr           impl;
     constraint_vector  constraints;
 };

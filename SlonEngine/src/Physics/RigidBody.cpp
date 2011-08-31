@@ -10,14 +10,14 @@
 namespace slon {
 namespace physics {
 
-RigidBody::RigidBody(const state_desc& desc_)
+RigidBody::RigidBody(const DESC& desc_)
 :   desc(desc_)
 {
 }
 
 const char* RigidBody::serialize(database::OArchive& ar) const
 {
-    getStateDesc();
+    getDesc();
     ar.writeChunk("transform", desc.transform.data(), desc.transform.num_elements);
     ar.writeChunk("type", reinterpret_cast<const int*>(&desc.type));
     ar.writeChunk("mass", &desc.mass);
@@ -154,7 +154,7 @@ RigidBody::DYNAMICS_TYPE RigidBody::getDynamicsType() const
 	return desc.type;
 }
 
-const RigidBody::state_desc& RigidBody::getStateDesc() const
+const RigidBody::DESC& RigidBody::getDesc() const
 {
 	if (impl)
 	{
@@ -165,7 +165,7 @@ const RigidBody::state_desc& RigidBody::getStateDesc() const
 	return desc;
 }
 
-void RigidBody::reset(const state_desc& desc_)
+void RigidBody::reset(const DESC& desc_)
 {
 	release();
 	desc = desc_;
