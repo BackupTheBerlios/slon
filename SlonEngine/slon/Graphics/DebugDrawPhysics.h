@@ -57,6 +57,9 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& c);
 /** Add cone shape to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& c);
 
+/** Add convex shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c);
+
 /** Add motor to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const motor& m);
 

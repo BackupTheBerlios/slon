@@ -75,7 +75,7 @@ void TransformVisitor::visitGroup(Group& group)
 
 bool TransformVisitor::visitTransform(Transform& transform)
 {
-    bool dirty = true;//currentNode->dirty | (transform.getTransformTraverseStamp() < transform.getModifiedCount());
+    bool dirty = currentNode->dirty | (transform.getTransformTraverseStamp() < transform.getModifiedCount());
     if (!transform.isAbsolute() && dirty) 
     {
         if (currentNode->transform)

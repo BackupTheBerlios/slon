@@ -33,7 +33,12 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c)
             break;
 
         case physics::CollisionShape::HEIGHTFIELD:
+            break;
+
         case physics::CollisionShape::CONVEX_MESH:
+            mesh << static_cast<const physics::ConvexShape&>(c);
+            break;
+
         case physics::CollisionShape::TRIANGLE_MESH:
             break;
 
@@ -74,6 +79,19 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& cylShape)
         mesh << transform( tr * math::make_scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.x) );
     }
     return mesh << cylinder(cylShape.halfExtent.x, cylShape.halfExtent.y * 2.0f, true) << transform(tr);
+}
+
+DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c)
+{
+    for (size_t i = 0; i<c.vertices.size(); ++i) 
+    {
+        mesh.vertices.push_back(c.vertices[i]);
+        mesh.indices.push_back(i);
+    }
+    mesh.pushPrimitive(sgl::POINTS, mesh.vertices.size());
+    mesh.geometryDirty = true;
+
+    return mesh;
 }
 
 float getArcEnd(const physics::Motor& motor, float scale)
