@@ -37,14 +37,16 @@ def convertMatrix(m, scale = 1.0):
     
     return mat
     
-def convertPhysicsTransform(rot, trans, scale = 1.0):
-    rotMat = utils.HPBToMatrix(rot)
+def convertPhysicsTransform(m, scale = 1.0):
+    v1 = m.v1.GetNormalized()
+    v2 = m.v2.GetNormalized()
+    v3 = m.v3.GetNormalized()
     
     mat = math.Matrix4f()
-    mat[0] = math.VectorRow4f(rotMat.v1.x, rotMat.v2.x, rotMat.v3.x, trans.x * scale)
-    mat[1] = math.VectorRow4f(rotMat.v1.y, rotMat.v2.y, rotMat.v3.y, trans.y * scale)
-    mat[2] = math.VectorRow4f(rotMat.v1.z, rotMat.v2.z, rotMat.v3.z, trans.z * scale)
-    mat[3] = math.VectorRow4f(          0,           0,           0,               1)
+    mat[0] = math.VectorRow4f(v1.x, v2.x, v3.x, m.off.x * scale)
+    mat[1] = math.VectorRow4f(v1.y, v2.y, v3.y, m.off.y * scale)
+    mat[2] = math.VectorRow4f(v1.z, v2.z, v3.z, m.off.z * scale)
+    mat[3] = math.VectorRow4f(   0,    0,    0,               1)
     
     return mat
     
@@ -174,19 +176,35 @@ class SlonExporter(plugins.SceneSaverData):
             
         return parent
                
-    def computeBoxShape(self, c4dNode):
+    def computeBoxShape(self, c4dNode, transform):
+        mp = c4dNode.GetMp() * self.documentScale
+        transform[0][3] += mp.x
+        transform[1][3] += mp.y
+        transform[2][3] += mp.z
         return physics.BoxShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-    def computeCylinderXShape(self, c4dNode):
+    def computeCylinderXShape(self, c4dNode, transform):
+        mp = c4dNode.GetMp() * self.documentScale
+        transform[0][3] += mp.x
+        transform[1][3] += mp.y
+        transform[2][3] += mp.z
         return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-    def computeCylinderYShape(self, c4dNode):
+    def computeCylinderYShape(self, c4dNode, transform):
+        mp = c4dNode.GetMp() * self.documentScale
+        transform[0][3] += mp.x
+        transform[1][3] += mp.y
+        transform[2][3] += mp.z
         return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-    def computeCylinderZShape(self, c4dNode):
+    def computeCylinderZShape(self, c4dNode, transform):
+        mp = c4dNode.GetMp() * self.documentScale
+        transform[0][3] += mp.x
+        transform[1][3] += mp.y
+        transform[2][3] += mp.z
         return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
-    def computeConvexHullShape(self, c4dNode):
+    def computeConvexHullShape(self, c4dNode, transform):
         pointsArr = slon.Vector3fArray()    
         for point in c4dNode.GetAllPoints():
             pointsArr.append( convertVector3(point, self.documentScale) )
@@ -199,21 +217,22 @@ class SlonExporter(plugins.SceneSaverData):
         dynTag = c4dNode.GetTag(180000102)
 
         desc = physics.RigidBody.DESC()
-        desc.transform = convertPhysicsTransform(c4dNode.GetAbsRot(), c4dNode.GetAbsPos(), self.documentScale)
+        desc.transform = convertPhysicsTransform(c4dNode.GetMg(), self.documentScale)
         desc.type = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
         desc.mass = dynTag[c4d.RIGID_BODY_MASS]
         desc.margin = dynTag[c4d.RIGID_BODY_MARGIN]
+        
         shape = dynTag[c4d.RIGID_BODY_SHAPE]
         if shape == c4d.RIGID_BODY_SHAPE_BOX:
-            desc.collisionShape = self.computeBoxShape(c4dNode)
+            desc.collisionShape = self.computeBoxShape(c4dNode, desc.transform)
         elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_X:
-            desc.collisionShape = self.computeCylinderXShape(c4dNode)
+            desc.collisionShape = self.computeCylinderXShape(c4dNode, desc.transform)
         elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_Y:
-            desc.collisionShape = self.computeCylinderYShape(c4dNode)
+            desc.collisionShape = self.computeCylinderYShape(c4dNode, desc.transform)
         elif shape == c4d.RIGID_BODY_SHAPE_CYLINDER_Z:
-            desc.collisionShape = self.computeCylinderZShape(c4dNode)
+            desc.collisionShape = self.computeCylinderZShape(c4dNode, desc.transform)
         elif shape == c4d.RIGID_BODY_SHAPE_CONVEX_HULL:
-            desc.collisionShape = self.computeConvexHullShape(c4dNode)
+            desc.collisionShape = self.computeConvexHullShape(c4dNode, desc.transform)
         else:
             print c4dNode.GetName(), " : physics shape not converted"
             desc.collisionShape = physics.SphereShape(1.0)

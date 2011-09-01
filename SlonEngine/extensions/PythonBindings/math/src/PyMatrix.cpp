@@ -92,6 +92,16 @@ inline boost::shared_ptr<Matrix4f> div4x4f(const math::Matrix4f& m, float v)
     return boost::shared_ptr<Matrix4f>( new Matrix4f(m / v) );
 }
 
+inline boost::shared_ptr<Matrix4f> make_identity4f()
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f( make_identity<float, 4>() ) );
+}
+
+inline boost::shared_ptr<Matrix4f> make_translation_xyz(float x, float y, float z)
+{
+    return boost::shared_ptr<Matrix4f>( new Matrix4f( make_translation(x, y, z) ) );
+}
+
 void exportMatrix()
 {
     class_<Matrix4f, boost::shared_ptr<Matrix4f>, boost::noncopyable>("Matrix4f")
@@ -112,5 +122,7 @@ void exportMatrix()
         .def("__mul__",     mul4x4x4f)
         .def("__mul__",     mul4x4x1f);
 
-    def("invert", invert4x4f);
+    def("invert",           invert4x4f);
+    def("make_translation", make_translation_xyz);
+    def("make_identity4f",  make_identity4f);
 }
