@@ -33,11 +33,11 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c)
             break;
 
         case physics::CollisionShape::CYLINDER_Y:
-            mesh << static_cast<const physics::CylinderXShape&>(c);
+            mesh << static_cast<const physics::CylinderYShape&>(c);
             break;
 
         case physics::CollisionShape::CYLINDER_Z:
-            mesh << static_cast<const physics::CylinderXShape&>(c);
+            mesh << static_cast<const physics::CylinderZShape&>(c);
             break;
 
         case physics::CollisionShape::HEIGHTFIELD:
@@ -115,12 +115,13 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderZShape& cylShape
 
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c)
 {
+    unsigned offset = (unsigned)mesh.vertices.size();
     for (size_t i = 0; i<c.vertices.size(); ++i) 
     {
         mesh.vertices.push_back(c.vertices[i]);
-        mesh.indices.push_back(i);
+        mesh.indices.push_back(offset + i);
     }
-    mesh.pushPrimitive(sgl::POINTS, mesh.vertices.size());
+    mesh.pushPrimitive(sgl::POINTS, c.vertices.size());
     mesh.geometryDirty = true;
 
     return mesh;
