@@ -42,6 +42,9 @@ void PhysicsTransform::deserialize(database::IArchive& ar)
 
 	// deserialize data
     collisionObject = ar.readSerializable<physics::CollisionObject>();
+    if (collisionObject) {
+        setCollisionObject(collisionObject);
+    }
     ar.readChunk("absolute", &absolute);
 }
 

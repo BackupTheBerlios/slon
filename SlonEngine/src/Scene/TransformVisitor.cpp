@@ -1,4 +1,5 @@
 #include "stdafx.h"
+//#include "Log/LogVisitor.h"
 #include "Scene/Entity.h"
 #include "Scene/Skeleton.h"
 #include "Scene/TransformVisitor.h"
@@ -7,6 +8,8 @@
 using namespace slon;
 using namespace scene;
 using namespace math;
+
+//DECLARE_AUTO_LOGGER("scene.TransformVisitor");
 
 namespace {
     math::Matrix4f identityMatrix = math::make_identity<float, 4>();
@@ -25,6 +28,9 @@ TransformVisitor::TransformVisitor(Node& node)
 
 void TransformVisitor::traverse(Node& node)
 {
+    //AUTO_LOGGER_INIT;
+    //log::LogVisitor vis(AUTO_LOGGER, log::S_FLOOD, node);
+
     // initialize
     aabb = bounds<math::AABBf>::inv_infinite();
 

@@ -1,13 +1,19 @@
 #include "stdafx.h"
+//#include "Log/LogVisitor.h"
 #include "Scene/Entity.h"
 #include "Scene/Group.h"
 #include "Scene/CullVisitor.h"
+
+//DECLARE_AUTO_LOGGER("scene.CullVisitor");
 
 namespace slon {
 namespace scene {
 
 void CullVisitor::traverse(const Node& node)
 {
+    //AUTO_LOGGER_INIT;
+    //log::LogVisitor vis(AUTO_LOGGER, log::S_FLOOD, node);
+
     forTraverse.push(&node);
     while ( !forTraverse.empty() )
     {

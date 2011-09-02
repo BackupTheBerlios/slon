@@ -13,7 +13,7 @@ class LogVisitor :
 {
 public:
     LogVisitor(const log::logger_ptr& logger = 0, log::SEVERITY severity = log::S_FLOOD);
-    LogVisitor(const log::logger_ptr& logger, log::SEVERITY severity, scene::Node& node);
+    LogVisitor(const log::logger_ptr& logger, log::SEVERITY severity, const scene::Node& node);
 
     /** Traverse scene graph using DFS and native recursion. */
     void traverse(const scene::Node& node);

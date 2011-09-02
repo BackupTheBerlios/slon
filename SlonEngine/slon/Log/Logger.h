@@ -32,6 +32,19 @@ namespace\
 #	define AUTO_LOGGER autoLogger 
 #endif
 
+/** Initialize logger if not already initialized. */
+#ifdef SLON_ENGINE_DISABLE_AUTO_LOGGING
+#	define AUTO_LOGGER_INIT
+#else // !SLON_ENGINE_DISABLE_AUTO_LOGGING
+#	define AUTO_LOGGER_INIT\
+	assert( !autoLoggerReleased && "Trying to initialize logger, but engine with log manager are released" );\
+	if (!autoLogger && !autoLoggerReleased)\
+	{\
+		autoLogger = slon::log::currentLogManager().createLogger(autoLoggerName);\
+		slon::log::currentLogManager().connectReleaseHandler(ReleaseAutoLogger);\
+	}
+#endif // !SLON_ENGINE_DISABLE_AUTO_LOGGING
+
 /** Log message with specified severity. You this if you used DECLARE_AUTO_LOGGER("<name>") in your *.cpp file.
  * Example:
  * \code
