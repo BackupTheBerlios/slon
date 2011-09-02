@@ -8,7 +8,8 @@ using namespace slon::physics;
 void exportRigidBody()
 {
     scope rbScope =
-        class_<RigidBody, bases<CollisionObject>, boost::intrusive_ptr<RigidBody>, boost::noncopyable>("RigidBody", init<>())
+        class_<RigidBody, bases<CollisionObject>, boost::intrusive_ptr<RigidBody>, boost::noncopyable>("RigidBody")
+            .def(init<>())
             .def(init<const RigidBody::DESC&>())
             .def("applyForce",                  &RigidBody::applyForce)
             .def("applyTorque",                 &RigidBody::applyTorque)
@@ -25,9 +26,12 @@ void exportRigidBody()
             .def("getDesc",                     &RigidBody::getDesc, return_internal_reference<>())
             .def("reset",                       &RigidBody::reset);
 
-    implicitly_convertible< boost::intrusive_ptr<RigidBody>, boost::intrusive_ptr<CollisionObject> >();
+    implicitly_convertible< boost::intrusive_ptr<RigidBody>,        boost::intrusive_ptr<CollisionObject> >();
+    implicitly_convertible< boost::intrusive_ptr<RigidBody>,        boost::intrusive_ptr<const CollisionObject> >();
+    implicitly_convertible< boost::intrusive_ptr<const RigidBody>,  boost::intrusive_ptr<const CollisionObject> >();
 
-    class_<RigidBody::DESC, boost::shared_ptr<RigidBody::DESC>, boost::noncopyable>("DESC", init<>())
+    class_<RigidBody::DESC, boost::shared_ptr<RigidBody::DESC>, boost::noncopyable>("DESC")
+        .def(init<>())
         .def_readwrite("transform",       &RigidBody::DESC::transform)
         .def_readwrite("type",            &RigidBody::DESC::type)
         .def_readwrite("mass",            &RigidBody::DESC::mass)
