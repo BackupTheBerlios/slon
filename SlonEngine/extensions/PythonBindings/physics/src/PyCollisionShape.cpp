@@ -35,14 +35,32 @@ void exportCollisionShape()
     implicitly_convertible< boost::intrusive_ptr<ConeShape>,       boost::intrusive_ptr<const CollisionShape> >();
     implicitly_convertible< boost::intrusive_ptr<const ConeShape>, boost::intrusive_ptr<const CollisionShape> >();
 
-    class_< CylinderShape, bases<CollisionShape>, boost::intrusive_ptr<CylinderShape> >("CylinderShape")
+    class_< CylinderXShape, bases<CollisionShape>, boost::intrusive_ptr<CylinderXShape> >("CylinderXShape")
         .def(init<>())
         .def(init<float, float, float>())
         .def(init<math::Vector3f>())
-        .def_readwrite("halfExtent", &CylinderShape::halfExtent);
-    implicitly_convertible< boost::intrusive_ptr<CylinderShape>,       boost::intrusive_ptr<CollisionShape> >();
-    implicitly_convertible< boost::intrusive_ptr<CylinderShape>,       boost::intrusive_ptr<const CollisionShape> >();
-    implicitly_convertible< boost::intrusive_ptr<const CylinderShape>, boost::intrusive_ptr<const CollisionShape> >();
+        .def_readwrite("halfExtent", &CylinderXShape::halfExtent);
+    implicitly_convertible< boost::intrusive_ptr<CylinderXShape>,       boost::intrusive_ptr<CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<CylinderXShape>,       boost::intrusive_ptr<const CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<const CylinderXShape>, boost::intrusive_ptr<const CollisionShape> >();
+
+    class_< CylinderYShape, bases<CollisionShape>, boost::intrusive_ptr<CylinderYShape> >("CylinderYShape")
+        .def(init<>())
+        .def(init<float, float, float>())
+        .def(init<math::Vector3f>())
+        .def_readwrite("halfExtent", &CylinderYShape::halfExtent);
+    implicitly_convertible< boost::intrusive_ptr<CylinderYShape>,       boost::intrusive_ptr<CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<CylinderYShape>,       boost::intrusive_ptr<const CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<const CylinderYShape>, boost::intrusive_ptr<const CollisionShape> >();
+
+    class_< CylinderZShape, bases<CollisionShape>, boost::intrusive_ptr<CylinderZShape> >("CylinderZShape")
+        .def(init<>())
+        .def(init<float, float, float>())
+        .def(init<math::Vector3f>())
+        .def_readwrite("halfExtent", &CylinderZShape::halfExtent);
+    implicitly_convertible< boost::intrusive_ptr<CylinderZShape>,       boost::intrusive_ptr<CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<CylinderZShape>,       boost::intrusive_ptr<const CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<const CylinderZShape>, boost::intrusive_ptr<const CollisionShape> >();
 
     class_< ConvexShape, bases<CollisionShape>, boost::intrusive_ptr<ConvexShape> >("ConvexShape")
         .def(init<>())

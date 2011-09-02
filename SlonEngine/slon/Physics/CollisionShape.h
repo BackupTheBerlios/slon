@@ -27,7 +27,9 @@ public:
 		BOX,
 		CONE,
 		CAPSULE,
-        CYLINDER,
+        CYLINDER_X,
+        CYLINDER_Y,
+        CYLINDER_Z,
 		HEIGHTFIELD,
 		CONVEX_MESH,
 		TRIANGLE_MESH,
@@ -39,11 +41,6 @@ public:
 
 	/** Get type of the collision shape. */
 	virtual SHAPE_TYPE getShapeType() const = 0;
-
-    /** Scale shape. Some shapes unable to handle arbitrary scaling.
-     * For example, sphere.
-     */
-    virtual void applyScaling(const math::Vector3r& scaling) = 0;
 
 	virtual ~CollisionShape() {}
 };
@@ -64,10 +61,9 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    // Override shape
+    // Override CollisionShape
     CollisionShape* clone() const        { return new PlaneShape(plane); }
 	SHAPE_TYPE      getShapeType() const { return PLANE; }
-    void            applyScaling(const math::Vector3r& /*scaling*/) { /*nothing*/ }
 
 public:
 	math::Planer plane;
@@ -86,9 +82,9 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new SphereShape(*this); }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new SphereShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return SPHERE; }
-    void            applyScaling(const math::Vector3r& scaling) { radius *= fabs(scaling.x + scaling.y + scaling.z) / 3; }
 
 public:
 	real radius;
@@ -115,12 +111,9 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new BoxShape(*this); }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new BoxShape(*this); }
     SHAPE_TYPE      getShapeType() const { return BOX; }
-    void            applyScaling(const math::Vector3r& scaling)
-    {
-        halfExtent *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
-    }
 
 public:
 	math::Vector3r halfExtent;
@@ -140,13 +133,9 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new ConeShape(*this); }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new ConeShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONE; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        height *= fabs(scaling.z);
-        radius *= fabs(scaling.x + scaling.y) / 2;
-    }
 
 public:
 	real radius;
@@ -167,33 +156,29 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new CapsuleShape(*this); }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new CapsuleShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CAPSULE; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        height *= fabs(scaling.y);
-        radius *= fabs(scaling.x + scaling.z) / 2;
-    }
 
 public:
 	real radius;	/// thickness of the cylinder
 	real height;	/// height of the cylinder
 };
 
-/** Capsule collision shape. Up axis is Y. */
-class CylinderShape :
+/** Cylinder collision shape. Up axis is X. */
+class CylinderXShape :
 	public CollisionShape
 {
 public:
-    CylinderShape() :
-	    halfExtent(1.0f, 1.0f, 1.0f)
+    CylinderXShape() :
+	    halfExtent(0.0f)
 	{}
 
-    CylinderShape(const math::Vector3f& halfExtent_) :
+    CylinderXShape(const math::Vector3f& halfExtent_) :
 	    halfExtent(halfExtent_)
 	{}
 
-    CylinderShape(real x, real y, real z) :
+    CylinderXShape(real x, real y, real z) :
 	    halfExtent(x, y, z)
 	{}
 
@@ -201,12 +186,67 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new CylinderShape(*this); }
-	SHAPE_TYPE      getShapeType() const { return CYLINDER; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        halfExtent *= math::Vector3r( fabs(scaling.x), fabs(scaling.y), fabs(scaling.z) );
-    }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new CylinderXShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CYLINDER_X; }
+
+public:
+    math::Vector3r halfExtent;
+};
+
+/** Cylinder collision shape. Up axis is Y. */
+class CylinderYShape :
+	public CollisionShape
+{
+public:
+    CylinderYShape() :
+	    halfExtent(0.0f)
+	{}
+
+    CylinderYShape(const math::Vector3f& halfExtent_) :
+	    halfExtent(halfExtent_)
+	{}
+
+    CylinderYShape(real x, real y, real z) :
+	    halfExtent(x, y, z)
+	{}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new CylinderYShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CYLINDER_Y; }
+
+public:
+    math::Vector3r halfExtent;
+};
+
+/** Cylinder collision shape. Up axis is Z. */
+class CylinderZShape :
+	public CollisionShape
+{
+public:
+    CylinderZShape() :
+	    halfExtent(0.0f)
+	{}
+
+    CylinderZShape(const math::Vector3f& halfExtent_) :
+	    halfExtent(halfExtent_)
+	{}
+
+    CylinderZShape(real x, real y, real z) :
+	    halfExtent(x, y, z)
+	{}
+
+    // Override Serializable
+    const char* serialize(database::OArchive& ar) const;
+    void        deserialize(database::IArchive& ar);
+
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new CylinderZShape(*this); }
+	SHAPE_TYPE      getShapeType() const { return CYLINDER_Z; }
 
 public:
     math::Vector3r halfExtent;
@@ -228,13 +268,6 @@ public:
 	// Override CollisionShape
     CollisionShape* clone() const { return new ConvexShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return CONVEX_MESH; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        math::Matrix3r matScaling = math::make_matrix( scaling.x,  (real)0.0,  (real)0.0,
-                                                       (real)0.0,  scaling.y,  (real)0.0,
-                                                       (real)0.0,  (real)0.0,  scaling.z );
-        transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
-    }
 
 	/** Build convex hull of the point cloud and store it as shape.
 	 * @param vertices - vertices of point cloud.
@@ -272,15 +305,10 @@ public:
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);
 
-    CollisionShape* clone() const { return new TriangleMeshShape(*this); }
+    // Override CollisionShape
+    CollisionShape* clone() const        { return new TriangleMeshShape(*this); }
 	SHAPE_TYPE      getShapeType() const { return TRIANGLE_MESH; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        math::Matrix3r matScaling = math::make_matrix( scaling.x,  (real)0.0,  (real)0.0,
-                                                       (real)0.0,  scaling.y,  (real)0.0,
-                                                       (real)0.0,  (real)0.0,  scaling.z );
-        transform_by_matrix( vertices.begin(), vertices.end(), vertices.begin(), matScaling );
-    }
+
 
 public:
 	std::vector<math::Vector3r>	vertices;
@@ -317,14 +345,8 @@ public:
     void        deserialize(database::IArchive& ar);
 
     // Override CollisionShape
-    CollisionShape* clone() const { return new CompoundShape(*this); }
+    CollisionShape* clone() const        { return new CompoundShape(*this); }
     SHAPE_TYPE      getShapeType() const { return COMPOUND; }
-    void applyScaling(const math::Vector3r& scaling)
-    {
-        for (size_t i = 0; i<shapes.size(); ++i) {
-            shapes[i].shape->applyScaling(scaling);
-        }
-    }
 
     /** Add shape with transform
      * @param transform - transform of the shape. Scaling doesn't applied.

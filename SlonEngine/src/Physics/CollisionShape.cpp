@@ -68,13 +68,35 @@ void CapsuleShape::deserialize(database::IArchive& ar)
     ar.readChunk("radius", &radius);
 }
 
-const char* CylinderShape::serialize(database::OArchive& ar) const
+const char* CylinderXShape::serialize(database::OArchive& ar) const
 {
     ar.writeChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
-    return "CylinderShape";
+    return "CylinderXShape";
 }
 
-void CylinderShape::deserialize(database::IArchive& ar)
+void CylinderXShape::deserialize(database::IArchive& ar)
+{
+    ar.readChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
+}
+
+const char* CylinderYShape::serialize(database::OArchive& ar) const
+{
+    ar.writeChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
+    return "CylinderYShape";
+}
+
+void CylinderYShape::deserialize(database::IArchive& ar)
+{
+    ar.readChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
+}
+
+const char* CylinderZShape::serialize(database::OArchive& ar) const
+{
+    ar.writeChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
+    return "CylinderZShape";
+}
+
+void CylinderZShape::deserialize(database::IArchive& ar)
 {
     ar.readChunk("halfExtent", halfExtent.arr, halfExtent.num_elements);
 }

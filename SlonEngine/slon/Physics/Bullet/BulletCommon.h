@@ -106,10 +106,28 @@ inline btCollisionShape* createBtCollisionShape(const CollisionShape& collisionS
             return bulletCollisionShape;
 		}
 
-		case CollisionShape::CYLINDER:
+		case CollisionShape::CYLINDER_X:
 		{
-			const CylinderShape& cylShape             = static_cast<const CylinderShape&>(collisionShape);
-			btCylinderShape*     bulletCollisionShape = new btCylinderShape( to_bt_vec(cylShape.halfExtent) );
+			const CylinderXShape& cylShape             = static_cast<const CylinderXShape&>(collisionShape);
+			btCylinderShape*      bulletCollisionShape = new btCylinderShapeX( to_bt_vec(cylShape.halfExtent) );
+            bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            bulletCollisionShape->setMargin( 2*std::min(cylShape.halfExtent.x, std::min(cylShape.halfExtent.y, cylShape.halfExtent.z))*relativeMargin + margin );
+            return bulletCollisionShape;
+		}
+
+		case CollisionShape::CYLINDER_Y:
+		{
+			const CylinderYShape& cylShape             = static_cast<const CylinderYShape&>(collisionShape);
+			btCylinderShape*      bulletCollisionShape = new btCylinderShape( to_bt_vec(cylShape.halfExtent) );
+            bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
+            bulletCollisionShape->setMargin( 2*std::min(cylShape.halfExtent.x, std::min(cylShape.halfExtent.y, cylShape.halfExtent.z))*relativeMargin + margin );
+            return bulletCollisionShape;
+		}
+
+		case CollisionShape::CYLINDER_Z:
+		{
+			const CylinderZShape& cylShape             = static_cast<const CylinderZShape&>(collisionShape);
+			btCylinderShape*      bulletCollisionShape = new btCylinderShapeZ( to_bt_vec(cylShape.halfExtent) );
             bulletCollisionShape->setUserPointer( const_cast<CollisionShape*>(&collisionShape) );
             bulletCollisionShape->setMargin( 2*std::min(cylShape.halfExtent.x, std::min(cylShape.halfExtent.y, cylShape.halfExtent.z))*relativeMargin + margin );
             return bulletCollisionShape;
@@ -241,13 +259,13 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
         switch ( btShape->getUpAxis() ) 
         {
         case 0:
-            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new CylinderShape(halfExtent.y, halfExtent.x, halfExtent.z) );
+            return new CylinderXShape(halfExtent);
 
         case 1:
-            return new CylinderShape(halfExtent);
+            return new CylinderYShape(halfExtent);
 
         case 2:
-            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CylinderShape(halfExtent.x, halfExtent.z, halfExtent.y) );
+            return new CylinderZShape(halfExtent);
 
         default:
             assert(!"can't get here");

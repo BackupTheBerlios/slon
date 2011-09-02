@@ -258,7 +258,7 @@ Engine::Engine() :
 		databaseManager.registerSerializableCreateFunc("MatrixTransform",       createSerializable<scene::MatrixTransform>);
 		databaseManager.registerSerializableCreateFunc("PhysicsTransform",      createSerializable<physics::PhysicsTransform>);
 		databaseManager.registerSerializableCreateFunc("StaticMesh",            createSerializable<graphics::StaticMesh>);
-		databaseManager.registerSerializableCreateFunc("Mesh",                  createSerializable<graphics::GPUSideMesh>);
+		databaseManager.registerSerializableCreateFunc("GPUSideMesh",           createSerializable<graphics::GPUSideMesh>);
 
         // physics
 #ifdef SLON_ENGINE_USE_BULLET
@@ -271,7 +271,9 @@ Engine::Engine() :
             databaseManager.registerSerializableCreateFunc("BoxShape",          createSerializable<physics::BoxShape>);
             databaseManager.registerSerializableCreateFunc("ConeShape",         createSerializable<physics::ConeShape>);
             databaseManager.registerSerializableCreateFunc("CapsuleShape",      createSerializable<physics::CapsuleShape>);
-            databaseManager.registerSerializableCreateFunc("CylinderShape",     createSerializable<physics::CylinderShape>);
+            databaseManager.registerSerializableCreateFunc("CylinderXShape",    createSerializable<physics::CylinderXShape>);
+            databaseManager.registerSerializableCreateFunc("CylinderYShape",    createSerializable<physics::CylinderYShape>);
+            databaseManager.registerSerializableCreateFunc("CylinderZShape",    createSerializable<physics::CylinderZShape>);
             databaseManager.registerSerializableCreateFunc("ConvexShape",       createSerializable<physics::ConvexShape>);
             databaseManager.registerSerializableCreateFunc("TriangleMeshShape", createSerializable<physics::TriangleMeshShape>);
             databaseManager.registerSerializableCreateFunc("CompoundShape",     createSerializable<physics::CompoundShape>);

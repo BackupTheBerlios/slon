@@ -80,9 +80,21 @@ std::ostream& operator << (std::ostream& os, const ConeShape& shape)
 	return os;
 }
 
-std::ostream& operator << (std::ostream& os, const CylinderShape& shape)
+std::ostream& operator << (std::ostream& os, const CylinderXShape& shape)
 {
-	os << "cylinder { halfExtent = {" << shape.halfExtent << "} }";
+	os << "cylinderX { halfExtent = {" << shape.halfExtent << "} }";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CylinderYShape& shape)
+{
+	os << "cylinderY { halfExtent = {" << shape.halfExtent << "} }";
+	return os;
+}
+
+std::ostream& operator << (std::ostream& os, const CylinderZShape& shape)
+{
+	os << "cylinderZ { halfExtent = {" << shape.halfExtent << "} }";
 	return os;
 }
 
@@ -103,8 +115,16 @@ std::ostream& operator << (std::ostream& os, const CollisionShape& shape)
 		case CollisionShape::CAPSULE:
 			break;
 
-		case CollisionShape::CYLINDER:
-			os << static_cast<const CylinderShape&>(shape);
+		case CollisionShape::CYLINDER_X:
+			os << static_cast<const CylinderXShape&>(shape);
+			break;
+
+		case CollisionShape::CYLINDER_Y:
+			os << static_cast<const CylinderYShape&>(shape);
+			break;
+
+		case CollisionShape::CYLINDER_Z:
+			os << static_cast<const CylinderZShape&>(shape);
 			break;
 
 		case CollisionShape::HEIGHTFIELD:

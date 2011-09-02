@@ -144,7 +144,7 @@ const char* GPUSideMesh::serialize(database::OArchive& ar) const
     }
     ar.closeChunk();
 
-    return "Mesh";
+    return "GPUSideMesh";
 }
 
 void GPUSideMesh::deserialize(database::IArchive& ar)

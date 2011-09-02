@@ -54,8 +54,14 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b);
 /** Add cone shape to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& c);
 
-/** Add cone shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderShape& c);
+/** Add cylinder shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderXShape& c);
+
+/** Add cylinder shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderYShape& c);
+
+/** Add cylinder shape to debug mesh */
+DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderZShape& c);
 
 /** Add convex shape to debug mesh */
 DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c);
