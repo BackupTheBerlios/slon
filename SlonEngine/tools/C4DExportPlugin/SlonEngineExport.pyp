@@ -37,7 +37,7 @@ def convertMatrix(m, scale = 1.0):
     
     return mat
     
-def convertPhysicsTransform(m, scale = 1.0):
+def convertMatrixP(m, scale = 1.0):
     v1 = m.v1.GetNormalized()
     v2 = m.v2.GetNormalized()
     v3 = m.v3.GetNormalized()
@@ -55,39 +55,7 @@ class SlonExporter(plugins.SceneSaverData):
     def __init__(self):
         self.library = database.Library()
         self.documentScale = 0.01
-        
-    def dumpMaterial(self, material):
-        if material.GetName() in self.materials:
-            return material.GetName()
-        
-        materialElem = etree.SubElement(self.graphicsEl, "material", name=material.GetName(), effect="phong_lighting")
-        etree.SubElement(materialElem, "color", type="vec3f", value=dumpVector(material.GetAverageColor(c4d.CHANNEL_COLOR)))
-        etree.SubElement(materialElem, "diffuse", type="vec3f", value=dumpVector(material.GetAverageColor(c4d.CHANNEL_DIFFUSION)))
-        
-        self.materials.add(material.GetName())
-        return material.GetName()
-        
-    def dumpMesh(self, parentEl, polygonObj):
-        # extract vertices and indices
-        positions = polygonObj.GetAllPoints()
-        indices = []
-        for poly in polygonObj.GetAllPolygons():
-            if hasattr(poly, "d"):
-                indices.extend([poly.a, poly.b, poly.c, poly.a, poly.c, poly.d])
-            else:
-                indices.extend([poly.a, poly.b, poly.c])
-                
-        meshEl = etree.SubElement(parentEl, "Mesh", vcount=str(len(positions)), icount=str(len(indices)))
-        etree.SubElement(meshEl, "attribute", size="3", semantic="position", type="float").text = dumpVectorArray(positions)
-        etree.SubElement(meshEl, "indices", type="uint32").text = dumpArray(indices)
-       
-        # extract effect
-        effectName = "default"
-        textureTag = polygonObj.GetTag(c4d.Ttexture)
-        if textureTag and textureTag.GetMaterial():
-            effectName = self.dumpMaterial(textureTag.GetMaterial())
-        subsetEl = etree.SubElement(meshEl, "subsets")
-        etree.SubElement(subsetEl, "indexed_subset", primitiveType="TRIANGLES", startIndex="0", numIndices=str(len(indices)), effect=effectName)
+        self.rigidBodies = []
         
     def convertPolygonObject(self, c4dPolygonObj):
         cpuSideMesh = graphics.CPUSideTriangleMesh()
@@ -162,6 +130,9 @@ class SlonExporter(plugins.SceneSaverData):
         else:
             parent = current = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl(), self.documentScale) )
         
+        if (c4dNode.GetType() == 180000011):
+            current.addChild( self.convertConnectorNode(c4dNode) )
+            
         if (c4dNode.GetType() == c4d.Opolygon):
             polyObj = self.convertPolygonObject(c4dNode)
             if (polyObj != None):
@@ -188,21 +159,21 @@ class SlonExporter(plugins.SceneSaverData):
         transform[0][3] += mp.x
         transform[1][3] += mp.y
         transform[2][3] += mp.z
-        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        return physics.CylinderXShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
     def computeCylinderYShape(self, c4dNode, transform):
         mp = c4dNode.GetMp() * self.documentScale
         transform[0][3] += mp.x
         transform[1][3] += mp.y
         transform[2][3] += mp.z
-        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        return physics.CylinderYShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
     def computeCylinderZShape(self, c4dNode, transform):
         mp = c4dNode.GetMp() * self.documentScale
         transform[0][3] += mp.x
         transform[1][3] += mp.y
         transform[2][3] += mp.z
-        return physics.CylinderShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        return physics.CylinderZShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
         
     def computeConvexHullShape(self, c4dNode, transform):
         pointsArr = slon.Vector3fArray()    
@@ -212,15 +183,81 @@ class SlonExporter(plugins.SceneSaverData):
         shape = physics.ConvexShape()
         shape.buildConvexHull(pointsArr)
         return shape
+        
+    def getNodeRigidBody(self, c4dNode):
+        try:
+            rbElem = c4d.DescID(c4d.DescLevel(c4d.ID_USERDATA), c4d.DescLevel(1))
+            rbID = c4dNode[rbElem]
+            return self.rigidBodies[rbID]
+        except:
+            rbData = c4d.GetCustomDatatypeDefault(c4d.DTYPE_LONG)
+            rbElem = c4dNode.AddUserData(rbData)
+            c4dNode[rbElem] = len(self.rigidBodies)
+            rigidBody = physics.RigidBody()
+            self.rigidBodies.append(rigidBody)
+            return rigidBody
+        
+    def convertConnectorNode(self, c4dNode):
+        objA = c4dNode[c4d.FORCE_OBJECT_A]
+        objB = c4dNode[c4d.FORCE_OBJECT_B]
+        
+        desc = physics.Constraint.DESC()
+        desc.rigidBodyA = self.getNodeRigidBody(objA)
+        desc.frameA     = math.invert( convertMatrixP(c4dNode.GetMg(), self.documentScale) ) * convertMatrixP(objA.GetMg(), self.documentScale)
+        desc.rigidBodyB = self.getNodeRigidBody(objB)
+        desc.frameB     = math.invert( convertMatrixP(c4dNode.GetMg(), self.documentScale) ) * convertMatrixP(objB.GetMg(), self.documentScale)
+       
+        type = c4dNode[c4d.FORCE_TYPE]
+        if type == c4d.CONSTRAINT_JOINT_TYPE_CARDAN:
+            if c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]:
+                desc.angularLimitMin.x = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
+                desc.angularLimitMax.x = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
+            else:
+                desc.angularLimitMin.x =  1
+                desc.angularLimitMax.x = -1
+                
+            if c4dNode[c4d.CONSTRAINT_ROT2_LIMIT]:
+                desc.angularLimitMin.y = c4dNode[c4d.CONSTRAINT_ROT2_LIMIT_MIN]
+                desc.angularLimitMax.y = c4dNode[c4d.CONSTRAINT_ROT2_LIMIT_MAX]
+            else:
+                desc.angularLimitMin.y =  1
+                desc.angularLimitMax.y = -1
+        elif type == c4d.CONSTRAINT_JOINT_TYPE_HINGE:
+            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]
+            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
+            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
+            if c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]:
+                desc.angularLimitMin.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
+                desc.angularLimitMax.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
+            else:
+                desc.angularLimitMin.z =  1
+                desc.angularLimitMax.z = -1
+        elif type == c4d.CONSTRAINT_JOINT_TYPE_RAGDOLL:
+            desc.angularLimitMin.x = -c4dNode[c4d.CONSTRAINT_CONE_LIMIT_RADIUS]
+            desc.angularLimitMax.x =  c4dNode[c4d.CONSTRAINT_CONE_LIMIT_RADIUS]
+            desc.angularLimitMin.y = -c4dNode[c4d.CONSTRAINT_CONE_LIMIT_RADIUS]
+            desc.angularLimitMax.y =  c4dNode[c4d.CONSTRAINT_CONE_LIMIT_RADIUS]
+            if c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]:
+                desc.angularLimitMin.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
+                desc.angularLimitMax.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
+            else:
+                desc.angularLimitMin.z =  1
+                desc.angularLimitMax.z = -1
+        
+        desc.angularLimitMin.y = 1
+        desc.angularLimitMax = math.Vector3f(-1, -1, -1)
+        constraint = physics.Constraint(desc)
+        return physics.ConstraintNode(constraint)
             
     def convertPhysicsNode(self, c4dNode):       
         dynTag = c4dNode.GetTag(180000102)
 
         desc = physics.RigidBody.DESC()
-        desc.transform = convertPhysicsTransform(c4dNode.GetMg(), self.documentScale)
-        desc.type = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
-        desc.mass = dynTag[c4d.RIGID_BODY_MASS]
-        desc.margin = dynTag[c4d.RIGID_BODY_MARGIN]
+        desc.transform      = convertMatrixP(c4dNode.GetMg(), self.documentScale)
+        desc.type           = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
+        desc.mass           = dynTag[c4d.RIGID_BODY_MASS]
+        desc.relativeMargin = 0.0
+        desc.margin         = dynTag[c4d.RIGID_BODY_MARGIN] * self.documentScale
         
         shape = dynTag[c4d.RIGID_BODY_SHAPE]
         if shape == c4d.RIGID_BODY_SHAPE_BOX:
@@ -236,7 +273,9 @@ class SlonExporter(plugins.SceneSaverData):
         else:
             print c4dNode.GetName(), " : physics shape not converted"
             desc.collisionShape = physics.SphereShape(1.0)
-        rigidBody = physics.RigidBody(desc)
+            
+        rigidBody = self.getNodeRigidBody(c4dNode)
+        rigidBody.reset(desc)
 
         physicsTransform = physics.PhysicsTransform(rigidBody)
         physicsTransform.absolute = True

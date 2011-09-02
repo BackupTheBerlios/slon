@@ -28,9 +28,9 @@ const char* Constraint::serialize(database::OArchive& ar) const
     ar.writeChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
     ar.writeChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
     ar.writeChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
-    ar.writeChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
+    ar.writeChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
-    ar.writeChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    ar.writeChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
     return "BulletConstraint";
 }
 
@@ -44,9 +44,9 @@ void Constraint::deserialize(database::IArchive& ar)
     ar.readChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
     ar.readChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
     ar.readChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
-    ar.readChunk("linearLimits0", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
+    ar.readChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
-    ar.readChunk("angularLimits0", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    ar.readChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
     desc.rigidBodies[0]->addConstraint(this);
     desc.rigidBodies[1]->addConstraint(this);
     instantiate();
