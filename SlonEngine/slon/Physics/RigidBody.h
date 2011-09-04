@@ -17,7 +17,7 @@ class Constraint;
 #endif
 
 /** Rigid body in the physics world */
-class RigidBody :
+class SLON_DLLEXPORT RigidBody :
     public CollisionObject
 {
 private:

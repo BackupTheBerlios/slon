@@ -18,7 +18,7 @@ namespace physics {
 /** Generic 6DOF constraint. Implementation will choose most
  * suitable constraint for every case.
  */
-class Constraint :
+class SLON_DLLEXPORT Constraint :
     public Referenced,
     public database::Serializable
 {

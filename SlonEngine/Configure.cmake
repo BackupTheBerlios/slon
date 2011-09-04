@@ -21,6 +21,10 @@ IF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
     MESSAGE ( "Build documentation: " ${BUILD_DOCUMENTATION} )
 ENDIF (NOT SLON_ENGINE_CONFIGURE_INTRUSIVE)
 
+# shared or static
+OPTION (SLON_ENGINE_BUILD_SHARED "Set to ON to build SlonEngine as shared library" OFF)
+MESSAGE ("Building shared: " ${SLON_ENGINE_BUILD_SHARED})
+
 # sse optimization
 OPTION (SLON_ENGINE_USE_SSE "Set to ON to enable sse optimizations" ON)
 MESSAGE ("Use SSE: " ${SLON_ENGINE_USE_SSE})

@@ -14,7 +14,7 @@ namespace physics {
 #endif
 
 /** Dynamics world or physics scene, as you wish. */
-class DynamicsWorld :
+class SLON_DLLEXPORT DynamicsWorld :
     public Referenced
 {
 private:

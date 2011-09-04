@@ -6,6 +6,7 @@
 #	define WIN32_LEAN_AND_MEAN
 #endif
 
+#cmakedefine SLON_ENGINE_BUILD_SHARED
 #cmakedefine SLON_ENGINE_USE_BULLET
 #cmakedefine SLON_ENGINE_USE_PYTHON
 #cmakedefine SLON_ENGINE_USE_SSE2
@@ -13,6 +14,16 @@
 #cmakedefine SLON_ENGINE_USE_SSE4
 #cmakedefine SLON_ENGINE_USE_GNUPLOT
 #cmakedefine SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
+
+#ifdef SLON_ENGINE_BUILD_SHARED
+#	ifdef SLON_ENGINE_EXPORT
+		#define SLON_DLLEXPORT __declspec(dllexport)
+	#else
+		#define SLON_DLLEXPORT __declspec(dllimport)
+#	endif
+#else
+#	define SLON_DLLEXPORT
+#endif
 
 #ifdef SLON_ENGINE_USE_BULLET
 #	define SLON_ENGINE_USE_PHYSICS
