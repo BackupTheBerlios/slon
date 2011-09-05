@@ -10,6 +10,7 @@
 #include "Graphics/StaticMesh.h"
 #include "Physics/CollisionShape.h"
 #include "Physics/Constraint.h"
+#include "Physics/ConstraintNode.h"
 #include "Physics/RigidBody.h"
 #include "Physics/PhysicsTransform.h"
 #include "Realm/BVHLocation.h"
@@ -261,10 +262,11 @@ Engine::Engine() :
 		databaseManager.registerSerializableCreateFunc("GPUSideMesh",           createSerializable<graphics::GPUSideMesh>);
 
         // physics
-#ifdef SLON_ENGINE_USE_BULLET
+#ifdef SLON_ENGINE_USE_PHYSICS
         {
             databaseManager.registerSerializableCreateFunc("PhysicsTransform",  createSerializable<physics::PhysicsTransform>);
             databaseManager.registerSerializableCreateFunc("RigidBody",         createSerializable<physics::RigidBody>);
+            databaseManager.registerSerializableCreateFunc("ConstraintNode",    createSerializable<physics::ConstraintNode>);  
             databaseManager.registerSerializableCreateFunc("Constraint",        createSerializable<physics::Constraint>);           
             databaseManager.registerSerializableCreateFunc("PlaneShape",        createSerializable<physics::PlaneShape>);
             databaseManager.registerSerializableCreateFunc("SphereShape",       createSerializable<physics::SphereShape>);
