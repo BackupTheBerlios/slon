@@ -17,7 +17,7 @@ namespace graphics {
 namespace scene {
 
 /** Abstract base class for camera classes */
-class Camera :
+class SLON_PUBLIC Camera :
     public scene::Entity
 {
 public:

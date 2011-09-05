@@ -9,7 +9,7 @@ namespace slon {
 namespace graphics {
 
 /** Effect for rendering debug information */
-class DebugEffect :
+class SLON_PUBLIC DebugEffect :
     public object_in_pool<DebugEffect, TransformEffect, aligned_allocator<0x10> >
 {
 public:

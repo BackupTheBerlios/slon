@@ -9,7 +9,7 @@ namespace slon {
 namespace database {
 
 /** Interface for accessing common objects in the storage. */
-class DatabaseManager :
+class SLON_PUBLIC DatabaseManager :
     public Referenced
 {
 public:
@@ -206,7 +206,7 @@ public:
 };
 
 /** Get engines database manager */
-DatabaseManager& currentDatabaseManager();
+SLON_PUBLIC DatabaseManager& currentDatabaseManager();
 
 /** Load library, add all loaded items into corresponding cache. 
  * @param path - path to the library file.
@@ -216,10 +216,10 @@ DatabaseManager& currentDatabaseManager();
  * function will throw loader_error if it find item with duplicate key.
  * @return loaded library.
  */
-library_ptr loadLibrary(const std::string& path,
-                        const std::string& keyPrefix,
-                        format_id          format = DatabaseManager::library_format_auto,
-                        bool               ignoreDuplicates = true);
+SLON_PUBLIC library_ptr loadLibrary(const std::string& path,
+                                    const std::string& keyPrefix,
+                                    format_id          format = DatabaseManager::library_format_auto,
+                                    bool               ignoreDuplicates = true);
 
 /** Load library, add all loaded items into corresponding cache. Use path as key prefix. 
  * @param path - path to the library file.
@@ -228,9 +228,9 @@ library_ptr loadLibrary(const std::string& path,
  * function will throw loader_error if it find item with duplicate key.
  * @return loaded library.
  */
-library_ptr loadLibrary(const std::string& path,
-                        format_id          format = DatabaseManager::library_format_auto,
-                        bool               ignoreDuplicates = true);
+SLON_PUBLIC library_ptr loadLibrary(const std::string& path,
+                                    format_id          format = DatabaseManager::library_format_auto,
+                                    bool               ignoreDuplicates = true);
 
 /** Save library into file. 
  * @param path - path to the library file.
@@ -238,7 +238,7 @@ library_ptr loadLibrary(const std::string& path,
  * @param format - format of the library to save.
  * @return true on success.
  */
-bool saveLibrary(const std::string& path,
+SLON_PUBLIC bool saveLibrary(const std::string& path,
 				 const library_ptr& library,
                  format_id          format = DatabaseManager::library_format_auto);
 
@@ -247,8 +247,8 @@ bool saveLibrary(const std::string& path,
  * @param format - format of the image to load.
  * @return loaded texture.
  */
-graphics::texture_ptr loadTexture(const std::string& path,
-                                  format_id          format = TextureCache::format_auto);
+SLON_PUBLIC graphics::texture_ptr loadTexture(const std::string& path,
+                                              format_id          format = TextureCache::format_auto);
 
 /** Save texture to the file.
  * @param path - path to the image file.
@@ -256,17 +256,17 @@ graphics::texture_ptr loadTexture(const std::string& path,
  * @param format - format of the image to save.
  * @return true on success.
  */
-bool saveTexture(const std::string&				path,
-				 const graphics::texture_ptr&	texture,
-                 format_id						format = TextureCache::format_auto);
+SLON_PUBLIC bool saveTexture(const std::string&				path,
+				             const graphics::texture_ptr&	texture,
+                             format_id						format = TextureCache::format_auto);
 
 /** Look for effect in the cache, if not found, load it from file and add to cache. 
  * @param path - path to the effect file.
  * @param format - format of the image to load.
  * @return loaded effect.
  */
-graphics::effect_ptr loadEffect(const std::string& path,
-                                format_id          format = EffectCache::format_auto);
+SLON_PUBLIC graphics::effect_ptr loadEffect(const std::string& path,
+                                            format_id          format = EffectCache::format_auto);
 
 /** Save effect to the file.
  * @param path - path to the effect file.
@@ -274,17 +274,17 @@ graphics::effect_ptr loadEffect(const std::string& path,
  * @param format - format of the effect to save.
  * @return true on success.
  */
-bool saveEffect(const std::string&			path,
-				const graphics::effect_ptr&	effect,
-                format_id					format = EffectCache::format_auto);
+SLON_PUBLIC bool saveEffect(const std::string&			path,
+				            const graphics::effect_ptr&	effect,
+                            format_id					format = EffectCache::format_auto);
 
 /** Look for visual scene in the cache, if not found, load it from file and add to cache. 
  * @param path - path to the scene file.
  * @param format - format of the image to load.
  * @return loaded scene.
  */
-scene::node_ptr loadVisualScene(const std::string& path,
-                                format_id          format = VisualSceneCache::format_auto);
+SLON_PUBLIC scene::node_ptr loadVisualScene(const std::string& path,
+                                            format_id          format = VisualSceneCache::format_auto);
 
 /** Save visual scene to the file.
  * @param path - path to the visual scene file.
@@ -292,9 +292,9 @@ scene::node_ptr loadVisualScene(const std::string& path,
  * @param format - format of the visual scene to save.
  * @return true on success.
  */
-bool saveVisualScene(const std::string&			path,
-					 const scene::node_ptr&		scene,
-					 format_id					format = VisualSceneCache::format_auto);
+SLON_PUBLIC bool saveVisualScene(const std::string&			path,
+					             const scene::node_ptr&		scene,
+					             format_id					format = VisualSceneCache::format_auto);
 
 #ifdef SLON_ENGINE_USE_PHYSICS
 /** Look for physics scene in the cache, if not found, load it from file and add to cache. 
@@ -302,8 +302,8 @@ bool saveVisualScene(const std::string&			path,
  * @param format - format of the image to load.
  * @return loaded scene.
  */
-physics::physics_model_ptr loadPhysicsScene(const std::string& path,
-                                            format_id          format = PhysicsSceneCache::format_auto);
+SLON_PUBLIC physics::physics_model_ptr loadPhysicsScene(const std::string& path,
+                                                        format_id          format = PhysicsSceneCache::format_auto);
 
 /** Save physics scene to the file.
  * @param path - path to the visual scene file.
@@ -311,9 +311,9 @@ physics::physics_model_ptr loadPhysicsScene(const std::string& path,
  * @param format - format of the physics scene to save.
  * @return true on success.
  */
-bool savePhysicsScene(const std::string&				path,
-					  const physics::physics_model_ptr&	scene,
-					  format_id							format = PhysicsSceneCache::format_auto);
+SLON_PUBLIC bool savePhysicsScene(const std::string&				path,
+					              const physics::physics_model_ptr&	scene,
+					              format_id							format = PhysicsSceneCache::format_auto);
 
 #endif
 

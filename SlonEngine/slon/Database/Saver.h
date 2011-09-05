@@ -26,7 +26,7 @@ public:
 
 /** Interface for database items loaders. */
 template<typename T>
-class Saver :
+class SLON_PUBLIC Saver :
     public Referenced
 {
 public:

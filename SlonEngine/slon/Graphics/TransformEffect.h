@@ -14,7 +14,7 @@ namespace detail {
 }
 
 /** Effect used for transforming objects into view space. */
-class TransformEffect :
+class SLON_PUBLIC TransformEffect :
     public Effect
 {
 friend class detail::DepthPass;

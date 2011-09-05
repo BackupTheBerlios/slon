@@ -29,7 +29,7 @@ typedef hash_string attribute_handle;
  * }
  * \uncode
  */
-class Effect :
+class SLON_PUBLIC Effect :
     public Referenced,
     public database::Serializable
 {

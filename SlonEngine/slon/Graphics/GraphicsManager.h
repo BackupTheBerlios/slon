@@ -136,7 +136,7 @@ public:
 };
 
 /** Get current graphics manager used by engine. */
-GraphicsManager& currentGraphicsManager();
+SLON_PUBLIC GraphicsManager& currentGraphicsManager();
 
 } // namespace graphics
 } // namespace slon

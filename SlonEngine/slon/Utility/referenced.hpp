@@ -8,7 +8,7 @@
 
 namespace slon {
 
-class referenced
+class SLON_PUBLIC referenced
 #ifdef SLON_ENGINE_USE_SSE
     // Just make sure that SSE vector operations will not fail
     : public aligned<0x10>

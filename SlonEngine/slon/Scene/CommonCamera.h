@@ -15,7 +15,7 @@ namespace scene {
  * Derived cameras must check lock mutex at any state modification functions.
  * Common camera creates AmbientPass by default.
  */
-class CommonCamera :
+class SLON_PUBLIC CommonCamera :
     public Camera
 {
 public:

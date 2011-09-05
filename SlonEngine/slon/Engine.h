@@ -20,7 +20,7 @@ namespace slon {
 /** Main class of the SlonEngine. The manager of the hole graphics,
  * physics, sound and etc in the scene.
  */
-class Engine
+class SLON_PUBLIC Engine
 {
 public:
     struct DESC

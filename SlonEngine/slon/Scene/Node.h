@@ -12,7 +12,7 @@ namespace scene {
 /** Tree Node class. Stores hierarchy. Use intrusive ptr
  * on scene graph structures. You can't construct nodes on the stack.
  */
-class Node
+class SLON_PUBLIC Node
 :   public Referenced
 ,   public database::Serializable
 {
@@ -47,8 +47,8 @@ public:
 
 private:
     // noncopyable
-    Node(const Node&);
-    Node& operator = (const Node&);
+    Node(const Node&) {}
+    Node& operator = (const Node&) { return *this; }
 
 public:
     Node();

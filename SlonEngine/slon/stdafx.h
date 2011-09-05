@@ -1,6 +1,14 @@
 #ifndef __SLON_ENGINE_STDAFX_H__
 #define __SLON_ENGINE_STDAFX_H__
 
+// config
+#include "Config.h"
+#ifdef _MSC_VER
+    // warns that classes not marked with SLON_EXPORT wouldn't be exported,
+    // but there are lots of header only classes, e.g. matrices, vectors, signals, ...
+#   pragma warning( disable : 4251 ) 
+#endif
+
 // stdlib
 #include <cstdlib>
 
