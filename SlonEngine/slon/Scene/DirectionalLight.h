@@ -8,7 +8,7 @@ namespace slon {
 namespace scene {
 
 /** Directional light source. */
-class DirectionalLight :
+class SLON_PUBLIC DirectionalLight :
     public Light
 {
 public:

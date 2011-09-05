@@ -8,7 +8,7 @@ namespace slon {
 namespace graphics {
 
 /** Mesh class represents renderable 3d object */
-class StaticMesh :
+class SLON_PUBLIC StaticMesh :
     public scene::Entity
 {
 public:

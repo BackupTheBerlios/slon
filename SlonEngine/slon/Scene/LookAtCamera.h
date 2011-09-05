@@ -10,7 +10,7 @@ namespace scene {
 /** Coommon camera with several functions to manipulate camera position
  * in the space.
  */
-class LookAtCamera :
+class SLON_PUBLIC LookAtCamera :
     public CommonCamera
 {
 public:

@@ -35,7 +35,7 @@ inline unsigned getPatchVersion(unsigned version)
 }
 
 /** Abstract base class for objects serializable/deserializable using slon serializers */
-class Serializable
+class SLON_PUBLIC Serializable
 {
 public:
     /** Serialize object data using provided serializer.

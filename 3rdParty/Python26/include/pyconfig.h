@@ -329,7 +329,7 @@ Py_NO_ENABLE_SHARED to find out.  Also support MS_NO_COREDLL for b/w compat */
 			their Makefile (other compilers are generally
 			taken care of by distutils.) */
 #			ifdef _DEBUG
-#				pragma comment(lib,"python26_d.lib")
+#				pragma comment(lib,"python26.lib")
 #			else
 #				pragma comment(lib,"python26.lib")
 #			endif /* _DEBUG */
@@ -371,7 +371,7 @@ Py_NO_ENABLE_SHARED to find out.  Also support MS_NO_COREDLL for b/w compat */
 #endif
 
 #ifdef _DEBUG
-#	define Py_DEBUG
+//#	define Py_DEBUG
 #endif
 
 

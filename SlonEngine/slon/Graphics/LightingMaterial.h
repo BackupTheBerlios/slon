@@ -10,7 +10,7 @@ namespace slon {
 namespace graphics {
 
 /** Effect that generalizes different lighting techniques */
-class LightingMaterial :
+class SLON_PUBLIC LightingMaterial :
     public Material
 {
 friend class LightingEffect;

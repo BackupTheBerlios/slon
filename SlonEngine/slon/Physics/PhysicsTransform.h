@@ -10,7 +10,7 @@
 namespace slon {
 namespace physics {
 
-class PhysicsTransform :
+class SLON_PUBLIC PhysicsTransform :
 	public scene::Transform,
 	public scene::AcceptVisitor<realm::EventVisitor>
 {

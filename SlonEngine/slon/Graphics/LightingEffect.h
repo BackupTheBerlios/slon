@@ -9,7 +9,7 @@ namespace slon {
 namespace graphics {
 
 /** Effect that generalizes different lighting techniques */
-class LightingEffect :
+class SLON_PUBLIC LightingEffect :
     public TransformEffect
 {
 public:

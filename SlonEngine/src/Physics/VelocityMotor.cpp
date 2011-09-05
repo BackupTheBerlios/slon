@@ -15,6 +15,10 @@ VelocityMotor::VelocityMotor(Constraint*     constraint_,
 {
 }
 
+VelocityMotor::~VelocityMotor()
+{
+}
+
 Motor::TYPE VelocityMotor::getType() const
 {
 	return MOTOR_SERVO;

@@ -19,6 +19,10 @@ Constraint::Constraint(const DESC& desc_)
     desc.rigidBodies[1]->addConstraint(this);
 }
 
+Constraint::~Constraint()
+{
+}
+
 // Override Serializable
 const char* Constraint::serialize(database::OArchive& ar) const
 {

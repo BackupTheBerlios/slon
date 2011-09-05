@@ -15,6 +15,10 @@ ServoMotor::ServoMotor(Constraint*     constraint_,
 {
 }
 
+ServoMotor::~ServoMotor()
+{
+}
+
 Motor::TYPE ServoMotor::getType() const
 {
 	return MOTOR_SERVO;

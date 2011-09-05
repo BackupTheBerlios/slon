@@ -14,7 +14,7 @@ typedef handle format_id;
 
 /** Interface for accessing common objects in the storage. */
 template<typename T>
-class Cache :
+class SLON_PUBLIC Cache :
     public Referenced
 {
 public:

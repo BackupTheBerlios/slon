@@ -18,7 +18,7 @@ namespace physics {
 /** Generic 6DOF constraint. Implementation will choose most
  * suitable constraint for every case.
  */
-class Constraint :
+class SLON_PUBLIC Constraint :
     public Referenced,
     public database::Serializable
 {
@@ -73,6 +73,7 @@ public:
 
 public:
     Constraint(const DESC& desc = DESC());
+    ~Constraint();
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;

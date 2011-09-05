@@ -7,7 +7,7 @@ namespace slon {
 namespace scene {
 
 /** Spherical point light source. */
-class PointLight :
+class SLON_PUBLIC PointLight :
     public Light
 {
 public:

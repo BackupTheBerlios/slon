@@ -9,7 +9,7 @@ namespace slon {
 namespace graphics {
 namespace debug {
 
-struct motor
+struct SLON_PUBLIC motor
 {
     motor(const physics::Motor& mot_, 
           float                 scale_ = 1.0f, 
@@ -27,7 +27,7 @@ struct motor
     float                 forceSectorScale;
 };
 
-struct constraint
+struct SLON_PUBLIC constraint
 {
     constraint(const physics::Constraint& cons_, 
                float                      scale_ = 1.0f, 
@@ -46,31 +46,31 @@ struct constraint
 };
 
 /** Add collision shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::CollisionShape& c);
 
 /** Add box shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::BoxShape& b);
 
 /** Add cone shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::ConeShape& c);
 
 /** Add cylinder shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderXShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderXShape& c);
 
 /** Add cylinder shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderYShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderYShape& c);
 
 /** Add cylinder shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderZShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderZShape& c);
 
 /** Add convex shape to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const physics::ConvexShape& c);
 
 /** Add motor to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const motor& m);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const motor& m);
 
 /** Add constraint to debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const constraint& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const constraint& c);
 
 } // namespace debug
 } // namespace graphics

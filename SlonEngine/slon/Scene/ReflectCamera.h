@@ -12,7 +12,7 @@ namespace scene {
  * and build reflection transformation matrix.
  * If observing camera is invalid returns NAN values.
  */
-class ReflectCamera :
+class SLON_PUBLIC ReflectCamera :
     public SlaveCamera
 {
 protected:

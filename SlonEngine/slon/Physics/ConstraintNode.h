@@ -9,7 +9,7 @@
 namespace slon {
 namespace physics {
 
-class ConstraintNode :
+class SLON_PUBLIC ConstraintNode :
     public scene::Node,
     public scene::AcceptVisitor<realm::EventVisitor>
 {
