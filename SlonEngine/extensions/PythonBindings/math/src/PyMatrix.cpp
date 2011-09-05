@@ -20,24 +20,27 @@ Matrix4f make_matrix4f( float _0,  float _1,  float _2,  float _3,
                        _12, _13, _14, _15);
 }
 
+template<typename T>
+void no_delete(T*) {}
+
 template<typename T, int n, int m>
 struct matrix_item
 {
     typedef math::Matrix<T, n, m>           matrix_type;
     typedef typename matrix_type::row_type  row_type;
 
-    static row_type& get(matrix_type& mat, int i)
+    static boost::shared_ptr<row_type> get(matrix_type& mat, int i)
     {
         if (i < 0) {
             i += n;
         }
 
         if (i >= 0 && i < n) {
-            return mat[i];
+            return boost::shared_ptr<row_type>(&mat[i], no_delete<row_type>);
         }
 
         IndexError(i, 0, n-1);
-        return mat[0];
+        return boost::shared_ptr<row_type>(&mat[0], no_delete<row_type>);
     }
 
     static void set(matrix_type& mat, int i, const row_type& r)
@@ -108,7 +111,7 @@ void exportMatrix()
         .def(init<>())
         .def(init<float>())
         .def(init<const Matrix4f&>())
-        .def("__getitem__", &matrix_item<float, 4, 4>::get, return_value_policy<reference_existing_object>())
+        .def("__getitem__", &matrix_item<float, 4, 4>::get)
         .def("__setitem__", &matrix_item<float, 4, 4>::set)
         .def(self += self)
         .def(self -= self)

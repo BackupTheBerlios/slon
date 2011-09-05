@@ -193,7 +193,7 @@ class SlonExporter(plugins.SceneSaverData):
             rbData = c4d.GetCustomDatatypeDefault(c4d.DTYPE_LONG)
             rbElem = c4dNode.AddUserData(rbData)
             c4dNode[rbElem] = len(self.rigidBodies)
-            rigidBody = physics.RigidBody()
+            rigidBody = self.convertRigidBody(c4dNode)
             self.rigidBodies.append(rigidBody)
             return rigidBody
         
@@ -203,9 +203,9 @@ class SlonExporter(plugins.SceneSaverData):
         
         desc = physics.Constraint.DESC()
         desc.rigidBodyA = self.getNodeRigidBody(objA)
-        desc.frameA     = math.invert( convertMatrixP(c4dNode.GetMg(), self.documentScale) ) * convertMatrixP(objA.GetMg(), self.documentScale)
+        desc.frameA     = math.invert( desc.rigidBodyA.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
         desc.rigidBodyB = self.getNodeRigidBody(objB)
-        desc.frameB     = math.invert( convertMatrixP(c4dNode.GetMg(), self.documentScale) ) * convertMatrixP(objB.GetMg(), self.documentScale)
+        desc.frameB     = math.invert( desc.rigidBodyB.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
        
         type = c4dNode[c4d.FORCE_TYPE]
         if type == c4d.CONSTRAINT_JOINT_TYPE_CARDAN:
@@ -223,9 +223,6 @@ class SlonExporter(plugins.SceneSaverData):
                 desc.angularLimitMin.y =  1
                 desc.angularLimitMax.y = -1
         elif type == c4d.CONSTRAINT_JOINT_TYPE_HINGE:
-            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]
-            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
-            print c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
             if c4dNode[c4d.CONSTRAINT_ROT1_LIMIT]:
                 desc.angularLimitMin.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MIN]
                 desc.angularLimitMax.z = c4dNode[c4d.CONSTRAINT_ROT1_LIMIT_MAX]
@@ -243,13 +240,11 @@ class SlonExporter(plugins.SceneSaverData):
             else:
                 desc.angularLimitMin.z =  1
                 desc.angularLimitMax.z = -1
-        
-        desc.angularLimitMin.y = 1
-        desc.angularLimitMax = math.Vector3f(-1, -1, -1)
+
         constraint = physics.Constraint(desc)
         return physics.ConstraintNode(constraint)
-            
-    def convertPhysicsNode(self, c4dNode):       
+        
+    def convertRigidBody(self, c4dNode):
         dynTag = c4dNode.GetTag(180000102)
 
         desc = physics.RigidBody.DESC()
@@ -274,14 +269,16 @@ class SlonExporter(plugins.SceneSaverData):
             print c4dNode.GetName(), " : physics shape not converted"
             desc.collisionShape = physics.SphereShape(1.0)
             
+        return physics.RigidBody(desc)
+        
+    def convertPhysicsNode(self, c4dNode):
         rigidBody = self.getNodeRigidBody(c4dNode)
-        rigidBody.reset(desc)
-
         physicsTransform = physics.PhysicsTransform(rigidBody)
+        physicsTransform.name = c4dNode.GetName()
         physicsTransform.absolute = True
         
         # physics to graphics transformation convertion       
-        transform = math.invert(desc.transform) * convertMatrix(c4dNode.GetMg(), self.documentScale) 
+        transform = math.invert(rigidBody.getTransform()) * convertMatrix(c4dNode.GetMg(), self.documentScale) 
         physToGraphics = scene.MatrixTransform("PhysicsToGraphics", transform)
         physicsTransform.addChild(physToGraphics)
         
