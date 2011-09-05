@@ -15,6 +15,10 @@ RigidBody::RigidBody(const DESC& desc_)
 {
 }
 
+RigidBody::~RigidBody()
+{
+}
+
 const char* RigidBody::serialize(database::OArchive& ar) const
 {
     getDesc();

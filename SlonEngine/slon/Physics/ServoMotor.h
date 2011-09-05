@@ -10,7 +10,7 @@ namespace physics {
 class BulletRotationalServoMotor;
 
 /** The simpliest motor, can apply force(torque). */
-class ServoMotor :
+class SLON_PUBLIC ServoMotor :
     public Motor
 {
 private:
@@ -44,6 +44,7 @@ public:
 
 private:
 	ServoMotor(Constraint* constraint, Constraint::DOF dof);
+    ~ServoMotor();
 
 	/** Create motor implementation, should be called by constraint. */
 	void instantiate();

@@ -10,7 +10,7 @@ namespace graphics {
 namespace debug {
 
 /** Debug primitive to setup font for the debug text */
-struct font :
+struct SLON_PUBLIC font :
     public aligned<0x10>
 {
     explicit font(const sgl::Font* textFont_ = 0) :
@@ -21,7 +21,7 @@ struct font :
 };
 
 /** Debug primitive to setup debug text size */
-struct text_size :
+struct SLON_PUBLIC text_size :
     public aligned<0x10>
 {
     text_size(int width, int height) :
@@ -36,7 +36,7 @@ struct text_size :
 };
 
 /** Debug primitive to print debug text */
-struct text :
+struct SLON_PUBLIC text :
     public aligned<0x10>
 {
     explicit text(const std::string& str_) :
@@ -77,7 +77,7 @@ struct text :
 };
 
 /** Debug primitive to setup color of the polygons */
-struct color :
+struct SLON_PUBLIC color :
     public aligned<0x10>
 {
     color(float r, float g, float b, float a = 1.0f) :
@@ -92,7 +92,7 @@ struct color :
 };
 
 /** Debug primitive to setup projection transform */
-struct projection :
+struct SLON_PUBLIC projection :
     public aligned<0x10>
 {
     projection() :
@@ -109,7 +109,7 @@ struct projection :
 };
 
 /** Debug primitive to setup model transform */
-struct transform :
+struct SLON_PUBLIC transform :
     public aligned<0x10>
 {
     explicit transform(const math::Matrix4f& _matrix) :
@@ -120,7 +120,7 @@ struct transform :
 };
 
 /** Debug primitive to toggle depth test */
-struct depth_test
+struct SLON_PUBLIC depth_test
 {
     depth_test(bool _toggle) :
         toggle(_toggle)
@@ -130,7 +130,7 @@ struct depth_test
 };
 
 /** Debug primitive to toggle wireframe drawing */
-struct wireframe
+struct SLON_PUBLIC wireframe
 {
     wireframe(bool _toggle) :
         toggle(_toggle)
@@ -140,7 +140,7 @@ struct wireframe
 };
 
 /** Debug primitive - line */
-struct line
+struct SLON_PUBLIC line
 {
     line(const math::Vector2f& a_, const math::Vector2f& b_) :
         a(a_.x, a_.y, 0.0f),
@@ -156,7 +156,7 @@ struct line
 };
 
 /** Debug primitive - sector */
-struct sector
+struct SLON_PUBLIC sector
 {
     sector(const    math::Vector3f& up_, 
            const    math::Vector3f& cross_, 
@@ -179,7 +179,7 @@ struct sector
 };
 
 /** Debug primitive - cone(up axis is Y) */
-struct cone
+struct SLON_PUBLIC cone
 {
     cone(float  radius_,
          float  height_,
@@ -198,7 +198,7 @@ struct cone
 };
 
 /** Debug primitive - cylinder(up axis is Y) */
-struct cylinder
+struct SLON_PUBLIC cylinder
 {
     cylinder(float  radius_,
              float  height_,
@@ -217,46 +217,46 @@ struct cylinder
 };
 
 /** Setup debug mesh draw color. */
-DebugMesh& operator << (DebugMesh& mesh, const font& f);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const font& f);
 
 /** Setup debug mesh draw color. */
-DebugMesh& operator << (DebugMesh& mesh, const text_size& ts);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const text_size& ts);
 
 /** Setup debug mesh draw color. */
-DebugMesh& operator << (DebugMesh& mesh, const text& t);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const text& t);
 
 /** Setup debug mesh draw color. */
-DebugMesh& operator << (DebugMesh& mesh, const color& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const color& c);
 
 /** Setup debug mesh projection transform. */
-DebugMesh& operator << (DebugMesh& mesh, const projection& t);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const projection& t);
 
 /** Setup debug mesh transform. */
-DebugMesh& operator << (DebugMesh& mesh, const transform& t);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const transform& t);
 
 /** Toggle depth test for debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const depth_test& d);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const depth_test& d);
 
 /** Toggle wireframe for debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const wireframe& w);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const wireframe& w);
 
 /** Add another debug mesh to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const DebugMesh& other);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const DebugMesh& other);
 
 /** Add line to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const line& l);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const line& l);
 
 /** Add sector to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const sector& s);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const sector& s);
 
 /** Add cone to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const cone& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const cone& c);
 
 /** Add cylinder to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const cylinder& c);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const cylinder& c);
 
 /** Add line to the debug mesh */
-DebugMesh& operator << (DebugMesh& mesh, const math::AABBf& a);
+SLON_PUBLIC DebugMesh& operator << (DebugMesh& mesh, const math::AABBf& a);
 
 } // namespace debug
 } // namespace graphics

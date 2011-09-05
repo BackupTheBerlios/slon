@@ -8,7 +8,7 @@ namespace slon {
 namespace scene {
 
 /** All childs of the Transform node are in local space */
-class Transform :
+class SLON_PUBLIC Transform :
     public Group
 {
 friend class TransformVisitor;

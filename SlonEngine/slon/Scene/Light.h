@@ -8,7 +8,7 @@ namespace scene {
 
 /** Interface for light sources.
  */
-class Light :
+class SLON_PUBLIC Light :
     public scene::Entity
 {
 public:

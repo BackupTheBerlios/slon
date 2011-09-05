@@ -10,7 +10,7 @@ namespace scene {
  * CullVisitor to the root joint, so adding geodes or other nodes affected
  * by CullVisitor in the skeletons joint hierarchy is meaningless.
  */
-class Skeleton :
+class SLON_PUBLIC Skeleton :
     public Node
 {
 public:

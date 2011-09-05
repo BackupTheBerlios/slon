@@ -11,7 +11,7 @@ namespace physics {
  * controllers this motor is very similar to PD controller. The force formula
  * can differ for different implementation, but should mimiv this one: F = stiffness * (equilibrium - position) - damping * velocity.
  */
-class SpringMotor :
+class SLON_PUBLIC SpringMotor :
     public Motor
 {
 public:

@@ -22,7 +22,7 @@ namespace slon {
 
 /** Overloads operator new and delete for aligned classes. */
 template<int align>
-class aligned
+class SLON_PUBLIC aligned
 {
 public:
     void* operator new(size_t size)

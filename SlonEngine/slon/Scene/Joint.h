@@ -9,7 +9,7 @@ namespace scene {
 
 /** Joint class is transform class specialized for skinning.
  */
-class Joint :
+class SLON_PUBLIC Joint :
     public MatrixTransform
 {
 friend class TransformVisitor;

@@ -11,7 +11,7 @@ class Effect;
  * and effect. Effect usually contains state set and shaders. During
  * render pass renderables will be sorted to reduce effect changes.
  */
-class Renderable
+class SLON_PUBLIC Renderable
 {
 public:
     /** Render object to the device. In the SlonEngine this means only

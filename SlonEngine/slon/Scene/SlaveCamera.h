@@ -10,7 +10,7 @@ namespace scene {
  * Slave camera must have valid master camera, otherwise any get
  * function except getMasterCamera, getRenderPass will assert.
  */
-class SlaveCamera :
+class SLON_PUBLIC SlaveCamera :
     public CommonCamera
 {
 private:

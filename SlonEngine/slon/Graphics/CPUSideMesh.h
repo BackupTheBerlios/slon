@@ -16,7 +16,7 @@ namespace graphics {
  * constructing GPUSideMesh. For processing algorithms see CPUSideTriangleMesh. 
  * @see GPUSideMesh, CPUSideTriangleMesh
  */
-class CPUSideMesh :
+class SLON_PUBLIC CPUSideMesh :
     public Referenced
 {
 public:

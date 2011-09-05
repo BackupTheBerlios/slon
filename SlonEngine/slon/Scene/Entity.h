@@ -12,7 +12,7 @@ namespace scene {
 /** Entity in the game world. Represents object that interacts with
  * game world.
  */
-class Entity :
+class SLON_PUBLIC Entity :
     public Node
 {
 public:

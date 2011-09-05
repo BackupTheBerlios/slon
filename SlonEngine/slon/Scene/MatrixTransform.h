@@ -10,7 +10,7 @@ namespace scene {
  * worldToLocal, localToWorld and local inverted transformation matrices are cached.
  * They update during the traversals.
  */
-class MatrixTransform :
+class SLON_PUBLIC MatrixTransform :
     public Transform
 {
 public:
