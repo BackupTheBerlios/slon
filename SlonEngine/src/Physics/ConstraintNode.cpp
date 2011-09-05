@@ -59,7 +59,7 @@ void ConstraintNode::accept(log::LogVisitor& visitor) const
 
 void ConstraintNode::accept(realm::EventVisitor& ev)
 {
-    if ( !ev.getPhysicsToggle() ) {
+    if ( !ev.getPhysicsToggle() || !constraint ) {
         return;
     }
 
