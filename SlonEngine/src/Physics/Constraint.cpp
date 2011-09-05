@@ -35,7 +35,7 @@ const char* Constraint::serialize(database::OArchive& ar) const
     ar.writeChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.writeChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    return "BulletConstraint";
+    return "Constraint";
 }
 
 void Constraint::deserialize(database::IArchive& ar)
