@@ -45,7 +45,7 @@ struct Contact
 #endif
 
 /** Rigid body in the phyics world */
-class CollisionObject :
+class SLON_PUBLIC CollisionObject :
     public Referenced,
     public database::Serializable
 {

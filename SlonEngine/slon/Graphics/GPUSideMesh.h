@@ -18,7 +18,7 @@ namespace slon {
 namespace graphics {
 
 /** Mesh representation convenient for rendering */
-class GPUSideMesh :
+class SLON_PUBLIC GPUSideMesh :
     public Referenced,
 	public database::Serializable
 {
@@ -26,7 +26,7 @@ public:
     static const int LOCK_READ  = 1;
     static const int LOCK_WRITE = 1 << 1;
 
-    class buffer_lock_impl
+    class SLON_PUBLIC buffer_lock_impl
     {
     public:
         buffer_lock_impl(sgl::Buffer* buffer,
@@ -54,7 +54,7 @@ public:
 		TEXCOORD,
     };
 
-    struct attribute
+    struct SLON_PUBLIC attribute
     {
         detail::AttributeTable::binding_ptr binding;
         unsigned                            size;
@@ -79,7 +79,7 @@ public:
         sgl::ref_ptr<sgl::IndexBuffer>  indexBuffer;    /// Index buffer storing indices (can be NULL)
     };
 
-    struct subset :
+    struct SLON_PUBLIC subset :
         public Referenced,
         public Renderable
     {
@@ -112,7 +112,7 @@ public:
     typedef subset_vector::const_iterator   subset_const_iterator;
 
 public:
-    struct plain_subset :
+    struct SLON_PUBLIC plain_subset :
         public subset
     {
     friend class GPUSideMesh;
@@ -142,7 +142,7 @@ public:
         unsigned            numVertices;
     };
 
-    struct indexed_subset :
+    struct SLON_PUBLIC indexed_subset :
         public subset
     {
     friend class GPUSideMesh;
@@ -182,7 +182,7 @@ public:
     typedef boost::intrusive_ptr<indexed_subset>  indexed_subset_ptr;
 
     template<typename T>
-    class accessor
+    class SLON_PUBLIC accessor
     {
     private:
         template<typename Y>

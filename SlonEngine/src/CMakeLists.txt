@@ -286,7 +286,6 @@ SET ( TARGET_UTILITY_MEMORY_HEADERS
     ${TARGET_HEADER_PATH}/Utility/Memory/aligned.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/aligned_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/block_allocator.hpp
-    ${TARGET_HEADER_PATH}/Utility/Memory/debug_new.h
     ${TARGET_HEADER_PATH}/Utility/Memory/fast_mutex.h
     ${TARGET_HEADER_PATH}/Utility/Memory/small_object_allocator.hpp
     ${TARGET_HEADER_PATH}/Utility/Memory/static_assert.h
@@ -588,7 +587,6 @@ SET ( TARGET_UTILITY_SOURCES
 )
 
 SET ( TARGET_UTILITY_MEMORY_SOURCES
-	Utility/Memory/debug_new.cpp
 )
 
 SET ( TARGET_UTILITY_PLOT_SOURCES

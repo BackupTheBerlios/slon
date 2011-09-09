@@ -8,7 +8,7 @@ namespace slon {
 namespace scene {
 
 /** Base class for visitors, traversing scene graphs. */
-class Visitor
+class SLON_PUBLIC Visitor
 {
 public:
     typedef Node node_type;
@@ -24,7 +24,7 @@ public:
 };
 
 /** Base class for constant visitors, traversing scene graphs. */
-class ConstVisitor
+class SLON_PUBLIC ConstVisitor
 {
 public:
     typedef const Node node_type;

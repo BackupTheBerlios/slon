@@ -11,7 +11,7 @@
 namespace slon {
 namespace graphics {
 
-class SkyBox :
+class SLON_PUBLIC SkyBox :
     public scene::Entity,
     public Renderable
 {

@@ -15,7 +15,7 @@ namespace slon {
 namespace physics {
 
 /** Collision shape class */
-class CollisionShape :
+class SLON_PUBLIC CollisionShape :
 	public Referenced,
     public database::Serializable
 {
@@ -49,7 +49,7 @@ typedef boost::intrusive_ptr<CollisionShape>        collision_shape_ptr;
 typedef boost::intrusive_ptr<const CollisionShape>  const_collision_shape_ptr;
 
 /** Planar collision shape */
-class PlaneShape :
+class SLON_PUBLIC PlaneShape :
 	public CollisionShape
 {
 public:
@@ -70,7 +70,7 @@ public:
 };
 
 /** Sphere collision shape */
-class SphereShape :
+class SLON_PUBLIC SphereShape :
 	public CollisionShape
 {
 public:
@@ -91,7 +91,7 @@ public:
 };
 
 /** Box collision shape */
-class BoxShape :
+class SLON_PUBLIC BoxShape :
 	public CollisionShape
 {
 public:
@@ -120,7 +120,7 @@ public:
 };
 
 /** Cone collision shape. Up axis is Y.  */
-class ConeShape :
+class SLON_PUBLIC ConeShape :
 	public CollisionShape
 {
 public:
@@ -143,7 +143,7 @@ public:
 };
 
 /** Capsule collision shape. Up axis is Y. */
-class CapsuleShape :
+class SLON_PUBLIC CapsuleShape :
 	public CollisionShape
 {
 public:
@@ -166,7 +166,7 @@ public:
 };
 
 /** Cylinder collision shape. Up axis is X. */
-class CylinderXShape :
+class SLON_PUBLIC CylinderXShape :
 	public CollisionShape
 {
 public:
@@ -195,7 +195,7 @@ public:
 };
 
 /** Cylinder collision shape. Up axis is Y. */
-class CylinderYShape :
+class SLON_PUBLIC CylinderYShape :
 	public CollisionShape
 {
 public:
@@ -224,7 +224,7 @@ public:
 };
 
 /** Cylinder collision shape. Up axis is Z. */
-class CylinderZShape :
+class SLON_PUBLIC CylinderZShape :
 	public CollisionShape
 {
 public:
@@ -257,7 +257,7 @@ public:
  * in cases you don't know definetely that the point cloud represents
  * convex hull.
  */
-class ConvexShape :
+class SLON_PUBLIC ConvexShape :
 	public CollisionShape
 {
 public:
@@ -297,7 +297,7 @@ public:
 };
 
 /** Arbitrary triangle mesh collision shape */
-class TriangleMeshShape :
+class SLON_PUBLIC TriangleMeshShape :
 	public CollisionShape
 {
 public:
@@ -316,7 +316,7 @@ public:
 };
 
 /** Compound collision shape*/
-class CompoundShape :
+class SLON_PUBLIC CompoundShape :
     public CollisionShape
 {
 public:

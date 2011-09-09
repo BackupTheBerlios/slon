@@ -10,7 +10,7 @@ namespace graphics {
 /** CPU side mesh. Treats mesh as indexed triangle surface, contains some
  * geometry processing utilities.
  */
-class CPUSideTriangleMesh :
+class SLON_PUBLIC CPUSideTriangleMesh :
     public CPUSideMesh
 {
 public:

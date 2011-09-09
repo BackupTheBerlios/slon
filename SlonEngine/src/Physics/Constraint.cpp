@@ -15,8 +15,16 @@ namespace physics {
 Constraint::Constraint(const DESC& desc_)
 :   desc(desc_)
 {
-    desc.rigidBodies[0]->addConstraint(this);
-    desc.rigidBodies[1]->addConstraint(this);
+    if (desc.rigidBodies[0]) {
+        desc.rigidBodies[0]->addConstraint(this);
+    }
+    if (desc.rigidBodies[1]) {
+        desc.rigidBodies[1]->addConstraint(this);
+    }
+}
+
+Constraint::~Constraint()
+{
 }
 
 // Override Serializable
@@ -31,24 +39,32 @@ const char* Constraint::serialize(database::OArchive& ar) const
     ar.writeChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.writeChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    return "BulletConstraint";
+    return "Constraint";
 }
 
 void Constraint::deserialize(database::IArchive& ar)
 {
-	desc.rigidBodies[0]->removeConstraint(this);
-    desc.rigidBodies[1]->removeConstraint(this);
+    if (desc.rigidBodies[0]) {
+        desc.rigidBodies[0]->removeConstraint(this);
+    }
+    if (desc.rigidBodies[1]) {
+        desc.rigidBodies[1]->removeConstraint(this);
+    }
     ar.readStringChunk("name", desc.name);
     desc.rigidBodies[0] = ar.readSerializable<RigidBody>();
+    if (desc.rigidBodies[0]) {
+        desc.rigidBodies[0]->addConstraint(this);
+    }
     desc.rigidBodies[1] = ar.readSerializable<RigidBody>();
+    if (desc.rigidBodies[1]) {
+        desc.rigidBodies[1]->addConstraint(this);
+    }
     ar.readChunk("frame0", desc.frames[0].data(), desc.frames[0].num_elements);
     ar.readChunk("frame1", desc.frames[1].data(), desc.frames[1].num_elements);
     ar.readChunk("linearLimits0", desc.linearLimits[0].arr, desc.linearLimits[0].num_elements);
     ar.readChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.readChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
-    desc.rigidBodies[0]->addConstraint(this);
-    desc.rigidBodies[1]->addConstraint(this);
     instantiate();
 }
 
@@ -152,11 +168,19 @@ const DynamicsWorld* Constraint::getDynamicsWorld() const
 
 void Constraint::reset(const DESC& desc_)
 {
-	desc.rigidBodies[0]->removeConstraint(this);
-    desc.rigidBodies[1]->removeConstraint(this);
+    if (desc.rigidBodies[0]) {
+        desc.rigidBodies[0]->removeConstraint(this);
+    }
+    if (desc.rigidBodies[1]) {
+        desc.rigidBodies[1]->removeConstraint(this);
+    }
 	desc = desc_;
-    desc.rigidBodies[0]->addConstraint(this);
-    desc.rigidBodies[1]->addConstraint(this);
+    if (desc.rigidBodies[0]) {
+        desc.rigidBodies[0]->addConstraint(this);
+    }
+    if (desc.rigidBodies[1]) {
+        desc.rigidBodies[1]->addConstraint(this);
+    }
 	instantiate();
 }
 
@@ -170,6 +194,10 @@ void Constraint::setWorld(const dynamics_world_ptr& world_)
 
 void Constraint::instantiate()
 {
+    if (!desc.rigidBodies[0] || !desc.rigidBodies[1]) {
+        return;
+    }
+
 	if ( !impl && world && desc.rigidBodies[0]->getDynamicsWorld() && desc.rigidBodies[1]->getDynamicsWorld() ) 
 	{
         assert( world == desc.rigidBodies[0]->getDynamicsWorld()

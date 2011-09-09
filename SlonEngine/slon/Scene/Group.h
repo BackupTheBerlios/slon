@@ -8,7 +8,7 @@ namespace slon {
 namespace scene {
 
 /** Group node stores links to the child nodes */
-class Group :
+class SLON_PUBLIC Group :
     public Node
 {
 public:

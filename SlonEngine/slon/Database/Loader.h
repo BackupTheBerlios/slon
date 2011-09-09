@@ -26,7 +26,7 @@ public:
 
 /** Interface for database items loaders. */
 template<typename T>
-class Loader :
+class SLON_PUBLIC Loader :
     public Referenced
 {
 public:

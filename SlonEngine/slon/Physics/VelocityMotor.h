@@ -13,7 +13,7 @@ class BulletRotationalVelocityMotor;
  * to solve multi-rigid-body simulation problem, keeping the provided velocity constraints,
  * using LCP solver or some similar staff.
  */
-class VelocityMotor :
+class SLON_PUBLIC VelocityMotor :
     public Motor
 {
 private:
@@ -56,6 +56,7 @@ public:
 
 private:
 	VelocityMotor(Constraint* constraint, Constraint::DOF dof);
+    ~VelocityMotor();
 
 	// Override Motor
 	void instantiate();

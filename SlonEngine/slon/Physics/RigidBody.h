@@ -17,7 +17,7 @@ class Constraint;
 #endif
 
 /** Rigid body in the physics world */
-class SLON_DLLEXPORT RigidBody :
+class SLON_PUBLIC RigidBody :
     public CollisionObject
 {
 private:
@@ -79,6 +79,7 @@ public:
 
 public:
 	RigidBody(const DESC& desc = DESC());
+    ~RigidBody();
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -170,7 +171,7 @@ private:
 
 private:
     dynamics_world_ptr world;
-    mutable DESC desc;
+    mutable DESC       desc;
     impl_ptr           impl;
     constraint_vector  constraints;
 };

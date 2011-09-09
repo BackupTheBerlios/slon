@@ -15,7 +15,7 @@ namespace slon {
 namespace graphics {
 
 /** Debug mesh provides basic functionality for drawing debug information */
-class DebugMesh :
+class SLON_PUBLIC DebugMesh :
     public scene::Entity
 {
 private:
