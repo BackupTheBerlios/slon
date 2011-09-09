@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( SCENE_HEADERS
