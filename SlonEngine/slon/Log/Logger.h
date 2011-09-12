@@ -81,7 +81,7 @@ namespace log {
  * are organized in tree structure. Id you redirect output
  * of the parent logger, all childs will be redirected too.
  */
-class Logger :
+class SLON_PUBLIC Logger :
 	public Referenced
 {
 public:

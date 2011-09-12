@@ -8,7 +8,7 @@ namespace slon {
 namespace log {
 
 /** LogVisitor logs information on the scene graph. Performs traverse using recursion. */
-class LogVisitor :
+class SLON_PUBLIC LogVisitor :
     public scene::ConstVisitor
 {
 public:

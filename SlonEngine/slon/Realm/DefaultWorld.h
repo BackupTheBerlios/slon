@@ -13,7 +13,7 @@ namespace realm {
 /** Very simple world. Stores array of locations and updates all
  * of them every frame. 
  */
-class DefaultWorld :
+class SLON_PUBLIC DefaultWorld :
 	public realm::World
 {
 public:

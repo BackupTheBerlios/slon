@@ -11,7 +11,7 @@ namespace input {
 /** Main class of the SlonEngine. The manager of the hole graphics,
  * physics, sound and etc in the scene.
  */
-class InputManager
+class SLON_PUBLIC InputManager
 {
 public:
     typedef std::vector<input_handler_ptr>          input_handler_vector;

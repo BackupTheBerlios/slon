@@ -8,7 +8,7 @@ namespace slon {
 namespace physics {
 
 /** Interface for rotational or translational motor. For rotational motor force means torque. */
-class Motor
+class SLON_PUBLIC Motor
 {
 private:
 	friend class Constraint;

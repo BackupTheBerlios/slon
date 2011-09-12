@@ -9,6 +9,14 @@ DECLARE_AUTO_LOGGER("physics.PhysicsModel")
 namespace slon {
 namespace physics {
 
+PhysicsModel::PhysicsModel()
+{
+}
+
+PhysicsModel::~PhysicsModel()
+{
+}
+
 const char* PhysicsModel::serialize(database::OArchive& ar) const
 {
     ar.writeStringChunk("name", name.data(), name.length());

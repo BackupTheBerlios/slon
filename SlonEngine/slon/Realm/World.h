@@ -20,7 +20,7 @@ namespace realm {
  * thread safe by itself, you must use lock functions to provide thread
  * safety.
  */
-class World :
+class SLON_PUBLIC World :
     public Referenced,
     public database::Serializable
 {
@@ -85,7 +85,7 @@ public:
 };
 
 /** Get simulation world */
-World* currentWorld();
+SLON_PUBLIC World* currentWorld();
 
 } // namespace realm
 } // namespace slon

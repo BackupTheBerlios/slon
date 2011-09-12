@@ -10,7 +10,7 @@ namespace realm {
 
 /** Event visitor notifies scene graph nodes about being added/removed to/form world.
  */
-class EventVisitor :
+class SLON_PUBLIC EventVisitor :
     public scene::VisitorImpl<EventVisitor, scene::Visitor>
 {
 public:
