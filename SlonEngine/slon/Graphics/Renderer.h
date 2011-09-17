@@ -11,7 +11,7 @@
 namespace slon {
 namespace graphics {
 
-struct FFPRendererDesc
+struct SLON_PUBLIC FFPRendererDesc
 {
     unsigned    bitsPerPixel;   /// 16, 24 or 32
     unsigned    depthBits;      /// 16 or 24
@@ -27,7 +27,7 @@ struct FFPRendererDesc
     {}
 };
 
-struct ForwardRendererDesc
+struct SLON_PUBLIC ForwardRendererDesc
 {
     unsigned    bitsPerPixel;   /// 16, 24 or 32
     unsigned    depthBits;      /// 16 or 24
@@ -51,7 +51,7 @@ struct ForwardRendererDesc
  * rendering techniques, such as deffered shading or forward rendering.
  * Add scene wich you want to render as chid to this node.
  */
-class Renderer :
+class SLON_PUBLIC Renderer :
     public Referenced
 {
 friend class scene::CullVisitor;
@@ -112,7 +112,7 @@ typedef boost::intrusive_ptr<Renderer>          renderer_ptr;
 typedef boost::intrusive_ptr<const Renderer>    const_renderer_ptr;
 
 /** Get current renderer used by engine. */
-Renderer* currentRenderer();
+SLON_PUBLIC Renderer* currentRenderer();
 
 } // namespace graphics
 } // namespace slon

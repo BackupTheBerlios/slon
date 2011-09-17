@@ -11,7 +11,7 @@
 namespace slon {
 namespace graphics {
 
-class ProjectedGrid :
+class SLON_PUBLIC ProjectedGrid :
     public scene::Entity,
     public Renderable
 {

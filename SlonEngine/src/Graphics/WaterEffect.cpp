@@ -295,6 +295,10 @@ WaterEffect::WaterEffect(const frequency_spectrum_ptr& _frequencySpectrum) :
     environmentMapBinder.reset( new parameter_binding<sgl::TextureCube>(0, 1, false) );
 }
 
+WaterEffect::~WaterEffect()
+{
+}
+
 // Lighting effect
 void WaterEffect::dirtyShaderTechniques()
 {

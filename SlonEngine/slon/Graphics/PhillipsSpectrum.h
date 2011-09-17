@@ -9,7 +9,7 @@ namespace graphics {
 /**
  * Interface for frequency spectrum generators for FFT based water
  */
-class PhillipsSpectrum :
+class SLON_PUBLIC PhillipsSpectrum :
     public FrequencySpectrum
 {
 public:

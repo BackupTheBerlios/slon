@@ -16,7 +16,7 @@ namespace graphics {
 class FFTMapsGenerator;
 
 /** Water effect based on the fft approach */
-class WaterEffect :
+class SLON_PUBLIC WaterEffect :
     public Effect
 {
 public:
@@ -24,6 +24,7 @@ public:
 
 public:
 	WaterEffect(const frequency_spectrum_ptr& _frequencySpectrum);
+    ~WaterEffect();
 
     /** Setup frequency spectrum generator for the water effect */
     void setFrequencySpectrum(const frequency_spectrum_ptr& _frequencySpectrum);

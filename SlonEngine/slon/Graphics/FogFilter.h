@@ -33,7 +33,7 @@ public:
 };
 
 /** Post process fog based on scene depth. */
-class FogFilter :
+class SLON_PUBLIC FogFilter :
     public PostProcessFilter
 {
 private:
