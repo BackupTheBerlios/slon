@@ -13,7 +13,7 @@ namespace realm {
  * for the scene graph and will store necessary information in it.
  * @see BVHLocation
  */
-class BVHLocationNode :
+class SLON_PUBLIC BVHLocationNode :
     public scene::Group
 {
 public:
@@ -25,6 +25,7 @@ public:
     BVHLocationNode(BVHLocation*      location_ = 0, 
                     object_tree_node* node_     = 0, 
                     bool              dynamic_  = true);
+    ~BVHLocationNode();
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;

@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( MATH_HEADERS
@@ -32,7 +32,7 @@ ADD_LIBRARY( PyMath SHARED
     ${MATH_SOURCES} 
 )
 
-ADD_PRECOMPILED_HEADER( PyMath "stdafx.h" "stdafx.cpp" )
+ADD_PRECOMPILED_HEADER( PyMath "${PYTHON_BINDINGS_DIR}/stdafx.h" "${PYTHON_BINDINGS_DIR}/stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PyMath PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"

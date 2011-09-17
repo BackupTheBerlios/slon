@@ -73,9 +73,19 @@ RigidBody* Constraint::getRigidBodyA() const
 	return desc.rigidBodies[0].get();
 }
 
+const math::Matrix4r& Constraint::getFrameInA() const
+{
+    return desc.frames[0];
+}
+
 RigidBody* Constraint::getRigidBodyB() const
 {
 	return desc.rigidBodies[1].get();
+}
+
+const math::Matrix4r& Constraint::getFrameInB() const
+{
+    return desc.frames[1];
 }
 
 const Motor* Constraint::getMotor(DOF dof) const

@@ -8,7 +8,7 @@ namespace slon {
 /** Timer measuring time from the creation. Uses windows QueryPerformanceCounter,
  * QueryPerformanceFrequency or linux gettimeofday functions.
  */
-class StartStopTimer :
+class SLON_PUBLIC StartStopTimer :
     public Timer
 {
 public:

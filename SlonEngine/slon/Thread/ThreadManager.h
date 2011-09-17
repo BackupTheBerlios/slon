@@ -21,7 +21,7 @@ enum THREAD_SEMANTIC
     MAX_THREAD_SEMANTIC =  3
 };
 
-class ThreadManager
+class SLON_PUBLIC ThreadManager
 {
 public:
     typedef boost::function<void ()> void_function;
@@ -66,7 +66,7 @@ public:
 };
 
 /** Get current thread manager used by engine */
-ThreadManager& currentThreadManager();
+SLON_PUBLIC ThreadManager& currentThreadManager();
 
 } // namespace thread
 } // namespace slon

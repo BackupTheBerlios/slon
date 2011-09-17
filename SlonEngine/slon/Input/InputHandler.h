@@ -309,7 +309,7 @@ class KeyboardEvent;
 class MouseEvent;
 
 /** Base class for any input event */
-class InputEvent
+class SLON_PUBLIC InputEvent
 {
 public:
     enum EVENT_TYPE
@@ -334,7 +334,7 @@ public:
 };
 
 /** Event occured whether key is pressed or released */
-class KeyboardEvent :
+class SLON_PUBLIC KeyboardEvent :
     public InputEvent
 {
 public:
@@ -354,7 +354,7 @@ public:
 /** Event occured whether mouse button was pressed or
  * mouse motion detected.
  */
-class MouseEvent :
+class SLON_PUBLIC MouseEvent :
     public InputEvent
 {
 public:
@@ -375,7 +375,7 @@ public:
 /** Input handler is interface for classes that transfers
  * input signals to the user.
  */
-class InputHandler :
+class SLON_PUBLIC InputHandler :
     public Referenced
 {
 public:

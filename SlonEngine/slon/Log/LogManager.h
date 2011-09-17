@@ -9,7 +9,7 @@ namespace slon {
 namespace log {
 
 /** Manages output for loggers. */
-class LogManager
+class SLON_PUBLIC LogManager
 {
 public:
     typedef boost::signal<void (LogManager&)>	signal_type;
@@ -47,7 +47,7 @@ public:
 };
 
 /** Get current input manager used by engine. */
-LogManager& currentLogManager();
+SLON_PUBLIC LogManager& currentLogManager();
 
 } // namespace log
 } // namespace slon

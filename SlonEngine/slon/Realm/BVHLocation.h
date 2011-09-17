@@ -39,7 +39,7 @@ visit_node_functor<Visitor> visit_node(Visitor& nv)
 	return visit_node_functor<Visitor>(nv);
 }
 
-class BVHLocation :
+class SLON_PUBLIC BVHLocation :
     public Location
 {
 public:
@@ -49,6 +49,7 @@ public:
 
 public:
     BVHLocation();
+    ~BVHLocation();
 
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;

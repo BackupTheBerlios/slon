@@ -2,6 +2,7 @@
 #define __SLON_ENGINE_UTILITY_TMP_FILE_HPP__
 
 #include <fstream>
+#include <ios>
 #include <stdio.h>
 
 namespace slon {
@@ -15,6 +16,9 @@ class basic_tmp_file :
 	public std::basic_ofstream<Elem, Traits>
 {
 public:
+    typedef std::basic_ofstream<Elem, Traits> base_type;
+
+public:
 	basic_tmp_file(const char* dir = "")
 	:	name_(dir)
 	{
@@ -26,15 +30,15 @@ public:
 
     using std::basic_ofstream<Elem, Traits>::open;
 
-    bool open(ios_base::openmode mode = ios_base::out)
+    bool open(std::ios_base::openmode mode = std::ios_base::out)
     {
-        open( name_.c_str(), mode );
-        return is_open();
+        base_type::open( name_.c_str(), mode );
+        return base_type::is_open();
     }
 
     ~basic_tmp_file()
     {
-        close();
+        base_type::close();
         remove(name_.c_str());
     }
 

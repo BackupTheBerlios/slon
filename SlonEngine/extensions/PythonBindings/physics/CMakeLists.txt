@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( PHYSICS_HEADERS
@@ -34,7 +34,7 @@ ADD_LIBRARY( PyPhysics SHARED
     ${PHYSICS_SOURCES} 
 )
 
-ADD_PRECOMPILED_HEADER( PyPhysics "stdafx.h" "stdafx.cpp" )
+ADD_PRECOMPILED_HEADER( PyPhysics "${PYTHON_BINDINGS_DIR}/stdafx.h" "${PYTHON_BINDINGS_DIR}/stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PyPhysics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"

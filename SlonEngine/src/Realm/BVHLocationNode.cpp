@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
+#include "Physics/DynamicsWorld.h"
 #include "Realm/BVHLocation.h"
 #include "Realm/BVHLocationNode.h"
 
@@ -12,6 +13,10 @@ BVHLocationNode::BVHLocationNode(BVHLocation*      location_,
 :   location(location_)
 ,   node(node_)
 ,   dynamic(dynamic_)
+{
+}
+
+BVHLocationNode::~BVHLocationNode()
 {
 }
 

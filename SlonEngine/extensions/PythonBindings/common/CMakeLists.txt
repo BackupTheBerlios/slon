@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( COMMON_HEADERS
@@ -26,7 +26,7 @@ ADD_LIBRARY( PyCommon SHARED
     ${COMMON_SOURCES} 
 )
 
-ADD_PRECOMPILED_HEADER( PyCommon "stdafx.h" "stdafx.cpp" )
+ADD_PRECOMPILED_HEADER( PyCommon "${PYTHON_BINDINGS_DIR}/stdafx.h" "${PYTHON_BINDINGS_DIR}/stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PyCommon PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"

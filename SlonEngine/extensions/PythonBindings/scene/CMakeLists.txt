@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( SCENE_HEADERS
@@ -32,7 +32,7 @@ ADD_LIBRARY( PyScene SHARED
     ${SCENE_SOURCES} 
 )
 
-ADD_PRECOMPILED_HEADER( PyScene "stdafx.h" "stdafx.cpp" )
+ADD_PRECOMPILED_HEADER( PyScene "${PYTHON_BINDINGS_DIR}/stdafx.h" "${PYTHON_BINDINGS_DIR}/stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PyScene PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"

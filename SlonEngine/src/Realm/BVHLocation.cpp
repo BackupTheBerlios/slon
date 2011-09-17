@@ -133,6 +133,10 @@ BVHLocation::BVHLocation()
     eventVisitor.setLocation(this);
 }
 
+BVHLocation::~BVHLocation()
+{
+}
+
 const char* BVHLocation::serialize(database::OArchive& ar) const
 {
     database::serialize(ar, "aabb", aabb);

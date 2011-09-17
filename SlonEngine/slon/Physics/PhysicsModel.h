@@ -3,7 +3,8 @@
 
 #include "../Database/Serializable.h"
 #include "../Utility/referenced.hpp"
-#include "Forward.h"
+#include "Constraint.h"
+#include "RigidBody.h"
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <map>
@@ -13,7 +14,7 @@ namespace slon {
 namespace physics {
 
 /** Container for rigid bodies, constraints and other physics entities. */
-class PhysicsModel :
+class SLON_PUBLIC PhysicsModel :
     public Referenced,
     public database::Serializable
 {
@@ -97,8 +98,11 @@ private:
     typedef dereference<Constraint>         constraint_dereference;
     typedef dereference<const Constraint>   const_constraint_dereference;
 
-public: 
+private: 
     typedef std::map<collision_object_ptr, std::string>                 collision_object_map;
+    typedef std::set<constraint_ptr>                                    constraint_set;
+
+public:
     typedef collision_object_map::iterator                              collision_object_iterator;
     typedef collision_object_map::const_iterator                        collision_object_const_iterator;
 
@@ -107,13 +111,15 @@ public:
     typedef rigid_body_iterator_impl<const RigidBody, 
                                      collision_object_const_iterator>   rigid_body_const_iterator;
 
-    typedef std::set<constraint_ptr>                                    constraint_set;
     typedef boost::transform_iterator<constraint_dereference, 
                                       constraint_set::iterator>         constraint_iterator;
     typedef boost::transform_iterator<const_constraint_dereference, 
                                       constraint_set::const_iterator>   constraint_const_iterator;
 
 public:
+    PhysicsModel();
+    ~PhysicsModel();
+
     // Override Serializable
     const char* serialize(database::OArchive& ar) const;
     void        deserialize(database::IArchive& ar);

@@ -14,6 +14,7 @@ class SLON_PUBLIC Transform :
 friend class TransformVisitor;
 public:
     Transform( const hash_string& name = hash_string() );
+    ~Transform();
 	    
 	// Override Serializable
     const char* serialize(database::OArchive& ar) const;
@@ -53,8 +54,6 @@ public:
      *  If no traverse were called result is undefined
      */
     virtual const math::Matrix4f& getLocalToWorld() const { return localToWorld; }
-
-    virtual ~Transform() {}
 
 protected:
 	/** Mark for traverse by transform visitor. */

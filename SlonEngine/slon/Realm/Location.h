@@ -12,7 +12,7 @@
 namespace slon {
 namespace realm {
 	
-class Location :
+class SLON_PUBLIC Location :
     public Referenced,
     public database::Serializable
 {

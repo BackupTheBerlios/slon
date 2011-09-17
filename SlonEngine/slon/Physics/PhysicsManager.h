@@ -8,7 +8,7 @@
 namespace slon {
 namespace physics {
 
-class PhysicsManager
+class SLON_PUBLIC PhysicsManager
 {
 public:
     typedef boost::signal<void ()>          pre_frame_signal;
@@ -41,7 +41,7 @@ public:
 };
 
 /** Get current physics manager */
-PhysicsManager& currentPhysicsManager();
+SLON_PUBLIC PhysicsManager& currentPhysicsManager();
 
 } // namespace slon
 } // namespace physics

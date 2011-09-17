@@ -40,7 +40,7 @@ public:
     {
         std::string     name;
         rigid_body_ptr  rigidBodies[2];     /// affected rigid bodies
-        math::Matrix4r  frames[2];          /// translational matrices from constraint coordinate frame to rigid bodies coordianate frames
+        math::Matrix4r  frames[2];          /// translational matrices from rigid bodies coordianate frames to constraint coordinate frame
         math::Vector3r  linearLimits[2];    /// translational limits, set -INF, +INF for free axes
         math::Vector3r  angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
 
@@ -82,8 +82,14 @@ public:
     /** Get first rigid body affecting by the constraint. */
     RigidBody* getRigidBodyA() const;
 
+    /** Get transformation matrix from first rigid body coordinate frame to constraint coordinate frame. */
+    const math::Matrix4r& getFrameInA() const;
+
     /** Get second rigid body affecting by the constraint. */
     RigidBody* getRigidBodyB() const;
+
+    /** Get transformation matrix from second rigid body coordinate frame to constraint coordinate frame. */
+    const math::Matrix4r& getFrameInB() const;
 
     /** Get motor of the constraint per axis. 
      * @param motor - motor id.

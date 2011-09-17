@@ -31,7 +31,7 @@ public:
         CT_CONTINUOUS   /// capture collision as if they were continous in time
     };
 
-    struct DESC
+    struct SLON_PUBLIC DESC
 #ifdef SLON_ENGINE_USE_SSE
        : public aligned<0x10>
 #endif
@@ -113,7 +113,7 @@ public:
 	const impl_type* getImpl() const { return impl.get(); }
 
 private:
-	DESC desc;
+	DESC       desc;
 	impl_ptr   impl;
 };
 

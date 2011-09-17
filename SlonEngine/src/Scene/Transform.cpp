@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Database/Archive.h"
-#include "Detail/Engine.h"
 #include "Log/Formatters.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Transform.h"
@@ -8,8 +7,8 @@
 
 DECLARE_AUTO_LOGGER("scene.Transform");
 
-using namespace slon;
-using namespace scene;
+namespace slon {
+namespace scene {
 
 Transform::Transform(const hash_string& name)
 :	Group(name)
@@ -17,7 +16,11 @@ Transform::Transform(const hash_string& name)
 ,	modifiedCount(1)
 {
 }
-	
+
+Transform::~Transform()
+{
+}
+
 // Override Serializable
 const char* Transform::serialize(database::OArchive& ar) const
 {
@@ -71,3 +74,6 @@ void Transform::update()
 	++modifiedCount;
     doUpdate();
 }
+
+} // namespace scene
+} // namespace slon

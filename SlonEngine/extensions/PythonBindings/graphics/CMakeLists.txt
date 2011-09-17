@@ -3,8 +3,8 @@ INCLUDE_DIRECTORIES (
 )
 
 SET ( SOURCES
-	stdafx.h
-    stdafx.cpp
+	../stdafx.h
+    ../stdafx.cpp
 )
 
 SET ( GRAPHICS_HEADERS
@@ -32,7 +32,7 @@ ADD_LIBRARY( PyGraphics SHARED
     ${GRAPHICS_SOURCES} 
 )
 
-ADD_PRECOMPILED_HEADER( PyGraphics "stdafx.h" "stdafx.cpp" )
+ADD_PRECOMPILED_HEADER( PyGraphics "${PYTHON_BINDINGS_DIR}/stdafx.h" "${PYTHON_BINDINGS_DIR}/stdafx.cpp" )
 
 SET_TARGET_PROPERTIES( PyGraphics PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"

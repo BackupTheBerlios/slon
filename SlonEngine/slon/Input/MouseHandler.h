@@ -9,7 +9,7 @@ namespace input {
 
 /** MouseHandler uses signals to handle mice events.
  */
-class MouseHandler :
+class SLON_PUBLIC MouseHandler :
     public InputHandler
 {
 public:

@@ -7,7 +7,7 @@
 namespace slon {
 
 /** Very simple timer interface */
-class Timer :
+class SLON_PUBLIC Timer :
     public Referenced
 {
 public:

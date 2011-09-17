@@ -11,7 +11,7 @@ namespace graphics {
  * onto different geometry types. For example, you can make wood material
  * and map it onto rigid and onto skinned geometry. 
  */
-class Material :
+class SLON_PUBLIC Material :
     public Referenced,
     public database::Serializable
 {

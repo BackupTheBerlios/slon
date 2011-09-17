@@ -10,7 +10,7 @@ namespace input {
 
 /** KeyboardHandler uses signals to handle key events.
  */
-class KeyboardHandler :
+class SLON_PUBLIC KeyboardHandler :
     public InputHandler
 {
 private:
