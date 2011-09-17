@@ -56,6 +56,10 @@ namespace {
 		}
 		motionState.setWorldTransform(massFrame);
 
+        if (desc.type != RigidBody::DT_DYNAMIC) {
+            desc.mass = 0;
+        }
+
 		btRigidBody::btRigidBodyConstructionInfo info(desc.mass, &motionState, collisionShape, localInertia);
 		return info;
 	}

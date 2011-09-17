@@ -8,6 +8,18 @@ using namespace slon::physics;
 void exportCollisionShape()
 {
     class_< CollisionShape, boost::intrusive_ptr<CollisionShape>, boost::noncopyable >("CollisionShape", no_init);
+    
+    class_< PlaneShape, bases<CollisionShape>, boost::intrusive_ptr<PlaneShape> >("PlaneShape")
+        .def(init<>())
+        .def(init<math::Planer>())
+        .def(init<real, real, real, real>())
+        .def(init<const math::Vector3r&, real>())
+        .def(init<const math::Vector3r&, real>())
+        .def(init<const math::Vector3r&, const math::Vector3r&, const math::Vector3r&>())
+        .def_readwrite("plane", &PlaneShape::plane);
+    implicitly_convertible< boost::intrusive_ptr<PlaneShape>,       boost::intrusive_ptr<CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<PlaneShape>,       boost::intrusive_ptr<const CollisionShape> >();
+    implicitly_convertible< boost::intrusive_ptr<const PlaneShape>, boost::intrusive_ptr<const CollisionShape> >();
 
     class_< SphereShape, bases<CollisionShape>, boost::intrusive_ptr<SphereShape> >("SphereShape")
         .def(init<>())

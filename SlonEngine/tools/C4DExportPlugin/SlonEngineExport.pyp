@@ -152,7 +152,7 @@ class SlonExporter(plugins.SceneSaverData):
         transform[0][3] += mp.x
         transform[1][3] += mp.y
         transform[2][3] += mp.z
-        return physics.BoxShape( convertVector3(c4dNode.GetRad(), self.documentScale) )
+        return physics.BoxShape(convertVector3(c4dNode.GetRad(), self.documentScale))
         
     def computeCylinderXShape(self, c4dNode, transform):
         mp = c4dNode.GetMp() * self.documentScale
@@ -182,6 +182,18 @@ class SlonExporter(plugins.SceneSaverData):
         
         shape = physics.ConvexShape()
         shape.buildConvexHull(pointsArr)
+        return shape
+       
+    def computePlaneShape(self, c4dNode, transform):
+        # heuristic
+        box = convertVector3(c4dNode.GetRad(), self.documentScale)
+        if box.x <= box.y and box.x <= box.z:
+            shape = physics.PlaneShape(1.0, 0.0, 0.0, c4dNode.GetMp().x * documentScale)
+        elif box.y <= box.x and box.y <= box.z:
+            shape = physics.PlaneShape(0.0, 1.0, 0.0, c4dNode.GetMp().y * documentScale)
+        else:
+            shape = physics.PlaneShape(0.0, 0.0, 1.0, c4dNode.GetMp().z * documentScale)
+
         return shape
         
     def getNodeRigidBody(self, c4dNode):
@@ -249,7 +261,10 @@ class SlonExporter(plugins.SceneSaverData):
 
         desc = physics.RigidBody.DESC()
         desc.transform      = convertMatrixP(c4dNode.GetMg(), self.documentScale)
-        desc.type           = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
+        if dynTag[c4d.RIGID_BODY_DYNAMIC] == 0:
+            desc.type       = physics.RigidBody.DYNAMICS_TYPE.STATIC
+        else:
+            desc.type       = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
         desc.mass           = dynTag[c4d.RIGID_BODY_MASS]
         desc.relativeMargin = 0.0
         desc.margin         = dynTag[c4d.RIGID_BODY_MARGIN] * self.documentScale
@@ -265,6 +280,8 @@ class SlonExporter(plugins.SceneSaverData):
             desc.collisionShape = self.computeCylinderZShape(c4dNode, desc.transform)
         elif shape == c4d.RIGID_BODY_SHAPE_CONVEX_HULL:
             desc.collisionShape = self.computeConvexHullShape(c4dNode, desc.transform)
+        #elif shape == c4d.RIGID_BODY_SHAPE_PLANE:
+        #    desc.collisionShape = self.computePlaneShape(c4dNode, desc.transform)
         else:
             print c4dNode.GetName(), " : physics shape not converted"
             desc.collisionShape = physics.SphereShape(1.0)

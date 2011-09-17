@@ -53,8 +53,17 @@ class SLON_PUBLIC PlaneShape :
 	public CollisionShape
 {
 public:
-    PlaneShape(const math::Planer& plane_ = math::Planer()) :
+    explicit PlaneShape(const math::Planer& plane_ = math::Planer()) :
         plane(plane_)
+    {}
+    PlaneShape(real A, real B, real C, real D) :
+        plane(A, B, C, D)
+    {}
+    PlaneShape(const math::Vector3r& normal, real D) :
+        plane(normal, D)
+    {}
+    PlaneShape(const math::Vector3r& pA, const math::Vector3r& pB, const math::Vector3r& pC) :
+        plane(pA, pB, pC)
     {}
 
     // Override Serializable
