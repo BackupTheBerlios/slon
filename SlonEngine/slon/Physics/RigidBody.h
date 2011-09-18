@@ -56,6 +56,7 @@ public:
         math::Matrix4r            transform;          /// initial transformation matrix
         DYNAMICS_TYPE             type;
         real                      mass;
+        real                      friction;           /// material friction
         math::Vector3r            inertia;            /// inertia tensor
         real                      margin;             /// collision margin
         real                      relativeMargin;     /// collision margin relative to the lowest dimension of the collision shape (e.g. box side, sphere radius, cylinder height)
@@ -68,6 +69,7 @@ public:
             transform( math::make_identity<float, 4>() ),
             type(DT_DYNAMIC),
             mass(0),
+            friction(1.0),
             inertia(0, 0, 0),
             margin(0),
             relativeMargin( real(0.02) ),
@@ -111,10 +113,13 @@ public:
     /** Get sum of all torques applied to the body. */
     math::Vector3r getTotalTorque() const;
 
-    /** Get mass of the rigid body */
+    /** Get mass of the rigid body. */
     real getMass() const;
 
-    /** Get local inertia tensor of rigid body */
+    /** Get friction of the rigid body material. */
+    real getFriction() const;
+
+    /** Get local inertia tensor of rigid body. */
     math::Vector3r getInertiaTensor() const;
 
     /** Get activation/deactivation state/policy of the object */

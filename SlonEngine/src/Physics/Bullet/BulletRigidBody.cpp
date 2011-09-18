@@ -225,6 +225,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*           pInterface_,
     }
 
     pInterface_->desc.mass            = real(1.0) / rigidBody->getInvMass();
+    pInterface_->desc.friction        = rigidBody->getFriction();
     pInterface_->desc.linearVelocity  = to_vec( rigidBody->getLinearVelocity() );
     pInterface_->desc.angularVelocity = to_vec( rigidBody->getAngularVelocity() );
     pInterface_->desc.name            = name_;
@@ -248,6 +249,7 @@ BulletRigidBody::BulletRigidBody(RigidBody*             pInterface_,
     motionState->setWorldTransform( to_bt_mat(desc.transform) );
 
 	rigidBody.reset( new btRigidBody( makeRigidBodyDesc(desc, *motionState) ) );
+    rigidBody->setFriction(desc.friction);
     rigidBody->setUserPointer( pInterface );
 	rigidBody->setLinearVelocity( to_bt_vec(desc.linearVelocity) );
 	rigidBody->setAngularVelocity( to_bt_vec(desc.angularVelocity) );

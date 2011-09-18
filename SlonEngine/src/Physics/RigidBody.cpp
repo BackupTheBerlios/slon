@@ -124,6 +124,11 @@ real RigidBody::getMass() const
 	return desc.mass;
 }
 
+real RigidBody::getFriction() const
+{
+    return desc.friction;
+}
+
 math::Vector3r RigidBody::getInertiaTensor() const
 {
 	return desc.inertia;
