@@ -47,7 +47,10 @@ public:
 
 private:
     // noncopyable
-    Node(const Node&) {}
+    Node(const Node& other)
+    :   Referenced(other)
+    {}
+
     Node& operator = (const Node&) { return *this; }
 
 public:

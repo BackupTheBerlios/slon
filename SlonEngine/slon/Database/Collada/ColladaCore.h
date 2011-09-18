@@ -113,9 +113,9 @@ public:
 
 	void setData( const float*	data, 
 				  size_t		size, 
-				  size_t		stride,
+                  size_t		/*stride*/,
 				  const char**	nameArray = 0)
-	{
+    {
 		floatArray.resize(size);
 		std::copy( data, data + size, floatArray.begin() );
 	}
@@ -286,7 +286,7 @@ class collada_instance<collada_geometry>
 public:
 	// override geometry
     void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 
 public:
 	collada_geometry_ptr 		geometry;
@@ -378,8 +378,8 @@ public:
 
 public:
 	collada_node() :
-		transform( math::make_identity<float, 4>() ),
-        type(NODE)
+        type(NODE),
+        transform( math::make_identity<float, 4>() )
 	{}
 
     XMLPP_ELEMENT_SERIALIZATION(collada_node, ColladaDocument);
@@ -464,7 +464,7 @@ public:
     ENTITY_TYPE getEntityType() const { return CONTROLLER; }
 
     void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 
 public:
     std::string                 url;

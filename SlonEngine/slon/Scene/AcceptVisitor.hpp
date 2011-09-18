@@ -45,4 +45,4 @@ public:
 } // namespace scene
 } // namespace slon
 
-#endif __SLON_ENGINE_SCENE_ACCEPT_VISITOR_H__
+#endif // __SLON_ENGINE_SCENE_ACCEPT_VISITOR_H__

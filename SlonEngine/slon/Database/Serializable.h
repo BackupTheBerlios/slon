@@ -134,7 +134,7 @@ public:
      * }
      * \uncode
      */
-    bool serializeDerived(T* object, OArchive& ar) const
+    bool serializeDerived(T* /*object*/, OArchive& /*ar*/) const
     {
         return false;
     }

@@ -72,7 +72,7 @@ class collada_instance<collada_image> :
 {
 public:
     void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 };
 
 /** Represents <newparam> element */
@@ -336,7 +336,7 @@ public:
 	virtual TECHNIQUE_TYPE getTechniqueType() const { return PHONG; }
 
 	void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 
 public:
 	// settings
@@ -451,7 +451,7 @@ public:
     }
 
 	void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 
 public:
 	std::string symbol;

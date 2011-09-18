@@ -315,7 +315,7 @@ public:
 
 public:
     void load(const ColladaDocument& document, const xmlpp::element& elem);
-    void save(ColladaDocument& document, xmlpp::element& elem) const {}
+    void save(ColladaDocument& /*document*/, xmlpp::element& /*elem*/) const {}
 
 public:
     instance_rigid_body_vector          rigidBodyInstances;
