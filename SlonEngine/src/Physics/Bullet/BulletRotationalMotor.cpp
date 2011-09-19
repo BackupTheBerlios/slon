@@ -12,6 +12,7 @@ BulletRotationalMotor::BulletRotationalMotor(BulletConstraint* constraint_,
                                              int               axis_)
 :   constraint(constraint_)
 ,   axis(axis_)
+,   numSimulatedSteps(0)
 {
     assert(constraint && axis >= 0 && axis < 3);
     motor = constraint->getBtConstraint().getRotationalLimitMotor(axis);
@@ -21,7 +22,7 @@ void BulletRotationalMotor::calculateAngleInfo() const
 {
 	// check if we have to update info
 	size_t numWorldSimulatedSteps = constraint->dynamicsWorld->getNumSimulatedSteps();
-	if (numSimulatedSteps < numWorldSimulatedSteps) 
+	if (numSimulatedSteps < numWorldSimulatedSteps || numSimulatedSteps == 0) 
 	{
 		btGeneric6DofConstraint& bConstraint = constraint->getBtConstraint();
 
@@ -53,7 +54,6 @@ void BulletRotationalMotor::calculateAngleInfo() const
 
 		numSimulatedSteps = numWorldSimulatedSteps;
 	}
-
 }
 
 math::Vector3r BulletRotationalMotor::getAxis() const       
