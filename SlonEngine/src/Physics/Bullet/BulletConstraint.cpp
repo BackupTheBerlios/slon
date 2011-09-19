@@ -99,7 +99,7 @@ BulletConstraint::BulletConstraint(Constraint*          pInterface_,
 
     // setup constraint
     constraint.reset( createBulletConstraint(desc) );
-    dynamicsWorld->getBtDynamicsWorld().addConstraint( constraint.get() );
+    dynamicsWorld->getBtDynamicsWorld().addConstraint( constraint.get(), desc.ignoreCollisions );
 }
 
 BulletConstraint::~BulletConstraint()

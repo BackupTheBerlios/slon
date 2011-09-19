@@ -214,10 +214,11 @@ class SlonExporter(plugins.SceneSaverData):
         objB = c4dNode[c4d.FORCE_OBJECT_B]
         
         desc = physics.Constraint.DESC()
-        desc.rigidBodyA = self.getNodeRigidBody(objA)
-        desc.frameA     = math.invert( desc.rigidBodyA.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
-        desc.rigidBodyB = self.getNodeRigidBody(objB)
-        desc.frameB     = math.invert( desc.rigidBodyB.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
+        desc.rigidBodyA       = self.getNodeRigidBody(objA)
+        desc.frameA           = math.invert( desc.rigidBodyA.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
+        desc.rigidBodyB       = self.getNodeRigidBody(objB)
+        desc.frameB           = math.invert( desc.rigidBodyB.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
+        desc.ignoreCollisions = c4dNode[c4d.CONSTRAINT_IGNORE_COLLISIONS]
        
         type = c4dNode[c4d.FORCE_TYPE]
         if type == c4d.CONSTRAINT_JOINT_TYPE_CARDAN:
@@ -266,6 +267,7 @@ class SlonExporter(plugins.SceneSaverData):
         else:
             desc.type       = physics.RigidBody.DYNAMICS_TYPE.DYNAMIC
         desc.mass           = dynTag[c4d.RIGID_BODY_MASS]
+        desc.friction       = dynTag[c4d.RIGID_BODY_FRICTION]
         desc.relativeMargin = 0.0
         desc.margin         = dynTag[c4d.RIGID_BODY_MARGIN] * self.documentScale
         

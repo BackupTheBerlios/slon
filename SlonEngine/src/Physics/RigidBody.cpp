@@ -25,6 +25,7 @@ const char* RigidBody::serialize(database::OArchive& ar) const
     ar.writeChunk("transform", desc.transform.data(), desc.transform.num_elements);
     ar.writeChunk("type", reinterpret_cast<const int*>(&desc.type));
     ar.writeChunk("mass", &desc.mass);
+    ar.writeChunk("friction", &desc.friction);
     ar.writeChunk("inertia", desc.inertia.arr, desc.inertia.num_elements);
     ar.writeChunk("margin", &desc.margin);
     ar.writeChunk("relativeMargin", &desc.relativeMargin);
@@ -40,6 +41,7 @@ void RigidBody::deserialize(database::IArchive& ar)
     ar.readChunk("transform", desc.transform.data(), desc.transform.num_elements);
     ar.readChunk("type", reinterpret_cast<int*>(&desc.type));
     ar.readChunk("mass", &desc.mass);
+    ar.readChunk("friction", &desc.friction);
     ar.readChunk("inertia", desc.inertia.arr, desc.inertia.num_elements);
     ar.readChunk("margin", &desc.margin);
     ar.readChunk("relativeMargin", &desc.relativeMargin);

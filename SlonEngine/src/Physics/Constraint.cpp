@@ -39,6 +39,7 @@ const char* Constraint::serialize(database::OArchive& ar) const
     ar.writeChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.writeChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.writeChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    ar.writeChunk("ignoreCollisions", &desc.ignoreCollisions);
     return "Constraint";
 }
 
@@ -65,6 +66,7 @@ void Constraint::deserialize(database::IArchive& ar)
     ar.readChunk("linearLimits1", desc.linearLimits[1].arr, desc.linearLimits[1].num_elements);
     ar.readChunk("angularLimits0", desc.angularLimits[0].arr, desc.angularLimits[0].num_elements);
     ar.readChunk("angularLimits1", desc.angularLimits[1].arr, desc.angularLimits[1].num_elements);
+    ar.readChunk("ignoreCollisions", &desc.ignoreCollisions);
     instantiate();
 }
 

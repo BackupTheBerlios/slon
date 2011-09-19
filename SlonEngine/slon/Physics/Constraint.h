@@ -43,9 +43,11 @@ public:
         math::Matrix4r  frames[2];          /// translational matrices from rigid bodies coordianate frames to constraint coordinate frame
         math::Vector3r  linearLimits[2];    /// translational limits, set -INF, +INF for free axes
         math::Vector3r  angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
+        bool            ignoreCollisions;   /// ignore collisions between constrained rigid bodies
 
         DESC(const std::string& _name = "") :
-            name(_name)
+            name(_name),
+            ignoreCollisions(true)
         {
             rigidBodies[0]   = rigidBodies[1]   = 0;
             frames[0]        = frames[1]        = math::make_identity<real, 4>();
