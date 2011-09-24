@@ -20,11 +20,20 @@ PhysicsManager::PhysicsManager()
 {
 }
 
+void PhysicsManager::addDynamicsWorld(const dynamics_world_ptr& world)
+{
+    worlds.push_back(world);
+}
+
+void PhysicsManager::removeDynamicsWorld(const dynamics_world_ptr& world)
+{
+    worlds.remove(world);
+}
+
 void PhysicsManager::handlePhysics()
 {
-    assert(timer);
-
     preFrameSignal();
+    if (timer)
     {
         //thread::lock_ptr lock = dynamicsWorld->lockForWriting();
         for (dynamics_world_iterator it  = firstDynamicsWorld();
@@ -39,18 +48,10 @@ void PhysicsManager::handlePhysics()
 
 void PhysicsManager::setTimer(const const_timer_ptr& timer_)
 {
-    timer      = timer_;
-    deltaTimer = delta_timer(timer);
-}
-
-void PhysicsManager::addDynamicsWorld(DynamicsWorld* world)
-{
-    worlds.push_back(world);
-}
-
-void PhysicsManager::removeDynamicsWorld(DynamicsWorld* world)
-{
-    worlds.remove(world);
+    timer = timer_;
+    if (timer) {
+        deltaTimer = delta_timer(timer);
+    }
 }
 
 } // namespace detail

@@ -57,27 +57,42 @@ void BulletDynamicsWorld::setGravity(const math::Vector3r& gravity)
 	dynamicsWorld->setGravity( to_bt_vec(gravity) );
 }
 
-real BulletDynamicsWorld::stepSimulation(real dt)
+real BulletDynamicsWorld::stepSimulation(real dt, bool force)
 {
-    if (dt < 0) {
-        return 0;
-    }
-    dt += unsimulatedTime; // unsimulated from last step
-
-    real t = 0;
+    assert(dt > 0 && "Simulation time interval should be positive");
+    if (force)
     {
-        const state_desc& desc = pInterface->desc;
-        for (unsigned i = 0; i<desc.maxNumSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
-        {
-			BulletSolver* solver = firstSolver;
-			while (solver) 
-			{
-				solver->solve(desc.fixedTimeStep);
-				solver = solver->next;
-			}
+	    BulletSolver* solver = firstSolver;
+	    while (solver) 
+	    {
+		    solver->solve(dt);
+		    solver = solver->next;
+	    }
 
-            dynamicsWorld->stepSimulation(desc.fixedTimeStep, 1, desc.fixedTimeStep);
+        dynamicsWorld->stepSimulation(dt, 0);
+        unsimulatedTime = std::max(unsimulatedTime - dt, real(0.0));
+    }
+    else
+    {
+        dt += unsimulatedTime; // unsimulated from last step
+
+        real t = 0;
+        {
+            const state_desc& desc = pInterface->desc;
+            for (unsigned i = 0; i<desc.maxNumSubSteps && (dt - t) >= desc.fixedTimeStep; ++i, t += desc.fixedTimeStep, ++numSimulatedSteps)
+            {
+			    BulletSolver* solver = firstSolver;
+			    while (solver) 
+			    {
+				    solver->solve(desc.fixedTimeStep);
+				    solver = solver->next;
+			    }
+
+                dynamicsWorld->stepSimulation(desc.fixedTimeStep, 0);
+            }
         }
+
+        unsimulatedTime = dt - t;
     }
 
     // enumerate contacts
@@ -141,7 +156,7 @@ real BulletDynamicsWorld::stepSimulation(real dt)
         dissapearingContacts[i].collisionObjects[1]->getImpl()->getContactDissapearSignal()(dissapearingContacts[i]);
     }
 
-    return unsimulatedTime = dt - t;
+    return unsimulatedTime;
 }
 
 void BulletDynamicsWorld::addSolver(BulletSolver* solver)

@@ -15,10 +15,16 @@ public:
     typedef boost::signal<void ()>          post_frame_signal;
     typedef boost::signals::connection      connection_type;
 
-    typedef std::list<DynamicsWorld*>       dynamics_world_list;
+    typedef std::list<dynamics_world_ptr>   dynamics_world_list;
     typedef dynamics_world_list::iterator   dynamics_world_iterator;
 
 public:
+    /** Add dynamics world to physics manager. */
+    virtual void addDynamicsWorld(const dynamics_world_ptr& world) = 0;
+
+    /** Remove dynamics world from physics manager. */
+    virtual void removeDynamicsWorld(const dynamics_world_ptr& world) = 0;
+
     /** Get iterator pointing first dynamics world. */
     virtual dynamics_world_iterator firstDynamicsWorld() = 0;
 

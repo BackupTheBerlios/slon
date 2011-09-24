@@ -66,7 +66,7 @@ public:
     math::Vector3r getGravity() const;
 
     /** Set fixed time step for simulation */
-    void setFixedTimeStep(const real dt);
+    void setFixedTimeStep(real dt);
 
     /** Set fixed time step of the simulation */
     real getFixedTimeStep() const;
@@ -77,10 +77,14 @@ public:
     /** Get description of the world. */
     const DESC& getDesc() const;
 
-    /** Step simulation. 
-     * @return "unsimulated" time < fixedTimeStep
+    /** Step simulation. Internally simulation is split into sub steps, 
+     * each has the fixedTimeStep length, unless force flag specified.
+     * @param dt - time to simulate.
+     * @param force - force to simulate specified interval without splitting simulation into sub steps.
+     * @return unsimulated time.
      */
-    real stepSimulation(real dt);
+    real stepSimulation(real dt, 
+                        bool force = false);
 
     /** Set maximum number of substeps in the simulation step. */
     void setMaxNumSubSteps(unsigned maxSubSteps);

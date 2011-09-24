@@ -14,12 +14,10 @@ DynamicsWorld::DynamicsWorld(const DESC& desc_)
 :	desc(desc_)
 {
 	impl.reset( new BulletDynamicsWorld(this) );
-    static_cast<detail::PhysicsManager&>( currentPhysicsManager() ).addDynamicsWorld(this);
 }
 
 DynamicsWorld::~DynamicsWorld()
 {
-    static_cast<detail::PhysicsManager&>( currentPhysicsManager() ).removeDynamicsWorld(this);
 }
 
 void DynamicsWorld::setGravity(const math::Vector3r& gravity)
@@ -33,7 +31,7 @@ math::Vector3r DynamicsWorld::getGravity() const
 	return desc.gravity;
 }
 
-void DynamicsWorld::setFixedTimeStep(const real dt)
+void DynamicsWorld::setFixedTimeStep(real dt)
 {
 	desc.fixedTimeStep = dt;
 	impl->setFixedTimeStep(dt);
@@ -65,9 +63,9 @@ const DynamicsWorld::DESC& DynamicsWorld::getDesc() const
 	return desc;
 }
 
-real DynamicsWorld::stepSimulation(real dt)
+real DynamicsWorld::stepSimulation(real dt, bool force)
 {
-	return impl->stepSimulation(dt);
+	return impl->stepSimulation(dt, force);
 }
 
 DynamicsWorld::contact_const_iterator DynamicsWorld::firstActiveContact() const

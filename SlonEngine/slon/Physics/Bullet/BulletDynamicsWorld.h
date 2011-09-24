@@ -66,7 +66,7 @@ public:
     void   setFixedTimeStep(const real dt)            { /* nothing */ }
     void   setMaxNumSubSteps(unsigned maxSubSteps_)   { /* nothing */ }
     size_t getNumSimulatedSteps() const               { return numSimulatedSteps; }
-    real   stepSimulation(real dt);
+    real   stepSimulation(real dt, bool force);
 
     contact_const_iterator firstActiveContact() const   { return contacts.begin(); }
     contact_const_iterator endActiveContact() const     { return contacts.end(); }
@@ -93,7 +93,7 @@ private:
 
     // settings 
     size_t                      numSimulatedSteps;
-    float                       unsimulatedTime;
+    real                        unsimulatedTime;
 
 	// internal solvers
 	BulletSolver*				firstSolver;

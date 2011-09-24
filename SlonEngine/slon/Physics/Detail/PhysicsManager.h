@@ -14,6 +14,9 @@ public:
 	PhysicsManager();
 
     // Override PhysicsManager
+    void addDynamicsWorld(const dynamics_world_ptr& world);
+    void removeDynamicsWorld(const dynamics_world_ptr& world);
+
     dynamics_world_iterator firstDynamicsWorld() { return worlds.begin(); }
     dynamics_world_iterator endDynamicsWorld()   { return worlds.end(); }
 
@@ -32,12 +35,6 @@ public:
     connection_type connectPostFrameCallback(post_frame_signal::slot_type slot) {
         return postFrameSignal.connect(slot);
     }
-
-    /** Add dynamics world into update queue. */
-    void addDynamicsWorld(DynamicsWorld* world);
-
-    /** Remove dynamics world from update queue. */
-    void removeDynamicsWorld(DynamicsWorld* world);
 
 private:
 	dynamics_world_list worlds;
