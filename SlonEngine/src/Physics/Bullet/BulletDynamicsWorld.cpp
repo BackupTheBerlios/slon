@@ -70,6 +70,7 @@ real BulletDynamicsWorld::stepSimulation(real dt, bool force)
 	    }
 
         dynamicsWorld->stepSimulation(dt, 0);
+        ++numSimulatedSteps;
         unsimulatedTime = std::max(unsimulatedTime - dt, real(0.0));
     }
     else
