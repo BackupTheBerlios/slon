@@ -231,7 +231,11 @@ DebugMesh& operator << (DebugMesh& mesh, const constraint& c)
 		 << transform(trB)
          << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(1.0f, 0.0f, 0.0f) )
          << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 1.0f, 0.0f) )
-         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) );
+         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) )
+         << transform( math::make_translation(trA[0][3], trA[1][3], trA[2][3]) )
+         << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(0) )
+         << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(1) )
+         << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(2) );
 
     if ( const physics::Motor* m = c.cons.getMotor(physics::Constraint::DOF_X_ROT) ) {
         mesh << motor(*m, c.scale, c.forceScale, c.forceSectorScale);
