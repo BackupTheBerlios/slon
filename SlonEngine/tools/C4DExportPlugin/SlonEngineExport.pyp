@@ -55,7 +55,7 @@ class SlonExporter(plugins.SceneSaverData):
     def __init__(self):
         self.library = database.Library()
         self.documentScale = 0.01
-        self.rigidBodies = []
+        self.rigidBodies = {}
         
     def convertPolygonObject(self, c4dPolygonObj):
         cpuSideMesh = graphics.CPUSideTriangleMesh()
@@ -131,7 +131,9 @@ class SlonExporter(plugins.SceneSaverData):
             parent = current = scene.MatrixTransform( c4dNode.GetName(), convertMatrix(c4dNode.GetRelMl(), self.documentScale) )
         
         if (c4dNode.GetType() == 180000011):
-            current.addChild( self.convertConnectorNode(c4dNode) )
+            connector = self.convertConnectorNode(c4dNode)
+            if connector:
+                current.addChild(connector)
             
         if (c4dNode.GetType() == c4d.Opolygon):
             polyObj = self.convertPolygonObject(c4dNode)
@@ -197,22 +199,18 @@ class SlonExporter(plugins.SceneSaverData):
         return shape
         
     def getNodeRigidBody(self, c4dNode):
-        try:
-            rbElem = c4d.DescID(c4d.DescLevel(c4d.ID_USERDATA), c4d.DescLevel(1))
-            rbID = c4dNode[rbElem]
-            return self.rigidBodies[rbID]
-        except:
-            rbData = c4d.GetCustomDatatypeDefault(c4d.DTYPE_LONG)
-            rbElem = c4dNode.AddUserData(rbData)
-            c4dNode[rbElem] = len(self.rigidBodies)
+        rigidBody = self.rigidBodies.get(c4dNode.GetName())
+        if not rigidBody:
             rigidBody = self.convertRigidBody(c4dNode)
-            self.rigidBodies.append(rigidBody)
-            return rigidBody
+            self.rigidBodies[c4dNode.GetName()] = rigidBody
+        return rigidBody
         
     def convertConnectorNode(self, c4dNode):
         objA = c4dNode[c4d.FORCE_OBJECT_A]
         objB = c4dNode[c4d.FORCE_OBJECT_B]
-        
+        if (not objA) or (not objB):
+            return None
+
         desc = physics.Constraint.DESC()
         desc.rigidBodyA       = self.getNodeRigidBody(objA)
         desc.frameA           = math.invert( desc.rigidBodyA.getTransform() ) * convertMatrixP(c4dNode.GetMg(), self.documentScale)
@@ -259,8 +257,10 @@ class SlonExporter(plugins.SceneSaverData):
         
     def convertRigidBody(self, c4dNode):
         dynTag = c4dNode.GetTag(180000102)
+        print c4dNode, " : ", c4dNode.GetName()
 
         desc = physics.RigidBody.DESC()
+        desc.name           = c4dNode.GetName()
         desc.transform      = convertMatrixP(c4dNode.GetMg(), self.documentScale)
         if dynTag[c4d.RIGID_BODY_DYNAMIC] == 0:
             desc.type       = physics.RigidBody.DYNAMICS_TYPE.STATIC
