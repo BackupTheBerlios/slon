@@ -65,7 +65,7 @@ void BulletRotationalServoMotor::setTargetForce(real targetForce_)
 { 
     targetForce = targetForce_;
 
-    bool enableMotor_ = fabs(targetForce) > real(0.01);
+    bool enableMotor_ = fabs(targetForce) > real(0.00001);
 	if (enableMotor_ && !enableMotor) {
 		constraint->dynamicsWorld->addSolver(this);
 	}
