@@ -35,9 +35,6 @@ public:
     };
 
 public:
-    /** Initialize engine. Call this before any actions with engine. */
-    virtual void init() = 0;
-
     /** Run main loop */
     virtual void run(const DESC& desc) = 0;
 

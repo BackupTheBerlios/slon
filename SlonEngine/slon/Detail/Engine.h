@@ -31,8 +31,6 @@ public:
     ~Engine();
 
 	// Override Engine
-    void init();
-    void free();
     void run(const DESC& desc);
     void frame();
     void stop() { working = false; }
@@ -75,10 +73,17 @@ public:
     filesystem::FileSystemManager& getFileSystemManager() { return *filesystemManager; }
 
     /** Add node to update quene */
-    void addToUpdateQueue(scene::Node* node) { updateQueue.push_back(node); }
+    void addToUpdateQueue(scene::Node* node);
 
     /** Get singleton engine instance */
     static Engine* Instance();
+
+private:
+    void handleInput();
+    void handlePhysics();
+    void handlePhysicsCycle();
+    void handleGraphics();
+    void handleScene();
 
 private:
     // managers, order is important!
@@ -96,6 +101,8 @@ private:
     
     // node waiting update function to be called
     update_queue updateQueue;
+    update_queue updateQueueTemp;
+    boost::mutex updateQueueMutex;
 
     // misc
     DESC    desc;

@@ -31,60 +31,6 @@ namespace {
     using namespace sgl;
     using namespace slon;
 
-    // Place physics and input handling in single thread
-    struct simulation_thread :
-        public std::unary_function<void, void>
-    {
-        simulation_thread( Engine& _engine,
-                           int     _maxOverhead,
-                           bool    _multithreaded) :
-            engine(_engine),
-            numFramesTraversed(0),
-            maxOverhead(_maxOverhead),
-            multithreaded(_multithreaded)
-        {};
-
-        void operator () (void)
-        {
-            realm::World& world = static_cast<realm::World&>(*engine.getWorld());
-            thread::detail::ThreadManager& threadManager = static_cast<thread::detail::ThreadManager&>(engine.getThreadManager());
-			if (multithreaded)
-			{
-				while( engine.isRunning() )
-				{
-					// perform up to 10 delayed functions
-					int i = 0;
-                    while ( threadManager.performDelayedFunctions(thread::SIMULATION_THREAD) && ++i < 10 ) {}
-
-					// physics simulation doesn't modify the world directly, but
-					// we will get problems if world simulation and traverse overlap
-					thread::lock_ptr lock = world.lockForReading();
-				#ifdef SLON_ENGINE_USE_PHYSICS
-                    static_cast<physics::detail::PhysicsManager&>( engine.getPhysicsManager() ).handlePhysics();
-				#endif
-				}
-			}
-            else
-			{
-				// perform up to 10 delayed functions
-				int i = 0;
-				while ( threadManager.performDelayedFunctions(thread::SIMULATION_THREAD) && ++i < 10 ) {}
-
-				// physics simulation doesn't modify the world directly, but
-				// we will get problems if world simulation and traverse overlap
-				thread::lock_ptr lock = world.lockForReading();
-			#ifdef SLON_ENGINE_USE_PHYSICS
-				static_cast<physics::detail::PhysicsManager&>( engine.getPhysicsManager() ).handlePhysics();
-			#endif
-			}
-        }
-
-        Engine& engine;
-        size_t  numFramesTraversed;
-        int     maxOverhead;
-        bool    multithreaded;
-    };
-
     // handler for sgl errors
     class LogErrorHandler :
 		public sgl::ErrorHandler
@@ -307,15 +253,59 @@ Engine::Engine() :
 #endif
 }
 
-void Engine::init()
+void Engine::handleInput()
 {
+    inputManager.handleEvents();
+}
+
+void Engine::handlePhysics()
+{
+    physicsManager.handlePhysics();
+}
+
+void Engine::handlePhysicsCycle()
+{
+    while (working) {
+        handlePhysics();
+    }
+}
+
+void Engine::handleGraphics()
+{
+	thread::lock_ptr lock = world->lockForReading();
+    graphicsManager.render(*world);
+}
+
+void Engine::handleScene()
+{
+	thread::lock_ptr lock = world->lockForWriting();
+    {
+        boost::lock_guard<boost::mutex> lock(updateQueueMutex);
+        updateQueueTemp.swap(updateQueue);
+    }
+   
+    for (size_t i = 0; i<updateQueueTemp.size(); ++i)
+    {
+        if (updateQueueTemp[i]->updatedFrameNo < frameNumber)
+        {
+            updateQueueTemp[i]->onUpdate();
+            updateQueueTemp[i]->updatedFrameNo = frameNumber;
+        }
+    }
+    updateQueueTemp.clear();
+}
+
+void Engine::addToUpdateQueue(scene::Node* node)
+{
+    boost::lock_guard<boost::mutex> lock(updateQueueMutex);
+    updateQueue.push_back(node);
 }
 
 void Engine::run(const DESC& desc_)
 {
-    desc           = desc_;
-    frameNumber    = 0;
-    working        = true;
+    desc        = desc_;
+    frameNumber = 0;
+    working     = true;
 
     // clear event queue before start
     while ( !SDL_PollEvent(0) ) {}
@@ -325,43 +315,15 @@ void Engine::run(const DESC& desc_)
 
     // run simulation thread
 #ifdef SLON_ENGINE_USE_PHYSICS
-    simulation_thread simulationThread(*this, 5, desc.multithreaded);
     if (desc.multithreaded) {
-        threadManager.startThread(thread::SIMULATION_THREAD, simulationThread);
+        threadManager.startThread(thread::SIMULATION_THREAD, boost::bind(&Engine::handlePhysicsCycle, this));
     }
 #endif
 
     // run main rendering cycle
-    scene::TransformVisitor traverser;
     simulationTimer->start();
-    while (working)
-    {
-        ++frameNumber;
-
-        // handle physics if not multithreaded
-#ifdef SLON_ENGINE_USE_PHYSICS
-        if (!desc.multithreaded) {
-            simulationThread();
-        }
-#endif
-        // handle input
-        inputManager.handleEvents();
-
-        // update waiting nodes
-        for (size_t i = 0; i<updateQueue.size(); ++i)
-        {
-            if (updateQueue[i]->updatedFrameNo < frameNumber)
-            {
-                updateQueue[i]->onUpdate();
-                updateQueue[i]->updatedFrameNo = frameNumber;
-            }
-        }
-
-        // perform 10 delayed functions
-        int i = 0;
-        while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
-
-        graphicsManager.render(*world);
+    while (working) {
+        frame();
     }
 
     // remove useless now delegates
@@ -376,50 +338,23 @@ void Engine::run(const DESC& desc_)
     SDL_PushEvent(&dummy);
 
     // join simulation thread
-    threadManager.joinThread(thread::SIMULATION_THREAD);
-
-    sglSetErrorHandler(0);
+#ifdef SLON_ENGINE_USE_PHYSICS
+    if (desc.multithreaded) {
+        threadManager.joinThread(thread::SIMULATION_THREAD);
+    }
+#endif
 }
 
 
 void Engine::frame()
 {
-    bool fullFrame = !working;
-    if (fullFrame)
-    {
-        working = true;
-        simulationTimer->start();
-    }
-
-#ifdef SLON_ENGINE_USE_PHYSICS
-    simulation_thread simulation(*this, 5, false);
-    simulation();
-#endif
-    // handle input
-    inputManager.handleEvents();
-
-    // update waiting nodes
-    for (size_t i = 0; i<updateQueue.size(); ++i)
-    {
-        if (updateQueue[i]->updatedFrameNo < frameNumber)
-        {
-            updateQueue[i]->onUpdate();
-            updateQueue[i]->updatedFrameNo = frameNumber;
-        }
-    }
-
-    // perform 10 delayed functions
-    int i = 0;
-    scene::TransformVisitor traverser;    
-    while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
-
-    graphicsManager.render(*world);
-
     ++frameNumber;
-
-    if (fullFrame) {    
-        working = false;
+    handleInput();
+    if (!desc.multithreaded) {
+        handlePhysics();
     }
+    handleScene();
+    handleGraphics();
 }
 
 Engine::~Engine()

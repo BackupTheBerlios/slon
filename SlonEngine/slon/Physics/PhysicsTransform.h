@@ -42,13 +42,12 @@ public:
     const CollisionObject* getCollisionObject() const { return collisionObject.get(); }
 
 private:
-    void setWorldTransform(const math::Matrix4f& transform);
+    void setWorldTransform(const math::RigidTransformr& transform);
 
 protected:
     collision_object_ptr            collisionObject;
     bool                            absolute;
     connection                      transformConnection;
-    const math::RigidTransformr*    physicsTransform;
     math::RigidTransformf           transform;
     mutable math::RigidTransformf   invTransform;
 };

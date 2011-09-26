@@ -12,8 +12,7 @@ namespace slon {
 namespace physics {
 
 PhysicsTransform::PhysicsTransform(const collision_object_ptr& collisionObject_) :
-    absolute(false),
-    physicsTransform(0)
+    absolute(false)
 {
     setCollisionObject(collisionObject_);
 }
@@ -44,20 +43,12 @@ void PhysicsTransform::deserialize(database::IArchive& ar)
 
 const math::Matrix4f& PhysicsTransform::getTransform() const
 {
-#ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
     return transform;
-#else
-    return physicsTransform ? (*physicsTransform) : transform;
-#endif
 }
 
 const math::Matrix4f& PhysicsTransform::getInverseTransform() const
 {
-#ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
     invTransform = math::invert(transform);
-#else
-    invTransform = math::invert(physicsTransform ? (*physicsTransform) : transform);
-#endif
 	return invTransform;
 }
 
@@ -68,7 +59,6 @@ void PhysicsTransform::setCollisionObject(const collision_object_ptr& collisionO
     {
         transformConnection.reset( collisionObject->getTransformSignal(), 
                                    make_slot<void (const math::RigidTransformr&)>(boost::bind(&PhysicsTransform::setWorldTransform, this, _1)) );
-        physicsTransform = collisionObject->getTransformPointer();
         transform = collisionObject->getTransform();
     }
     else {
@@ -76,13 +66,13 @@ void PhysicsTransform::setCollisionObject(const collision_object_ptr& collisionO
     }
 }
 
-void PhysicsTransform::setWorldTransform(const math::Matrix4f& transform_)
+void PhysicsTransform::setWorldTransform(const math::RigidTransformr& transform_)
 {
 #ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
     // copy if using double precision physics
     transform = math::RigidTransformf(transform_);
 #else
-     physicsTransform = collisionObject->getTransformPointer();
+    transform = transform_;
 #endif
     ++modifiedCount;
     update(false);
