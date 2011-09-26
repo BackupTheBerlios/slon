@@ -50,23 +50,20 @@ private:
     /** Calculate worldToLocal and localToWorld transformations.
      * @return true if transform dirty.
      */
-	bool visitTransform(Transform& transform);
+	bool visitTransform(Transform* parentTransform, Transform& transform);
 
     /** Extend AABB. */
-    void visitEntity(Entity& entity);
+    void visitEntity(Transform* parentTransform, Entity& entity);
 
 	/** Compute skeleton children transformations in skeleton local space. */
 	void visitSkeleton(Skeleton& skeleton);
 
 	/** Compute skinning matrix. */
-	void visitJoint(Joint& joint);
+	void visitJoint(Transform* parentTransform, Joint& joint);
 
 private:
     math::AABBf aabb;
-
-    // traverse
-    traverse_node*              currentNode;
-    std::stack<traverse_node>   forTraverse;
+    Transform*  currentTransform;
 };
 
 } // namespace scene

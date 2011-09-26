@@ -63,6 +63,7 @@ public:
     // cached transforms
     math::Matrix4f  worldToLocal;
     math::Matrix4f  localToWorld;
+    bool            updated;
     unsigned int    traverseStamp;
 	unsigned int	modifiedCount;
 };

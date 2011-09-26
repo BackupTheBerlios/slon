@@ -16,12 +16,12 @@ namespace {
 //DECLARE_AUTO_LOGGER("scene.TransformVisitor");
 
 TransformVisitor::TransformVisitor()
-:   currentNode(0)
+:   currentTransform(0)
 {
 }
 
 TransformVisitor::TransformVisitor(Node& node)
-:   currentNode(0)
+:   currentTransform(0)
 {
     traverse(node);
 }
@@ -33,7 +33,7 @@ void TransformVisitor::traverse(Node& node)
 
     // initialize
     aabb = bounds<math::AABBf>::inv_infinite();
-
+/*
     // traverse
     forTraverse.push( traverse_node(&node) );
     while ( !forTraverse.empty() )
@@ -59,60 +59,107 @@ void TransformVisitor::traverse(Node& node)
         }
     }
     currentNode = 0;
-
-    assert( forTraverse.empty() );    
-}
-
-void TransformVisitor::visitGroup(Group& group)
-{
-    traverse_node child = *currentNode;
-    for(Node* i = group.getChild(); i; i = i->getRight())
+*/
+    Node* currentNode = &node;
+    currentTransform  = 0;
+    while (currentNode)
     {
-        child.node = i;
-        forTraverse.push(child);
-    }
-}
-
-bool TransformVisitor::visitTransform(Transform& transform)
-{
-    bool dirty = currentNode->dirty | (transform.getTransformTraverseStamp() < transform.getModifiedCount());
-    if (!transform.isAbsolute() && dirty) 
-    {
-        if (currentNode->transform)
+        Transform* visitedTransform = 0;
+        Group*     currentGroup     = 0;
+		Node::TYPE type             = currentNode->getNodeType();
+        if (type & Node::JOINT_BIT)
         {
-            if ( currentNode->transform->isAbsolute() )
-            {
-                transform.localToWorld = currentNode->transform->getTransform() * transform.getTransform();
-                transform.worldToLocal = transform.getInverseTransform() * currentNode->transform->getInverseTransform();
-            }
-            else
-            {
-                // if transform have parent, get transformation from it
-                transform.localToWorld = currentNode->transform->getLocalToWorld() * transform.getTransform();
-                transform.worldToLocal = transform.getInverseTransform() * currentNode->transform->getWorldToLocal();
+            visitJoint( currentTransform, static_cast<Joint&>(*currentNode) );
+            currentGroup = visitedTransform = static_cast<Transform*>(currentNode);
+        }
+        else if (type & Node::TRANSFORM_BIT)
+        {
+            currentGroup = visitedTransform = static_cast<Transform*>(currentNode);
+            visitTransform(currentTransform, *visitedTransform);
+        }
+        else if (type & Node::GROUP_BIT) {
+            currentGroup = static_cast<Group*>(currentNode);
+        }
+        else if (type & Node::SKELETON_BIT) {
+            visitSkeleton( static_cast<Skeleton&>(*currentNode) );
+        }
+        else if (type & Node::ENTITY_BIT) {
+            visitEntity( currentTransform, static_cast<Entity&>(*currentNode) );
+        }
+
+        if ( currentGroup && currentGroup->getChild() ) // go down
+        {
+            currentNode = currentGroup->getChild();
+            if (visitedTransform) {
+                currentTransform = visitedTransform;
             }
         }
-        else
+        else if ( currentNode->getRight() ) // go right
+        {
+            currentNode = currentNode->getRight();
+        }
+        else // go up
+        {
+            while ( currentNode != &node && !currentNode->getRight() )
+            {
+                currentNode = currentNode->getParent();
+                if (currentNode == currentTransform) {
+                    currentTransform = 0;
+                }
+            }
+
+            if (currentNode == &node) {
+                return;
+            }
+            else 
+            {
+                currentNode = currentNode->getRight();
+                
+                // search for parent transform
+                if (!currentTransform)
+                {
+                    Node* transformNode = currentNode->getParent();
+                    while (transformNode)
+                    {
+                        if (transformNode->getNodeType() & Node::TRANSFORM_BIT)
+                        {
+                            currentTransform = static_cast<Transform*>(transformNode);
+                            break;
+                        }
+                        transformNode = transformNode->getParent();
+                    }
+                }
+            }
+        }
+    }
+
+    currentTransform = 0;
+}
+
+bool TransformVisitor::visitTransform(Transform* parentTransform, Transform& transform)
+{
+    // means dirty
+    transform.updated = (parentTransform && parentTransform->updated) 
+                        || (transform.getTransformTraverseStamp() < transform.getModifiedCount());
+    if (transform.updated) 
+    {
+        if (transform.isAbsolute() || !parentTransform)
         {
             transform.localToWorld = transform.getTransform();
             transform.worldToLocal = transform.getInverseTransform();
         }
+        else if (parentTransform)
+        {
+            transform.localToWorld = parentTransform->getLocalToWorld() * transform.getTransform();
+            transform.worldToLocal = transform.getInverseTransform() * parentTransform->getWorldToLocal();
+        }
     }
     transform.traverseStamp = transform.getModifiedCount();
 
-    traverse_node child;
-    child.transform = &transform;
-    child.dirty     = dirty;
-    for(Node* i = transform.getChild(); i; i = i->getRight())
-    {
-        child.node = i;
-        forTraverse.push(child);
-    }
-
-    return dirty;
+    return transform.updated;
 }
 
-void TransformVisitor::visitEntity(Entity& entity)
+void TransformVisitor::visitEntity(Transform* parentTransform, Entity& entity)
 {
     aabb = math::merge( aabb, getLocalToWorldTransform() * entity.getBounds() );
     entity.accept(*this);
@@ -125,31 +172,25 @@ void TransformVisitor::visitSkeleton(Skeleton& skeleton)
     }
 }
 
-void TransformVisitor::visitJoint(Joint& joint)
+void TransformVisitor::visitJoint(Transform* parentTransform, Joint& joint)
 {
-    if ( visitTransform(joint) ) {
+    if ( visitTransform(parentTransform, joint) ) {
         joint.skinningMatrix = joint.localToWorld * joint.inverseBindMatrix;
     }
 }
 
 const math::Matrix4f& TransformVisitor::getLocalToWorldTransform() const 
 {
-    if (currentNode && currentNode->transform) {
-        return currentNode->transform->localToWorld;
-    }
-    else if (!forTraverse.empty() && forTraverse.top().transform) {
-        return forTraverse.top().transform->localToWorld;
+    if (currentTransform) {
+        return currentTransform->localToWorld;
     }
     return identityMatrix;
 }
 
 const math::Matrix4f& TransformVisitor::getWorldToLocalTransform() const 
 {
-    if (currentNode && currentNode->transform) {
-        return currentNode->transform->localToWorld;
-    }
-    else if (!forTraverse.empty() && forTraverse.top().transform) {
-        return forTraverse.top().transform->worldToLocal;
+    if (currentTransform) {
+        return currentTransform->localToWorld;
     }
     return identityMatrix;
 }
