@@ -102,26 +102,26 @@ const math::Matrix4f& MatrixTransform::getInverseTransform() const
     return invTransform;
 }
 
-void MatrixTransform::setTransform(const Matrix4f& matrix)
+void MatrixTransform::setTransform(const Matrix4f& matrix, bool immediate)
 {
     transform         = matrix;
     invTransformDirty = true;
-    update();
+    update(immediate);
 }
 
-void MatrixTransform::setInverseTransform(const Matrix4f& matrix)
+void MatrixTransform::setInverseTransform(const Matrix4f& matrix, bool immediate)
 {
     invTransform   = matrix;
     transformDirty = true;
-    update();
+    update(immediate);
 }
 
-void MatrixTransform::setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix)
+void MatrixTransform::setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix, bool immediate)
 {
     transform      = matrix;
     invTransform   = invMatrix;
     transformDirty = invTransformDirty = false;
-    update();
+    update(immediate);
 }    
 
 void MatrixTransform::accept(log::LogVisitor& visitor) const

@@ -36,13 +36,13 @@ public:
     const math::Matrix4f&   getInverseTransform() const;
 
     /** Set world to local transformation matrix */
-    void setTransform(const math::Matrix4f& matrix);
+    void setTransform(const math::Matrix4f& matrix, bool immediate = true);
 
     /** Set local to world transformation matrix */
-    void setInverseTransform(const math::Matrix4f& matrix);
+    void setInverseTransform(const math::Matrix4f& matrix, bool immediate = true);
 
     /** Set both transform and inverse transform, neither checks performed */
-    void setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix);
+    void setTransformAndInverse(const math::Matrix4f& matrix, const math::Matrix4f& invMatrix, bool immediate = true);
 
     virtual ~MatrixTransform() {}
 

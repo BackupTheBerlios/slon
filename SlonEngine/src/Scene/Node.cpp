@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Detail/Engine.h"
 #include "Database/Archive.h"
 #include "Log/LogVisitor.h"
 #include "Scene/Group.h"
@@ -14,6 +15,7 @@ Node::Node()
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
+,   updatedFrameNo(-1)
 {}
 
 Node::Node(hash_string name_)
@@ -22,6 +24,7 @@ Node::Node(hash_string name_)
 ,	left(0)
 ,	right(0)
 ,	userPointer(0)
+,   updatedFrameNo(-1)
 {
 }
 
@@ -57,13 +60,19 @@ void Node::deserialize(database::IArchive& ar)
 	name = hash_string( ar.readStringChunk("name", tmp) );
 }
 
-void Node::doUpdate()
+void Node::doUpdate(bool immediate)
 {
     Node* node = this;
     while (node && node->getParent()) {
 	    node = node->getParent();
     }
-    node->onUpdate();
+
+    if (immediate) {
+        node->onUpdate();
+    }
+    else {
+        detail::Engine::Instance()->addToUpdateQueue(node);
+    }
 }
 
 Node* findNamedNode(Node& root, hash_string name)

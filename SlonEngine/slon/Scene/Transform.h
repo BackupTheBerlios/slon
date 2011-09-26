@@ -57,7 +57,7 @@ public:
 
 protected:
 	/** Mark for traverse by transform visitor. */
-	void update();
+	void update(bool immediate);
 
 public:    
     // cached transforms

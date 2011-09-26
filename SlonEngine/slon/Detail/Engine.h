@@ -24,6 +24,9 @@ class Engine :
     public slon::Engine
 {
 public:
+    typedef std::vector<scene::Node*> update_queue;
+
+public:
     Engine();
     ~Engine();
 
@@ -71,6 +74,12 @@ public:
 	/** Get file system manager */
     filesystem::FileSystemManager& getFileSystemManager() { return *filesystemManager; }
 
+    /** Add node to update quene */
+    void addToUpdateQueue(scene::Node* node) { updateQueue.push_back(node); }
+
+    /** Get singleton engine instance */
+    static Engine* Instance();
+
 private:
     // managers, order is important!
     log::detail::LogManager                     logManager;
@@ -84,6 +93,9 @@ private:
 #ifdef SLON_ENGINE_USE_PHYSICS
     physics::detail::PhysicsManager             physicsManager;
 #endif
+    
+    // node waiting update function to be called
+    update_queue updateQueue;
 
     // misc
     DESC    desc;

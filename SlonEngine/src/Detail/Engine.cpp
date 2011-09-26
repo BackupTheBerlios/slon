@@ -347,6 +347,16 @@ void Engine::run(const DESC& desc_)
         // handle input
         inputManager.handleEvents();
 
+        // update waiting nodes
+        for (size_t i = 0; i<updateQueue.size(); ++i)
+        {
+            if (updateQueue[i]->updatedFrameNo < frameNumber)
+            {
+                updateQueue[i]->onUpdate();
+                updateQueue[i]->updatedFrameNo = frameNumber;
+            }
+        }
+
         // perform 10 delayed functions
         int i = 0;
         while ( threadManager.performDelayedFunctions(thread::MAIN_THREAD) && ++i < 10 ) {}
@@ -388,6 +398,16 @@ void Engine::frame()
     // handle input
     inputManager.handleEvents();
 
+    // update waiting nodes
+    for (size_t i = 0; i<updateQueue.size(); ++i)
+    {
+        if (updateQueue[i]->updatedFrameNo < frameNumber)
+        {
+            updateQueue[i]->onUpdate();
+            updateQueue[i]->updatedFrameNo = frameNumber;
+        }
+    }
+
     // perform 10 delayed functions
     int i = 0;
     scene::TransformVisitor traverser;    
@@ -407,6 +427,15 @@ Engine::~Engine()
     SDL_Quit();
 	sglSetErrorHandler(0);
 	delete logErrorHandler;
+}
+
+Engine* Engine::Instance()
+{
+    if (!detail::Engine::engineInstance) {
+        detail::Engine::engineInstance = new detail::Engine();
+    }
+
+    return detail::Engine::engineInstance;
 }
 
 } // namespace detail

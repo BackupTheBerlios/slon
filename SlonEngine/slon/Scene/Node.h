@@ -107,7 +107,7 @@ public:
     virtual void onUpdate() {}
 
     /** Call update for root node */
-    void doUpdate();
+    void doUpdate(bool immediate);
 
     virtual ~Node() {}
 
@@ -118,6 +118,9 @@ protected:
 	Node*			left;
 	node_ptr		right;
 	void*			userPointer;
+
+public:
+    int updatedFrameNo;
 };
 
 /** Find node with specified name in the graph

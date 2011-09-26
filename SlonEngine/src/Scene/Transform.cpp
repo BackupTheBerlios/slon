@@ -69,10 +69,10 @@ void Transform::accept(log::LogVisitor& visitor) const
     visitor << log::unindent() << "}\n";
 }
 
-void Transform::update()
+void Transform::update(bool immediate)
 {
 	++modifiedCount;
-    doUpdate();
+    doUpdate(immediate);
 }
 
 } // namespace scene

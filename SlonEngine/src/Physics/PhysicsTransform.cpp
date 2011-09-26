@@ -85,7 +85,7 @@ void PhysicsTransform::setWorldTransform(const math::Matrix4f& transform_)
      physicsTransform = collisionObject->getTransformPointer();
 #endif
     ++modifiedCount;
-    update();
+    update(false);
 }
 
 void PhysicsTransform::accept(log::LogVisitor& visitor) const
