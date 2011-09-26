@@ -72,12 +72,17 @@ const std::string& RigidBody::getName() const
 	return desc.name;
 }
 
-math::Matrix4r RigidBody::getTransform() const
+const math::RigidTransformr* RigidBody::getTransformPointer() const
+{
+	return impl ? impl->getTransformPointer() : 0;
+}
+
+const math::RigidTransformr& RigidBody::getTransform() const
 {
 	return impl ? impl->getTransform() : desc.transform;
 }
 
-void RigidBody::setTransform(const math::Matrix4r& transform)
+void RigidBody::setTransform(const math::RigidTransformr& transform)
 {
     if (impl) {
 	    impl->setTransform(transform);

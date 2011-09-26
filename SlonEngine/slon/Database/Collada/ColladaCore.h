@@ -378,9 +378,10 @@ public:
 
 public:
 	collada_node() :
-        type(NODE),
-        transform( math::make_identity<float, 4>() )
-	{}
+        type(NODE)
+	{
+        transform.make_identity();
+    }
 
     XMLPP_ELEMENT_SERIALIZATION(collada_node, ColladaDocument);
 

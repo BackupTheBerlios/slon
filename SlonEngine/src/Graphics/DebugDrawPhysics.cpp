@@ -86,8 +86,8 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderXShape& cylShape
     if (cylShape.halfExtent.x != cylShape.halfExtent.z) 
     {
         mesh << transform( tr 
-                           * math::make_scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.y) 
-                           * math::make_rotation_z(math::HALF_PI) );
+                           * math::Matrix4f::scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.y) 
+                           * math::Matrix4f::rotation_z(math::HALF_PI) );
     }
     return mesh << cylinder(cylShape.halfExtent.y, cylShape.halfExtent.x * 2.0f, true) << transform(tr);
 }
@@ -96,7 +96,7 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderYShape& cylShape
 {
     math::Matrix4f tr = mesh.transform;
     if (cylShape.halfExtent.x != cylShape.halfExtent.z) {
-        mesh << transform( tr * math::make_scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.x) );
+        mesh << transform( tr * math::Matrix4f::scaling(1.0f, 1.0f, cylShape.halfExtent.z / cylShape.halfExtent.x) );
     }
     return mesh << cylinder(cylShape.halfExtent.x, cylShape.halfExtent.y * 2.0f, true) << transform(tr);
 }
@@ -107,8 +107,8 @@ DebugMesh& operator << (DebugMesh& mesh, const physics::CylinderZShape& cylShape
     if (cylShape.halfExtent.x != cylShape.halfExtent.z) 
     {
         mesh << transform( tr 
-                           * math::make_scaling(1.0f, cylShape.halfExtent.y / cylShape.halfExtent.x, 1.0f) 
-                           * math::make_rotation_x(math::HALF_PI) );
+                           * math::Matrix4f::scaling(1.0f, cylShape.halfExtent.y / cylShape.halfExtent.x, 1.0f) 
+                           * math::Matrix4f::rotation_x(math::HALF_PI) );
     }
     return mesh << cylinder(cylShape.halfExtent.x, cylShape.halfExtent.z * 2.0f, true) << transform(tr);
 }
@@ -232,7 +232,7 @@ DebugMesh& operator << (DebugMesh& mesh, const constraint& c)
          << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(1.0f, 0.0f, 0.0f) )
          << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 1.0f, 0.0f) )
          << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * math::Vector3f(0.0f, 0.0f, 1.0f) )
-         << transform( math::make_translation(trA[0][3], trA[1][3], trA[2][3]) )
+         << transform( math::Matrix4f::translation(trA[0][3], trA[1][3], trA[2][3]) )
          << color(1.0f, 0.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(0) )
          << color(0.0f, 1.0f, 0.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(1) )
          << color(0.0f, 0.0f, 1.0f) << line( math::Vector3f(0.0f, 0.0f, 0.0f), c.scale * c.cons.getAxis(2) );

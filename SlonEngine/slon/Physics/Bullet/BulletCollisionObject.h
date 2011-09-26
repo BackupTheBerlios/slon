@@ -13,8 +13,8 @@ class BulletCollisionObject :
 {
 friend class BulletMotionState;
 public:
-    typedef signal<void (const math::Matrix4f&)>  transform_signal;
-    typedef signal<void (const Contact&)>         contact_signal;
+    typedef signal<void (const math::RigidTransformr&)>  transform_signal;
+    typedef signal<void (const Contact&)>                contact_signal;
 
 public:
     BulletCollisionObject(CollisionObject* pInterface, BulletDynamicsWorld* dynamicsWorld);

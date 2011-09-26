@@ -75,7 +75,7 @@ RigidBody* Constraint::getRigidBodyA() const
 	return desc.rigidBodies[0].get();
 }
 
-const math::Matrix4r& Constraint::getFrameInA() const
+const math::RigidTransformr& Constraint::getFrameInA() const
 {
     return desc.frames[0];
 }
@@ -85,7 +85,7 @@ RigidBody* Constraint::getRigidBodyB() const
 	return desc.rigidBodies[1].get();
 }
 
-const math::Matrix4r& Constraint::getFrameInB() const
+const math::RigidTransformr& Constraint::getFrameInB() const
 {
     return desc.frames[1];
 }

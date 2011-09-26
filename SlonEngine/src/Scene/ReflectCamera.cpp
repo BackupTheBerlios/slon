@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Scene/ReflectCamera.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 using namespace slon;
 using namespace scene;
@@ -114,8 +114,8 @@ Matrix4f ReflectCamera::getReflectionMatrix() const
            * Mat4f::scale(0.5f, 0.5f, 1.0f)
            * Mat4f::translate(0.5f, 0.5f, 0.0f);
     */
-    return math::make_translation(0.5f, 0.5f, 0.0f)
-           * math::make_scaling(0.5f, 0.5f, 1.0f)
+    return math::Matrix4f::translation(0.5f, 0.5f, 0.0f)
+           * math::Matrix4f::scaling(0.5f, 0.5f, 1.0f)
            * masterCamera->getProjectionMatrix()
            * masterCamera->getViewMatrix();
 }

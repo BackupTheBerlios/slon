@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Animation/Detail/AnimationTrack.h"
 #include <algorithm>
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 namespace slon {
 namespace animation {

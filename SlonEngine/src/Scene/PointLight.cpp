@@ -8,7 +8,10 @@ namespace scene {
 
 void PointLight::accept(scene::TransformVisitor& visitor)
 {
-    position = math::make_vec(math::get_translation( visitor.getLocalToWorldTransform() ), 1.0f);
+    const math::Matrix4f& trans = visitor.getLocalToWorldTransform();
+    position.x = trans[0][3];
+    position.y = trans[1][3];
+    position.z = trans[2][3];
 }
 
 void PointLight::accept(scene::CullVisitor& visitor) const

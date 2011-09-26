@@ -198,6 +198,10 @@ SET ( TARGET_LOG_DETAIL_HEADERS
     ${TARGET_HEADER_PATH}/Log/Detail/Stream.h
 )
 
+SET ( TARGET_MATH_HEADERS
+    ${TARGET_HEADER_PATH}/Math/RigidTransform.hpp
+)
+
 SET ( TARGET_REALM_HEADERS
     ${TARGET_HEADER_PATH}/Realm/BVHLocation.h
     ${TARGET_HEADER_PATH}/Realm/BVHLocationNode.h
@@ -320,6 +324,7 @@ SOURCE_GROUP( headers\\Input FILES                         ${TARGET_INPUT_HEADER
 SOURCE_GROUP( headers\\Input\\Detail FILES                 ${TARGET_INPUT_DETAIL_HEADERS} )
 SOURCE_GROUP( headers\\Log FILES                           ${TARGET_LOG_HEADERS} )
 SOURCE_GROUP( headers\\Log\\Detail FILES                   ${TARGET_LOG_DETAIL_HEADERS} )
+SOURCE_GROUP( headers\\Math FILES                  	       ${TARGET_MATH_HEADERS} )
 SOURCE_GROUP( headers\\Physics FILES                       ${TARGET_PHYSICS_HEADERS} )
 SOURCE_GROUP( headers\\Physics\\Bullet FILES               ${TARGET_PHYSICS_BULLET_HEADERS} )
 SOURCE_GROUP( headers\\Physics\\Detail FILES               ${TARGET_PHYSICS_DETAIL_HEADERS} )
@@ -353,6 +358,7 @@ SET ( TARGET_HEADERS
     ${TARGET_INPUT_DETAIL_HEADERS}
     ${TARGET_LOG_HEADERS}
     ${TARGET_LOG_DETAIL_HEADERS}
+    ${TARGET_MATH_HEADERS}
     ${TARGET_REALM_HEADERS}
     ${TARGET_REALM_DETAIL_HEADERS}
     ${TARGET_SCENE_HEADERS}

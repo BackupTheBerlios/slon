@@ -9,11 +9,11 @@ using namespace slon;
 using namespace scene;
 using namespace math;
 
-//DECLARE_AUTO_LOGGER("scene.TransformVisitor");
-
 namespace {
-    math::Matrix4f identityMatrix = math::make_identity<float, 4>();
-} // anonymous namespace
+    math::Matrix4f identityMatrix = math::Matrix4f::identity();
+}
+
+//DECLARE_AUTO_LOGGER("scene.TransformVisitor");
 
 TransformVisitor::TransformVisitor()
 :   currentNode(0)

@@ -3,7 +3,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <sgl/Math/Containers.hpp>
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 #include <sgl/Math/Plane.hpp>
 #include <vector>
 #include "../Database/Serializable.h"

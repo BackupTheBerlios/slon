@@ -63,7 +63,7 @@ void collada_shape::serialize( ColladaDocument& document,
                                xmlpp::element&  elem, 
                                xmlpp::s_state	state )
 {
-    transform = math::make_identity<float, 4>();
+    transform.make_identity();
 
     collada_serializer serializer;
     serializer >>= xmlpp::make_nvp( "translate",		xmlpp::make_elem_loader( read_translate(transform) ) );
@@ -144,7 +144,7 @@ void collada_attachment::serialize( ColladaDocument&  document,
                                     xmlpp::element&   elem, 
                                     xmlpp::s_state    state )
 {
-    transform = math::make_identity<float, 4>();
+    transform.make_identity();
 	
     collada_serializer serializer;
     serializer &=  xmlpp::make_nvp( "rigid_body",	xmlpp::as_attribute(rigidBodyStr) );
@@ -188,7 +188,6 @@ void collada_instance_rigid_constraint::serialize( ColladaDocument&  document,
 }
 
 collada_mass_frame::collada_mass_frame()
-:   transform( math::make_identity<float, 4>() )
 {
 }
 

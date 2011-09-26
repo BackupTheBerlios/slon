@@ -1,6 +1,7 @@
 #ifndef __SLON_ENGINE_DATABASE_COLLADA_PHYSICS_H__
 #define __SLON_ENGINE_DATABASE_COLLADA_PHYSICS_H__
 
+#include "../../Math/RigidTransform.hpp"
 #include "ColladaCore.h"
 
 #ifdef SLON_ENGINE_USE_PHYSICS
@@ -180,7 +181,7 @@ public:
     XMLPP_ELEMENT_SERIALIZATION(collada_attachment, ColladaDocument);
 
 public:
-    math::Matrix4f          transform;
+    math::RigidTransformf   transform;
     collada_rigid_body_ptr  rigidBody;
 
 private:
@@ -231,7 +232,7 @@ public:
     XMLPP_SERIALIZATION_SPLIT_MEMBER(ColladaDocument, xmlpp::element);
 
 public:
-    math::Matrix4f transform;
+    math::RigidTransformf transform;
 };
 
 /** Represents <rigid_body> element */

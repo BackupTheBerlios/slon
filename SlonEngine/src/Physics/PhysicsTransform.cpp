@@ -7,20 +7,14 @@
 #include "Physics/PhysicsTransform.h"
 #include "Realm/Location.h"
 #include "Utility/functor_slot.hpp"
-#include <sgl/Math/MatrixFunctions.hpp>
 
 namespace slon {
 namespace physics {
 
 PhysicsTransform::PhysicsTransform(const collision_object_ptr& collisionObject_) :
-    absolute(false)
+    absolute(false),
+    physicsTransform(0)
 {
-	if (collisionObject_) {
-		transform = collisionObject_->getTransform();
-	}
-	else {
-		transform = math::make_identity<float, 4>();
-	}
     setCollisionObject(collisionObject_);
 }
 
@@ -50,20 +44,32 @@ void PhysicsTransform::deserialize(database::IArchive& ar)
 
 const math::Matrix4f& PhysicsTransform::getTransform() const
 {
-	return transform;
+#ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
+    return transform;
+#else
+    return physicsTransform ? (*physicsTransform) : transform;
+#endif
 }
 
 const math::Matrix4f& PhysicsTransform::getInverseTransform() const
 {
-	invTransform = math::invert( getTransform() );
+#ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
+    invTransform = math::invert(transform);
+#else
+    invTransform = math::invert(physicsTransform ? (*physicsTransform) : transform);
+#endif
 	return invTransform;
 }
 
 void PhysicsTransform::setCollisionObject(const collision_object_ptr& collisionObject_)
 {
     collisionObject = collisionObject_;
-    if (collisionObject) {
-        transformConnection.reset( collisionObject->getTransformSignal(), make_slot<void (const math::Matrix4f&)>(boost::bind(&PhysicsTransform::setWorldTransform, this, _1)) );
+    if (collisionObject)
+    {
+        transformConnection.reset( collisionObject->getTransformSignal(), 
+                                   make_slot<void (const math::RigidTransformr&)>(boost::bind(&PhysicsTransform::setWorldTransform, this, _1)) );
+        physicsTransform = collisionObject->getTransformPointer();
+        transform = collisionObject->getTransform();
     }
     else {
         transformConnection.reset();
@@ -72,7 +78,12 @@ void PhysicsTransform::setCollisionObject(const collision_object_ptr& collisionO
 
 void PhysicsTransform::setWorldTransform(const math::Matrix4f& transform_)
 {
-    transform = transform_;
+#ifdef SLON_ENGINE_USE_DOUBLE_PRECISION_PHYSICS
+    // copy if using double precision physics
+    transform = math::RigidTransformf(transform_);
+#else
+     physicsTransform = collisionObject->getTransformPointer();
+#endif
     ++modifiedCount;
     update();
 }

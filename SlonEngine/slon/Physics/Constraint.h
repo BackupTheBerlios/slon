@@ -2,10 +2,10 @@
 #define __SLON_ENGINE_PHYSICS_CONSTRAINT_H__
 
 #include "../Database/Serializable.h"
+#include "../Math/RigidTransform.hpp"
 #include "../Utility/referenced.hpp"
 #include "../Utility/Memory/aligned.hpp"
 #include "RigidBody.h"
-#include <sgl/Math/MatrixFunctions.hpp>
 #include <string>
 
 namespace slon {
@@ -38,19 +38,18 @@ public:
        : public aligned<0x10>
 #endif
     {
-        std::string     name;
-        rigid_body_ptr  rigidBodies[2];     /// affected rigid bodies
-        math::Matrix4r  frames[2];          /// translational matrices from rigid bodies coordianate frames to constraint coordinate frame
-        math::Vector3r  linearLimits[2];    /// translational limits, set -INF, +INF for free axes
-        math::Vector3r  angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
-        bool            ignoreCollisions;   /// ignore collisions between constrained rigid bodies
+        std::string             name;
+        rigid_body_ptr          rigidBodies[2];     /// affected rigid bodies
+        math::RigidTransformr   frames[2];          /// translational matrices from rigid bodies coordianate frames to constraint coordinate frame
+        math::Vector3r          linearLimits[2];    /// translational limits, set -INF, +INF for free axes
+        math::Vector3r          angularLimits[2];   /// rotational limits in radians, set -INF, +INF for free axes
+        bool                    ignoreCollisions;   /// ignore collisions between constrained rigid bodies
 
         DESC(const std::string& _name = "") :
             name(_name),
             ignoreCollisions(true)
         {
             rigidBodies[0]   = rigidBodies[1]   = 0;
-            frames[0]        = frames[1]        = math::make_identity<real, 4>();
             linearLimits[0]  = linearLimits[1]  = math::Vector3r(0);
             angularLimits[0] = angularLimits[1] = math::Vector3r(0);
         }
@@ -85,13 +84,13 @@ public:
     RigidBody* getRigidBodyA() const;
 
     /** Get transformation matrix from first rigid body coordinate frame to constraint coordinate frame. */
-    const math::Matrix4r& getFrameInA() const;
+    const math::RigidTransformr& getFrameInA() const;
 
     /** Get second rigid body affecting by the constraint. */
     RigidBody* getRigidBodyB() const;
 
     /** Get transformation matrix from second rigid body coordinate frame to constraint coordinate frame. */
-    const math::Matrix4r& getFrameInB() const;
+    const math::RigidTransformr& getFrameInB() const;
 
     /** Get motor of the constraint per axis. 
      * @param motor - motor id.

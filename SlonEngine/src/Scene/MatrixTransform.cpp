@@ -4,7 +4,7 @@
 #include "Log/LogVisitor.h"
 #include "Scene/MatrixTransform.h"
 #include "Utility/error.hpp"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 DECLARE_AUTO_LOGGER("scene.MatrixTransform");
 
@@ -16,8 +16,8 @@ MatrixTransform::MatrixTransform()
 :   transformDirty(false)
 ,   invTransformDirty(false)
 {
-	transform    = math::make_identity<float, 4>();
-    invTransform = math::make_identity<float, 4>();
+	transform.make_identity();
+	invTransform.make_identity();
 }
 	
 MatrixTransform::MatrixTransform(const math::Matrix4f& transform_)
@@ -32,8 +32,8 @@ MatrixTransform::MatrixTransform(const hash_string& name)
 ,	transformDirty(false)
 ,	invTransformDirty(false)
 {
-	transform    = math::make_identity<float, 4>();
-    invTransform = math::make_identity<float, 4>();
+	transform.make_identity();
+	invTransform.make_identity();
 }
 
 MatrixTransform::MatrixTransform(const hash_string& name, const math::Matrix4f& transform_)

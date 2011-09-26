@@ -542,7 +542,7 @@ void SkinnedMesh::accept(scene::TransformVisitor& visitor)
 				bounds			 = math::merge( mesh->getBounds() * joints[i]->getTransform(), bounds );
 			}
 
-            boneMatrices.back() = math::make_identity<float, 4>();
+            boneMatrices.back().make_identity();
         }
         else
         {

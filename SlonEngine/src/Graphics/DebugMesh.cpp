@@ -15,14 +15,15 @@ DebugMesh::DebugMesh() :
     stateChanged(true),
     infiniteBounds(false),
     useCameraProjection(true),
-	baseTransform( math::make_identity<float, 4>() ),
-    transform( math::make_identity<float, 4>() ),
     color(1.0f, 1.0f, 1.0f, 1.0f),
     textSize(10, 12),
     geometryDirty(false),
     depthTest(true),
     wireframe(false)
 {
+    baseTransform.make_identity();
+    transform.make_identity();
+
     // create vertex layout
     sgl::Device* device = currentDevice();
     if ( currentRenderer()->getRenderTechnique() == Renderer::FIXED_PIPELINE )
@@ -188,8 +189,9 @@ void DebugMesh::pushTextPrimitive(const std::string& text)
     infiniteBounds = true;
 
     text_subset s;
-    s.text      = text;
-    s.position  = math::xy( math::get_translation(transform) );
+    s.text       = text;
+    s.position.x = transform[0][3];
+    s.position.y = transform[1][3];
     s.debugEffect.reset( new DebugTextEffect(font.get(), textSize, color) );
     textSubsets.push_back(s);
 }

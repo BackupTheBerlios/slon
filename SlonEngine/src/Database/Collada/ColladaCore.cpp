@@ -405,7 +405,7 @@ void collada_node::serialize(ColladaDocument& document,
                              xmlpp::s_state   state)
 {
     if ( state == xmlpp::LOAD ) {
-        transform = math::make_identity<float, 4>();
+        transform.make_identity();
 	}
 
 	// load

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Scene/LookAtCamera.h"
-#include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Quaternion.hpp>
 #include <sgl/Math/Utility.hpp>
 
@@ -85,11 +84,11 @@ void LookAtCamera::setUp(const math::Vector3f& _up)
 
 void LookAtCamera::turnPitch(float angle)
 {
-    if ( fabs(angle) > math::EPSf )
+    if ( !fpt_small(angle, math::EPS_3f) )
     {
         Quaternionf rotation = math::from_axis_angle( angle * getRight() );
-        direction = normalize( rotation * direction );
-        up = normalize( rotation * up );
+        direction = normalize( rotate(rotation, direction) );
+        up = normalize( rotate(rotation, up) );
 
         viewMatrix.make_dirty();
         invViewMatrix.make_dirty();
@@ -99,10 +98,10 @@ void LookAtCamera::turnPitch(float angle)
 
 void LookAtCamera::turnYaw(float angle)
 {
-    if ( fabs(angle) > math::EPSf )
+    if ( !fpt_small(angle, math::EPS_3f) )
     {
         Quaternionf rotation = math::from_axis_angle(angle * up);
-        direction = normalize( rotation * direction );
+        direction = normalize( rotate(rotation, direction) );
 
         frustum.make_dirty();
         viewMatrix.make_dirty();
@@ -113,10 +112,10 @@ void LookAtCamera::turnYaw(float angle)
 
 void LookAtCamera::turnRoll(float angle)
 {
-    if ( fabs(angle) > math::EPSf )
+    if ( !fpt_small(angle, math::EPS_3f) )
     {
         Quaternionf rotation = math::from_axis_angle(angle * direction);
-        up = normalize( rotation * up );
+        up = normalize( rotate(rotation, up) );
 
         frustum.make_dirty();
         viewMatrix.make_dirty();
@@ -127,11 +126,11 @@ void LookAtCamera::turnRoll(float angle)
 
 void LookAtCamera::turnAroundAxis(float angle, const math::Vector3f& axis)
 {
-    if ( fabs(angle) > math::EPSf )
+    if ( !fpt_small(angle, math::EPS_3f) )
     {
         Quaternionf rotation = math::from_axis_angle(angle * axis);
-        direction = normalize( rotation * direction );
-        up = normalize( rotation * up );
+        direction = normalize( rotate(rotation, direction) );
+        up = normalize( rotate(rotation, up) );
 
         frustum.make_dirty();
         viewMatrix.make_dirty();

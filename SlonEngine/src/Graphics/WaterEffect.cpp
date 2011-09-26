@@ -10,7 +10,7 @@
 #include "Graphics/ForwardRenderer.h"
 #include "Log/Logger.h"
 #include "Scene/DirectionalLight.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 //#define DEBUG_WATER_PERFORMANCE
 
@@ -491,8 +491,8 @@ int WaterEffect::present(render_group_handle renderGroup, render_pass_handle ren
 
         if (reflectTexture)
         {
-            reflectionMatrixBinder->write_value( math::make_translation(0.5f, 0.5f, 0.0f)
-                                                 * math::make_scaling(0.5f, 0.5f, 1.0f)
+            reflectionMatrixBinder->write_value( math::Matrix4f::translation(0.5f, 0.5f, 0.0f)
+                                                 * math::Matrix4f::scaling(0.5f, 0.5f, 1.0f)
                                                  * reflectCamera->getProjectionMatrix()
                                                  * reflectCamera->getViewMatrix() );
         }

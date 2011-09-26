@@ -1,9 +1,8 @@
 #ifndef __SLON_ENGINE_PHYSICS_COLLISION_OBJECT_H__
 #define __SLON_ENGINE_PHYSICS_COLLISION_OBJECT_H__
 
-#include <boost/signals.hpp>
-#include <sgl/Math/Matrix.hpp>
 #include "../Database/Serializable.h"
+#include "../Math/RigidTransform.hpp"
 #include "../Utility/referenced.hpp"
 #include "../Utility/signal.hpp"
 #include "Forward.h"
@@ -16,7 +15,7 @@ class CollisionObject;
 class CollisionShape;
 class DynamicsWorld;
 
-/** Struct for retreiving contact information */
+/** Struct for retrieving contact information */
 struct Contact
 {
     CollisionObject*    collisionObjects[2];
@@ -55,13 +54,13 @@ private:
 	typedef BulletCollisionObject impl_type;
 #endif
 public:
-    typedef slot<void (const math::Matrix4f&)>          transform_handler;
-    typedef slot<void (const Contact&)>                 contact_handler;
+    typedef slot<void (const math::RigidTransformr&)>           transform_handler;
+    typedef slot<void (const Contact&)>                         contact_handler;
 
-    typedef signal<void (const math::Matrix4f&)>        transform_signal;
-    typedef signal_base<void (const math::Matrix4f&)>   transform_signal_base;
-    typedef signal<void (const Contact&)>               contact_signal;
-    typedef signal_base<void (const Contact&)>          contact_signal_base;
+    typedef signal<void (const math::RigidTransformr&)>         transform_signal;
+    typedef signal_base<void (const math::RigidTransformr&)>    transform_signal_base;
+    typedef signal<void (const Contact&)>                       contact_signal;
+    typedef signal_base<void (const Contact&)>                  contact_signal_base;
 
     enum COLLISION_TYPE
     {
@@ -79,16 +78,22 @@ public:
     /** Get dynamics world where object is created. */
     virtual const DynamicsWorld* getDynamicsWorld() const = 0;
 
-    /** Get name of the objecty */
+    /** Get name of the object. */
     virtual const std::string& getName() const = 0;
 
+    /** Get internal transformation matrix pointer, so other objects can quickly track collision objects movements. 
+     * This pointer is NULL if implementation object is not created (e.g. object is not in the world).
+     * This pointer may change if reset function called.
+     */
+    virtual const math::RigidTransformr* getTransformPointer() const = 0;
+
     /** Get local to world transform matrix of the object. */
-    virtual math::Matrix4r getTransform() const = 0;
+    virtual const math::RigidTransformr& getTransform() const = 0;
 
     /** Set world transform for the object. Works only for ghost objects and kinematic rigid bodies */
-    virtual void setTransform(const math::Matrix4r& transform) = 0;
+    virtual void setTransform(const math::RigidTransformr& transform) = 0;
 
-    /** Get signal for connecting trasnform handlers. */
+    /** Get signal for connecting transform handlers. */
     transform_signal_base& getTransformSignal() { return transformSignal; }
 
     /** Get signal for connecting contact appear handlers. */

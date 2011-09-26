@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Animation/Detail/AnimationController.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 namespace {
 
-	static math::Matrix4f identity_matrix = math::make_identity<float, 4>();
+    static math::Matrix4f identity_matrix = math::Matrix4f::identity();
 
     template<typename T>
     inline T clamp(T x, T a, T b)
@@ -21,8 +21,8 @@ namespace detail {
 AnimationController::AnimationController()
 :   threshold(1E-3f)
 {
-    transform    = math::make_identity<float, 4>();
-    invTransform = math::make_identity<float, 4>();
+    transform.make_identity();
+    invTransform.make_identity();
 }
 
 void AnimationController::setTrack(const AnimationTrack* track_)

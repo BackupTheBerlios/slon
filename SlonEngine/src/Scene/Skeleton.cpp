@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Scene/Skeleton.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 namespace {
 

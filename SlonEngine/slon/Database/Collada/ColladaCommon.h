@@ -4,7 +4,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <functional>
-#include <sgl/Math/MatrixFunctions.hpp>
 #include <sgl/Math/Quaternion.hpp>
 #include <sgl/Math/Utility.hpp>
 #include <sstream>
@@ -251,7 +250,7 @@ struct read_rotate :
     {
         math::Vector4f rotation;
         extract(node, rotation);
-        transform *= math::make_rotation(math::deg_to_rad(rotation.w), math::xyz(rotation));
+        transform *= math::Matrix4f::rotation(math::deg_to_rad(rotation.w), math::xyz(rotation));
     }
 };
 
@@ -267,7 +266,7 @@ struct read_translate :
     {
         math::Vector4f translation;
         extract(node, translation);
-        transform *= math::make_translation(translation.x, translation.y, translation.z);
+        transform *= math::Matrix4f::translation(translation.x, translation.y, translation.z);
     }
 };
 
@@ -283,7 +282,7 @@ struct read_scale :
     {
         math::Vector4f scale;
         extract(node, scale);
-        transform *= math::make_scaling(scale.x, scale.y, scale.z);
+        transform *= math::Matrix4f::scaling(scale.x, scale.y, scale.z);
     }
 };
 

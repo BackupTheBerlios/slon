@@ -45,11 +45,12 @@ private:
     void setWorldTransform(const math::Matrix4f& transform);
 
 protected:
-    collision_object_ptr        collisionObject;
-    bool                        absolute;
-    connection                  transformConnection;
-    math::Matrix4f              transform;
-    mutable math::Matrix4f      invTransform;
+    collision_object_ptr            collisionObject;
+    bool                            absolute;
+    connection                      transformConnection;
+    const math::RigidTransformr*    physicsTransform;
+    math::RigidTransformf           transform;
+    mutable math::RigidTransformf   invTransform;
 };
 
 } // namespace physics

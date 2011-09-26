@@ -13,6 +13,7 @@ namespace slon {
 namespace physics {
 
 class BulletMotionState :
+    public slon::aligned<0x40>,
     public btMotionState
 {
 public:
@@ -21,20 +22,41 @@ public:
     {
     }
 
-	void getWorldTransform(btTransform& worldTrans_) const
+	void getWorldTransform(btTransform& worldTrans) const
     {
-        worldTrans_ = worldTrans;
+        worldTrans.setBasis( btMatrix3x3(transform[0][0], transform[0][1], transform[0][2],
+                                         transform[1][0], transform[1][1], transform[1][2],
+                                         transform[2][0], transform[2][1], transform[2][2]) );
+
+        worldTrans.setOrigin( btVector3(transform[0][3], transform[1][3], transform[2][3]));
     }
 
-	void setWorldTransform(const btTransform& worldTrans_)
+	void setWorldTransform(const btTransform& worldTrans)
     {
-        worldTrans = worldTrans_;
-        rbody->getTransformSignal()( to_mat(worldTrans) );
+	    const btMatrix3x3& basis  = worldTrans.getBasis();
+	    const btVector3&   origin = worldTrans.getOrigin();
+
+        transform[0][0] = basis[0].x();
+        transform[0][1] = basis[0].y();
+        transform[0][2] = basis[0].z();
+        transform[0][3] = origin.x();
+
+        transform[1][0] = basis[1].x();
+        transform[1][1] = basis[1].y();
+        transform[1][2] = basis[1].z();
+        transform[1][3] = origin.y();
+
+        transform[2][0] = basis[2].x();
+        transform[2][1] = basis[2].y();
+        transform[2][2] = basis[2].z();
+        transform[2][3] = origin.z();
+
+        rbody->getTransformSignal()(transform);
     }
 
-private:
-    BulletRigidBody* rbody;
-    btTransform      worldTrans;
+public:
+    math::RigidTransformr  transform;
+    BulletRigidBody*       rbody;
 };
 
 namespace {
@@ -325,11 +347,14 @@ math::Vector3r BulletRigidBody::getTotalTorque() const
     return to_vec( const_cast<btRigidBody&>(*rigidBody).getTotalTorque() );
 }
 
-math::Matrix4r BulletRigidBody::getTransform() const
+const math::RigidTransformr* BulletRigidBody::getTransformPointer() const
 {
-	btTransform worldTrans;
-	motionState->getWorldTransform(worldTrans);
-	return to_mat(worldTrans);
+    return &motionState->transform;
+}
+
+const math::RigidTransformr& BulletRigidBody::getTransform() const
+{
+	return motionState->transform;
 }
 
 RigidBody::ACTIVATION_STATE BulletRigidBody::getActivationState() const

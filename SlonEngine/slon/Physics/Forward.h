@@ -23,6 +23,9 @@ namespace math
 	template<typename T>
 	class Quaternion;
 
+    template<typename T>
+    class RigidTransform;
+
 	typedef Matrix<slon::physics::real, 4, 1>      Vector4r;
 	typedef Matrix<slon::physics::real, 3, 1>      Vector3r;
 	typedef Matrix<slon::physics::real, 2, 1>      Vector2r;
@@ -39,6 +42,8 @@ namespace math
 	typedef Matrix<slon::physics::real, 4, 4>      Matrix4r;   
 	typedef Matrix<slon::physics::real, 3, 3>      Matrix3r;
 	typedef Matrix<slon::physics::real, 2, 2>      Matrix2r;
+
+    typedef RigidTransform<slon::physics::real>    RigidTransformr;
 
 	typedef AABB<slon::physics::real, 2>		   AABB2r;
 	typedef AABB<slon::physics::real, 3>		   AABB3r;

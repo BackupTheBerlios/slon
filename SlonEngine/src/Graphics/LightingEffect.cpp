@@ -9,7 +9,7 @@
 #include "Graphics/FixedPipelineRenderer.h"
 #include "Graphics/ForwardRenderer.h"
 #include <boost/bind.hpp>
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 DECLARE_AUTO_LOGGER("graphics.LightingEffect")
 

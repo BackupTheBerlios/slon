@@ -7,7 +7,7 @@
 #include "Graphics/ForwardRenderer.h"
 #include "Graphics/FixedPipelineRenderer.h"
 #include "Log/Logger.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 DECLARE_AUTO_LOGGER("graphics.DebugEffect")
 

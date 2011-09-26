@@ -675,7 +675,7 @@ namespace {
             else
             {
 			    Group* group = 0;
-			    if ( node.transform == make_identity<float, 4>() ) {
+                if ( fpt_close_abs(node.transform, math::Matrix4f::identity()) ) {
 				    group = new Group();
 			    }
 			    else
@@ -1050,8 +1050,8 @@ namespace {
             // create constraint
             physics::Constraint::DESC desc(colladaConstraint.sid);
 
-            desc.frames[0] = math::Matrix4r(colladaConstraint.refAttachment.transform);
-            desc.frames[1] = math::Matrix4r(colladaConstraint.attachment.transform);
+            desc.frames[0] = math::RigidTransformr(colladaConstraint.refAttachment.transform);
+            desc.frames[1] = math::RigidTransformr(colladaConstraint.attachment.transform);
 
             desc.rigidBodies[0] = dynamic_cast<physics::RigidBody*>( sceneModel.findCollisionObjectByName(colladaConstraint.refAttachment.rigidBody->sid)->first.get() );
             desc.rigidBodies[1] = dynamic_cast<physics::RigidBody*>( sceneModel.findCollisionObjectByName(colladaConstraint.attachment.rigidBody->sid)->first.get() );
@@ -1096,7 +1096,7 @@ namespace {
                 desc.transform = colladaRigidBody.massFrame.value.transform;
             }
             else {
-                desc.transform = math::make_identity<float, 4>();
+                desc.transform.make_identity();
             }
 
             if (colladaRigidBodyInstance.inertia) {
@@ -1106,12 +1106,12 @@ namespace {
                 desc.inertia = colladaRigidBody.inertia.value;
             }
             else {
-                desc.inertia = math::Vector3f(0, 0, 0);
+                desc.inertia = math::Vector3f(0.0f);
             }
 
             math::Matrix4f invMassFrame = math::invert(desc.transform);
             if ( colladaRigidBody.shapes.size() > 1
-                || !math::equal(invMassFrame * colladaRigidBody.shapes[0]->transform, math::make_identity<float, 4>(), 0.01f) )
+                || !math::fpt_close_abs(invMassFrame * colladaRigidBody.shapes[0]->transform, math::Matrix4f::identity(), 0.001f) )
             {
                 physics::CompoundShape* compoundShape = new physics::CompoundShape();
                 for (size_t i = 0; i<colladaRigidBody.shapes.size(); ++i)
@@ -1186,7 +1186,7 @@ namespace {
                         transformNode = transformNode->getParent();
                     }
 
-                    math::Matrix4f T = math::make_identity<float, 4>();
+                    math::Matrix4f T = math::Matrix4f::identity();
                     if (transformNode) {
                         T = static_cast<scene::Transform*>(transformNode)->localToWorld;
                     }
@@ -1196,7 +1196,7 @@ namespace {
                     physics::physics_transform_ptr rbTransform( new physics::PhysicsTransform(iter->first) );
                     scene::group_ptr               rbNode = rbTransform;
 			        math::Matrix4f                 invRT  = math::invert(R) * T;
-                    if ( !math::equal(invRT, math::make_identity<float, 4>()) ) 
+                    if ( !math::fpt_close_abs(invRT, math::Matrix4f::identity(), 0.001f) ) 
                     {
                         rbNode.reset( new scene::MatrixTransform("PhysicsToGraphics", invRT) );
 			            rbTransform->addChild(rbNode);

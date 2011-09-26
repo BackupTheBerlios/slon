@@ -1,10 +1,10 @@
 #ifndef __SLON_ENGINE_PHYSICS_BULLET_BULLET_COMMON_H__
 #define __SLON_ENGINE_PHYSICS_BULLET_BULLET_COMMON_H__
 
+#include "../../Math/RigidTransform.hpp"
 #include "../CollisionShape.h"
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
-#include <sgl/Math/Matrix.hpp>
 
 namespace slon {
 namespace physics {
@@ -45,15 +45,16 @@ inline math::Vector4r to_vec(const btVector4& vec)
     return math::Vector4r( vec.x(), vec.y(), vec.z(), vec.w() );
 }
 
-inline math::Matrix4r to_mat(const btTransform& transform)
+inline math::RigidTransformr to_mat(const btTransform& transform)
 {
 	const btMatrix3x3& basis  = transform.getBasis();
 	const btVector3&   origin = transform.getOrigin();
 
-	return math::make_matrix( basis[0].x(), basis[0].y(), basis[0].z(), origin.x(),
-						      basis[1].x(), basis[1].y(), basis[1].z(), origin.y(),
-					          basis[2].x(), basis[2].y(), basis[2].z(), origin.z(),
-						      (real)0.0,    (real)0.0,   (real)0.0,     (real)1.0 );
+	return math::RigidTransformr( basis[0].x(), basis[0].y(), basis[0].z(), origin.x(),
+						          basis[1].x(), basis[1].y(), basis[1].z(), origin.y(),
+					              basis[2].x(), basis[2].y(), basis[2].z(), origin.z(),
+						          (real)0.0,    (real)0.0,   (real)0.0,     (real)1.0, 
+                                  -1.0f );
 }
 
 // create bullet collision shape from slon collision shape
@@ -224,13 +225,13 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
         switch ( btShape->getConeUpIndex() ) 
         {
         case 0:
-            return new CompoundShape( math::make_rotation_z(math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
+            return new CompoundShape( math::Matrix4r::rotation_z(math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
 
         case 1:
             return new ConeShape(btShape->getRadius(), btShape->getHeight());
 
         case 2:
-            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
+            return new CompoundShape( math::Matrix4r::rotation_x(-math::HALF_PI), new ConeShape(btShape->getRadius(), btShape->getHeight()) );
 
         default:
             assert(!"can't get here");
@@ -241,13 +242,13 @@ inline CollisionShape* createCollisionShape(const btCollisionShape& collisionSha
         switch ( btShape->getUpAxis() ) 
         {
         case 0:
-            return new CompoundShape( math::make_rotation_z(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
+            return new CompoundShape( math::Matrix4r::rotation_z(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
 
         case 1:
             return new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2);
 
         case 2:
-            return new CompoundShape( math::make_rotation_x(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
+            return new CompoundShape( math::Matrix4r::rotation_x(-math::HALF_PI), new CapsuleShape(btShape->getRadius(), btShape->getHalfHeight() * 2) );
 
         default:
             assert(!"can't get here");

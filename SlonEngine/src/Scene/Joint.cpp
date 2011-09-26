@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "Scene/Joint.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Quaternion.hpp>
 
 namespace slon {
 namespace scene {
 
 Joint::Joint() :
-    inverseBindMatrix( math::make_identity<float, 4>() ),
     id(0)
 {
+    inverseBindMatrix.make_identity();
 }
 
 // Override transform

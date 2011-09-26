@@ -40,12 +40,13 @@ public:
     void applyImpulse(const math::Vector3r& impulse, const math::Vector3r& pos);
     void applyTorqueImpulse(const math::Vector3r& torqueImpulse);
 
-    math::Vector3r				getTotalForce() const;
-    math::Vector3r				getTotalTorque() const;
-    math::Matrix4r				getTransform() const;
-    RigidBody::ACTIVATION_STATE getActivationState() const;
-    math::Vector3r				getLinearVelocity() const;
-    math::Vector3r				getAngularVelocity() const;
+    math::Vector3r				    getTotalForce() const;
+    math::Vector3r				    getTotalTorque() const;
+    const math::RigidTransformr*	getTransformPointer() const;
+    const math::RigidTransformr&	getTransform() const;
+    RigidBody::ACTIVATION_STATE     getActivationState() const;
+    math::Vector3r				    getLinearVelocity() const;
+    math::Vector3r				    getAngularVelocity() const;
 
     void    setTransform(const math::Matrix4r& worldTransform);
     void    setActivationState(RigidBody::ACTIVATION_STATE state);

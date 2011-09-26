@@ -53,7 +53,7 @@ public:
        : public aligned<0x10>
 #endif
     {
-        math::Matrix4r            transform;          /// initial transformation matrix
+        math::RigidTransformr     transform;          /// initial transformation matrix
         DYNAMICS_TYPE             type;
         real                      mass;
         real                      friction;           /// material friction
@@ -66,7 +66,6 @@ public:
         const_collision_shape_ptr collisionShape;
 
         DESC(const std::string& _name = "") :
-            transform( math::make_identity<float, 4>() ),
             type(DT_DYNAMIC),
             mass(0),
             friction(1.0),
@@ -88,12 +87,13 @@ public:
     void        deserialize(database::IArchive& ar);
 
 	// Override CollisionObject
-	COLLISION_TYPE        getType() const;
-    const CollisionShape* getCollisionShape() const;
-    const DynamicsWorld*  getDynamicsWorld() const;
-    const std::string&    getName() const;
-    math::Matrix4r        getTransform() const;
-    void                  setTransform(const math::Matrix4r& transform);
+	COLLISION_TYPE               getType() const;
+    const CollisionShape*        getCollisionShape() const;
+    const DynamicsWorld*         getDynamicsWorld() const;
+    const std::string&           getName() const;
+    const math::RigidTransformr* getTransformPointer() const;
+    const math::RigidTransformr& getTransform() const;
+    void                         setTransform(const math::RigidTransformr& transform);
 
     /** Apply force to rigid body at the specified position. */
     void applyForce(const math::Vector3r& force, const math::Vector3r& pos);

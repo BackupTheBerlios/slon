@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Graphics/DebugDrawCommon.h"
-#include <sgl/Math/MatrixFunctions.hpp>
+#include <sgl/Math/Matrix.hpp>
 
 namespace slon {
 namespace graphics {
@@ -102,7 +102,7 @@ DebugMesh& operator << (DebugMesh& mesh, const DebugMesh& other)
 
         for (size_t i = 0; i<other.textSubsets.size(); ++i) 
         {
-            mesh.transform = transform * math::make_translation(other.textSubsets[i].position.x, other.textSubsets[i].position.y, 0.0f);
+            mesh.transform = transform * math::Matrix4f::translation(other.textSubsets[i].position.x, other.textSubsets[i].position.y, 0.0f);
             //mesh.color     = other.textSubsets[i].debugEffect->getColor();
             //mesh.textSize  = other.textSubsets[i].debugEffect->getSize();
             //mesh.font.reset( other.textSubsets[i].debugEffect->getFont() );
@@ -149,7 +149,7 @@ DebugMesh& operator << (DebugMesh& mesh, const sector& s)
     for (unsigned i = 0; i < splits + 1; ++i)
     {
         float          angle   = s.loLimit + i * (s.hiLimit - s.loLimit) / splits;
-        math::Vector3f pointer = math::make_rotation(angle, s.cross) * s.up;
+        math::Vector3f pointer = math::Matrix4f::rotation(angle, s.cross) * s.up;
         mesh.vertices.push_back(pointer);
         mesh.indices.push_back(base + i + 1);
     }
