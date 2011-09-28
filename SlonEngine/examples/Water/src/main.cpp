@@ -45,10 +45,10 @@ namespace {
         // create camera
         LookAtCamera* camera = new LookAtCamera();
         camera->setViewport(viewport);
-        camera->setProjectionMatrix( math::make_perspective( 0.7853982f,
-                                                            static_cast<float>(viewport.width) / viewport.height,
-                                                            1.0f,
-                                                            4000.0f ) );
+        camera->setProjectionMatrix( math::Matrix4f::perspective( 0.7853982f,
+                                                                  static_cast<float>(viewport.width) / viewport.height,
+                                                                  1.0f,
+                                                                  4000.0f ) );
 
         return camera;
     }
@@ -429,13 +429,11 @@ private:
         const float bottom_threshold = -0.9f;
         const float top_threshold    =  0.5f;
 
-        Vector2f rel = Vector2f( -static_cast<float>(xrel),
-                                  static_cast<float>(yrel) );
-
+        Vector2f rel = Vector2f( float(xrel), float(yrel) );
         {
             thread::lock_ptr lock = camera->lockForWriting();
             camera->turnAroundAxis( rel.x * 0.002f, Vector3f(0.0f, 1.0f, 0.0f) );
-            camera->turnPitch(-rel.y * 0.002f);
+            camera->turnPitch(rel.y * 0.002f);
 
             Vector3f direction = camera->getDirection();
             if (direction.y < bottom_threshold)
@@ -625,7 +623,6 @@ int main(int argc, char** argv)
 
     // init engine
 	Engine* engine = Engine::Instance();
-	engine->init();
 /*
     if (benchmark)
     {
