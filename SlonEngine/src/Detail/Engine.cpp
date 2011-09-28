@@ -265,7 +265,9 @@ void Engine::handlePhysics()
 
 void Engine::handlePhysicsCycle()
 {
-    while (working) {
+    while (working)
+    {
+        thread::lock_ptr lock = physicsManager.lockForReading();
         handlePhysics();
     }
 }

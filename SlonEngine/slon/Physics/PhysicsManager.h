@@ -2,6 +2,8 @@
 #define __SLON_ENGINE_PHYSICS_PHYSICS_MANAGER_H__
 
 #include <boost/signal.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include "../Thread/Lock.h"
 #include "../Thread/Timer.h"
 #include "DynamicsWorld.h"
 
@@ -42,6 +44,16 @@ public:
 
     /** Attach post frame callback. Calls after physics frame simulation. */
     virtual connection_type connectPostFrameCallback(post_frame_signal::slot_type slot) = 0;
+
+    /** Grant thread read access to the physics manager.
+     * @return lock object. Lock is freed whether object is deleted.
+     */
+    virtual thread::lock_ptr lockForReading() const = 0;
+
+    /** Grant thread write access to the physics manager.
+     * @return lock object. Lock is freed whether object is deleted.
+     */
+    virtual thread::lock_ptr lockForWriting() = 0;
 
     virtual ~PhysicsManager() {}
 };

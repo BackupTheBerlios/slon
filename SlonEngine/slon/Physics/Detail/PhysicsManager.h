@@ -36,6 +36,9 @@ public:
         return postFrameSignal.connect(slot);
     }
 
+    thread::lock_ptr lockForReading() const;
+    thread::lock_ptr lockForWriting();
+
 private:
 	dynamics_world_list worlds;
     const_timer_ptr     timer;
@@ -46,6 +49,9 @@ private:
     // connections
     pre_frame_signal    preFrameSignal;
     post_frame_signal   postFrameSignal;
+
+    // sync
+    mutable boost::shared_mutex accessMutex;
 };
 
 } // namespace detail
