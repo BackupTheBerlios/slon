@@ -32,10 +32,10 @@ public:
     /** Identity by default */
     RigidTransform()
     {
-        rows[0] = row_type(T(1), T(0), T(0), T(0));
-        rows[1] = row_type(T(0), T(1), T(0), T(0));
-        rows[2] = row_type(T(0), T(0), T(1), T(0));
-        rows[3] = row_type(T(0), T(0), T(0), T(1));
+        base_type::rows[0] = row_type(T(1), T(0), T(0), T(0));
+        base_type::rows[1] = row_type(T(0), T(1), T(0), T(0));
+        base_type::rows[2] = row_type(T(0), T(0), T(1), T(0));
+        base_type::rows[3] = row_type(T(0), T(0), T(0), T(1));
     }
 
 	// For internal matrix constructors
@@ -44,10 +44,10 @@ public:
                    T _20, T _21, T _22, T _23,
                    T _30, T _31, T _32, T _33, T eps = std::numeric_limits<T>::epsilon())
 	{
-        rows[0] = row_type(_00, _01, _02, _03);
-        rows[1] = row_type(_10, _11, _12, _13);
-        rows[2] = row_type(_20, _21, _22, _23);
-        rows[3] = row_type(_30, _31, _32, _33);
+        base_type::rows[0] = row_type(_00, _01, _02, _03);
+        base_type::rows[1] = row_type(_10, _11, _12, _13);
+        base_type::rows[2] = row_type(_20, _21, _22, _23);
+        base_type::rows[3] = row_type(_30, _31, _32, _33);
         if (eps > T(0) && !valid(eps)) {
             throw std::logic_error("matrix is not rigid transform");
         }
@@ -60,10 +60,10 @@ public:
     explicit RigidTransform(const base_type& matrix,
                             T                eps = std::numeric_limits<T>::epsilon())
     {
-        rows[0] = matrix.rows[0];
-        rows[1] = matrix.rows[1];
-        rows[2] = matrix.rows[2];
-        rows[3] = matrix.rows[3];
+        base_type::rows[0] = matrix.rows[0];
+        base_type::rows[1] = matrix.rows[1];
+        base_type::rows[2] = matrix.rows[2];
+        base_type::rows[3] = matrix.rows[3];
         if (eps > T(0) && !valid(eps)) {
             throw std::logic_error("matrix is not rigid transform");
         }
@@ -75,12 +75,12 @@ public:
      */
     template<typename Y>
     explicit RigidTransform(const Matrix<T, 4, 4>& matrix,
-                            bool                   check = true)
+                            T                      eps = std::numeric_limits<T>::epsilon())
     {
-        rows[0] = row_type(matrix.rows[0]);
-        rows[1] = row_type(matrix.rows[1]);
-        rows[2] = row_type(matrix.rows[2]);
-        rows[3] = row_type(matrix.rows[3]);
+        base_type::rows[0] = row_type(matrix.rows[0]);
+        base_type::rows[1] = row_type(matrix.rows[1]);
+        base_type::rows[2] = row_type(matrix.rows[2]);
+        base_type::rows[3] = row_type(matrix.rows[3]);
         if (eps > T(0) && !valid(eps)) {
             throw std::logic_error("matrix is not rigid transform");
         }
@@ -90,13 +90,20 @@ public:
     bool valid(T eps = std::numeric_limits<T>::epsilon()) const
     {
         // check upper left 3x3 orthonormality
-        return    fpt_small(rows[0].x*rows[1].x + rows[0].y*rows[1].y + rows[0].z*rows[1].z, eps)
-               && fpt_small(rows[0].x*rows[2].x + rows[0].y*rows[2].y + rows[0].z*rows[2].z, eps)
-               && fpt_small(rows[1].x*rows[2].x + rows[1].y*rows[2].y + rows[1].z*rows[2].z, eps)       
-               && fpt_close_abs(rows[0].x*rows[0].x + rows[0].y*rows[0].y + rows[0].z*rows[0].z, T(1), eps) 
-               && fpt_close_abs(rows[1].x*rows[1].x + rows[1].y*rows[1].y + rows[1].z*rows[1].z, T(1), eps) 
-               && fpt_close_abs(rows[2].x*rows[2].x + rows[2].y*rows[2].y + rows[2].z*rows[2].z, T(1), eps)
-               && fpt_close_abs(rows[3], row_type(T(0), T(0), T(0), T(1)), eps);
+        T _00 = base_type::rows[0].x*base_type::rows[1].x + base_type::rows[0].y*base_type::rows[1].y + base_type::rows[0].z*base_type::rows[1].z;
+        T _01 = base_type::rows[0].x*base_type::rows[1].x + base_type::rows[0].y*base_type::rows[1].y + base_type::rows[0].z*base_type::rows[1].z;
+        T _02 = base_type::rows[0].x*base_type::rows[2].x + base_type::rows[0].y*base_type::rows[2].y + base_type::rows[0].z*base_type::rows[2].z;
+        T _11 = base_type::rows[1].x*base_type::rows[1].x + base_type::rows[1].y*base_type::rows[1].y + base_type::rows[1].z*base_type::rows[1].z;
+        T _12 = base_type::rows[1].x*base_type::rows[2].x + base_type::rows[1].y*base_type::rows[2].y + base_type::rows[1].z*base_type::rows[2].z;
+        T _22 = base_type::rows[2].x*base_type::rows[2].x + base_type::rows[2].y*base_type::rows[2].y + base_type::rows[2].z*base_type::rows[2].z;
+
+        return    fpt_small(_01, eps)
+               && fpt_small(_02, eps)
+               && fpt_small(_12, eps)
+               && fpt_close_abs(_00, T(1), eps)
+               && fpt_close_abs(_11, T(1), eps)
+               && fpt_close_abs(_22, T(1), eps)
+               && fpt_close_abs(base_type::rows[3], row_type(T(0), T(0), T(0), T(1)), eps);
     }
 
     /** Get translation transformation matrix */
