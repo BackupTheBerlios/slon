@@ -90,7 +90,7 @@ public:
     bool valid(T eps = std::numeric_limits<T>::epsilon()) const
     {
         // check upper left 3x3 orthonormality
-        T _00 = base_type::rows[0].x*base_type::rows[1].x + base_type::rows[0].y*base_type::rows[1].y + base_type::rows[0].z*base_type::rows[1].z;
+        T _00 = base_type::rows[0].x*base_type::rows[0].x + base_type::rows[0].y*base_type::rows[0].y + base_type::rows[0].z*base_type::rows[0].z;
         T _01 = base_type::rows[0].x*base_type::rows[1].x + base_type::rows[0].y*base_type::rows[1].y + base_type::rows[0].z*base_type::rows[1].z;
         T _02 = base_type::rows[0].x*base_type::rows[2].x + base_type::rows[0].y*base_type::rows[2].y + base_type::rows[0].z*base_type::rows[2].z;
         T _11 = base_type::rows[1].x*base_type::rows[1].x + base_type::rows[1].y*base_type::rows[1].y + base_type::rows[1].z*base_type::rows[1].z;
@@ -112,7 +112,7 @@ public:
         return this_type( T(1), T(0), T(0), x,
                           T(0), T(1), T(0), y,
                           T(0), T(0), T(1), z,
-                          T(0), T(0), T(0), T(1) );
+                          T(0), T(0), T(0), T(1), T(-1) );
     }
 
     /** Get scaling transformation matrix */
@@ -121,7 +121,7 @@ public:
         return this_type( T(x), T(0), T(0), T(0),
                           T(0), T(y), T(0), T(0),
                           T(0), T(0), T(z), T(0),
-                          T(0), T(0), T(0), T(1) );
+                          T(0), T(0), T(0), T(1), T(-1) );
     }
 
     /** Get rotation around x transformation matrix */
@@ -132,7 +132,7 @@ public:
         return this_type( T(1), T(0), T(0), T(0),
                           T(0), c,    -s,   T(0),
                           T(0), s,    c,    T(0),
-                          T(0), T(0), T(0), T(1) );
+                          T(0), T(0), T(0), T(1), T(-1) );
     }
 
     /** Get rotation around y transformation matrix */
@@ -143,7 +143,7 @@ public:
         return this_type( c,    T(0), s,    T(0),
                           T(0), T(1), T(0), T(0),
                           -s,   T(0), c,    T(0),
-                          T(0), T(0), T(0), T(1) );
+                          T(0), T(0), T(0), T(1), T(-1) );
     }
 
     /** Get rotation around z transformation matrix */
@@ -154,7 +154,7 @@ public:
         return this_type( c,    -s,   T(0), T(0),
                           s,    c,    T(0), T(0),
                           T(0), T(0), T(1), T(0),
-                          T(0), T(0), T(0), T(1) );
+                          T(0), T(0), T(0), T(1), T(-1) );
     }
 
     /** Get rotation around arbitrary axis transformation matrix */
@@ -165,7 +165,7 @@ public:
         return this_type( v.x * v.x + (T(1) - v.x * v.x) * c, v.x * v.y * (T(1)- c) - v.z * s,    v.x * v.z * (T(1) - c) + v.y * s,   T(0),
                           v.x * v.y * (T(1) - c) + v.z * s,   v.y * v.y + (T(1) - v.y * v.y) * c, v.y * v.z * (T(1) - c) - v.x * s,   T(0),
                           v.x * v.z * (T(1) - c) - v.y * s,   v.y * v.z * (T(1) - c) + v.x * s,   v.z * v.z + (T(1) - v.z * v.z) * c, T(0),
-                          T(0),                               T(0),                               T(0),                               T(1) );
+                          T(0),                               T(0),                               T(0),                               T(1), T(-1) );
     }
 };
 
