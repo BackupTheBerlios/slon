@@ -2,7 +2,7 @@
 #define __SLON_ENGINE_PHYSICS_MOTOR_H__
 
 #include <sgl/Math/Vector.hpp>
-#include "Forward.h"
+#include "Constraint.h"
 
 namespace slon {
 namespace physics {
@@ -24,6 +24,9 @@ public:
 public:
 	/** Get type of the motor */
 	virtual TYPE getType() const = 0;
+
+	/** Get degree of freedom of the motor */
+    virtual Constraint::DOF getDOF() const = 0;
 
     /** Get constraint to which motor is attached */
     virtual const Constraint* getConstraint() const = 0;

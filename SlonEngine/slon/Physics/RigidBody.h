@@ -146,11 +146,14 @@ public:
     /** Recreate rigid body from desc */
     void reset(const DESC& desc);
 
-    /** Get iterator addressing first constraint attached to this rigid body */
-    constraint_iterator firstConstraint();
+    /** Get number of constraints attached to this rigid body. */
+    size_t getNumConstraints() const;
 
-    /** Get iterator addressing end of the constraints */
-    constraint_iterator endConstraint();
+    /** Get i'the constraint attached to this rigid body*/
+    Constraint* getConstraint(size_t i);
+
+    /** Get i'the constraint attached to this rigid body*/
+    const Constraint* getConstraint(size_t i) const;
 
 	/** Get implementation object. */
 	impl_type* getImpl() { return impl.get(); }

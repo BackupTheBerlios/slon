@@ -1240,11 +1240,9 @@ namespace {
 					// add constraint nodes
 					if ( physics::RigidBody* rigidBody = dynamic_cast<physics::RigidBody*>(iter->first.get()) )
 					{
-						for (RigidBody::constraint_iterator cIt  = rigidBody->firstConstraint();
-															cIt != rigidBody->endConstraint();
-															++cIt)
+						for (size_t i = 0; i<rigidBody->getNumConstraints(); ++i)
 						{
-							constraint_node_ptr constraintNode( new physics::ConstraintNode(*cIt) );
+							constraint_node_ptr constraintNode( new physics::ConstraintNode(rigidBody->getConstraint(i)) );
 							rbTransform->addChild(constraintNode);
 						}
 					}

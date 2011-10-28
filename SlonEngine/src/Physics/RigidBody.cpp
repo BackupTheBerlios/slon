@@ -188,14 +188,19 @@ void RigidBody::reset(const DESC& desc_)
 	instantiate();
 }
 
-RigidBody::constraint_iterator RigidBody::firstConstraint()
+size_t RigidBody::getNumConstraints() const
 {
-	return constraints.begin();
+    return constraints.size();
 }
 
-RigidBody::constraint_iterator RigidBody::endConstraint()
+Constraint* RigidBody::getConstraint(size_t i)
 {
-	return constraints.end();
+    return constraints[i];
+}
+
+const Constraint* RigidBody::getConstraint(size_t i) const
+{
+    return constraints[i];
 }
 
 void RigidBody::setWorld(const dynamics_world_ptr& world_)
